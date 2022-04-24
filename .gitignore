@@ -37,6 +37,5 @@
 # SWP
 *.swp
 
-# BIN/BUILD
-bin/*
+# BUILD
 build/*
