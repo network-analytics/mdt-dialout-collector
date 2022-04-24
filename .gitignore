@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# VSCode
+.vscode/*
+
+# SWP
+*.swp
+
+# BIN/BUILD
+bin/*
+build/*
