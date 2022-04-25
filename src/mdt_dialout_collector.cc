@@ -5,8 +5,6 @@
  *
  * mdt_dialout => gRPCMdtDialout => MdtDialout => MdtDialoutArgs => Args
  *
- * The Com
- *
  */
 
 
