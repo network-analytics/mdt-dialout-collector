@@ -107,11 +107,7 @@ class ServerImpl final {
                         std::cout << "data: " << msg_.data() << std::endl;
                         std::cout << "totalSize: " << msg_.totalsize() <<
                                                                     std::endl;
-                        reply_.set_reqid(msg_.reqid());
-                        reply_.set_data(msg_.data());
-                        reply_.set_errors(msg_.errors());
-                        reply_.set_totalsize(msg_.totalsize());
-                        responder_.Write(reply_, this);
+                        //responder_.Write(msg_, this);
                     }
                 } else {
                     std::cout << "Status: " << status_ << std::endl;
@@ -126,7 +122,6 @@ class ServerImpl final {
             ServerContext ctx_;
 
             mdt_dialout::MdtDialoutArgs msg_;
-            mdt_dialout::MdtDialoutArgs reply_;
 
             ServerAsyncReaderWriter<MdtDialoutArgs, MdtDialoutArgs> responder_;
 
