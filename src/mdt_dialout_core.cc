@@ -1,5 +1,6 @@
 #include <iostream>
 #include <grpcpp/grpcpp.h>
+#include "mdt_dialout_core.h"
 #include "mdt_dialout_cisco.grpc.pb.h"
 
 
