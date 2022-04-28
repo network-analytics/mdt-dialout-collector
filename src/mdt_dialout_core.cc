@@ -23,16 +23,16 @@ void Srv::Bind(std::string srv_addr)
 void Srv::FsmCtrl()
 {
     new Srv::Stream(&service_, cq_.get());
-    void *tag = nullptr;
-    bool ok = false;
+    void *tag {nullptr};
+    bool ok {false};
     while (true) {
         GPR_ASSERT(cq_->Next(&tag, &ok));
         if (!ok) {
             /* Something went wrong with CQ -> set stream_status = END */
-            static_cast<Stream*>(tag)->Stop();
+            static_cast<Stream *>(tag)->Stop();
             continue;
         }
-        static_cast<Stream*>(tag)->Start();
+        static_cast<Stream *>(tag)->Start();
     }
 }
 
@@ -40,7 +40,7 @@ Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
                     grpc::ServerCompletionQueue *cq) : service_ {service},
                                                         cq_ {cq},
                                                         responder_ {&ctx_},
-                                                        stream_status{START}
+                                                        stream_status {START}
 {
     Srv::Stream::Start();
 }
@@ -48,10 +48,10 @@ Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
 void Srv::Stream::Start()
 {
     /* Initial stream_status set to START */
-    service_->RequestMdtDialout(&ctx_, &responder_, cq_, cq_, this);
-    stream_status = FLOW;
-
-    if (stream_status == FLOW) {
+    if (stream_status == START) {
+        service_->RequestMdtDialout(&ctx_, &responder_, cq_, cq_, this);
+        stream_status = FLOW;
+    } else if (stream_status == FLOW) {
         //std::cout << "Streaming Started ..." << std::endl;
         new Stream(service_, cq_);
         responder_.Read(&stream, this);
