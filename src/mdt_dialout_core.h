@@ -21,7 +21,7 @@ private:
                 grpc::ServerCompletionQueue *cq) : service_(service),
                                                     cq_(cq),
                                                     responder_(&ctx_),
-                                                    status_(CREATE);
+                                                    status_(CREATE) {}
         void Proceed();
         void Stop();
 
