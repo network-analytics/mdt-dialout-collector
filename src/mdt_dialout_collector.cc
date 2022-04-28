@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    ServerImpl server;
+    ServerImpl::ServerImpl server;
     server.Run();
 
     return (0);
