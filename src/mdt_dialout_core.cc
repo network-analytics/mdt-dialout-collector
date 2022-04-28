@@ -1,69 +1,70 @@
 #include <iostream>
 #include <grpcpp/grpcpp.h>
 #include "mdt_dialout_core.h"
-#include "mdt_dialout_cisco.grpc.pb.h"
+#include "mdt_dialout.grpc.pb.h"
 
 
-ServerImpl::~ServerImpl()
+Srv::~Srv()
 {
     server_->grpc::ServerInterface::Shutdown();
     cq_->grpc::CompletionQueue::Shutdown();
 }
 
-void ServerImpl::Run()
+void Srv::Bind(std::string srv_addr)
 {
-    std::string server_addr("0.0.0.0:10000");
     grpc::ServerBuilder builder;
-    builder.AddListeningPort(server_addr, grpc::InsecureServerCredentials());
+    builder.AddListeningPort(srv_addr, grpc::InsecureServerCredentials());
     builder.RegisterService(&service_);
     cq_ = builder.AddCompletionQueue();
     server_ = builder.BuildAndStart();
-    //std::cout << "MDT Server listening on " << server_addr << std::endl;
-
-    ServerImpl::HandleRpcs();
+    Srv::FsmCtrl();
 }
 
-void ServerImpl::HandleRpcs()
+void Srv::FsmCtrl()
 {
-    new ServerImpl::CallData(&service_, cq_.get());
-    void *tag;
-    bool ok;
+    new Srv::Stream(&service_, cq_.get());
+    void *tag = nullptr;
+    bool ok = false;
     while (true) {
         GPR_ASSERT(cq_->Next(&tag, &ok));
-        if(!ok) {
-            static_cast<CallData*>(tag)->Stop();
+        if (!ok) {
+            /* Something went wrong with CQ -> set stream_status = END */
+            static_cast<Stream*>(tag)->Stop();
             continue;
         }
-        static_cast<CallData*>(tag)->Proceed();
+        static_cast<Stream*>(tag)->Start();
     }
 }
 
-ServerImpl::CallData::CallData(mdt_dialout::gRPCMdtDialout::AsyncService *service,
-                                grpc::ServerCompletionQueue *cq) : service_(service),
-                                                                    cq_(cq),
-                                                                    responder_(&ctx_),
-                                                                    status_(CREATE)
+Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
+                    grpc::ServerCompletionQueue *cq) : service_ {service},
+                                                        cq_ {cq},
+                                                        responder_ {&ctx_},
+                                                        stream_status{START}
 {
-    ServerImpl::CallData::Proceed();
+    Srv::Stream::Start();
 }
 
-void ServerImpl::CallData::Proceed()
+void Srv::Stream::Start()
 {
-    if (status_ == CREATE) {
-        service_->RequestMdtDialout(&ctx_, &responder_, cq_, cq_, this);
-        status_ = PROCESS;
-    } else if (status_ == PROCESS) {
-        new CallData(service_, cq_);
-        responder_.Read(&msg_, this);
-        std::cout << msg_.data() << std::endl;
+    /* Initial stream_status set to START */
+    service_->RequestMdtDialout(&ctx_, &responder_, cq_, cq_, this);
+    stream_status = FLOW;
+
+    if (stream_status == FLOW) {
+        //std::cout << "Streaming Started ..." << std::endl;
+        new Stream(service_, cq_);
+        responder_.Read(&stream, this);
+        std::cout << stream.data() << std::endl;
     } else {
-        GPR_ASSERT(status_ == FINISH);
+        GPR_ASSERT(stream_status == END);
         delete this;
     }
 }
 
-void ServerImpl::CallData::Stop()
+void Srv::Stream::Stop()
 {
-    std::cerr << "Finishing up client " << std::endl;
-    status_ = FINISH;
+    //std::cout << "Streaming Interrupted ..." << std::endl;
+    stream_status = END;
 }
+

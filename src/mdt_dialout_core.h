@@ -1,40 +1,43 @@
-#ifndef _SERVERIMPL_H_
-#define _SERVERIMPL_H_
+#ifndef _SRV_H_
+#define _SRV_H_
 
 #include <iostream>
 #include <grpcpp/grpcpp.h>
-#include "mdt_dialout_cisco.grpc.pb.h"
+#include "mdt_dialout.grpc.pb.h"
 
-
-class ServerImpl final {
+/*
+ * Prefix each Class-name or Method-name with MdtDialout
+ * should make the code more readable
+ */
+class Srv final {
 public:
-    ~ServerImpl();
-    void Run();
+    ~Srv();
+    void Bind(std::string srv_addr);
 
 private:
-    std::unique_ptr<grpc::ServerCompletionQueue> cq_;
     mdt_dialout::gRPCMdtDialout::AsyncService service_;
+    std::unique_ptr<grpc::ServerCompletionQueue> cq_;
     std::unique_ptr<grpc::Server> server_;
+    void FsmCtrl();
 
-    void HandleRpcs();
-
-    class CallData {
+    class Stream {
     public:
-        CallData(mdt_dialout::gRPCMdtDialout::AsyncService *service,
-                grpc::ServerCompletionQueue *cq);
-        void Proceed();
+        Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
+            grpc::ServerCompletionQueue *cq);
+        void Start();
         void Stop();
 
     private:
+        enum StreamStatus { START, FLOW, END };
+        StreamStatus stream_status;
         mdt_dialout::gRPCMdtDialout::AsyncService *service_;
         grpc::ServerCompletionQueue *cq_;
         grpc::ServerContext ctx_;
-        mdt_dialout::MdtDialoutArgs msg_;
+        mdt_dialout::MdtDialoutArgs stream;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
                                     mdt_dialout::MdtDialoutArgs> responder_;
-        enum CallStatus { CREATE, PROCESS, FINISH };
-        CallStatus status_;
     };
 };
 
 #endif
+
