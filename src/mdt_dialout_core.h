@@ -17,14 +17,11 @@ private:
     std::unique_ptr<grpc::Server> server_;
 
     void HandleRpcs();
-    
+
     class CallData {
     public:
         CallData(mdt_dialout::gRPCMdtDialout::AsyncService *service,
-                grpc::ServerCompletionQueue *cq) : service_(service),
-                                                    cq_(cq),
-                                                    responder_(&ctx_),
-                                                    status_(CREATE) {}
+                grpc::ServerCompletionQueue *cq);
         void Proceed();
         void Stop();
 

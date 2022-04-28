@@ -7,7 +7,7 @@
 ServerImpl::~ServerImpl()
 {
     server_->grpc::ServerInterface::Shutdown();
-    cq_->grpc::ServerInterface::Shutdown();
+    cq_->grpc::CompletionQueue::Shutdown();
 }
 
 void ServerImpl::Run()
@@ -25,7 +25,7 @@ void ServerImpl::Run()
 
 void ServerImpl::HandleRpcs()
 {
-    new ServerImpl::CallData(&service_, cq_.get(), num_clients_++);
+    new ServerImpl::CallData(&service_, cq_.get());
     void *tag;
     bool ok;
     while (true) {
@@ -39,10 +39,10 @@ void ServerImpl::HandleRpcs()
 }
 
 ServerImpl::CallData::CallData(mdt_dialout::gRPCMdtDialout::AsyncService *service,
-                                ServerCompletionQueue *cq) : service_(service),
-                                                                cq_(cq),
-                                                                responder_(&ctx_),
-                                                                status_(CREATE)
+                                grpc::ServerCompletionQueue *cq) : service_(service),
+                                                                    cq_(cq),
+                                                                    responder_(&ctx_),
+                                                                    status_(CREATE)
 {
     ServerImpl::CallData::Proceed();
 }
@@ -50,10 +50,10 @@ ServerImpl::CallData::CallData(mdt_dialout::gRPCMdtDialout::AsyncService *servic
 void ServerImpl::CallData::Proceed()
 {
     if (status_ == CREATE) {
-        service_->mdt_dialout::RequestMdtDialout(&ctx_, &responder_, cq_, cq_, this);
+        service_->RequestMdtDialout(&ctx_, &responder_, cq_, cq_, this);
         status_ = PROCESS;
     } else if (status_ == PROCESS) {
-        new CallData(service_, cq_, client_id_+1);
+        new CallData(service_, cq_);
         responder_.Read(&msg_, this);
         std::cout << msg_.data() << std::endl;
     } else {

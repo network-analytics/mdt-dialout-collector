@@ -44,6 +44,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto")
 foreach(_target
   "mdt_dialout_collector")
   add_executable(${_target} "${CMAKE_CURRENT_SOURCE_DIR}/src/${_target}.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/mdt_dialout_core.cc"
     ${hw_proto_srcs}
     ${hw_grpc_srcs})
   target_link_libraries(${_target}
