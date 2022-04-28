@@ -1,3 +1,6 @@
+#ifndef _SERVERIMPL_H_
+#define _SERVERIMPL_H_
+
 #include <iostream>
 #include <grpcpp/grpcpp.h>
 #include "mdt_dialout_cisco.grpc.pb.h"
@@ -36,3 +39,5 @@ private:
         CallStatus status_;
     };
 };
+
+#endif
