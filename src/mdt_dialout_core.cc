@@ -6,8 +6,8 @@
 
 ServerImpl::~ServerImpl()
 {
-    server_->Shutdown();
-    cq_->Shutdown();
+    server_->grpc::ServerInterface::Shutdown();
+    cq_->grpc::ServerInterface::Shutdown();
 }
 
 void ServerImpl::Run()
