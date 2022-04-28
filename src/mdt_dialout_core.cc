@@ -20,6 +20,7 @@ void Srv::Bind(std::string srv_addr)
     Srv::FsmCtrl();
 }
 
+/* Parallelism should be eventually handled with this func */
 void Srv::FsmCtrl()
 {
     new Srv::Stream(&service_, cq_.get());
@@ -39,7 +40,7 @@ void Srv::FsmCtrl()
 Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
                     grpc::ServerCompletionQueue *cq) : service_ {service},
                                                         cq_ {cq},
-                                                        responder_ {&ctx_},
+                                                        resp {&server_ctx},
                                                         stream_status {START}
 {
     Srv::Stream::Start();
@@ -49,12 +50,14 @@ void Srv::Stream::Start()
 {
     /* Initial stream_status set to START */
     if (stream_status == START) {
-        service_->RequestMdtDialout(&ctx_, &responder_, cq_, cq_, this);
+        service_->RequestMdtDialout(&server_ctx, &resp, cq_, cq_, this);
         stream_status = FLOW;
     } else if (stream_status == FLOW) {
         //std::cout << "Streaming Started ..." << std::endl;
-        new Stream(service_, cq_);
-        responder_.Read(&stream, this);
+        //std::string peer = server_ctx.peer();
+        //std::cout << "Peer: " + peer << std::endl;
+        new Srv::Stream(service_, cq_);
+        resp.Read(&stream, this);
         std::cout << stream.data() << std::endl;
     } else {
         GPR_ASSERT(stream_status == END);

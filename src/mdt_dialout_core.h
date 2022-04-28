@@ -32,10 +32,10 @@ private:
         StreamStatus stream_status;
         mdt_dialout::gRPCMdtDialout::AsyncService *service_;
         grpc::ServerCompletionQueue *cq_;
-        grpc::ServerContext ctx_;
+        grpc::ServerContext server_ctx;
         mdt_dialout::MdtDialoutArgs stream;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
-                                    mdt_dialout::MdtDialoutArgs> responder_;
+                                    mdt_dialout::MdtDialoutArgs> resp;
     };
 };
 
