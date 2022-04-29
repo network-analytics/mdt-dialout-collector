@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include <grpcpp/grpcpp.h>
 #include "mdt_dialout_core.h"
 #include "mdt_dialout.grpc.pb.h"
@@ -17,7 +18,14 @@ void Srv::Bind(std::string srv_addr)
     builder.RegisterService(&service_);
     cq_ = builder.AddCompletionQueue();
     server_ = builder.BuildAndStart();
-    Srv::FsmCtrl();
+
+    std::thread t1(&Srv::FsmCtrl, this);
+    std::thread t2(&Srv::FsmCtrl, this);
+    std::thread t3(&Srv::FsmCtrl, this);
+
+    t1.join();
+    t2.join();
+    t3.join();
 }
 
 /* Parallelism should be eventually handled with this func */
