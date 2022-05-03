@@ -22,12 +22,19 @@ set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 get_filename_component(hw_proto "proto/mdt_dialout.proto" ABSOLUTE)
 get_filename_component(hw_proto_path "${hw_proto}" PATH)
 
-# Jsoncpp Libs
+# jsoncpp libs
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp)
 link_libraries(${JSONCPP_LIBRARIES})
-message(STATUS "Using JsonCPP ${JSONCPP_VERSION}")
+message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
 include_directories("${JSONCPP_INCLUDE_DIRS}")
+
+# librdkafka
+pkg_check_modules(RDKAFKA rdkafka++)
+link_libraries(${RDKAFKA_LIBRARIES})
+message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
+set(RDKAFKA_INCLUDE_DIR /usr/local/include)
+include_directories("${RDKAFKA_INCLUDE_DIR}")
 
 # Protobuf generated
 set(dialout_pb_cc
@@ -71,6 +78,7 @@ foreach(_target "mdt_dialout_collector")
         ${_GRPC_GRPCPP}
         ${_PROTOBUF_LIBPROTOBUF}
         ${JSONCPP_LIBRARIES}
+        ${RDKAFKA_LIBRARIES}
     )
 endforeach()
 

@@ -2,6 +2,7 @@
 #include <thread>
 #include <grpcpp/grpcpp.h>
 #include <json/json.h>
+#include <librdkafka/rdkafkacpp.h>
 #include "mdt_dialout_core.h"
 #include "mdt_dialout.grpc.pb.h"
 
