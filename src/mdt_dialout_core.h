@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <grpcpp/grpcpp.h>
+//#include <json/json.h>
 #include "mdt_dialout.grpc.pb.h"
 
 /*
@@ -26,6 +27,7 @@ private:
             grpc::ServerCompletionQueue *cq);
         void Start();
         void Stop();
+        int str2json(const std::string json_str);
 
     private:
         enum StreamStatus { START, FLOW, END };

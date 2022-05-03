@@ -22,6 +22,13 @@ set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 get_filename_component(hw_proto "proto/mdt_dialout.proto" ABSOLUTE)
 get_filename_component(hw_proto_path "${hw_proto}" PATH)
 
+# Jsoncpp Libs
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(JSONCPP jsoncpp)
+link_libraries(${JSONCPP_LIBRARIES})
+message(STATUS "Using JsonCPP ${JSONCPP_VERSION}")
+include_directories("${JSONCPP_INCLUDE_DIRS}")
+
 # Protobuf generated
 set(dialout_pb_cc
     "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/mdt_dialout.pb.cc")
@@ -63,6 +70,7 @@ foreach(_target "mdt_dialout_collector")
         ${_REFLECTION}
         ${_GRPC_GRPCPP}
         ${_PROTOBUF_LIBPROTOBUF}
+        ${JSONCPP_LIBRARIES}
     )
 endforeach()
 

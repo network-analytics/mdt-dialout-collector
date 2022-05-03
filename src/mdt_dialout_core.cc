@@ -1,5 +1,6 @@
 #include <iostream>
 #include <grpcpp/grpcpp.h>
+#include <json/json.h>
 #include "mdt_dialout_core.h"
 #include "mdt_dialout.grpc.pb.h"
 
@@ -46,6 +47,33 @@ Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
     Srv::Stream::Start();
 }
 
+int Srv::Stream::str2json(const std::string json_str)
+{
+    const auto json_str_length = static_cast<int>(json_str.length());
+    JSONCPP_STRING err;
+    Json::Value root;
+    Json::CharReaderBuilder builderR;
+    Json::StreamWriterBuilder builderW;
+    const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
+    const std::unique_ptr<Json::StreamWriter> writer(builderW.newStreamWriter());
+    if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
+                      &root, &err)) {
+        std::cout << "error" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    //writer->write(root, &std::cout);
+    const std::string encoding_path = root["encoding_path"].asString();
+    const std::string msg_timestamp = root["msg_timestamp"].asString();
+    const std::string node_id_str = root["node_id_str"].asString();
+
+    std::cout << encoding_path << std::endl;
+    std::cout << msg_timestamp << std::endl;
+    std::cout << node_id_str << std::endl;
+
+    return EXIT_SUCCESS;
+}
+
 void Srv::Stream::Start()
 {
     /* Initial stream_status set to START */
@@ -58,7 +86,9 @@ void Srv::Stream::Start()
         //std::cout << "Peer: " + peer << std::endl;
         new Srv::Stream(service_, cq_);
         resp.Read(&stream, this);
-        std::cout << stream.data() << std::endl;
+        const std::string stream_data = stream.data();
+        Srv::Stream::str2json(stream_data);
+        //std::cout << stream.data() << std::endl;
     } else {
         GPR_ASSERT(stream_status == END);
         delete this;
