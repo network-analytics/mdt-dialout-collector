@@ -47,7 +47,7 @@ Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
     Srv::Stream::Start();
 }
 
-int Srv::Stream::str2json(const std::string json_str)
+int Srv::Stream::str2json(const std::string& json_str)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;

@@ -27,7 +27,7 @@ private:
             grpc::ServerCompletionQueue *cq);
         void Start();
         void Stop();
-        int str2json(const std::string json_str);
+        int str2json(const std::string& json_str);
 
     private:
         enum StreamStatus { START, FLOW, END };
