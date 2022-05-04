@@ -6,7 +6,7 @@
 //#include <json/json.h>
 #include "mdt_dialout.grpc.pb.h"
 
-/*
+/**
  * Prefix each Class-name or Method-name with MdtDialout
  * should make the code more readable
  */

@@ -3,6 +3,7 @@
 #include <grpcpp/grpcpp.h>
 #include <json/json.h>
 #include <librdkafka/rdkafkacpp.h>
+//#include "kafka/KafkaProducer.h"
 #include "mdt_dialout_core.h"
 #include "mdt_dialout.grpc.pb.h"
 
@@ -30,7 +31,9 @@ void Srv::Bind(std::string srv_addr)
     t3.join();
 }
 
-/* Parallelism should be eventually handled with this func */
+/**
+ * Parallelism should be eventually handled with this func
+ */
 void Srv::FsmCtrl()
 {
     new Srv::Stream(&service_, cq_.get());
@@ -85,7 +88,9 @@ int Srv::Stream::str2json(const std::string& json_str)
 
 void Srv::Stream::Start()
 {
-    /* Initial stream_status set to START */
+    /**
+     * Initial stream_status set to START
+     */
     if (stream_status == START) {
         service_->RequestMdtDialout(&server_ctx, &resp, cq_, cq_, this);
         stream_status = FLOW;

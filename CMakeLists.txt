@@ -59,9 +59,11 @@ add_custom_command(
     DEPENDS "${hw_proto}"
 )
 
-# Include header files
+# Include local header files
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 
 # Compile
 foreach(_target "mdt_dialout_collector")
@@ -72,6 +74,7 @@ foreach(_target "mdt_dialout_collector")
         ${dialout_pb_cc}
         ${dialout_pb_grpc_cc}
     )
+    target_compile_features(${_target} PRIVATE cxx_std_17)
     target_link_libraries(
         ${_target}
         ${_REFLECTION}
@@ -79,6 +82,8 @@ foreach(_target "mdt_dialout_collector")
         ${_PROTOBUF_LIBPROTOBUF}
         ${JSONCPP_LIBRARIES}
         ${RDKAFKA_LIBRARIES}
+        -L"${CMAKE_CURRENT_SOURCE_DIR}/include"
+        -lpthread
     )
 endforeach()
 
