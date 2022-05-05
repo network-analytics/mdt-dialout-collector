@@ -57,7 +57,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_mdt_5fdialout_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\021mdt_dialout.proto\022\013mdt_dialout\"=\n\016MdtD"
-  "ialoutArgs\022\r\n\005ReqId\030\001 \001(\003\022\014\n\004data\030\002 \001(\t\022"
+  "ialoutArgs\022\r\n\005ReqId\030\001 \001(\003\022\014\n\004data\030\002 \001(\014\022"
   "\016\n\006errors\030\003 \001(\t2^\n\016gRPCMdtDialout\022L\n\nMdt"
   "Dialout\022\033.mdt_dialout.MdtDialoutArgs\032\033.m"
   "dt_dialout.MdtDialoutArgs\"\000(\0010\001b\006proto3"
@@ -176,12 +176,11 @@ const char* MdtDialoutArgs::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
         } else
           goto handle_unusual;
         continue;
-      // string data = 2;
+      // bytes data = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_data();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.MdtDialoutArgs.data"));
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -231,13 +230,9 @@ uint8_t* MdtDialoutArgs::_InternalSerialize(
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_reqid(), target);
   }
 
-  // string data = 2;
+  // bytes data = 2;
   if (!this->_internal_data().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_data().data(), static_cast<int>(this->_internal_data().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "mdt_dialout.MdtDialoutArgs.data");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         2, this->_internal_data(), target);
   }
 
@@ -267,10 +262,10 @@ size_t MdtDialoutArgs::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string data = 2;
+  // bytes data = 2;
   if (!this->_internal_data().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_data());
   }
 

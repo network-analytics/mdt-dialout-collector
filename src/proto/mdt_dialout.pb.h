@@ -191,7 +191,7 @@ class MdtDialoutArgs final :
     kErrorsFieldNumber = 3,
     kReqIdFieldNumber = 1,
   };
-  // string data = 2;
+  // bytes data = 2;
   void clear_data();
   const std::string& data() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -272,7 +272,7 @@ inline void MdtDialoutArgs::set_reqid(int64_t value) {
   // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.ReqId)
 }
 
-// string data = 2;
+// bytes data = 2;
 inline void MdtDialoutArgs::clear_data() {
   data_.ClearToEmpty();
 }
@@ -284,7 +284,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void MdtDialoutArgs::set_data(ArgT0&& arg0, ArgT... args) {
  
- data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ data_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.data)
 }
 inline std::string* MdtDialoutArgs::mutable_data() {

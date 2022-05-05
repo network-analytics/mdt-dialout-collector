@@ -75,13 +75,53 @@ int Srv::Stream::str2json(const std::string& json_str)
     }
 
     //writer->write(root, &std::cout);
-    const std::string encoding_path = root["encoding_path"].asString();
-    const std::string msg_timestamp = root["msg_timestamp"].asString();
-    const std::string node_id_str = root["node_id_str"].asString();
+    //const std::string encoding_path = root["encoding_path"].asString();
+    //const std::string msg_timestamp = root["msg_timestamp"].asString();
+    //const std::string node_id_str = root["node_id_str"].asString();
 
-    std::cout << encoding_path << std::endl;
-    std::cout << msg_timestamp << std::endl;
-    std::cout << node_id_str << std::endl;
+    //std::cout << encoding_path << std::endl;
+    //std::cout << msg_timestamp << std::endl;
+    //std::cout << node_id_str << std::endl;
+
+    return EXIT_SUCCESS;
+}
+
+int Srv::Stream::async_kafka_prod(const std::string& json_str)
+{
+    using namespace kafka::clients;
+
+    std::string brokers = "192.168.100.241";
+    kafka::Topic topic  = "quickstart";
+
+    try {
+        // Additional config options here
+        kafka::Properties properties ({
+            {"bootstrap.servers",  brokers},
+            {"enable.idempotence", "true"},
+        });
+
+        KafkaProducer producer(properties);
+
+        auto msg = producer::ProducerRecord(topic,
+                        kafka::NullKey,
+                        kafka::Value(json_str.c_str(), json_str.size()));
+
+        producer.send(
+            msg,
+            [](const producer::RecordMetadata& mdata,
+                const kafka::Error& err) {
+            if (!error && !json_str.empty()) {
+                std::cout << "Msg delivered: "
+                        << mdata.toString() << std::endl;
+            } else {
+                std::cerr << "Msg delivery failed: "
+                        << err.message() << std::endl;
+            }
+        }, KafkaProducer::SendOption::ToCopyRecordValue);
+    } catch (const kafka::KafkaException& ex) {
+        std::cerr << "Unexpected exception: " << ex.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
@@ -103,6 +143,7 @@ void Srv::Stream::Start()
         const std::string stream_data = stream.data();
         Srv::Stream::str2json(stream_data);
         //std::cout << stream.data() << std::endl;
+        Srv::Stream::async_kafka_prod(stream_data);
     } else {
         GPR_ASSERT(stream_status == END);
         delete this;
