@@ -86,6 +86,9 @@ int Srv::Stream::str2json(const std::string& json_str)
     return EXIT_SUCCESS;
 }
 
+/**
+ * string-to-json can be used for data manipulation
+ */
 int Srv::Stream::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
@@ -102,15 +105,21 @@ int Srv::Stream::async_kafka_prod(const std::string& json_str)
 
         KafkaProducer producer(properties);
 
+        if (json_str.empty()) {
+            // TBD
+            std::cout << "Empty json rcv ..." << std::endl;
+            return EXIT_FAILURE;
+        }
+
         auto msg = producer::ProducerRecord(topic,
-                        kafka::NullKey,
-                        kafka::Value(json_str.c_str(), json_str.size()));
+                    kafka::NullKey,
+                    kafka::Value(json_str.c_str(), json_str.size()));
 
         producer.send(
             msg,
             [](const producer::RecordMetadata& mdata,
                 const kafka::Error& err) {
-            if (!error && !json_str.empty()) {
+            if (!err) {
                 std::cout << "Msg delivered: "
                         << mdata.toString() << std::endl;
             } else {
