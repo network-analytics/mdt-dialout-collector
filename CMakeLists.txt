@@ -22,12 +22,14 @@ set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 get_filename_component(hw_proto "proto/mdt_dialout.proto" ABSOLUTE)
 get_filename_component(hw_proto_path "${hw_proto}" PATH)
 
-# jsoncpp libs
 find_package(PkgConfig REQUIRED)
+
+# jsoncpp libs
 pkg_check_modules(JSONCPP jsoncpp)
 link_libraries(${JSONCPP_LIBRARIES})
 message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
-include_directories("${JSONCPP_INCLUDE_DIRS}")
+set(JSONCPP_INCLUDE_DIR /usr/include/jsoncpp)
+include_directories("${JSONCPP_INCLUDE_DIR}")
 
 # librdkafka
 pkg_check_modules(RDKAFKA_CPP rdkafka++)
