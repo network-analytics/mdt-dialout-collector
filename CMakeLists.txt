@@ -30,7 +30,13 @@ message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
 include_directories("${JSONCPP_INCLUDE_DIRS}")
 
 # librdkafka
-pkg_check_modules(RDKAFKA rdkafka++)
+pkg_check_modules(RDKAFKA_CPP rdkafka++)
+link_libraries(${RDKAFKA_CPP_LIBRARIES})
+message(STATUS "Using librdkafka++ ${RDKAFKA_CPP_VERSION}")
+set(RDKAFKA_CPP_INCLUDE_DIR /usr/local/include)
+include_directories("${RDKAFKA_CPP_INCLUDE_DIR}")
+
+pkg_check_modules(RDKAFKA rdkafka)
 link_libraries(${RDKAFKA_LIBRARIES})
 message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
 set(RDKAFKA_INCLUDE_DIR /usr/local/include)
@@ -62,7 +68,7 @@ add_custom_command(
 # Include local header files
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 
 
 # Compile
@@ -81,9 +87,8 @@ foreach(_target "mdt_dialout_collector")
         ${_GRPC_GRPCPP}
         ${_PROTOBUF_LIBPROTOBUF}
         ${JSONCPP_LIBRARIES}
+        ${RDKAFKA_CPP_LIBRARIES}
         ${RDKAFKA_LIBRARIES}
-        -L"${CMAKE_CURRENT_SOURCE_DIR}/include"
-        -lpthread
     )
 endforeach()
 
