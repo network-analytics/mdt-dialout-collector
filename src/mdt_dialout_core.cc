@@ -59,6 +59,9 @@ Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
     Srv::Stream::Start();
 }
 
+/**
+ * string-to-json can be used for data manipulation
+ */
 int Srv::Stream::str2json(const std::string& json_str)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
@@ -86,9 +89,6 @@ int Srv::Stream::str2json(const std::string& json_str)
     return EXIT_SUCCESS;
 }
 
-/**
- * string-to-json can be used for data manipulation
- */
 int Srv::Stream::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
