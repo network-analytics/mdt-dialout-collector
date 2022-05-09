@@ -35,44 +35,46 @@ class gRPCMdtDialout final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
+    // rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};
+    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>> MdtDialoutGpbkv(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>>(MdtDialoutGpbkvRaw(context));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
+    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>> AsyncMdtDialoutGpbkv(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>>(AsyncMdtDialoutGpbkvRaw(context, cq, tag));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
+    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>> PrepareAsyncMdtDialoutGpbkv(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>>(PrepareAsyncMdtDialoutGpbkvRaw(context, cq));
     }
     class async_interface {
      public:
       virtual ~async_interface() {}
-      virtual void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>* reactor) = 0;
+      // rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};
+      virtual void MdtDialoutGpbkv(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::Telemetry,::mdt_dialout::Telemetry>* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
    private:
-    virtual ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* MdtDialoutGpbkvRaw(::grpc::ClientContext* context) = 0;
+    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* AsyncMdtDialoutGpbkvRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* PrepareAsyncMdtDialoutGpbkvRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
+    std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>> MdtDialoutGpbkv(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>>(MdtDialoutGpbkvRaw(context));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
+    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>> AsyncMdtDialoutGpbkv(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>>(AsyncMdtDialoutGpbkvRaw(context, cq, tag));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
+    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>> PrepareAsyncMdtDialoutGpbkv(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>>(PrepareAsyncMdtDialoutGpbkvRaw(context, cq));
     }
     class async final :
       public StubInterface::async_interface {
      public:
-      void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>* reactor) override;
+      void MdtDialoutGpbkv(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::Telemetry,::mdt_dialout::Telemetry>* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -84,10 +86,10 @@ class gRPCMdtDialout final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class async async_stub_{this};
-    ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) override;
-    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
-    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_MdtDialout_;
+    ::grpc::ClientReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* MdtDialoutGpbkvRaw(::grpc::ClientContext* context) override;
+    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* AsyncMdtDialoutGpbkvRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* PrepareAsyncMdtDialoutGpbkvRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    const ::grpc::internal::RpcMethod rpcmethod_MdtDialoutGpbkv_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -95,111 +97,112 @@ class gRPCMdtDialout final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status MdtDialout(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* stream);
+    // rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};
+    virtual ::grpc::Status MdtDialoutGpbkv(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* stream);
   };
   template <class BaseClass>
-  class WithAsyncMethod_MdtDialout : public BaseClass {
+  class WithAsyncMethod_MdtDialoutGpbkv : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithAsyncMethod_MdtDialout() {
+    WithAsyncMethod_MdtDialoutGpbkv() {
       ::grpc::Service::MarkMethodAsync(0);
     }
-    ~WithAsyncMethod_MdtDialout() override {
+    ~WithAsyncMethod_MdtDialoutGpbkv() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialoutGpbkv(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestMdtDialout(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestMdtDialoutGpbkv(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(0, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_MdtDialout<Service > AsyncService;
+  typedef WithAsyncMethod_MdtDialoutGpbkv<Service > AsyncService;
   template <class BaseClass>
-  class WithCallbackMethod_MdtDialout : public BaseClass {
+  class WithCallbackMethod_MdtDialoutGpbkv : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithCallbackMethod_MdtDialout() {
+    WithCallbackMethod_MdtDialoutGpbkv() {
       ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackBidiHandler< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>(
+          new ::grpc::internal::CallbackBidiHandler< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>(
             [this](
-                   ::grpc::CallbackServerContext* context) { return this->MdtDialout(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->MdtDialoutGpbkv(context); }));
     }
-    ~WithCallbackMethod_MdtDialout() override {
+    ~WithCallbackMethod_MdtDialoutGpbkv() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialoutGpbkv(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerBidiReactor< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialout(
+    virtual ::grpc::ServerBidiReactor< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* MdtDialoutGpbkv(
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };
-  typedef WithCallbackMethod_MdtDialout<Service > CallbackService;
+  typedef WithCallbackMethod_MdtDialoutGpbkv<Service > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
-  class WithGenericMethod_MdtDialout : public BaseClass {
+  class WithGenericMethod_MdtDialoutGpbkv : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithGenericMethod_MdtDialout() {
+    WithGenericMethod_MdtDialoutGpbkv() {
       ::grpc::Service::MarkMethodGeneric(0);
     }
-    ~WithGenericMethod_MdtDialout() override {
+    ~WithGenericMethod_MdtDialoutGpbkv() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialoutGpbkv(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithRawMethod_MdtDialout : public BaseClass {
+  class WithRawMethod_MdtDialoutGpbkv : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawMethod_MdtDialout() {
+    WithRawMethod_MdtDialoutGpbkv() {
       ::grpc::Service::MarkMethodRaw(0);
     }
-    ~WithRawMethod_MdtDialout() override {
+    ~WithRawMethod_MdtDialoutGpbkv() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialoutGpbkv(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestMdtDialout(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestMdtDialoutGpbkv(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(0, context, stream, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithRawCallbackMethod_MdtDialout : public BaseClass {
+  class WithRawCallbackMethod_MdtDialoutGpbkv : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawCallbackMethod_MdtDialout() {
+    WithRawCallbackMethod_MdtDialoutGpbkv() {
       ::grpc::Service::MarkMethodRawCallback(0,
           new ::grpc::internal::CallbackBidiHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-                   ::grpc::CallbackServerContext* context) { return this->MdtDialout(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->MdtDialoutGpbkv(context); }));
     }
-    ~WithRawCallbackMethod_MdtDialout() override {
+    ~WithRawCallbackMethod_MdtDialoutGpbkv() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialoutGpbkv(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* MdtDialout(
+    virtual ::grpc::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* MdtDialoutGpbkv(
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };

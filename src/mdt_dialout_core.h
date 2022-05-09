@@ -6,6 +6,7 @@
 //#include <json/json.h>
 #include "mdt_dialout.grpc.pb.h"
 
+
 /**
  * Prefix each Class-name or Method-name with MdtDialout
  * should make the code more readable
@@ -36,11 +37,13 @@ private:
         mdt_dialout::gRPCMdtDialout::AsyncService *service_;
         grpc::ServerCompletionQueue *cq_;
         grpc::ServerContext server_ctx;
-        mdt_dialout::MdtDialoutArgs stream;
-        grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
-                                    mdt_dialout::MdtDialoutArgs> resp;
+        //mdt_dialout::MdtDialoutArgs stream;
+        //grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
+        //                            mdt_dialout::MdtDialoutArgs> resp;
+        mdt_dialout::Telemetry stream;
+        grpc::ServerAsyncReaderWriter<mdt_dialout::Telemetry,
+                                    mdt_dialout::Telemetry> resp;
     };
 };
 
 #endif
-

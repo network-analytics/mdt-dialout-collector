@@ -17,55 +17,168 @@
 
 PROTOBUF_PRAGMA_INIT_SEG
 namespace mdt_dialout {
-constexpr MdtDialoutArgs::MdtDialoutArgs(
+constexpr Telemetry::Telemetry(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : data_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , errors_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , reqid_(int64_t{0}){}
-struct MdtDialoutArgsDefaultTypeInternal {
-  constexpr MdtDialoutArgsDefaultTypeInternal()
+  : data_gpbkv_()
+  , encoding_path_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , data_gpb_(nullptr)
+  , collection_id_(uint64_t{0u})
+  , collection_start_time_(uint64_t{0u})
+  , msg_timestamp_(uint64_t{0u})
+  , collection_end_time_(uint64_t{0u})
+  , _oneof_case_{}{}
+struct TelemetryDefaultTypeInternal {
+  constexpr TelemetryDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
-  ~MdtDialoutArgsDefaultTypeInternal() {}
+  ~TelemetryDefaultTypeInternal() {}
   union {
-    MdtDialoutArgs _instance;
+    Telemetry _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT MdtDialoutArgsDefaultTypeInternal _MdtDialoutArgs_default_instance_;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT TelemetryDefaultTypeInternal _Telemetry_default_instance_;
+constexpr TelemetryField::TelemetryField(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : fields_()
+  , name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , timestamp_(uint64_t{0u})
+  , _oneof_case_{}{}
+struct TelemetryFieldDefaultTypeInternal {
+  constexpr TelemetryFieldDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~TelemetryFieldDefaultTypeInternal() {}
+  union {
+    TelemetryField _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT TelemetryFieldDefaultTypeInternal _TelemetryField_default_instance_;
+constexpr TelemetryGPBTable::TelemetryGPBTable(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : row_(){}
+struct TelemetryGPBTableDefaultTypeInternal {
+  constexpr TelemetryGPBTableDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~TelemetryGPBTableDefaultTypeInternal() {}
+  union {
+    TelemetryGPBTable _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT TelemetryGPBTableDefaultTypeInternal _TelemetryGPBTable_default_instance_;
+constexpr TelemetryRowGPB::TelemetryRowGPB(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : keys_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , content_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , timestamp_(uint64_t{0u}){}
+struct TelemetryRowGPBDefaultTypeInternal {
+  constexpr TelemetryRowGPBDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~TelemetryRowGPBDefaultTypeInternal() {}
+  union {
+    TelemetryRowGPB _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT TelemetryRowGPBDefaultTypeInternal _TelemetryRowGPB_default_instance_;
 }  // namespace mdt_dialout
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_mdt_5fdialout_2eproto[1];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_mdt_5fdialout_2eproto[4];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_mdt_5fdialout_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_mdt_5fdialout_2eproto = nullptr;
 
 const uint32_t TableStruct_mdt_5fdialout_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, _internal_metadata_),
+  ~0u,  // no _extensions_
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, _oneof_case_[0]),
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, encoding_path_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, collection_id_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, collection_start_time_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, msg_timestamp_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, data_gpbkv_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, data_gpb_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, collection_end_time_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, node_id_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::Telemetry, subscription_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryField, _internal_metadata_),
+  ~0u,  // no _extensions_
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryField, _oneof_case_[0]),
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryField, timestamp_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryField, name_),
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryField, fields_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryField, value_by_type_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryGPBTable, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, reqid_),
-  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, data_),
-  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, errors_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryGPBTable, row_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryRowGPB, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryRowGPB, timestamp_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryRowGPB, keys_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::TelemetryRowGPB, content_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::mdt_dialout::MdtDialoutArgs)},
+  { 0, -1, -1, sizeof(::mdt_dialout::Telemetry)},
+  { 17, -1, -1, sizeof(::mdt_dialout::TelemetryField)},
+  { 36, -1, -1, sizeof(::mdt_dialout::TelemetryGPBTable)},
+  { 43, -1, -1, sizeof(::mdt_dialout::TelemetryRowGPB)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mdt_dialout::_MdtDialoutArgs_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mdt_dialout::_Telemetry_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mdt_dialout::_TelemetryField_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mdt_dialout::_TelemetryGPBTable_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mdt_dialout::_TelemetryRowGPB_default_instance_),
 };
 
 const char descriptor_table_protodef_mdt_5fdialout_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\021mdt_dialout.proto\022\013mdt_dialout\"=\n\016MdtD"
-  "ialoutArgs\022\r\n\005ReqId\030\001 \001(\003\022\014\n\004data\030\002 \001(\t\022"
-  "\016\n\006errors\030\003 \001(\t2^\n\016gRPCMdtDialout\022L\n\nMdt"
-  "Dialout\022\033.mdt_dialout.MdtDialoutArgs\032\033.m"
-  "dt_dialout.MdtDialoutArgs\"\000(\0010\001b\006proto3"
+  "\n\021mdt_dialout.proto\022\013mdt_dialout\"\300\002\n\tTel"
+  "emetry\022\025\n\013node_id_str\030\001 \001(\tH\000\022\035\n\023subscri"
+  "ption_id_str\030\003 \001(\tH\001\022\025\n\rencoding_path\030\006 "
+  "\001(\t\022\025\n\rcollection_id\030\010 \001(\004\022\035\n\025collection"
+  "_start_time\030\t \001(\004\022\025\n\rmsg_timestamp\030\n \001(\004"
+  "\022/\n\ndata_gpbkv\030\013 \003(\0132\033.mdt_dialout.Telem"
+  "etryField\0220\n\010data_gpb\030\014 \001(\0132\036.mdt_dialou"
+  "t.TelemetryGPBTable\022\033\n\023collection_end_ti"
+  "me\030\r \001(\004B\t\n\007node_idB\016\n\014subscription\"\303\002\n\016"
+  "TelemetryField\022\021\n\ttimestamp\030\001 \001(\004\022\014\n\004nam"
+  "e\030\002 \001(\t\022\025\n\013bytes_value\030\004 \001(\014H\000\022\026\n\014string"
+  "_value\030\005 \001(\tH\000\022\024\n\nbool_value\030\006 \001(\010H\000\022\026\n\014"
+  "uint32_value\030\007 \001(\rH\000\022\026\n\014uint64_value\030\010 \001"
+  "(\004H\000\022\026\n\014sint32_value\030\t \001(\021H\000\022\026\n\014sint64_v"
+  "alue\030\n \001(\022H\000\022\026\n\014double_value\030\013 \001(\001H\000\022\025\n\013"
+  "float_value\030\014 \001(\002H\000\022+\n\006fields\030\017 \003(\0132\033.md"
+  "t_dialout.TelemetryFieldB\017\n\rvalue_by_typ"
+  "e\">\n\021TelemetryGPBTable\022)\n\003row\030\001 \003(\0132\034.md"
+  "t_dialout.TelemetryRowGPB\"C\n\017TelemetryRo"
+  "wGPB\022\021\n\ttimestamp\030\001 \001(\004\022\014\n\004keys\030\n \001(\014\022\017\n"
+  "\007content\030\013 \001(\0142Y\n\016gRPCMdtDialout\022G\n\017MdtD"
+  "ialoutGpbkv\022\026.mdt_dialout.Telemetry\032\026.md"
+  "t_dialout.Telemetry\"\000(\0010\001b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mdt_5fdialout_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mdt_5fdialout_2eproto = {
-  false, false, 199, descriptor_table_protodef_mdt_5fdialout_2eproto, "mdt_dialout.proto", 
-  &descriptor_table_mdt_5fdialout_2eproto_once, nullptr, 0, 1,
+  false, false, 913, descriptor_table_protodef_mdt_5fdialout_2eproto, "mdt_dialout.proto", 
+  &descriptor_table_mdt_5fdialout_2eproto_once, nullptr, 0, 4,
   schemas, file_default_instances, TableStruct_mdt_5fdialout_2eproto::offsets,
   file_level_metadata_mdt_5fdialout_2eproto, file_level_enum_descriptors_mdt_5fdialout_2eproto, file_level_service_descriptors_mdt_5fdialout_2eproto,
 };
@@ -79,119 +192,244 @@ namespace mdt_dialout {
 
 // ===================================================================
 
-class MdtDialoutArgs::_Internal {
+class Telemetry::_Internal {
  public:
+  static const ::mdt_dialout::TelemetryGPBTable& data_gpb(const Telemetry* msg);
 };
 
-MdtDialoutArgs::MdtDialoutArgs(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+const ::mdt_dialout::TelemetryGPBTable&
+Telemetry::_Internal::data_gpb(const Telemetry* msg) {
+  return *msg->data_gpb_;
+}
+Telemetry::Telemetry(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  data_gpbkv_(arena) {
   SharedCtor();
   if (!is_message_owned) {
     RegisterArenaDtor(arena);
   }
-  // @@protoc_insertion_point(arena_constructor:mdt_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(arena_constructor:mdt_dialout.Telemetry)
 }
-MdtDialoutArgs::MdtDialoutArgs(const MdtDialoutArgs& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
+Telemetry::Telemetry(const Telemetry& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      data_gpbkv_(from.data_gpbkv_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  encoding_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+    encoding_path_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (!from._internal_data().empty()) {
-    data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_data(), 
+  if (!from._internal_encoding_path().empty()) {
+    encoding_path_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_encoding_path(), 
       GetArenaForAllocation());
   }
-  errors_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    errors_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (!from._internal_errors().empty()) {
-    errors_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_errors(), 
-      GetArenaForAllocation());
+  if (from._internal_has_data_gpb()) {
+    data_gpb_ = new ::mdt_dialout::TelemetryGPBTable(*from.data_gpb_);
+  } else {
+    data_gpb_ = nullptr;
   }
-  reqid_ = from.reqid_;
-  // @@protoc_insertion_point(copy_constructor:mdt_dialout.MdtDialoutArgs)
+  ::memcpy(&collection_id_, &from.collection_id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&collection_end_time_) -
+    reinterpret_cast<char*>(&collection_id_)) + sizeof(collection_end_time_));
+  clear_has_node_id();
+  switch (from.node_id_case()) {
+    case kNodeIdStr: {
+      _internal_set_node_id_str(from._internal_node_id_str());
+      break;
+    }
+    case NODE_ID_NOT_SET: {
+      break;
+    }
+  }
+  clear_has_subscription();
+  switch (from.subscription_case()) {
+    case kSubscriptionIdStr: {
+      _internal_set_subscription_id_str(from._internal_subscription_id_str());
+      break;
+    }
+    case SUBSCRIPTION_NOT_SET: {
+      break;
+    }
+  }
+  // @@protoc_insertion_point(copy_constructor:mdt_dialout.Telemetry)
 }
 
-inline void MdtDialoutArgs::SharedCtor() {
-data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void Telemetry::SharedCtor() {
+encoding_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  encoding_path_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-errors_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  errors_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-reqid_ = int64_t{0};
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&data_gpb_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&collection_end_time_) -
+    reinterpret_cast<char*>(&data_gpb_)) + sizeof(collection_end_time_));
+clear_has_node_id();
+clear_has_subscription();
 }
 
-MdtDialoutArgs::~MdtDialoutArgs() {
-  // @@protoc_insertion_point(destructor:mdt_dialout.MdtDialoutArgs)
+Telemetry::~Telemetry() {
+  // @@protoc_insertion_point(destructor:mdt_dialout.Telemetry)
   if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-inline void MdtDialoutArgs::SharedDtor() {
+inline void Telemetry::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  errors_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  encoding_path_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete data_gpb_;
+  if (has_node_id()) {
+    clear_node_id();
+  }
+  if (has_subscription()) {
+    clear_subscription();
+  }
 }
 
-void MdtDialoutArgs::ArenaDtor(void* object) {
-  MdtDialoutArgs* _this = reinterpret_cast< MdtDialoutArgs* >(object);
+void Telemetry::ArenaDtor(void* object) {
+  Telemetry* _this = reinterpret_cast< Telemetry* >(object);
   (void)_this;
 }
-void MdtDialoutArgs::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void Telemetry::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void MdtDialoutArgs::SetCachedSize(int size) const {
+void Telemetry::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 
-void MdtDialoutArgs::Clear() {
-// @@protoc_insertion_point(message_clear_start:mdt_dialout.MdtDialoutArgs)
+void Telemetry::clear_node_id() {
+// @@protoc_insertion_point(one_of_clear_start:mdt_dialout.Telemetry)
+  switch (node_id_case()) {
+    case kNodeIdStr: {
+      node_id_.node_id_str_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+      break;
+    }
+    case NODE_ID_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = NODE_ID_NOT_SET;
+}
+
+void Telemetry::clear_subscription() {
+// @@protoc_insertion_point(one_of_clear_start:mdt_dialout.Telemetry)
+  switch (subscription_case()) {
+    case kSubscriptionIdStr: {
+      subscription_.subscription_id_str_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+      break;
+    }
+    case SUBSCRIPTION_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[1] = SUBSCRIPTION_NOT_SET;
+}
+
+
+void Telemetry::Clear() {
+// @@protoc_insertion_point(message_clear_start:mdt_dialout.Telemetry)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  data_.ClearToEmpty();
-  errors_.ClearToEmpty();
-  reqid_ = int64_t{0};
+  data_gpbkv_.Clear();
+  encoding_path_.ClearToEmpty();
+  if (GetArenaForAllocation() == nullptr && data_gpb_ != nullptr) {
+    delete data_gpb_;
+  }
+  data_gpb_ = nullptr;
+  ::memset(&collection_id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&collection_end_time_) -
+      reinterpret_cast<char*>(&collection_id_)) + sizeof(collection_end_time_));
+  clear_node_id();
+  clear_subscription();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* MdtDialoutArgs::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* Telemetry::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // int64 ReqId = 1;
+      // string node_id_str = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          reqid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // string data = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          auto str = _internal_mutable_data();
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_node_id_str();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.MdtDialoutArgs.data"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.Telemetry.node_id_str"));
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // string errors = 3;
+      // string subscription_id_str = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          auto str = _internal_mutable_errors();
+          auto str = _internal_mutable_subscription_id_str();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.MdtDialoutArgs.errors"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.Telemetry.subscription_id_str"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string encoding_path = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
+          auto str = _internal_mutable_encoding_path();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.Telemetry.encoding_path"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 collection_id = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
+          collection_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 collection_start_time = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 72)) {
+          collection_start_time_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 msg_timestamp = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 80)) {
+          msg_timestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated .mdt_dialout.TelemetryField data_gpbkv = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 90)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_data_gpbkv(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<90>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      // .mdt_dialout.TelemetryGPBTable data_gpb = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 98)) {
+          ptr = ctx->ParseMessage(_internal_mutable_data_gpb(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 collection_end_time = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 104)) {
+          collection_end_time_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -219,147 +457,1318 @@ failure:
 #undef CHK_
 }
 
-uint8_t* MdtDialoutArgs::_InternalSerialize(
+uint8_t* Telemetry::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:mdt_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(serialize_to_array_start:mdt_dialout.Telemetry)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int64 ReqId = 1;
-  if (this->_internal_reqid() != 0) {
+  // string node_id_str = 1;
+  if (_internal_has_node_id_str()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_node_id_str().data(), static_cast<int>(this->_internal_node_id_str().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "mdt_dialout.Telemetry.node_id_str");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_node_id_str(), target);
+  }
+
+  // string subscription_id_str = 3;
+  if (_internal_has_subscription_id_str()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_subscription_id_str().data(), static_cast<int>(this->_internal_subscription_id_str().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "mdt_dialout.Telemetry.subscription_id_str");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_subscription_id_str(), target);
+  }
+
+  // string encoding_path = 6;
+  if (!this->_internal_encoding_path().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_encoding_path().data(), static_cast<int>(this->_internal_encoding_path().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "mdt_dialout.Telemetry.encoding_path");
+    target = stream->WriteStringMaybeAliased(
+        6, this->_internal_encoding_path(), target);
+  }
+
+  // uint64 collection_id = 8;
+  if (this->_internal_collection_id() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_reqid(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(8, this->_internal_collection_id(), target);
   }
 
-  // string data = 2;
-  if (!this->_internal_data().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_data().data(), static_cast<int>(this->_internal_data().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "mdt_dialout.MdtDialoutArgs.data");
-    target = stream->WriteStringMaybeAliased(
-        2, this->_internal_data(), target);
+  // uint64 collection_start_time = 9;
+  if (this->_internal_collection_start_time() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(9, this->_internal_collection_start_time(), target);
   }
 
-  // string errors = 3;
-  if (!this->_internal_errors().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_errors().data(), static_cast<int>(this->_internal_errors().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "mdt_dialout.MdtDialoutArgs.errors");
-    target = stream->WriteStringMaybeAliased(
-        3, this->_internal_errors(), target);
+  // uint64 msg_timestamp = 10;
+  if (this->_internal_msg_timestamp() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(10, this->_internal_msg_timestamp(), target);
+  }
+
+  // repeated .mdt_dialout.TelemetryField data_gpbkv = 11;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_data_gpbkv_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(11, this->_internal_data_gpbkv(i), target, stream);
+  }
+
+  // .mdt_dialout.TelemetryGPBTable data_gpb = 12;
+  if (this->_internal_has_data_gpb()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        12, _Internal::data_gpb(this), target, stream);
+  }
+
+  // uint64 collection_end_time = 13;
+  if (this->_internal_collection_end_time() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(13, this->_internal_collection_end_time(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:mdt_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(serialize_to_array_end:mdt_dialout.Telemetry)
   return target;
 }
 
-size_t MdtDialoutArgs::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:mdt_dialout.MdtDialoutArgs)
+size_t Telemetry::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:mdt_dialout.Telemetry)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string data = 2;
-  if (!this->_internal_data().empty()) {
+  // repeated .mdt_dialout.TelemetryField data_gpbkv = 11;
+  total_size += 1UL * this->_internal_data_gpbkv_size();
+  for (const auto& msg : this->data_gpbkv_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // string encoding_path = 6;
+  if (!this->_internal_encoding_path().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_data());
+        this->_internal_encoding_path());
   }
 
-  // string errors = 3;
-  if (!this->_internal_errors().empty()) {
+  // .mdt_dialout.TelemetryGPBTable data_gpb = 12;
+  if (this->_internal_has_data_gpb()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_errors());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *data_gpb_);
   }
 
-  // int64 ReqId = 1;
-  if (this->_internal_reqid() != 0) {
-    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64SizePlusOne(this->_internal_reqid());
+  // uint64 collection_id = 8;
+  if (this->_internal_collection_id() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_collection_id());
   }
 
+  // uint64 collection_start_time = 9;
+  if (this->_internal_collection_start_time() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_collection_start_time());
+  }
+
+  // uint64 msg_timestamp = 10;
+  if (this->_internal_msg_timestamp() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_msg_timestamp());
+  }
+
+  // uint64 collection_end_time = 13;
+  if (this->_internal_collection_end_time() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_collection_end_time());
+  }
+
+  switch (node_id_case()) {
+    // string node_id_str = 1;
+    case kNodeIdStr: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_node_id_str());
+      break;
+    }
+    case NODE_ID_NOT_SET: {
+      break;
+    }
+  }
+  switch (subscription_case()) {
+    // string subscription_id_str = 3;
+    case kSubscriptionIdStr: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_subscription_id_str());
+      break;
+    }
+    case SUBSCRIPTION_NOT_SET: {
+      break;
+    }
+  }
   return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData MdtDialoutArgs::_class_data_ = {
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Telemetry::_class_data_ = {
     ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
-    MdtDialoutArgs::MergeImpl
+    Telemetry::MergeImpl
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*MdtDialoutArgs::GetClassData() const { return &_class_data_; }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Telemetry::GetClassData() const { return &_class_data_; }
 
-void MdtDialoutArgs::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+void Telemetry::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
                       const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-  static_cast<MdtDialoutArgs *>(to)->MergeFrom(
-      static_cast<const MdtDialoutArgs &>(from));
+  static_cast<Telemetry *>(to)->MergeFrom(
+      static_cast<const Telemetry &>(from));
 }
 
 
-void MdtDialoutArgs::MergeFrom(const MdtDialoutArgs& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:mdt_dialout.MdtDialoutArgs)
+void Telemetry::MergeFrom(const Telemetry& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:mdt_dialout.Telemetry)
   GOOGLE_DCHECK_NE(&from, this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (!from._internal_data().empty()) {
-    _internal_set_data(from._internal_data());
+  data_gpbkv_.MergeFrom(from.data_gpbkv_);
+  if (!from._internal_encoding_path().empty()) {
+    _internal_set_encoding_path(from._internal_encoding_path());
   }
-  if (!from._internal_errors().empty()) {
-    _internal_set_errors(from._internal_errors());
+  if (from._internal_has_data_gpb()) {
+    _internal_mutable_data_gpb()->::mdt_dialout::TelemetryGPBTable::MergeFrom(from._internal_data_gpb());
   }
-  if (from._internal_reqid() != 0) {
-    _internal_set_reqid(from._internal_reqid());
+  if (from._internal_collection_id() != 0) {
+    _internal_set_collection_id(from._internal_collection_id());
+  }
+  if (from._internal_collection_start_time() != 0) {
+    _internal_set_collection_start_time(from._internal_collection_start_time());
+  }
+  if (from._internal_msg_timestamp() != 0) {
+    _internal_set_msg_timestamp(from._internal_msg_timestamp());
+  }
+  if (from._internal_collection_end_time() != 0) {
+    _internal_set_collection_end_time(from._internal_collection_end_time());
+  }
+  switch (from.node_id_case()) {
+    case kNodeIdStr: {
+      _internal_set_node_id_str(from._internal_node_id_str());
+      break;
+    }
+    case NODE_ID_NOT_SET: {
+      break;
+    }
+  }
+  switch (from.subscription_case()) {
+    case kSubscriptionIdStr: {
+      _internal_set_subscription_id_str(from._internal_subscription_id_str());
+      break;
+    }
+    case SUBSCRIPTION_NOT_SET: {
+      break;
+    }
   }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
-void MdtDialoutArgs::CopyFrom(const MdtDialoutArgs& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:mdt_dialout.MdtDialoutArgs)
+void Telemetry::CopyFrom(const Telemetry& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:mdt_dialout.Telemetry)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool MdtDialoutArgs::IsInitialized() const {
+bool Telemetry::IsInitialized() const {
   return true;
 }
 
-void MdtDialoutArgs::InternalSwap(MdtDialoutArgs* other) {
+void Telemetry::InternalSwap(Telemetry* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  data_gpbkv_.InternalSwap(&other->data_gpbkv_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &encoding_path_, lhs_arena,
+      &other->encoding_path_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Telemetry, collection_end_time_)
+      + sizeof(Telemetry::collection_end_time_)
+      - PROTOBUF_FIELD_OFFSET(Telemetry, data_gpb_)>(
+          reinterpret_cast<char*>(&data_gpb_),
+          reinterpret_cast<char*>(&other->data_gpb_));
+  swap(node_id_, other->node_id_);
+  swap(subscription_, other->subscription_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
+  swap(_oneof_case_[1], other->_oneof_case_[1]);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Telemetry::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_mdt_5fdialout_2eproto_getter, &descriptor_table_mdt_5fdialout_2eproto_once,
+      file_level_metadata_mdt_5fdialout_2eproto[0]);
+}
+
+// ===================================================================
+
+class TelemetryField::_Internal {
+ public:
+};
+
+TelemetryField::TelemetryField(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  fields_(arena) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:mdt_dialout.TelemetryField)
+}
+TelemetryField::TelemetryField(const TelemetryField& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      fields_(from.fields_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_name().empty()) {
+    name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
+      GetArenaForAllocation());
+  }
+  timestamp_ = from.timestamp_;
+  clear_has_value_by_type();
+  switch (from.value_by_type_case()) {
+    case kBytesValue: {
+      _internal_set_bytes_value(from._internal_bytes_value());
+      break;
+    }
+    case kStringValue: {
+      _internal_set_string_value(from._internal_string_value());
+      break;
+    }
+    case kBoolValue: {
+      _internal_set_bool_value(from._internal_bool_value());
+      break;
+    }
+    case kUint32Value: {
+      _internal_set_uint32_value(from._internal_uint32_value());
+      break;
+    }
+    case kUint64Value: {
+      _internal_set_uint64_value(from._internal_uint64_value());
+      break;
+    }
+    case kSint32Value: {
+      _internal_set_sint32_value(from._internal_sint32_value());
+      break;
+    }
+    case kSint64Value: {
+      _internal_set_sint64_value(from._internal_sint64_value());
+      break;
+    }
+    case kDoubleValue: {
+      _internal_set_double_value(from._internal_double_value());
+      break;
+    }
+    case kFloatValue: {
+      _internal_set_float_value(from._internal_float_value());
+      break;
+    }
+    case VALUE_BY_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  // @@protoc_insertion_point(copy_constructor:mdt_dialout.TelemetryField)
+}
+
+inline void TelemetryField::SharedCtor() {
+name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+timestamp_ = uint64_t{0u};
+clear_has_value_by_type();
+}
+
+TelemetryField::~TelemetryField() {
+  // @@protoc_insertion_point(destructor:mdt_dialout.TelemetryField)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void TelemetryField::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (has_value_by_type()) {
+    clear_value_by_type();
+  }
+}
+
+void TelemetryField::ArenaDtor(void* object) {
+  TelemetryField* _this = reinterpret_cast< TelemetryField* >(object);
+  (void)_this;
+}
+void TelemetryField::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void TelemetryField::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void TelemetryField::clear_value_by_type() {
+// @@protoc_insertion_point(one_of_clear_start:mdt_dialout.TelemetryField)
+  switch (value_by_type_case()) {
+    case kBytesValue: {
+      value_by_type_.bytes_value_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+      break;
+    }
+    case kStringValue: {
+      value_by_type_.string_value_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+      break;
+    }
+    case kBoolValue: {
+      // No need to clear
+      break;
+    }
+    case kUint32Value: {
+      // No need to clear
+      break;
+    }
+    case kUint64Value: {
+      // No need to clear
+      break;
+    }
+    case kSint32Value: {
+      // No need to clear
+      break;
+    }
+    case kSint64Value: {
+      // No need to clear
+      break;
+    }
+    case kDoubleValue: {
+      // No need to clear
+      break;
+    }
+    case kFloatValue: {
+      // No need to clear
+      break;
+    }
+    case VALUE_BY_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = VALUE_BY_TYPE_NOT_SET;
+}
+
+
+void TelemetryField::Clear() {
+// @@protoc_insertion_point(message_clear_start:mdt_dialout.TelemetryField)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  fields_.Clear();
+  name_.ClearToEmpty();
+  timestamp_ = uint64_t{0u};
+  clear_value_by_type();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* TelemetryField::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 timestamp = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          timestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string name = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_name();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.TelemetryField.name"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes bytes_value = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          auto str = _internal_mutable_bytes_value();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string string_value = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+          auto str = _internal_mutable_string_value();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.TelemetryField.string_value"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bool bool_value = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
+          _internal_set_bool_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint32 uint32_value = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
+          _internal_set_uint32_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 uint64_value = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
+          _internal_set_uint64_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // sint32 sint32_value = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 72)) {
+          _internal_set_sint32_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarintZigZag32(&ptr));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // sint64 sint64_value = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 80)) {
+          _internal_set_sint64_value(::PROTOBUF_NAMESPACE_ID::internal::ReadVarintZigZag64(&ptr));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // double double_value = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 89)) {
+          _internal_set_double_value(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
+          ptr += sizeof(double);
+        } else
+          goto handle_unusual;
+        continue;
+      // float float_value = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 101)) {
+          _internal_set_float_value(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated .mdt_dialout.TelemetryField fields = 15;
+      case 15:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 122)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_fields(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<122>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* TelemetryField::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:mdt_dialout.TelemetryField)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 timestamp = 1;
+  if (this->_internal_timestamp() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(1, this->_internal_timestamp(), target);
+  }
+
+  // string name = 2;
+  if (!this->_internal_name().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "mdt_dialout.TelemetryField.name");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_name(), target);
+  }
+
+  // bytes bytes_value = 4;
+  if (_internal_has_bytes_value()) {
+    target = stream->WriteBytesMaybeAliased(
+        4, this->_internal_bytes_value(), target);
+  }
+
+  // string string_value = 5;
+  if (_internal_has_string_value()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_string_value().data(), static_cast<int>(this->_internal_string_value().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "mdt_dialout.TelemetryField.string_value");
+    target = stream->WriteStringMaybeAliased(
+        5, this->_internal_string_value(), target);
+  }
+
+  // bool bool_value = 6;
+  if (_internal_has_bool_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(6, this->_internal_bool_value(), target);
+  }
+
+  // uint32 uint32_value = 7;
+  if (_internal_has_uint32_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(7, this->_internal_uint32_value(), target);
+  }
+
+  // uint64 uint64_value = 8;
+  if (_internal_has_uint64_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(8, this->_internal_uint64_value(), target);
+  }
+
+  // sint32 sint32_value = 9;
+  if (_internal_has_sint32_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteSInt32ToArray(9, this->_internal_sint32_value(), target);
+  }
+
+  // sint64 sint64_value = 10;
+  if (_internal_has_sint64_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteSInt64ToArray(10, this->_internal_sint64_value(), target);
+  }
+
+  // double double_value = 11;
+  if (_internal_has_double_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(11, this->_internal_double_value(), target);
+  }
+
+  // float float_value = 12;
+  if (_internal_has_float_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(12, this->_internal_float_value(), target);
+  }
+
+  // repeated .mdt_dialout.TelemetryField fields = 15;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_fields_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(15, this->_internal_fields(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:mdt_dialout.TelemetryField)
+  return target;
+}
+
+size_t TelemetryField::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:mdt_dialout.TelemetryField)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .mdt_dialout.TelemetryField fields = 15;
+  total_size += 1UL * this->_internal_fields_size();
+  for (const auto& msg : this->fields_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // string name = 2;
+  if (!this->_internal_name().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_name());
+  }
+
+  // uint64 timestamp = 1;
+  if (this->_internal_timestamp() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_timestamp());
+  }
+
+  switch (value_by_type_case()) {
+    // bytes bytes_value = 4;
+    case kBytesValue: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+          this->_internal_bytes_value());
+      break;
+    }
+    // string string_value = 5;
+    case kStringValue: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_string_value());
+      break;
+    }
+    // bool bool_value = 6;
+    case kBoolValue: {
+      total_size += 1 + 1;
+      break;
+    }
+    // uint32 uint32_value = 7;
+    case kUint32Value: {
+      total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_uint32_value());
+      break;
+    }
+    // uint64 uint64_value = 8;
+    case kUint64Value: {
+      total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_uint64_value());
+      break;
+    }
+    // sint32 sint32_value = 9;
+    case kSint32Value: {
+      total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SInt32SizePlusOne(this->_internal_sint32_value());
+      break;
+    }
+    // sint64 sint64_value = 10;
+    case kSint64Value: {
+      total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SInt64SizePlusOne(this->_internal_sint64_value());
+      break;
+    }
+    // double double_value = 11;
+    case kDoubleValue: {
+      total_size += 1 + 8;
+      break;
+    }
+    // float float_value = 12;
+    case kFloatValue: {
+      total_size += 1 + 4;
+      break;
+    }
+    case VALUE_BY_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData TelemetryField::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    TelemetryField::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*TelemetryField::GetClassData() const { return &_class_data_; }
+
+void TelemetryField::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+  static_cast<TelemetryField *>(to)->MergeFrom(
+      static_cast<const TelemetryField &>(from));
+}
+
+
+void TelemetryField::MergeFrom(const TelemetryField& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:mdt_dialout.TelemetryField)
+  GOOGLE_DCHECK_NE(&from, this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  fields_.MergeFrom(from.fields_);
+  if (!from._internal_name().empty()) {
+    _internal_set_name(from._internal_name());
+  }
+  if (from._internal_timestamp() != 0) {
+    _internal_set_timestamp(from._internal_timestamp());
+  }
+  switch (from.value_by_type_case()) {
+    case kBytesValue: {
+      _internal_set_bytes_value(from._internal_bytes_value());
+      break;
+    }
+    case kStringValue: {
+      _internal_set_string_value(from._internal_string_value());
+      break;
+    }
+    case kBoolValue: {
+      _internal_set_bool_value(from._internal_bool_value());
+      break;
+    }
+    case kUint32Value: {
+      _internal_set_uint32_value(from._internal_uint32_value());
+      break;
+    }
+    case kUint64Value: {
+      _internal_set_uint64_value(from._internal_uint64_value());
+      break;
+    }
+    case kSint32Value: {
+      _internal_set_sint32_value(from._internal_sint32_value());
+      break;
+    }
+    case kSint64Value: {
+      _internal_set_sint64_value(from._internal_sint64_value());
+      break;
+    }
+    case kDoubleValue: {
+      _internal_set_double_value(from._internal_double_value());
+      break;
+    }
+    case kFloatValue: {
+      _internal_set_float_value(from._internal_float_value());
+      break;
+    }
+    case VALUE_BY_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void TelemetryField::CopyFrom(const TelemetryField& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:mdt_dialout.TelemetryField)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TelemetryField::IsInitialized() const {
+  return true;
+}
+
+void TelemetryField::InternalSwap(TelemetryField* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  fields_.InternalSwap(&other->fields_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &name_, lhs_arena,
+      &other->name_, rhs_arena
+  );
+  swap(timestamp_, other->timestamp_);
+  swap(value_by_type_, other->value_by_type_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata TelemetryField::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_mdt_5fdialout_2eproto_getter, &descriptor_table_mdt_5fdialout_2eproto_once,
+      file_level_metadata_mdt_5fdialout_2eproto[1]);
+}
+
+// ===================================================================
+
+class TelemetryGPBTable::_Internal {
+ public:
+};
+
+TelemetryGPBTable::TelemetryGPBTable(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  row_(arena) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:mdt_dialout.TelemetryGPBTable)
+}
+TelemetryGPBTable::TelemetryGPBTable(const TelemetryGPBTable& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      row_(from.row_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:mdt_dialout.TelemetryGPBTable)
+}
+
+inline void TelemetryGPBTable::SharedCtor() {
+}
+
+TelemetryGPBTable::~TelemetryGPBTable() {
+  // @@protoc_insertion_point(destructor:mdt_dialout.TelemetryGPBTable)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void TelemetryGPBTable::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void TelemetryGPBTable::ArenaDtor(void* object) {
+  TelemetryGPBTable* _this = reinterpret_cast< TelemetryGPBTable* >(object);
+  (void)_this;
+}
+void TelemetryGPBTable::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void TelemetryGPBTable::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void TelemetryGPBTable::Clear() {
+// @@protoc_insertion_point(message_clear_start:mdt_dialout.TelemetryGPBTable)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  row_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* TelemetryGPBTable::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // repeated .mdt_dialout.TelemetryRowGPB row = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_row(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* TelemetryGPBTable::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:mdt_dialout.TelemetryGPBTable)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .mdt_dialout.TelemetryRowGPB row = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_row_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_row(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:mdt_dialout.TelemetryGPBTable)
+  return target;
+}
+
+size_t TelemetryGPBTable::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:mdt_dialout.TelemetryGPBTable)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .mdt_dialout.TelemetryRowGPB row = 1;
+  total_size += 1UL * this->_internal_row_size();
+  for (const auto& msg : this->row_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData TelemetryGPBTable::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    TelemetryGPBTable::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*TelemetryGPBTable::GetClassData() const { return &_class_data_; }
+
+void TelemetryGPBTable::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+  static_cast<TelemetryGPBTable *>(to)->MergeFrom(
+      static_cast<const TelemetryGPBTable &>(from));
+}
+
+
+void TelemetryGPBTable::MergeFrom(const TelemetryGPBTable& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:mdt_dialout.TelemetryGPBTable)
+  GOOGLE_DCHECK_NE(&from, this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  row_.MergeFrom(from.row_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void TelemetryGPBTable::CopyFrom(const TelemetryGPBTable& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:mdt_dialout.TelemetryGPBTable)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TelemetryGPBTable::IsInitialized() const {
+  return true;
+}
+
+void TelemetryGPBTable::InternalSwap(TelemetryGPBTable* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  row_.InternalSwap(&other->row_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata TelemetryGPBTable::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_mdt_5fdialout_2eproto_getter, &descriptor_table_mdt_5fdialout_2eproto_once,
+      file_level_metadata_mdt_5fdialout_2eproto[2]);
+}
+
+// ===================================================================
+
+class TelemetryRowGPB::_Internal {
+ public:
+};
+
+TelemetryRowGPB::TelemetryRowGPB(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:mdt_dialout.TelemetryRowGPB)
+}
+TelemetryRowGPB::TelemetryRowGPB(const TelemetryRowGPB& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  keys_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    keys_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_keys().empty()) {
+    keys_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_keys(), 
+      GetArenaForAllocation());
+  }
+  content_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    content_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_content().empty()) {
+    content_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_content(), 
+      GetArenaForAllocation());
+  }
+  timestamp_ = from.timestamp_;
+  // @@protoc_insertion_point(copy_constructor:mdt_dialout.TelemetryRowGPB)
+}
+
+inline void TelemetryRowGPB::SharedCtor() {
+keys_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  keys_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+content_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  content_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+timestamp_ = uint64_t{0u};
+}
+
+TelemetryRowGPB::~TelemetryRowGPB() {
+  // @@protoc_insertion_point(destructor:mdt_dialout.TelemetryRowGPB)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void TelemetryRowGPB::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  keys_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  content_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void TelemetryRowGPB::ArenaDtor(void* object) {
+  TelemetryRowGPB* _this = reinterpret_cast< TelemetryRowGPB* >(object);
+  (void)_this;
+}
+void TelemetryRowGPB::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void TelemetryRowGPB::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void TelemetryRowGPB::Clear() {
+// @@protoc_insertion_point(message_clear_start:mdt_dialout.TelemetryRowGPB)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  keys_.ClearToEmpty();
+  content_.ClearToEmpty();
+  timestamp_ = uint64_t{0u};
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* TelemetryRowGPB::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 timestamp = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          timestamp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes keys = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
+          auto str = _internal_mutable_keys();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes content = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 90)) {
+          auto str = _internal_mutable_content();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* TelemetryRowGPB::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:mdt_dialout.TelemetryRowGPB)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 timestamp = 1;
+  if (this->_internal_timestamp() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(1, this->_internal_timestamp(), target);
+  }
+
+  // bytes keys = 10;
+  if (!this->_internal_keys().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        10, this->_internal_keys(), target);
+  }
+
+  // bytes content = 11;
+  if (!this->_internal_content().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        11, this->_internal_content(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:mdt_dialout.TelemetryRowGPB)
+  return target;
+}
+
+size_t TelemetryRowGPB::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:mdt_dialout.TelemetryRowGPB)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bytes keys = 10;
+  if (!this->_internal_keys().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_keys());
+  }
+
+  // bytes content = 11;
+  if (!this->_internal_content().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_content());
+  }
+
+  // uint64 timestamp = 1;
+  if (this->_internal_timestamp() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_timestamp());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData TelemetryRowGPB::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    TelemetryRowGPB::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*TelemetryRowGPB::GetClassData() const { return &_class_data_; }
+
+void TelemetryRowGPB::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+  static_cast<TelemetryRowGPB *>(to)->MergeFrom(
+      static_cast<const TelemetryRowGPB &>(from));
+}
+
+
+void TelemetryRowGPB::MergeFrom(const TelemetryRowGPB& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:mdt_dialout.TelemetryRowGPB)
+  GOOGLE_DCHECK_NE(&from, this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_keys().empty()) {
+    _internal_set_keys(from._internal_keys());
+  }
+  if (!from._internal_content().empty()) {
+    _internal_set_content(from._internal_content());
+  }
+  if (from._internal_timestamp() != 0) {
+    _internal_set_timestamp(from._internal_timestamp());
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void TelemetryRowGPB::CopyFrom(const TelemetryRowGPB& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:mdt_dialout.TelemetryRowGPB)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TelemetryRowGPB::IsInitialized() const {
+  return true;
+}
+
+void TelemetryRowGPB::InternalSwap(TelemetryRowGPB* other) {
   using std::swap;
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      &data_, lhs_arena,
-      &other->data_, rhs_arena
+      &keys_, lhs_arena,
+      &other->keys_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      &errors_, lhs_arena,
-      &other->errors_, rhs_arena
+      &content_, lhs_arena,
+      &other->content_, rhs_arena
   );
-  swap(reqid_, other->reqid_);
+  swap(timestamp_, other->timestamp_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata MdtDialoutArgs::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata TelemetryRowGPB::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_mdt_5fdialout_2eproto_getter, &descriptor_table_mdt_5fdialout_2eproto_once,
-      file_level_metadata_mdt_5fdialout_2eproto[0]);
+      file_level_metadata_mdt_5fdialout_2eproto[3]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace mdt_dialout
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::mdt_dialout::MdtDialoutArgs* Arena::CreateMaybeMessage< ::mdt_dialout::MdtDialoutArgs >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::mdt_dialout::MdtDialoutArgs >(arena);
+template<> PROTOBUF_NOINLINE ::mdt_dialout::Telemetry* Arena::CreateMaybeMessage< ::mdt_dialout::Telemetry >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::mdt_dialout::Telemetry >(arena);
+}
+template<> PROTOBUF_NOINLINE ::mdt_dialout::TelemetryField* Arena::CreateMaybeMessage< ::mdt_dialout::TelemetryField >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::mdt_dialout::TelemetryField >(arena);
+}
+template<> PROTOBUF_NOINLINE ::mdt_dialout::TelemetryGPBTable* Arena::CreateMaybeMessage< ::mdt_dialout::TelemetryGPBTable >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::mdt_dialout::TelemetryGPBTable >(arena);
+}
+template<> PROTOBUF_NOINLINE ::mdt_dialout::TelemetryRowGPB* Arena::CreateMaybeMessage< ::mdt_dialout::TelemetryRowGPB >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::mdt_dialout::TelemetryRowGPB >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

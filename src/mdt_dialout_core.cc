@@ -11,7 +11,7 @@
 Srv::~Srv()
 {
     server_->grpc::ServerInterface::Shutdown();
-    cq_->grpc::CompletionQueue::Shutdown();
+    cq_->grpc::ServerCompletionQueue::Shutdown();
 }
 
 void Srv::Bind(std::string srv_addr)
@@ -22,13 +22,14 @@ void Srv::Bind(std::string srv_addr)
     cq_ = builder.AddCompletionQueue();
     server_ = builder.BuildAndStart();
 
-    std::thread t1(&Srv::FsmCtrl, this);
-    std::thread t2(&Srv::FsmCtrl, this);
-    std::thread t3(&Srv::FsmCtrl, this);
+    Srv::FsmCtrl();
+    //std::thread t1(&Srv::FsmCtrl, this);
+    //std::thread t2(&Srv::FsmCtrl, this);
+    //std::thread t3(&Srv::FsmCtrl, this);
 
-    t1.join();
-    t2.join();
-    t3.join();
+    //t1.join();
+    //t2.join();
+    //t3.join();
 }
 
 /**
@@ -57,6 +58,36 @@ Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
                                                         stream_status {START}
 {
     Srv::Stream::Start();
+}
+
+void Srv::Stream::Start()
+{
+    /**
+     * Initial stream_status set to START
+     */
+    if (stream_status == START) {
+        service_->RequestMdtDialoutGpbkv(&server_ctx, &resp, cq_, cq_, this);
+        stream_status = FLOW;
+    } else if (stream_status == FLOW) {
+        std::cout << "Streaming Started ..." << std::endl;
+        std::string peer = server_ctx.peer();
+        std::cout << "Peer: " + peer << std::endl;
+        new Srv::Stream(service_, cq_);
+        resp.Read(&stream, this);
+        //const std::string stream_data = stream.data();
+        //Srv::Stream::str2json(stream_data);
+        std::cout << stream.collection_id() << std::endl;
+        //Srv::Stream::async_kafka_prod(stream_data);
+    } else {
+        GPR_ASSERT(stream_status == END);
+        delete this;
+    }
+}
+
+void Srv::Stream::Stop()
+{
+    //std::cout << "Streaming Interrupted ..." << std::endl;
+    stream_status = END;
 }
 
 /**
@@ -134,34 +165,3 @@ int Srv::Stream::async_kafka_prod(const std::string& json_str)
 
     return EXIT_SUCCESS;
 }
-
-void Srv::Stream::Start()
-{
-    /**
-     * Initial stream_status set to START
-     */
-    if (stream_status == START) {
-        service_->RequestMdtDialout(&server_ctx, &resp, cq_, cq_, this);
-        stream_status = FLOW;
-    } else if (stream_status == FLOW) {
-        //std::cout << "Streaming Started ..." << std::endl;
-        //std::string peer = server_ctx.peer();
-        //std::cout << "Peer: " + peer << std::endl;
-        new Srv::Stream(service_, cq_);
-        resp.Read(&stream, this);
-        const std::string stream_data = stream.data();
-        Srv::Stream::str2json(stream_data);
-        //std::cout << stream.data() << std::endl;
-        Srv::Stream::async_kafka_prod(stream_data);
-    } else {
-        GPR_ASSERT(stream_status == END);
-        delete this;
-    }
-}
-
-void Srv::Stream::Stop()
-{
-    //std::cout << "Streaming Interrupted ..." << std::endl;
-    stream_status = END;
-}
-
