@@ -28,13 +28,13 @@ void Srv::Bind(std::string srv_addr)
     server_ = builder.BuildAndStart();
 
     Srv::FsmCtrl();
-    //std::thread t1(&Srv::FsmCtrl, this);
-    //std::thread t2(&Srv::FsmCtrl, this);
-    //std::thread t3(&Srv::FsmCtrl, this);
+    std::thread t1(&Srv::FsmCtrl, this);
+    std::thread t2(&Srv::FsmCtrl, this);
+    std::thread t3(&Srv::FsmCtrl, this);
 
-    //t1.join();
-    //t2.join();
-    //t3.join();
+    t1.join();
+    t2.join();
+    t3.join();
 }
 
 /**
