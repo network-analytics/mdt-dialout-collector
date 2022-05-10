@@ -44,7 +44,7 @@ message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
 set(RDKAFKA_INCLUDE_DIR /usr/local/include)
 include_directories("${RDKAFKA_INCLUDE_DIR}")
 
-# Protobuf generated "gRPC dial-out" 
+# Protobuf generated "gRPC dial-out"
 set(dialout_pb_cc
     "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/mdt_dialout.pb.cc")
 set(dialout_pb_h
@@ -67,7 +67,7 @@ add_custom_command(
     DEPENDS "${hw_proto}"
 )
 
-# Protobuf generated support "GPB-KV" encoding  
+# Protobuf generated support "GPB-KV" encoding
 #set(telemetry_pb_cc
 #    "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/telemetry.pb.cc")
 #set(telemetry_pb_h

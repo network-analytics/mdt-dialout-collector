@@ -3,16 +3,16 @@ syntax = "proto3";
 package mdt_dialout;
 
 service gRPCMdtDialout {
-//rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};
-  rpc MdtDialoutGpbkv(stream Telemetry) returns(stream Telemetry) {};
+  rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};
+  //rpc MdtDialoutGpbkv(stream Telemetry) returns(stream Telemetry) {};
 }
 
-//message MdtDialoutArgs {
-//  int64 ReqId = 1;
-//  string data = 2;
-//  //bytes data = 2;
-//  string errors = 3;
-//}
+message MdtDialoutArgs {
+  int64 ReqId = 1;
+  //string data = 2;
+  bytes data = 2;
+  string errors = 3;
+}
 
 message Telemetry {
   oneof node_id {

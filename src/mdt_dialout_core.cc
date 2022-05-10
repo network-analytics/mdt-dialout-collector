@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <thread>
 #include <grpcpp/grpcpp.h>
 #include <json/json.h>
@@ -38,16 +39,20 @@ void Srv::Bind(std::string srv_addr)
 void Srv::FsmCtrl()
 {
     new Srv::Stream(&service_, cq_.get());
+    int counter {0};
     void *tag {nullptr};
     bool ok {false};
     while (true) {
+        //std::cout << counter << std::endl;
         GPR_ASSERT(cq_->Next(&tag, &ok));
+        //GPR_ASSERT(ok);
         if (!ok) {
             /* Something went wrong with CQ -> set stream_status = END */
             static_cast<Stream *>(tag)->Stop();
             continue;
         }
         static_cast<Stream *>(tag)->Start();
+        counter++;
     }
 }
 
@@ -66,17 +71,22 @@ void Srv::Stream::Start()
      * Initial stream_status set to START
      */
     if (stream_status == START) {
-        service_->RequestMdtDialoutGpbkv(&server_ctx, &resp, cq_, cq_, this);
+        service_->RequestMdtDialout(&server_ctx, &resp, cq_, cq_, this);
         stream_status = FLOW;
     } else if (stream_status == FLOW) {
-        std::cout << "Streaming Started ..." << std::endl;
-        std::string peer = server_ctx.peer();
-        std::cout << "Peer: " + peer << std::endl;
+        //std::cout << "Streaming Started ..." << std::endl;
+        //std::string peer = server_ctx.peer();
+        //std::cout << "Peer: " + peer << std::endl;
         new Srv::Stream(service_, cq_);
+        /* this is used as a unique TAG */
         resp.Read(&stream, this);
         //const std::string stream_data = stream.data();
         //Srv::Stream::str2json(stream_data);
-        std::cout << stream.collection_id() << std::endl;
+        if (std::ofstream output{"gpbkv.bin", std::ios::out}) {
+            output << stream.data();
+        } else {
+            std::exit(EXIT_FAILURE);
+        }
         //Srv::Stream::async_kafka_prod(stream_data);
     } else {
         GPR_ASSERT(stream_status == END);

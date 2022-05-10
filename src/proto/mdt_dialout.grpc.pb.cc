@@ -22,7 +22,7 @@
 namespace mdt_dialout {
 
 static const char* gRPCMdtDialout_method_names[] = {
-  "/mdt_dialout.gRPCMdtDialout/MdtDialoutGpbkv",
+  "/mdt_dialout.gRPCMdtDialout/MdtDialout",
 };
 
 std::unique_ptr< gRPCMdtDialout::Stub> gRPCMdtDialout::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -32,42 +32,42 @@ std::unique_ptr< gRPCMdtDialout::Stub> gRPCMdtDialout::NewStub(const std::shared
 }
 
 gRPCMdtDialout::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
-  : channel_(channel), rpcmethod_MdtDialoutGpbkv_(gRPCMdtDialout_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
+  : channel_(channel), rpcmethod_MdtDialout_(gRPCMdtDialout_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
   {}
 
-::grpc::ClientReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* gRPCMdtDialout::Stub::MdtDialoutGpbkvRaw(::grpc::ClientContext* context) {
-  return ::grpc::internal::ClientReaderWriterFactory< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>::Create(channel_.get(), rpcmethod_MdtDialoutGpbkv_, context);
+::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* gRPCMdtDialout::Stub::MdtDialoutRaw(::grpc::ClientContext* context) {
+  return ::grpc::internal::ClientReaderWriterFactory< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>::Create(channel_.get(), rpcmethod_MdtDialout_, context);
 }
 
-void gRPCMdtDialout::Stub::async::MdtDialoutGpbkv(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::Telemetry,::mdt_dialout::Telemetry>* reactor) {
-  ::grpc::internal::ClientCallbackReaderWriterFactory< ::mdt_dialout::Telemetry,::mdt_dialout::Telemetry>::Create(stub_->channel_.get(), stub_->rpcmethod_MdtDialoutGpbkv_, context, reactor);
+void gRPCMdtDialout::Stub::async::MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>* reactor) {
+  ::grpc::internal::ClientCallbackReaderWriterFactory< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>::Create(stub_->channel_.get(), stub_->rpcmethod_MdtDialout_, context, reactor);
 }
 
-::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* gRPCMdtDialout::Stub::AsyncMdtDialoutGpbkvRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-  return ::grpc::internal::ClientAsyncReaderWriterFactory< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>::Create(channel_.get(), cq, rpcmethod_MdtDialoutGpbkv_, context, true, tag);
+::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* gRPCMdtDialout::Stub::AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc::internal::ClientAsyncReaderWriterFactory< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>::Create(channel_.get(), cq, rpcmethod_MdtDialout_, context, true, tag);
 }
 
-::grpc::ClientAsyncReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* gRPCMdtDialout::Stub::PrepareAsyncMdtDialoutGpbkvRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncReaderWriterFactory< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>::Create(channel_.get(), cq, rpcmethod_MdtDialoutGpbkv_, context, false, nullptr);
+::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* gRPCMdtDialout::Stub::PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncReaderWriterFactory< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>::Create(channel_.get(), cq, rpcmethod_MdtDialout_, context, false, nullptr);
 }
 
 gRPCMdtDialout::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       gRPCMdtDialout_method_names[0],
       ::grpc::internal::RpcMethod::BIDI_STREAMING,
-      new ::grpc::internal::BidiStreamingHandler< gRPCMdtDialout::Service, ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>(
+      new ::grpc::internal::BidiStreamingHandler< gRPCMdtDialout::Service, ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>(
           [](gRPCMdtDialout::Service* service,
              ::grpc::ServerContext* ctx,
-             ::grpc::ServerReaderWriter<::mdt_dialout::Telemetry,
-             ::mdt_dialout::Telemetry>* stream) {
-               return service->MdtDialoutGpbkv(ctx, stream);
+             ::grpc::ServerReaderWriter<::mdt_dialout::MdtDialoutArgs,
+             ::mdt_dialout::MdtDialoutArgs>* stream) {
+               return service->MdtDialout(ctx, stream);
              }, this)));
 }
 
 gRPCMdtDialout::Service::~Service() {
 }
 
-::grpc::Status gRPCMdtDialout::Service::MdtDialoutGpbkv(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mdt_dialout::Telemetry, ::mdt_dialout::Telemetry>* stream) {
+::grpc::Status gRPCMdtDialout::Service::MdtDialout(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* stream) {
   (void) context;
   (void) stream;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
