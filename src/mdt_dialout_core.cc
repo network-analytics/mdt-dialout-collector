@@ -91,13 +91,13 @@ void Srv::Stream::Start()
         //} else {
         //    std::exit(EXIT_FAILURE);
         //}
-        //Srv::Stream::async_kafka_prod(stream_data);
         google::protobuf::Message *tlm = new telemetry::Telemetry;
         tlm->ParseFromString(stream.data());
         google::protobuf::util::JsonOptions opt;
         opt.add_whitespace = true;
         google::protobuf::util::MessageToJsonString(*tlm, &stream_data, opt);
-        std::cout << stream_data;
+        Srv::Stream::async_kafka_prod(stream_data);
+        //std::cout << stream_data;
     } else {
         GPR_ASSERT(stream_status == END);
         delete this;
