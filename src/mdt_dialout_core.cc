@@ -7,6 +7,10 @@
 #include "kafka/KafkaProducer.h"
 #include "mdt_dialout_core.h"
 #include "mdt_dialout.grpc.pb.h"
+#include "telemetry.pb.h"
+#include <google/protobuf/arena.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/util/json_util.h>
 
 
 Srv::~Srv()
@@ -80,14 +84,20 @@ void Srv::Stream::Start()
         new Srv::Stream(service_, cq_);
         /* this is used as a unique TAG */
         resp.Read(&stream, this);
-        //const std::string stream_data = stream.data();
+        std::string stream_data;
         //Srv::Stream::str2json(stream_data);
-        if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
-            output << stream.data();
-        } else {
-            std::exit(EXIT_FAILURE);
-        }
+        //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
+        //    output << stream.data();
+        //} else {
+        //    std::exit(EXIT_FAILURE);
+        //}
         //Srv::Stream::async_kafka_prod(stream_data);
+        google::protobuf::Message *tlm = new telemetry::Telemetry;
+        tlm->ParseFromString(stream.data());
+        google::protobuf::util::JsonOptions opt;
+        opt.add_whitespace = true;
+        google::protobuf::util::MessageToJsonString(*tlm, &stream_data, opt);
+        std::cout << stream_data;
     } else {
         GPR_ASSERT(stream_status == END);
         delete this;
