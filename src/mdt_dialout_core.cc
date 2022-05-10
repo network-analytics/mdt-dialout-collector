@@ -82,7 +82,7 @@ void Srv::Stream::Start()
         resp.Read(&stream, this);
         //const std::string stream_data = stream.data();
         //Srv::Stream::str2json(stream_data);
-        if (std::ofstream output{"gpbkv.bin", std::ios::out}) {
+        if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
             output << stream.data();
         } else {
             std::exit(EXIT_FAILURE);

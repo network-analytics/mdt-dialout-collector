@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package mdt_dialout;
+
+service gRPCMdtDialout {
+  rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};
+  //rpc MdtDialoutGpbkv(stream Telemetry) returns(stream Telemetry) {};
+}
+
+message MdtDialoutArgs {
+  int64 ReqId = 1;
+  //string data = 2;
+  bytes data = 2;
+  string errors = 3;
+}
+
+message Telemetry {
+  oneof node_id {
+    string node_id_str = 1;
+  }
+  oneof subscription {
+    string   subscription_id_str = 3;
+  }
+  string   encoding_path = 6;
+  uint64   collection_id = 8;
+  uint64   collection_start_time = 9;
+  uint64   msg_timestamp = 10;
+  repeated TelemetryField data_gpbkv = 11;
+  TelemetryGPBTable data_gpb = 12;
+  uint64 collection_end_time = 13;
+}
+ 
+message TelemetryField {
+  uint64         timestamp = 1;
+  string         name = 2;
+  oneof value_by_type {
+    bytes          bytes_value = 4;
+    string         string_value = 5;
+    bool           bool_value = 6;
+    uint32         uint32_value = 7;
+    uint64         uint64_value = 8;
+    sint32         sint32_value = 9;
+    sint64         sint64_value = 10;
+    double         double_value = 11;
+    float          float_value = 12;
+  }
+  repeated TelemetryField fields = 15;
+}
+ 
+message TelemetryGPBTable {
+  repeated TelemetryRowGPB row = 1;
+}
+ 
+message TelemetryRowGPB {
+  uint64 timestamp = 1;
+  bytes keys = 10;
+  bytes content = 11;
+}
