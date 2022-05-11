@@ -104,7 +104,7 @@ foreach(_target "mdt_dialout_collector")
         ${dialout_pb_grpc_cc}
         ${telemetry_pb_cc}
     )
-    target_compile_features(${_target} PRIVATE cxx_std_17)
+    target_compile_features(${_target} PRIVATE cxx_std_20)
     target_link_libraries(
         ${_target}
         ${_REFLECTION}
