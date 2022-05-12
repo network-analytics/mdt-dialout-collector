@@ -40,9 +40,6 @@ private:
         mdt_dialout::MdtDialoutArgs stream;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
                                     mdt_dialout::MdtDialoutArgs> resp;
-        //mdt_dialout::Telemetry stream;
-        //grpc::ServerAsyncReaderWriter<mdt_dialout::Telemetry,
-        //                            mdt_dialout::Telemetry> resp;
     };
 };
 
