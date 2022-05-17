@@ -1,15 +1,17 @@
 syntax = "proto3";
 
-package mdt_dialout;
+package huawei_dialout;
 
-service gRPCMdtDialout {
-  rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};
+service gRPCDataservice {
+  rpc dataPublish(stream serviceArgs) returns(stream serviceArgs) {};
 }
 
-message MdtDialoutArgs {
-  int64 ReqId = 1;
-  //string data = 2;
-  bytes data = 2;
-  string errors = 3;
+message serviceArgs {
+	int64 ReqId = 1;
+  oneof MessageData {
+  	bytes data = 2;
+  	string data_json = 4;
+	}
+	string errors = 3;
 }
 

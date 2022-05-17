@@ -17,14 +17,14 @@ public:
     void Bind(std::string srv_addr);
 
 private:
-    mdt_dialout::gRPCMdtDialout::AsyncService service_;
+    huawei_dialout::gRPCDataservice::AsyncService service_;
     std::unique_ptr<grpc::ServerCompletionQueue> cq_;
     std::unique_ptr<grpc::Server> server_;
     void FsmCtrl();
 
     class Stream {
     public:
-        Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
+        Stream(huawei_dialout::gRPCDataservice::AsyncService *service,
             grpc::ServerCompletionQueue *cq);
         void Start();
         void Stop();
@@ -34,12 +34,12 @@ private:
     private:
         enum StreamStatus { START, FLOW, END };
         StreamStatus stream_status;
-        mdt_dialout::gRPCMdtDialout::AsyncService *service_;
+        huawei_dialout::gRPCDataservice::AsyncService *service_;
         grpc::ServerCompletionQueue *cq_;
         grpc::ServerContext server_ctx;
-        mdt_dialout::MdtDialoutArgs stream;
-        grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
-                                    mdt_dialout::MdtDialoutArgs> resp;
+        huawei_dialout::serviceArgs stream;
+        grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
+                                    huawei_dialout::serviceArgs> resp;
     };
 };
 

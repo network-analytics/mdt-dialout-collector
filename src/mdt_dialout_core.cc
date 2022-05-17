@@ -61,7 +61,7 @@ void Srv::FsmCtrl()
     }
 }
 
-Srv::Stream::Stream(mdt_dialout::gRPCMdtDialout::AsyncService *service,
+Srv::Stream::Stream(huawei_dialout::gRPCDataservice::AsyncService *service,
                     grpc::ServerCompletionQueue *cq) : service_ {service},
                                                         cq_ {cq},
                                                         resp {&server_ctx},
@@ -76,7 +76,7 @@ void Srv::Stream::Start()
      * Initial stream_status set to START
      */
     if (stream_status == START) {
-        service_->RequestMdtDialout(&server_ctx, &resp, cq_, cq_, this);
+        service_->RequestdataPublish(&server_ctx, &resp, cq_, cq_, this);
         stream_status = FLOW;
     } else if (stream_status == FLOW) {
         //std::cout << "Streaming Started ..." << std::endl;

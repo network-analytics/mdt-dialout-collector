@@ -53,36 +53,36 @@ struct TableStruct_mdt_5fdialout_2eproto {
   static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mdt_5fdialout_2eproto;
-namespace mdt_dialout {
-class MdtDialoutArgs;
-struct MdtDialoutArgsDefaultTypeInternal;
-extern MdtDialoutArgsDefaultTypeInternal _MdtDialoutArgs_default_instance_;
-}  // namespace mdt_dialout
+namespace huawei_dialout {
+class serviceArgs;
+struct serviceArgsDefaultTypeInternal;
+extern serviceArgsDefaultTypeInternal _serviceArgs_default_instance_;
+}  // namespace huawei_dialout
 PROTOBUF_NAMESPACE_OPEN
-template<> ::mdt_dialout::MdtDialoutArgs* Arena::CreateMaybeMessage<::mdt_dialout::MdtDialoutArgs>(Arena*);
+template<> ::huawei_dialout::serviceArgs* Arena::CreateMaybeMessage<::huawei_dialout::serviceArgs>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
-namespace mdt_dialout {
+namespace huawei_dialout {
 
 // ===================================================================
 
-class MdtDialoutArgs final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mdt_dialout.MdtDialoutArgs) */ {
+class serviceArgs final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:huawei_dialout.serviceArgs) */ {
  public:
-  inline MdtDialoutArgs() : MdtDialoutArgs(nullptr) {}
-  ~MdtDialoutArgs() override;
-  explicit constexpr MdtDialoutArgs(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline serviceArgs() : serviceArgs(nullptr) {}
+  ~serviceArgs() override;
+  explicit constexpr serviceArgs(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  MdtDialoutArgs(const MdtDialoutArgs& from);
-  MdtDialoutArgs(MdtDialoutArgs&& from) noexcept
-    : MdtDialoutArgs() {
+  serviceArgs(const serviceArgs& from);
+  serviceArgs(serviceArgs&& from) noexcept
+    : serviceArgs() {
     *this = ::std::move(from);
   }
 
-  inline MdtDialoutArgs& operator=(const MdtDialoutArgs& from) {
+  inline serviceArgs& operator=(const serviceArgs& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MdtDialoutArgs& operator=(MdtDialoutArgs&& from) noexcept {
+  inline serviceArgs& operator=(serviceArgs&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -105,20 +105,26 @@ class MdtDialoutArgs final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const MdtDialoutArgs& default_instance() {
+  static const serviceArgs& default_instance() {
     return *internal_default_instance();
   }
-  static inline const MdtDialoutArgs* internal_default_instance() {
-    return reinterpret_cast<const MdtDialoutArgs*>(
-               &_MdtDialoutArgs_default_instance_);
+  enum MessageDataCase {
+    kData = 2,
+    kDataJson = 4,
+    MESSAGEDATA_NOT_SET = 0,
+  };
+
+  static inline const serviceArgs* internal_default_instance() {
+    return reinterpret_cast<const serviceArgs*>(
+               &_serviceArgs_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(MdtDialoutArgs& a, MdtDialoutArgs& b) {
+  friend void swap(serviceArgs& a, serviceArgs& b) {
     a.Swap(&b);
   }
-  inline void Swap(MdtDialoutArgs* other) {
+  inline void Swap(serviceArgs* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
@@ -131,7 +137,7 @@ class MdtDialoutArgs final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MdtDialoutArgs* other) {
+  void UnsafeArenaSwap(serviceArgs* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -139,13 +145,13 @@ class MdtDialoutArgs final :
 
   // implements Message ----------------------------------------------
 
-  MdtDialoutArgs* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<MdtDialoutArgs>(arena);
+  serviceArgs* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<serviceArgs>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const MdtDialoutArgs& from);
+  void CopyFrom(const serviceArgs& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const MdtDialoutArgs& from);
+  void MergeFrom(const serviceArgs& from);
   private:
   static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
   public:
@@ -162,15 +168,15 @@ class MdtDialoutArgs final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MdtDialoutArgs* other);
+  void InternalSwap(serviceArgs* other);
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "mdt_dialout.MdtDialoutArgs";
+    return "huawei_dialout.serviceArgs";
   }
   protected:
-  explicit MdtDialoutArgs(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit serviceArgs(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   private:
   static void ArenaDtor(void* object);
@@ -187,24 +193,11 @@ class MdtDialoutArgs final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kDataFieldNumber = 2,
     kErrorsFieldNumber = 3,
     kReqIdFieldNumber = 1,
+    kDataFieldNumber = 2,
+    kDataJsonFieldNumber = 4,
   };
-  // bytes data = 2;
-  void clear_data();
-  const std::string& data() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_data(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_data();
-  PROTOBUF_NODISCARD std::string* release_data();
-  void set_allocated_data(std::string* data);
-  private:
-  const std::string& _internal_data() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_data(const std::string& value);
-  std::string* _internal_mutable_data();
-  public:
-
   // string errors = 3;
   void clear_errors();
   const std::string& errors() const;
@@ -228,17 +221,67 @@ class MdtDialoutArgs final :
   void _internal_set_reqid(int64_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:mdt_dialout.MdtDialoutArgs)
+  // bytes data = 2;
+  bool has_data() const;
+  private:
+  bool _internal_has_data() const;
+  public:
+  void clear_data();
+  const std::string& data() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_data(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_data();
+  PROTOBUF_NODISCARD std::string* release_data();
+  void set_allocated_data(std::string* data);
+  private:
+  const std::string& _internal_data() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
+  public:
+
+  // string data_json = 4;
+  bool has_data_json() const;
+  private:
+  bool _internal_has_data_json() const;
+  public:
+  void clear_data_json();
+  const std::string& data_json() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_data_json(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_data_json();
+  PROTOBUF_NODISCARD std::string* release_data_json();
+  void set_allocated_data_json(std::string* data_json);
+  private:
+  const std::string& _internal_data_json() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_data_json(const std::string& value);
+  std::string* _internal_mutable_data_json();
+  public:
+
+  void clear_MessageData();
+  MessageDataCase MessageData_case() const;
+  // @@protoc_insertion_point(class_scope:huawei_dialout.serviceArgs)
  private:
   class _Internal;
+  void set_has_data();
+  void set_has_data_json();
+
+  inline bool has_MessageData() const;
+  inline void clear_has_MessageData();
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr errors_;
   int64_t reqid_;
+  union MessageDataUnion {
+    constexpr MessageDataUnion() : _constinit_{} {}
+      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_json_;
+  } MessageData_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  uint32_t _oneof_case_[1];
+
   friend struct ::TableStruct_mdt_5fdialout_2eproto;
 };
 // ===================================================================
@@ -250,115 +293,228 @@ class MdtDialoutArgs final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// MdtDialoutArgs
+// serviceArgs
 
 // int64 ReqId = 1;
-inline void MdtDialoutArgs::clear_reqid() {
+inline void serviceArgs::clear_reqid() {
   reqid_ = int64_t{0};
 }
-inline int64_t MdtDialoutArgs::_internal_reqid() const {
+inline int64_t serviceArgs::_internal_reqid() const {
   return reqid_;
 }
-inline int64_t MdtDialoutArgs::reqid() const {
-  // @@protoc_insertion_point(field_get:mdt_dialout.MdtDialoutArgs.ReqId)
+inline int64_t serviceArgs::reqid() const {
+  // @@protoc_insertion_point(field_get:huawei_dialout.serviceArgs.ReqId)
   return _internal_reqid();
 }
-inline void MdtDialoutArgs::_internal_set_reqid(int64_t value) {
+inline void serviceArgs::_internal_set_reqid(int64_t value) {
   
   reqid_ = value;
 }
-inline void MdtDialoutArgs::set_reqid(int64_t value) {
+inline void serviceArgs::set_reqid(int64_t value) {
   _internal_set_reqid(value);
-  // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.ReqId)
+  // @@protoc_insertion_point(field_set:huawei_dialout.serviceArgs.ReqId)
 }
 
 // bytes data = 2;
-inline void MdtDialoutArgs::clear_data() {
-  data_.ClearToEmpty();
+inline bool serviceArgs::_internal_has_data() const {
+  return MessageData_case() == kData;
 }
-inline const std::string& MdtDialoutArgs::data() const {
-  // @@protoc_insertion_point(field_get:mdt_dialout.MdtDialoutArgs.data)
+inline bool serviceArgs::has_data() const {
+  return _internal_has_data();
+}
+inline void serviceArgs::set_has_data() {
+  _oneof_case_[0] = kData;
+}
+inline void serviceArgs::clear_data() {
+  if (_internal_has_data()) {
+    MessageData_.data_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+    clear_has_MessageData();
+  }
+}
+inline const std::string& serviceArgs::data() const {
+  // @@protoc_insertion_point(field_get:huawei_dialout.serviceArgs.data)
   return _internal_data();
 }
 template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void MdtDialoutArgs::set_data(ArgT0&& arg0, ArgT... args) {
- 
- data_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.data)
+inline void serviceArgs::set_data(ArgT0&& arg0, ArgT... args) {
+  if (!_internal_has_data()) {
+    clear_MessageData();
+    set_has_data();
+    MessageData_.data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  MessageData_.data_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:huawei_dialout.serviceArgs.data)
 }
-inline std::string* MdtDialoutArgs::mutable_data() {
+inline std::string* serviceArgs::mutable_data() {
   std::string* _s = _internal_mutable_data();
-  // @@protoc_insertion_point(field_mutable:mdt_dialout.MdtDialoutArgs.data)
+  // @@protoc_insertion_point(field_mutable:huawei_dialout.serviceArgs.data)
   return _s;
 }
-inline const std::string& MdtDialoutArgs::_internal_data() const {
-  return data_.Get();
+inline const std::string& serviceArgs::_internal_data() const {
+  if (_internal_has_data()) {
+    return MessageData_.data_.Get();
+  }
+  return ::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited();
 }
-inline void MdtDialoutArgs::_internal_set_data(const std::string& value) {
-  
-  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+inline void serviceArgs::_internal_set_data(const std::string& value) {
+  if (!_internal_has_data()) {
+    clear_MessageData();
+    set_has_data();
+    MessageData_.data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  MessageData_.data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* MdtDialoutArgs::_internal_mutable_data() {
-  
-  return data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+inline std::string* serviceArgs::_internal_mutable_data() {
+  if (!_internal_has_data()) {
+    clear_MessageData();
+    set_has_data();
+    MessageData_.data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  return MessageData_.data_.Mutable(
+      ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* MdtDialoutArgs::release_data() {
-  // @@protoc_insertion_point(field_release:mdt_dialout.MdtDialoutArgs.data)
-  return data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
-}
-inline void MdtDialoutArgs::set_allocated_data(std::string* data) {
-  if (data != nullptr) {
-    
+inline std::string* serviceArgs::release_data() {
+  // @@protoc_insertion_point(field_release:huawei_dialout.serviceArgs.data)
+  if (_internal_has_data()) {
+    clear_has_MessageData();
+    return MessageData_.data_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
   } else {
-    
+    return nullptr;
   }
-  data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), data,
-      GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (data_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
-    data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+}
+inline void serviceArgs::set_allocated_data(std::string* data) {
+  if (has_MessageData()) {
+    clear_MessageData();
   }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:mdt_dialout.MdtDialoutArgs.data)
+  if (data != nullptr) {
+    set_has_data();
+    MessageData_.data_.UnsafeSetDefault(data);
+    ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArenaForAllocation();
+    if (arena != nullptr) {
+      arena->Own(data);
+    }
+  }
+  // @@protoc_insertion_point(field_set_allocated:huawei_dialout.serviceArgs.data)
+}
+
+// string data_json = 4;
+inline bool serviceArgs::_internal_has_data_json() const {
+  return MessageData_case() == kDataJson;
+}
+inline bool serviceArgs::has_data_json() const {
+  return _internal_has_data_json();
+}
+inline void serviceArgs::set_has_data_json() {
+  _oneof_case_[0] = kDataJson;
+}
+inline void serviceArgs::clear_data_json() {
+  if (_internal_has_data_json()) {
+    MessageData_.data_json_.Destroy(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+    clear_has_MessageData();
+  }
+}
+inline const std::string& serviceArgs::data_json() const {
+  // @@protoc_insertion_point(field_get:huawei_dialout.serviceArgs.data_json)
+  return _internal_data_json();
+}
+template <typename ArgT0, typename... ArgT>
+inline void serviceArgs::set_data_json(ArgT0&& arg0, ArgT... args) {
+  if (!_internal_has_data_json()) {
+    clear_MessageData();
+    set_has_data_json();
+    MessageData_.data_json_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  MessageData_.data_json_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:huawei_dialout.serviceArgs.data_json)
+}
+inline std::string* serviceArgs::mutable_data_json() {
+  std::string* _s = _internal_mutable_data_json();
+  // @@protoc_insertion_point(field_mutable:huawei_dialout.serviceArgs.data_json)
+  return _s;
+}
+inline const std::string& serviceArgs::_internal_data_json() const {
+  if (_internal_has_data_json()) {
+    return MessageData_.data_json_.Get();
+  }
+  return ::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited();
+}
+inline void serviceArgs::_internal_set_data_json(const std::string& value) {
+  if (!_internal_has_data_json()) {
+    clear_MessageData();
+    set_has_data_json();
+    MessageData_.data_json_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  MessageData_.data_json_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* serviceArgs::_internal_mutable_data_json() {
+  if (!_internal_has_data_json()) {
+    clear_MessageData();
+    set_has_data_json();
+    MessageData_.data_json_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  }
+  return MessageData_.data_json_.Mutable(
+      ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* serviceArgs::release_data_json() {
+  // @@protoc_insertion_point(field_release:huawei_dialout.serviceArgs.data_json)
+  if (_internal_has_data_json()) {
+    clear_has_MessageData();
+    return MessageData_.data_json_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+  } else {
+    return nullptr;
+  }
+}
+inline void serviceArgs::set_allocated_data_json(std::string* data_json) {
+  if (has_MessageData()) {
+    clear_MessageData();
+  }
+  if (data_json != nullptr) {
+    set_has_data_json();
+    MessageData_.data_json_.UnsafeSetDefault(data_json);
+    ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArenaForAllocation();
+    if (arena != nullptr) {
+      arena->Own(data_json);
+    }
+  }
+  // @@protoc_insertion_point(field_set_allocated:huawei_dialout.serviceArgs.data_json)
 }
 
 // string errors = 3;
-inline void MdtDialoutArgs::clear_errors() {
+inline void serviceArgs::clear_errors() {
   errors_.ClearToEmpty();
 }
-inline const std::string& MdtDialoutArgs::errors() const {
-  // @@protoc_insertion_point(field_get:mdt_dialout.MdtDialoutArgs.errors)
+inline const std::string& serviceArgs::errors() const {
+  // @@protoc_insertion_point(field_get:huawei_dialout.serviceArgs.errors)
   return _internal_errors();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void MdtDialoutArgs::set_errors(ArgT0&& arg0, ArgT... args) {
+void serviceArgs::set_errors(ArgT0&& arg0, ArgT... args) {
  
  errors_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_set:huawei_dialout.serviceArgs.errors)
 }
-inline std::string* MdtDialoutArgs::mutable_errors() {
+inline std::string* serviceArgs::mutable_errors() {
   std::string* _s = _internal_mutable_errors();
-  // @@protoc_insertion_point(field_mutable:mdt_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_mutable:huawei_dialout.serviceArgs.errors)
   return _s;
 }
-inline const std::string& MdtDialoutArgs::_internal_errors() const {
+inline const std::string& serviceArgs::_internal_errors() const {
   return errors_.Get();
 }
-inline void MdtDialoutArgs::_internal_set_errors(const std::string& value) {
+inline void serviceArgs::_internal_set_errors(const std::string& value) {
   
   errors_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* MdtDialoutArgs::_internal_mutable_errors() {
+inline std::string* serviceArgs::_internal_mutable_errors() {
   
   return errors_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* MdtDialoutArgs::release_errors() {
-  // @@protoc_insertion_point(field_release:mdt_dialout.MdtDialoutArgs.errors)
+inline std::string* serviceArgs::release_errors() {
+  // @@protoc_insertion_point(field_release:huawei_dialout.serviceArgs.errors)
   return errors_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void MdtDialoutArgs::set_allocated_errors(std::string* errors) {
+inline void serviceArgs::set_allocated_errors(std::string* errors) {
   if (errors != nullptr) {
     
   } else {
@@ -371,16 +527,25 @@ inline void MdtDialoutArgs::set_allocated_errors(std::string* errors) {
     errors_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:mdt_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_set_allocated:huawei_dialout.serviceArgs.errors)
 }
 
+inline bool serviceArgs::has_MessageData() const {
+  return MessageData_case() != MESSAGEDATA_NOT_SET;
+}
+inline void serviceArgs::clear_has_MessageData() {
+  _oneof_case_[0] = MESSAGEDATA_NOT_SET;
+}
+inline serviceArgs::MessageDataCase serviceArgs::MessageData_case() const {
+  return serviceArgs::MessageDataCase(_oneof_case_[0]);
+}
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace mdt_dialout
+}  // namespace huawei_dialout
 
 // @@protoc_insertion_point(global_scope)
 

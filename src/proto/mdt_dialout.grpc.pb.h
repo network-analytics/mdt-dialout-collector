@@ -25,54 +25,54 @@
 #include <grpcpp/impl/codegen/stub_options.h>
 #include <grpcpp/impl/codegen/sync_stream.h>
 
-namespace mdt_dialout {
+namespace huawei_dialout {
 
-class gRPCMdtDialout final {
+class gRPCDataservice final {
  public:
   static constexpr char const* service_full_name() {
-    return "mdt_dialout.gRPCMdtDialout";
+    return "huawei_dialout.gRPCDataservice";
   }
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
+    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>> dataPublish(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>>(dataPublishRaw(context));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
+    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>> AsyncdataPublish(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>>(AsyncdataPublishRaw(context, cq, tag));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
+    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>> PrepareAsyncdataPublish(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>>(PrepareAsyncdataPublishRaw(context, cq));
     }
     class async_interface {
      public:
       virtual ~async_interface() {}
-      virtual void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>* reactor) = 0;
+      virtual void dataPublish(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::huawei_dialout::serviceArgs,::huawei_dialout::serviceArgs>* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
    private:
-    virtual ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* dataPublishRaw(::grpc::ClientContext* context) = 0;
+    virtual ::grpc::ClientAsyncReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* AsyncdataPublishRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderWriterInterface< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* PrepareAsyncdataPublishRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
+    std::unique_ptr< ::grpc::ClientReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>> dataPublish(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>>(dataPublishRaw(context));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
+    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>> AsyncdataPublish(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>>(AsyncdataPublishRaw(context, cq, tag));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
+    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>> PrepareAsyncdataPublish(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>>(PrepareAsyncdataPublishRaw(context, cq));
     }
     class async final :
       public StubInterface::async_interface {
      public:
-      void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>* reactor) override;
+      void dataPublish(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::huawei_dialout::serviceArgs,::huawei_dialout::serviceArgs>* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -84,10 +84,10 @@ class gRPCMdtDialout final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class async async_stub_{this};
-    ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) override;
-    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
-    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_MdtDialout_;
+    ::grpc::ClientReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* dataPublishRaw(::grpc::ClientContext* context) override;
+    ::grpc::ClientAsyncReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* AsyncdataPublishRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* PrepareAsyncdataPublishRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    const ::grpc::internal::RpcMethod rpcmethod_dataPublish_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -95,111 +95,111 @@ class gRPCMdtDialout final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status MdtDialout(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* stream);
+    virtual ::grpc::Status dataPublish(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* stream);
   };
   template <class BaseClass>
-  class WithAsyncMethod_MdtDialout : public BaseClass {
+  class WithAsyncMethod_dataPublish : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithAsyncMethod_MdtDialout() {
+    WithAsyncMethod_dataPublish() {
       ::grpc::Service::MarkMethodAsync(0);
     }
-    ~WithAsyncMethod_MdtDialout() override {
+    ~WithAsyncMethod_dataPublish() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status dataPublish(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestMdtDialout(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestdataPublish(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(0, context, stream, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_MdtDialout<Service > AsyncService;
+  typedef WithAsyncMethod_dataPublish<Service > AsyncService;
   template <class BaseClass>
-  class WithCallbackMethod_MdtDialout : public BaseClass {
+  class WithCallbackMethod_dataPublish : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithCallbackMethod_MdtDialout() {
+    WithCallbackMethod_dataPublish() {
       ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackBidiHandler< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>(
+          new ::grpc::internal::CallbackBidiHandler< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>(
             [this](
-                   ::grpc::CallbackServerContext* context) { return this->MdtDialout(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->dataPublish(context); }));
     }
-    ~WithCallbackMethod_MdtDialout() override {
+    ~WithCallbackMethod_dataPublish() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status dataPublish(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerBidiReactor< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialout(
+    virtual ::grpc::ServerBidiReactor< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* dataPublish(
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };
-  typedef WithCallbackMethod_MdtDialout<Service > CallbackService;
+  typedef WithCallbackMethod_dataPublish<Service > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
-  class WithGenericMethod_MdtDialout : public BaseClass {
+  class WithGenericMethod_dataPublish : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithGenericMethod_MdtDialout() {
+    WithGenericMethod_dataPublish() {
       ::grpc::Service::MarkMethodGeneric(0);
     }
-    ~WithGenericMethod_MdtDialout() override {
+    ~WithGenericMethod_dataPublish() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status dataPublish(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithRawMethod_MdtDialout : public BaseClass {
+  class WithRawMethod_dataPublish : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawMethod_MdtDialout() {
+    WithRawMethod_dataPublish() {
       ::grpc::Service::MarkMethodRaw(0);
     }
-    ~WithRawMethod_MdtDialout() override {
+    ~WithRawMethod_dataPublish() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status dataPublish(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestMdtDialout(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestdataPublish(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(0, context, stream, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithRawCallbackMethod_MdtDialout : public BaseClass {
+  class WithRawCallbackMethod_dataPublish : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawCallbackMethod_MdtDialout() {
+    WithRawCallbackMethod_dataPublish() {
       ::grpc::Service::MarkMethodRawCallback(0,
           new ::grpc::internal::CallbackBidiHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-                   ::grpc::CallbackServerContext* context) { return this->MdtDialout(context); }));
+                   ::grpc::CallbackServerContext* context) { return this->dataPublish(context); }));
     }
-    ~WithRawCallbackMethod_MdtDialout() override {
+    ~WithRawCallbackMethod_dataPublish() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status dataPublish(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::huawei_dialout::serviceArgs, ::huawei_dialout::serviceArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* MdtDialout(
+    virtual ::grpc::ServerBidiReactor< ::grpc::ByteBuffer, ::grpc::ByteBuffer>* dataPublish(
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };
@@ -208,7 +208,7 @@ class gRPCMdtDialout final {
   typedef Service StreamedService;
 };
 
-}  // namespace mdt_dialout
+}  // namespace huawei_dialout
 
 
 #endif  // GRPC_mdt_5fdialout_2eproto__INCLUDED
