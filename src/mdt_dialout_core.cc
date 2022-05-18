@@ -99,11 +99,11 @@ void Srv::Stream::Start()
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(*tlm, &stream_data, opt);
-            Srv::Stream::async_kafka_prod(stream_data);
-            //std::cout << stream_data;
+            //Srv::Stream::async_kafka_prod(stream_data);
+            std::cout << stream_data;
         } else {
-            Srv::Stream::async_kafka_prod(stream.data());
-            //std::cout << stream.data();
+            //Srv::Stream::async_kafka_prod(stream.data());
+            std::cout << stream.data();
         }
     } else {
         GPR_ASSERT(stream_status == END);
