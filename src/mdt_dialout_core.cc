@@ -85,8 +85,18 @@ void Srv::Stream::Start()
         new Srv::Stream(service_, cq_);
         /* this is used as a unique TAG */
         resp.Read(&stream, this);
-        auto type_info = typeid(stream.data()).name();
+        
+        /**
+         * Huawei JSON format
+         */
+        std::cout << stream.data_json() << std::endl;
+
+        //auto type_info = typeid(stream.data()).name();
         //std::cout << type_info << std::endl;
+
+        /**
+         * Partially Huawei GPB-Compact format & with the right PROTO CISCO JSON & GPB-KV
+         */
         std::string stream_data;
         //Srv::Stream::str2json(stream_data);
         //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
@@ -100,10 +110,10 @@ void Srv::Stream::Start()
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(*tlm, &stream_data, opt);
             //Srv::Stream::async_kafka_prod(stream_data);
-            std::cout << stream_data;
+            std::cout << stream_data << std::endl;
         } else {
             //Srv::Stream::async_kafka_prod(stream.data());
-            std::cout << stream.data();
+            std::cout << stream.data() << std::endl;
         }
     } else {
         GPR_ASSERT(stream_status == END);
