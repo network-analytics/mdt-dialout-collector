@@ -21,7 +21,7 @@
 
 syntax = "proto3";
 
-package telemetry;
+package cisco_telemetry;
  
 // Telemetry message is the outermost payload message used to stream
 // telemetry in a Model Driven Telemetry (MDT) system. MDT provides a

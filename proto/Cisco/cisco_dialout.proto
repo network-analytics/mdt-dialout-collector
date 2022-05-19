@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package mdt_dialout;
+package cisco_dialout;
 
 service gRPCMdtDialout {
   rpc MdtDialout(stream MdtDialoutArgs) returns(stream MdtDialoutArgs) {};

@@ -1,6 +1,6 @@
 syntax = "proto3";                           //The .proto file version is defined as v3. 
 
-package telemetry;                           //The package name is telemetry. 
+package huawei_telemetry;                    //The package name is telemetry. 
 
 message Telemetry {                          //Telemetry message structure definition. 
   string node_id_str = 1;                    //Device name.
