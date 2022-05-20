@@ -27,7 +27,7 @@ void Srv::Bind(std::string srv_addr)
     grpc::ServerBuilder builder;
     builder.AddListeningPort(srv_addr, grpc::InsecureServerCredentials());
     builder.RegisterService(&cisco_service_);
-    builder.RegisterService(&huawei_service_);
+    //builder.RegisterService(&huawei_service_);
     cq_ = builder.AddCompletionQueue();
     server_ = builder.BuildAndStart();
 
@@ -47,7 +47,7 @@ void Srv::Bind(std::string srv_addr)
 void Srv::FsmCtrl()
 {
     new Srv::CiscoStream(&cisco_service_, cq_.get());
-    new Srv::HuaweiStream(&huawei_service_, cq_.get());
+    //new Srv::HuaweiStream(&huawei_service_, cq_.get());
     int counter {0};
     void *tag {nullptr};
     bool ok {false};
@@ -58,7 +58,7 @@ void Srv::FsmCtrl()
         if (!ok) {
             /* Something went wrong with CQ -> set stream_status = END */
             static_cast<CiscoStream *>(tag)->CiscoStream::Stop();
-            static_cast<HuaweiStream *>(tag)->HuaweiStream::Stop();
+            //static_cast<HuaweiStream *>(tag)->HuaweiStream::Stop();
             continue;
         }
         static_cast<CiscoStream *>(tag)->CiscoStream::Start();
@@ -100,18 +100,11 @@ void Srv::CiscoStream::Start()
         new Srv::CiscoStream(cisco_service_, cq_);
         /* this is used as a unique TAG */
         cisco_resp.Read(&cisco_stream, this);
-
-        /**
-         * Huawei JSON format
-         */
-        //std::cout << huawei_stream.data_json() << std::endl;
+        std::cout << cisco_stream.data() << std::endl;
 
         //auto type_info = typeid(stream.data()).name();
         //std::cout << type_info << std::endl;
 
-        /**
-         * Partially Huawei GPB-Compact format & with the right PROTO CISCO JSON & GPB-KV
-         */
         std::string stream_data;
         //Srv::Stream::str2json(stream_data);
         //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
@@ -160,9 +153,6 @@ void Srv::HuaweiStream::Start()
         //auto type_info = typeid(stream.data()).name();
         //std::cout << type_info << std::endl;
 
-        /**
-         * Partially Huawei GPB-Compact format & with the right PROTO CISCO JSON & GPB-KV
-         */
         std::string stream_data;
         //Srv::Stream::str2json(stream_data);
         //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
@@ -179,7 +169,7 @@ void Srv::HuaweiStream::Start()
             std::cout << stream_data << std::endl;
         } else {
             //Srv::Stream::async_kafka_prod(stream.data());
-            std::cout << huawei_stream.data() << std::endl;
+            std::cout << huawei_stream.data_json() << std::endl;
         }
     } else {
         GPR_ASSERT(stream_status == END);
