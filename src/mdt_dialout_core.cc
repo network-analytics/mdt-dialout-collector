@@ -52,16 +52,16 @@ void Srv::FsmCtrl()
     void *tag {nullptr};
     bool ok {false};
     while (true) {
-        //std::cout << counter << std::endl;
+        std::cout << counter << std::endl;
         GPR_ASSERT(cq_->Next(&tag, &ok));
         //GPR_ASSERT(ok);
         if (!ok) {
             /* Something went wrong with CQ -> set stream_status = END */
-            static_cast<CiscoStream *>(tag)->CiscoStream::Stop();
+            static_cast<Srv::CiscoStream *>(tag)->Srv::CiscoStream::Stop();
             //static_cast<HuaweiStream *>(tag)->HuaweiStream::Stop();
             continue;
         }
-        static_cast<CiscoStream *>(tag)->CiscoStream::Start();
+        static_cast<Srv::CiscoStream *>(tag)->Srv::CiscoStream::Start();
         //static_cast<HuaweiStream *>(tag)->HuaweiStream::Start();
         counter++;
     }
@@ -76,6 +76,7 @@ Srv::CiscoStream::CiscoStream(cisco_dialout::gRPCMdtDialout::AsyncService *cisco
     Srv::CiscoStream::Start();
 }
 
+/*
 Srv::HuaweiStream::HuaweiStream(huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
                     grpc::ServerCompletionQueue *cq) : huawei_service_ {huawei_service},
                                                         cq_ {cq},
@@ -84,6 +85,7 @@ Srv::HuaweiStream::HuaweiStream(huawei_dialout::gRPCDataservice::AsyncService *h
 {
     Srv::HuaweiStream::Start();
 }
+*/
 
 void Srv::CiscoStream::Start()
 {
@@ -94,7 +96,7 @@ void Srv::CiscoStream::Start()
         cisco_service_->RequestMdtDialout(&server_ctx, &cisco_resp, cq_, cq_, this);
         stream_status = FLOW;
     } else if (stream_status == FLOW) {
-        //std::cout << "Streaming Started ..." << std::endl;
+        std::cout << "Streaming Started ..." << std::endl;
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
         new Srv::CiscoStream(cisco_service_, cq_);
@@ -129,53 +131,54 @@ void Srv::CiscoStream::Start()
     }
 }
 
-void Srv::HuaweiStream::Start()
-{
-    /**
-     * Initial stream_status set to START
-     */
-    if (stream_status == START) {
-        huawei_service_->RequestdataPublish(&server_ctx, &huawei_resp, cq_, cq_, this);
-        stream_status = FLOW;
-    } else if (stream_status == FLOW) {
-        //std::cout << "Streaming Started ..." << std::endl;
-        //std::string peer = server_ctx.peer();
-        //std::cout << "Peer: " + peer << std::endl;
-        new Srv::HuaweiStream(huawei_service_, cq_);
-        /* this is used as a unique TAG */
-        huawei_resp.Read(&huawei_stream, this);
+//void Srv::HuaweiStream::Start()
+//{
+//    /**
+//     * Initial stream_status set to START
+//     */
+//    if (stream_status == START) {
+//        huawei_service_->RequestdataPublish(&server_ctx, &huawei_resp, cq_, cq_, this);
+//        stream_status = FLOW;
+//    } else if (stream_status == FLOW) {
+//        //std::cout << "Streaming Started ..." << std::endl;
+//        //std::string peer = server_ctx.peer();
+//        //std::cout << "Peer: " + peer << std::endl;
+//        new Srv::HuaweiStream(huawei_service_, cq_);
+//        /* this is used as a unique TAG */
+//        huawei_resp.Read(&huawei_stream, this);
+//
+//        /**
+//         * Huawei JSON format
+//         */
+//        std::cout << huawei_stream.data_json() << std::endl;
+//
+//        //auto type_info = typeid(stream.data()).name();
+//        //std::cout << type_info << std::endl;
+//
+//        std::string stream_data;
+//        //Srv::Stream::str2json(stream_data);
+//        //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
+//        //    output << stream.data();
+//        //} else {
+//        //    std::exit(EXIT_FAILURE);
+//        //}
+//        google::protobuf::Message *huawei_tlm = new huawei_telemetry::Telemetry;
+//        if (huawei_tlm->ParseFromString(huawei_stream.data())) {
+//            google::protobuf::util::JsonOptions opt;
+//            opt.add_whitespace = true;
+//            google::protobuf::util::MessageToJsonString(*huawei_tlm, &stream_data, opt);
+//            //Srv::Stream::async_kafka_prod(stream_data);
+//            std::cout << stream_data << std::endl;
+//        } else {
+//            //Srv::Stream::async_kafka_prod(stream.data());
+//            std::cout << huawei_stream.data_json() << std::endl;
+//        }
+//    } else {
+//        GPR_ASSERT(stream_status == END);
+//        delete this;
+//    }
+//}
 
-        /**
-         * Huawei JSON format
-         */
-        std::cout << huawei_stream.data_json() << std::endl;
-
-        //auto type_info = typeid(stream.data()).name();
-        //std::cout << type_info << std::endl;
-
-        std::string stream_data;
-        //Srv::Stream::str2json(stream_data);
-        //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
-        //    output << stream.data();
-        //} else {
-        //    std::exit(EXIT_FAILURE);
-        //}
-        google::protobuf::Message *huawei_tlm = new huawei_telemetry::Telemetry;
-        if (huawei_tlm->ParseFromString(huawei_stream.data())) {
-            google::protobuf::util::JsonOptions opt;
-            opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(*huawei_tlm, &stream_data, opt);
-            //Srv::Stream::async_kafka_prod(stream_data);
-            std::cout << stream_data << std::endl;
-        } else {
-            //Srv::Stream::async_kafka_prod(stream.data());
-            std::cout << huawei_stream.data_json() << std::endl;
-        }
-    } else {
-        GPR_ASSERT(stream_status == END);
-        delete this;
-    }
-}
 
 void Srv::CiscoStream::Stop()
 {
@@ -183,11 +186,11 @@ void Srv::CiscoStream::Stop()
     stream_status = END;
 }
 
-void Srv::HuaweiStream::Stop()
-{
-    //std::cout << "Streaming Interrupted ..." << std::endl;
-    stream_status = END;
-}
+//void Srv::HuaweiStream::Stop()
+//{
+//    //std::cout << "Streaming Interrupted ..." << std::endl;
+//    stream_status = END;
+//}
 
 /**
  * string-to-json can be used for data manipulation

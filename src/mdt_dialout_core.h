@@ -28,8 +28,6 @@ private:
     public:
         CiscoStream(cisco_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cq);
-        enum StreamStatus { START, FLOW, END };
-        StreamStatus stream_status;
         void Start();
         void Stop();
         int str2json(const std::string& json_str);
@@ -39,17 +37,18 @@ private:
         cisco_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
         grpc::ServerCompletionQueue *cq_;
         grpc::ServerContext server_ctx;
+        enum StreamStatus { START, FLOW, END };
+        StreamStatus stream_status;
         cisco_dialout::MdtDialoutArgs cisco_stream;
         grpc::ServerAsyncReaderWriter<cisco_dialout::MdtDialoutArgs,
                                     cisco_dialout::MdtDialoutArgs> cisco_resp;
     };
 
+    /*
     class HuaweiStream {
     public:
         HuaweiStream(huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *cq);
-        enum StreamStatus { START, FLOW, END };
-        StreamStatus stream_status;
         void Start();
         void Stop();
         //int str2json(const std::string& json_str);
@@ -59,10 +58,13 @@ private:
         huawei_dialout::gRPCDataservice::AsyncService *huawei_service_;
         grpc::ServerCompletionQueue *cq_;
         grpc::ServerContext server_ctx;
+        enum StreamStatus { START, FLOW, END };
+        StreamStatus stream_status;
         huawei_dialout::serviceArgs huawei_stream;
         grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
                                     huawei_dialout::serviceArgs> huawei_resp;
     };
+    */
 };
 
 #endif
