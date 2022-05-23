@@ -70,7 +70,7 @@ void Srv::CiscoFsmCtrl()
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
     while (true) {
-        //std::cout << counter << std::endl;
+        std::cout << "Cisco: " << counter << std::endl;
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
         //GPR_ASSERT(ok);
         if (!cisco_ok) {
@@ -90,7 +90,7 @@ void Srv::HuaweiFsmCtrl()
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
     while (true) {
-        //std::cout << counter << std::endl;
+        std::cout << "Huawei: " << counter << std::endl;
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
         //GPR_ASSERT(ok);
         if (!huawei_ok) {
