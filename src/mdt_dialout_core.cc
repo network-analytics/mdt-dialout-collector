@@ -18,71 +18,100 @@
 
 Srv::~Srv()
 {
-    server_->grpc::ServerInterface::Shutdown();
-    cq_->grpc::ServerCompletionQueue::Shutdown();
+    cisco_server_->grpc::ServerInterface::Shutdown();
+    huawei_server_->grpc::ServerInterface::Shutdown();
+    cisco_cq_->grpc::ServerCompletionQueue::Shutdown();
+    huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
 }
 
-void Srv::Bind(std::string srv_addr)
+void Srv::Bind(std::string cisco_srv_socket, std::string huawei_srv_socket)
 {
-    grpc::ServerBuilder builder;
-    builder.AddListeningPort(srv_addr, grpc::InsecureServerCredentials());
-    builder.RegisterService(&cisco_service_);
-    builder.RegisterService(&huawei_service_);
-    cq_ = builder.AddCompletionQueue();
-    server_ = builder.BuildAndStart();
+    grpc::ServerBuilder cisco_builder, huawei_builder;
+    cisco_builder.AddListeningPort(cisco_srv_socket, grpc::InsecureServerCredentials());
+    cisco_builder.RegisterService(&cisco_service_);
+    huawei_builder.AddListeningPort(huawei_srv_socket, grpc::InsecureServerCredentials());
+    huawei_builder.RegisterService(&huawei_service_);
+    cisco_cq_ = cisco_builder.AddCompletionQueue();
+    huawei_cq_ = huawei_builder.AddCompletionQueue();
+    cisco_server_ = cisco_builder.BuildAndStart();
+    huawei_server_ = huawei_builder.BuildAndStart();
 
-    Srv::FsmCtrl();
-    std::thread t1(&Srv::FsmCtrl, this);
-    std::thread t2(&Srv::FsmCtrl, this);
-    std::thread t3(&Srv::FsmCtrl, this);
+    Srv::CiscoFsmCtrl();
+    std::thread t1(&Srv::CiscoFsmCtrl, this);
+    std::thread t2(&Srv::CiscoFsmCtrl, this);
+    std::thread t3(&Srv::CiscoFsmCtrl, this);
 
     t1.join();
     t2.join();
     t3.join();
+    
+    Srv::HuaweiFsmCtrl();
+    std::thread t4(&Srv::HuaweiFsmCtrl, this);
+    std::thread t5(&Srv::HuaweiFsmCtrl, this);
+    std::thread t6(&Srv::HuaweiFsmCtrl, this);
+
+    t4.join();
+    t5.join();
+    t6.join();
 }
 
 /**
  * Parallelism should be eventually handled with this func
  */
-void Srv::FsmCtrl()
+void Srv::CiscoFsmCtrl()
 {
-    new Srv::CiscoStream(&cisco_service_, cq_.get());
-    new Srv::HuaweiStream(&huawei_service_, cq_.get());
+    new Srv::CiscoStream(&cisco_service_, cisco_cq_.get());
     int counter {0};
-    void *tag {nullptr};
-    bool ok {false};
+    void *cisco_tag {nullptr};
+    bool cisco_ok {false};
     while (true) {
-        std::cout << "Here: " << counter << std::endl;
-        GPR_ASSERT(cq_->Next(&tag, &ok));
+        //std::cout << counter << std::endl;
+        GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
         //GPR_ASSERT(ok);
-        if (!ok) {
-            std::cout << "NOT OK" << std::endl;
+        if (!cisco_ok) {
             /* Something went wrong with CQ -> set stream_status = END */
-            static_cast<CiscoStream *>(tag)->Stop();
-            static_cast<HuaweiStream *>(tag)->Stop();
+            static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Stop();
             continue;
         }
-        std::cout << "OK" << std::endl;
-        static_cast<CiscoStream *>(tag)->Start();
-        static_cast<HuaweiStream *>(tag)->Start();
+        static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
+        counter++;
+    }
+}
+
+void Srv::HuaweiFsmCtrl()
+{
+    new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get());
+    int counter {0};
+    void *huawei_tag {nullptr};
+    bool huawei_ok {false};
+    while (true) {
+        //std::cout << counter << std::endl;
+        GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
+        //GPR_ASSERT(ok);
+        if (!huawei_ok) {
+            /* Something went wrong with CQ -> set stream_status = END */
+            static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Stop();
+            continue;
+        }
+        static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start();
         counter++;
     }
 }
 
 Srv::CiscoStream::CiscoStream(mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
-                    grpc::ServerCompletionQueue *cq) : cisco_service_ {cisco_service},
-                                                        cq_ {cq},
-                                                        cisco_resp {&server_ctx},
-                                                        stream_status {START}
+                    grpc::ServerCompletionQueue *cisco_cq) : cisco_service_ {cisco_service},
+                                                        cisco_cq_ {cisco_cq},
+                                                        cisco_resp {&cisco_server_ctx},
+                                                        cisco_stream_status {START}
 {
     Srv::CiscoStream::Start();
 }
 
 Srv::HuaweiStream::HuaweiStream(huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
-                    grpc::ServerCompletionQueue *cq) : huawei_service_ {huawei_service},
-                                                        cq_ {cq},
-                                                        huawei_resp {&server_ctx},
-                                                        stream_status {START}
+                    grpc::ServerCompletionQueue *huawei_cq) : huawei_service_ {huawei_service},
+                                                        huawei_cq_ {huawei_cq},
+                                                        huawei_resp {&huawei_server_ctx},
+                                                        huawei_stream_status {START}
 {
     Srv::HuaweiStream::Start();
 }
@@ -92,16 +121,13 @@ void Srv::CiscoStream::Start()
     /**
      * Initial stream_status set to START
      */
-    if (stream_status == START) {
-        std::cout << "Streaming Started 0 ..." << std::endl;
-        cisco_service_->RequestMdtDialout(&server_ctx, &cisco_resp, cq_, cq_, this);
-        std::cout << "Streaming Started 1 ..." << std::endl;
-        stream_status = FLOW;
-    } else if (stream_status == FLOW) {
-        std::cout << "Streaming Started 2 ..." << std::endl;
+    if (cisco_stream_status == START) {
+        cisco_service_->RequestMdtDialout(&cisco_server_ctx, &cisco_resp, cisco_cq_, cisco_cq_, this);
+        cisco_stream_status = FLOW;
+    } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
-        new Srv::CiscoStream(cisco_service_, cq_);
+        new Srv::CiscoStream(cisco_service_, cisco_cq_);
         /* this is used as a unique TAG */
         cisco_resp.Read(&cisco_stream, this);
 
@@ -127,7 +153,7 @@ void Srv::CiscoStream::Start()
             std::cout << cisco_stream.data() << std::endl;
         }
     } else {
-        GPR_ASSERT(stream_status == END);
+        GPR_ASSERT(cisco_stream_status == END);
         delete this;
     }
 }
@@ -137,14 +163,14 @@ void Srv::HuaweiStream::Start()
     /**
      * Initial stream_status set to START
      */
-    if (stream_status == START) {
-        huawei_service_->RequestdataPublish(&server_ctx, &huawei_resp, cq_, cq_, this);
-        stream_status = FLOW;
-    } else if (stream_status == FLOW) {
+    if (huawei_stream_status == START) {
+        huawei_service_->RequestdataPublish(&huawei_server_ctx, &huawei_resp, huawei_cq_, huawei_cq_, this);
+        huawei_stream_status = FLOW;
+    } else if (huawei_stream_status == FLOW) {
         //std::cout << "Streaming Started ..." << std::endl;
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
-        new Srv::HuaweiStream(huawei_service_, cq_);
+        new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         /* this is used as a unique TAG */
         huawei_resp.Read(&huawei_stream, this);
 
@@ -175,7 +201,7 @@ void Srv::HuaweiStream::Start()
             std::cout << huawei_stream.data_json() << std::endl;
         }
     } else {
-        GPR_ASSERT(stream_status == END);
+        GPR_ASSERT(huawei_stream_status == END);
         delete this;
     }
 }
@@ -184,13 +210,13 @@ void Srv::HuaweiStream::Start()
 void Srv::CiscoStream::Stop()
 {
     //std::cout << "Streaming Interrupted ..." << std::endl;
-    stream_status = END;
+    cisco_stream_status = END;
 }
 
 void Srv::HuaweiStream::Stop()
 {
     //std::cout << "Streaming Interrupted ..." << std::endl;
-    stream_status = END;
+    huawei_stream_status = END;
 }
 
 /**
