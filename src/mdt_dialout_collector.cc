@@ -10,8 +10,8 @@ int main(void) {
     void *cisco_ptr {nullptr};
     void *huawei_ptr {nullptr};
 
-    std::jthread cisco_t(&cisco_thread, cisco_ptr);
-    std::jthread huawei_t(&huawei_thread, huawei_ptr);
+    std::thread cisco_t(&cisco_thread, cisco_ptr);
+    std::thread huawei_t(&huawei_thread, huawei_ptr);
 
     cisco_t.join();
     huawei_t.join();
