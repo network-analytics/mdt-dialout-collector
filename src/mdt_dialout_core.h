@@ -19,7 +19,7 @@ public:
 
 private:
     cisco_dialout::gRPCMdtDialout::AsyncService cisco_service_;
-    huawei_dialout::gRPCDataservice::AsyncService huawei_service_;
+    //huawei_dialout::gRPCDataservice::AsyncService huawei_service_;
     std::unique_ptr<grpc::ServerCompletionQueue> cq_;
     std::unique_ptr<grpc::Server> server_;
     void FsmCtrl();
@@ -34,11 +34,11 @@ private:
         int async_kafka_prod(const std::string& json_str);
 
     private:
+        enum StreamStatus { START, FLOW, END };
+        StreamStatus stream_status;
         cisco_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
         grpc::ServerCompletionQueue *cq_;
         grpc::ServerContext server_ctx;
-        enum StreamStatus { START, FLOW, END };
-        StreamStatus stream_status;
         cisco_dialout::MdtDialoutArgs cisco_stream;
         grpc::ServerAsyncReaderWriter<cisco_dialout::MdtDialoutArgs,
                                     cisco_dialout::MdtDialoutArgs> cisco_resp;

@@ -32,13 +32,13 @@ void Srv::Bind(std::string srv_addr)
     server_ = builder.BuildAndStart();
 
     Srv::FsmCtrl();
-    std::thread t1(&Srv::FsmCtrl, this);
-    std::thread t2(&Srv::FsmCtrl, this);
-    std::thread t3(&Srv::FsmCtrl, this);
+    //std::thread t1(&Srv::FsmCtrl, this);
+    //std::thread t2(&Srv::FsmCtrl, this);
+    //std::thread t3(&Srv::FsmCtrl, this);
 
-    t1.join();
-    t2.join();
-    t3.join();
+    //t1.join();
+    //t2.join();
+    //t3.join();
 }
 
 /**
@@ -52,16 +52,18 @@ void Srv::FsmCtrl()
     void *tag {nullptr};
     bool ok {false};
     while (true) {
-        std::cout << counter << std::endl;
+        std::cout << "Here: " << counter << std::endl;
         GPR_ASSERT(cq_->Next(&tag, &ok));
         //GPR_ASSERT(ok);
         if (!ok) {
+            std::cout << "NOT OK" << std::endl;
             /* Something went wrong with CQ -> set stream_status = END */
-            static_cast<Srv::CiscoStream *>(tag)->Srv::CiscoStream::Stop();
+            static_cast<CiscoStream *>(tag)->Stop();
             //static_cast<HuaweiStream *>(tag)->HuaweiStream::Stop();
             continue;
         }
-        static_cast<Srv::CiscoStream *>(tag)->Srv::CiscoStream::Start();
+        std::cout << "OK" << std::endl;
+        static_cast<CiscoStream *>(tag)->Start();
         //static_cast<HuaweiStream *>(tag)->HuaweiStream::Start();
         counter++;
     }
@@ -93,16 +95,17 @@ void Srv::CiscoStream::Start()
      * Initial stream_status set to START
      */
     if (stream_status == START) {
+        std::cout << "Streaming Started 0 ..." << std::endl;
         cisco_service_->RequestMdtDialout(&server_ctx, &cisco_resp, cq_, cq_, this);
+        std::cout << "Streaming Started 1 ..." << std::endl;
         stream_status = FLOW;
     } else if (stream_status == FLOW) {
-        std::cout << "Streaming Started ..." << std::endl;
+        std::cout << "Streaming Started 2 ..." << std::endl;
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
         new Srv::CiscoStream(cisco_service_, cq_);
         /* this is used as a unique TAG */
         cisco_resp.Read(&cisco_stream, this);
-        std::cout << cisco_stream.data() << std::endl;
 
         //auto type_info = typeid(stream.data()).name();
         //std::cout << type_info << std::endl;
