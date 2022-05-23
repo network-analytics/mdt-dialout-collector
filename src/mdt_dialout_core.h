@@ -15,7 +15,8 @@
 class Srv final {
 public:
     ~Srv();
-    void Bind(std::string cisco_srv_socket, std::string huawei_srv_socket);
+    void CiscoBind(std::string cisco_srv_socket);
+    void HuaweiBind(std::string huawei_srv_socket);
 
 private:
     mdt_dialout::gRPCMdtDialout::AsyncService cisco_service_;

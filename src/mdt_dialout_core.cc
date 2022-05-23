@@ -24,17 +24,13 @@ Srv::~Srv()
     huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
 }
 
-void Srv::Bind(std::string cisco_srv_socket, std::string huawei_srv_socket)
+void Srv::CiscoBind(std::string cisco_srv_socket)
 {
-    grpc::ServerBuilder cisco_builder, huawei_builder;
+    grpc::ServerBuilder cisco_builder;
     cisco_builder.AddListeningPort(cisco_srv_socket, grpc::InsecureServerCredentials());
     cisco_builder.RegisterService(&cisco_service_);
-    huawei_builder.AddListeningPort(huawei_srv_socket, grpc::InsecureServerCredentials());
-    huawei_builder.RegisterService(&huawei_service_);
     cisco_cq_ = cisco_builder.AddCompletionQueue();
-    huawei_cq_ = huawei_builder.AddCompletionQueue();
     cisco_server_ = cisco_builder.BuildAndStart();
-    huawei_server_ = huawei_builder.BuildAndStart();
 
     Srv::CiscoFsmCtrl();
     std::thread t1(&Srv::CiscoFsmCtrl, this);
@@ -44,15 +40,24 @@ void Srv::Bind(std::string cisco_srv_socket, std::string huawei_srv_socket)
     t1.join();
     t2.join();
     t3.join();
-    
-    Srv::HuaweiFsmCtrl();
-    std::thread t4(&Srv::HuaweiFsmCtrl, this);
-    std::thread t5(&Srv::HuaweiFsmCtrl, this);
-    std::thread t6(&Srv::HuaweiFsmCtrl, this);
+}
 
-    t4.join();
-    t5.join();
-    t6.join();
+void Srv::HuaweiBind(std::string huawei_srv_socket)
+{
+    grpc::ServerBuilder huawei_builder;
+    huawei_builder.AddListeningPort(huawei_srv_socket, grpc::InsecureServerCredentials());
+    huawei_builder.RegisterService(&huawei_service_);
+    huawei_cq_ = huawei_builder.AddCompletionQueue();
+    huawei_server_ = huawei_builder.BuildAndStart();
+
+    Srv::HuaweiFsmCtrl();
+    std::thread t1(&Srv::HuaweiFsmCtrl, this);
+    std::thread t2(&Srv::HuaweiFsmCtrl, this);
+    std::thread t3(&Srv::HuaweiFsmCtrl, this);
+
+    t1.join();
+    t2.join();
+    t3.join();
 }
 
 /**
