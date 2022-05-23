@@ -3,20 +3,22 @@
 #include "mdt_dialout_core.h"
 
 
-void *cisco_thread(void *arg)
+void *cisco_thread(void *)
 {
-    printf("Cisco worker_thread()\n");
     std::string cisco_srv_socket {"0.0.0.0:10007"};
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
+
+    pthread_exit(NULL);
 }
 
-void *huawei_thread(void *arg)
+void *huawei_thread(void *)
 {
-    printf("Huawei worker_thread()\n");
     std::string huawei_srv_socket {"0.0.0.0:10008"};
     Srv huawei_mdt_dialout_collector;
     huawei_mdt_dialout_collector.CiscoBind(huawei_srv_socket);
+    
+    pthread_exit(NULL);
 }
 
 int main(void)
