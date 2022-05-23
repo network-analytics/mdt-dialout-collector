@@ -58,9 +58,6 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
     t3.join();
 }
 
-/**
- * Parallelism should be eventually handled with this func
- */
 void Srv::CiscoFsmCtrl()
 {
     new Srv::CiscoStream(&cisco_service_, cisco_cq_.get());
@@ -68,11 +65,10 @@ void Srv::CiscoFsmCtrl()
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
     while (true) {
-        std::cout << "Cisco: " << cisco_counter << std::endl;
+        //std::cout << "Cisco: " << cisco_counter << std::endl;
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
         //GPR_ASSERT(ok);
         if (!cisco_ok) {
-            /* Something went wrong with CQ -> set stream_status = END */
             static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Stop();
             continue;
         }
@@ -88,11 +84,10 @@ void Srv::HuaweiFsmCtrl()
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
     while (true) {
-        std::cout << "Huawei: " << huawei_counter << std::endl;
+        //std::cout << "Huawei: " << huawei_counter << std::endl;
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
         //GPR_ASSERT(ok);
         if (!huawei_ok) {
-            /* Something went wrong with CQ -> set stream_status = END */
             static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Stop();
             continue;
         }
@@ -149,10 +144,10 @@ void Srv::CiscoStream::Start()
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(*cisco_tlm, &stream_data, opt);
-            //Srv::Stream::async_kafka_prod(stream_data);
+            //Srv::async_kafka_prod(stream_data);
             std::cout << stream_data << std::endl;
         } else {
-            //Srv::Stream::async_kafka_prod(stream.data());
+            //Srv::async_kafka_prod(stream.data());
             std::cout << cisco_stream.data() << std::endl;
         }
     } else {
@@ -163,44 +158,28 @@ void Srv::CiscoStream::Start()
 
 void Srv::HuaweiStream::Start()
 {
-    /**
-     * Initial stream_status set to START
-     */
     if (huawei_stream_status == START) {
         huawei_service_->RequestdataPublish(&huawei_server_ctx, &huawei_resp, huawei_cq_, huawei_cq_, this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        //std::cout << "Streaming Started ..." << std::endl;
-        //std::string peer = server_ctx.peer();
-        //std::cout << "Peer: " + peer << std::endl;
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
-        /* this is used as a unique TAG */
         huawei_resp.Read(&huawei_stream, this);
 
         /**
          * Huawei JSON format
          */
         std::cout << huawei_stream.data_json() << std::endl;
-
-        //auto type_info = typeid(stream.data()).name();
-        //std::cout << type_info << std::endl;
-
         std::string stream_data;
-        //Srv::Stream::str2json(stream_data);
-        //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
-        //    output << stream.data();
-        //} else {
-        //    std::exit(EXIT_FAILURE);
-        //}
+        
         google::protobuf::Message *huawei_tlm = new huawei_telemetry::Telemetry;
         if (huawei_tlm->ParseFromString(huawei_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(*huawei_tlm, &stream_data, opt);
-            //Srv::Stream::async_kafka_prod(stream_data);
+            //Srv::async_kafka_prod(stream_data);
             std::cout << stream_data << std::endl;
         } else {
-            //Srv::Stream::async_kafka_prod(stream.data());
+            //Srv::async_kafka_prod(stream.data());
             std::cout << huawei_stream.data_json() << std::endl;
         }
     } else {
@@ -225,7 +204,7 @@ void Srv::HuaweiStream::Stop()
 /**
  * string-to-json can be used for data manipulation
  */
-int Srv::CiscoStream::str2json(const std::string& json_str)
+int Srv::str2json(const std::string& json_str)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;
@@ -252,7 +231,7 @@ int Srv::CiscoStream::str2json(const std::string& json_str)
     return EXIT_SUCCESS;
 }
 
-int Srv::CiscoStream::async_kafka_prod(const std::string& json_str)
+int Srv::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
 
