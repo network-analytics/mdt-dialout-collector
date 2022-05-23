@@ -16,7 +16,7 @@ void *huawei_thread(void *)
 {
     std::string huawei_srv_socket {"0.0.0.0:10008"};
     Srv huawei_mdt_dialout_collector;
-    huawei_mdt_dialout_collector.CiscoBind(huawei_srv_socket);
+    huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
     
     pthread_exit(NULL);
 }

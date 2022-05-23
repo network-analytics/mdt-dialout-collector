@@ -66,11 +66,11 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 void Srv::CiscoFsmCtrl()
 {
     new Srv::CiscoStream(&cisco_service_, cisco_cq_.get());
-    int counter {0};
+    int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
     while (true) {
-        std::cout << "Cisco: " << counter << std::endl;
+        std::cout << "Cisco: " << cisco_counter << std::endl;
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
         //GPR_ASSERT(ok);
         if (!cisco_ok) {
@@ -79,18 +79,18 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
-        counter++;
+        cisco_counter++;
     }
 }
 
 void Srv::HuaweiFsmCtrl()
 {
     new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get());
-    int counter {0};
+    int huawei_counter {0};
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
     while (true) {
-        std::cout << "Huawei: " << counter << std::endl;
+        std::cout << "Huawei: " << huawei_counter << std::endl;
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
         //GPR_ASSERT(ok);
         if (!huawei_ok) {
@@ -99,7 +99,7 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start();
-        counter++;
+        huawei_counter++;
     }
 }
 
