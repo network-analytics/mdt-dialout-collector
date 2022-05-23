@@ -166,4 +166,3 @@ foreach(_target "mdt_dialout_collector")
         ${RDKAFKA_LIBRARIES}
     )
 endforeach()
-

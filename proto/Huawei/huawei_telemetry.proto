@@ -88,4 +88,3 @@ message TelemetryThreshold {
   }
   ThresholdOpType thresholdOpType = 2;       //Threshold on the device.
 }
-

@@ -182,4 +182,3 @@ message TelemetryRowGPB {
   // containing Telemetry message.
 bytes content = 11;
 }
-

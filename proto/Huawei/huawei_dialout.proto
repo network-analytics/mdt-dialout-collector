@@ -14,4 +14,3 @@ message serviceArgs {
 	}
 	string errors = 3;
 }
-

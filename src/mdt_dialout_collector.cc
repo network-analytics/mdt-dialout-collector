@@ -1,44 +1,36 @@
 #include <iostream>
-#include <pthread.h>
+#include <thread>
 #include "mdt_dialout_core.h"
 
 
-void *cisco_thread(void *)
-{
+void *cisco_thread(void *);
+void *huawei_thread(void *);
+
+int main(void) {
+    void *cisco_ptr {nullptr};
+    void *huawei_ptr {nullptr};
+
+    std::jthread cisco_t(&cisco_thread, cisco_ptr);
+    std::jthread huawei_t(&huawei_thread, huawei_ptr);
+
+    cisco_t.join();
+    huawei_t.join();
+
+    return (0);
+}
+
+void *cisco_thread(void *cisco_ptr) {
     std::string cisco_srv_socket {"0.0.0.0:10007"};
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
 
-    pthread_exit(NULL);
+    return (0);
 }
 
-void *huawei_thread(void *)
-{
+void *huawei_thread(void *huawei_ptr) {
     std::string huawei_srv_socket {"0.0.0.0:10008"};
     Srv huawei_mdt_dialout_collector;
     huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
     
-    pthread_exit(NULL);
-}
-
-int main(void)
-{
-    pthread_t cisco_t;
-    pthread_t huawei_t;
-
-    pthread_create(&cisco_t, NULL, &cisco_thread, NULL);
-    pthread_create(&huawei_t, NULL, &huawei_thread, NULL);
-
-    pthread_join(cisco_t, 0);
-    pthread_join(huawei_t, 0);
-
-    //std::string cisco_srv_socket {"0.0.0.0:10007"};
-    //std::string huawei_srv_socket {"0.0.0.0:10008"};
-    //Srv cisco_mdt_dialout_collector;
-    //Srv huawei_mdt_dialout_collector;
-    //cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
-    //huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
-    //std::cout << "MDT Server listening on " << server_addr << std::endl;
-
     return (0);
 }

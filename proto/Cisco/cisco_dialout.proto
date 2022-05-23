@@ -12,4 +12,3 @@ message MdtDialoutArgs {
   bytes data = 2;
   string errors = 3;
 }
-
