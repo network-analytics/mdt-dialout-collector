@@ -16,7 +16,7 @@
 #include <google/protobuf/port_def.inc>
 
 PROTOBUF_PRAGMA_INIT_SEG
-namespace cisco_dialout {
+namespace mdt_dialout {
 constexpr MdtDialoutArgs::MdtDialoutArgs(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : data_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
@@ -31,41 +31,41 @@ struct MdtDialoutArgsDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT MdtDialoutArgsDefaultTypeInternal _MdtDialoutArgs_default_instance_;
-}  // namespace cisco_dialout
+}  // namespace mdt_dialout
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_cisco_5fdialout_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_cisco_5fdialout_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_cisco_5fdialout_2eproto = nullptr;
 
 const uint32_t TableStruct_cisco_5fdialout_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::cisco_dialout::MdtDialoutArgs, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::cisco_dialout::MdtDialoutArgs, reqid_),
-  PROTOBUF_FIELD_OFFSET(::cisco_dialout::MdtDialoutArgs, data_),
-  PROTOBUF_FIELD_OFFSET(::cisco_dialout::MdtDialoutArgs, errors_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, reqid_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, data_),
+  PROTOBUF_FIELD_OFFSET(::mdt_dialout::MdtDialoutArgs, errors_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::cisco_dialout::MdtDialoutArgs)},
+  { 0, -1, -1, sizeof(::mdt_dialout::MdtDialoutArgs)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::cisco_dialout::_MdtDialoutArgs_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mdt_dialout::_MdtDialoutArgs_default_instance_),
 };
 
 const char descriptor_table_protodef_cisco_5fdialout_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\023cisco_dialout.proto\022\rcisco_dialout\"=\n\016"
-  "MdtDialoutArgs\022\r\n\005ReqId\030\001 \001(\003\022\014\n\004data\030\002 "
-  "\001(\014\022\016\n\006errors\030\003 \001(\t2b\n\016gRPCMdtDialout\022P\n"
-  "\nMdtDialout\022\035.cisco_dialout.MdtDialoutAr"
-  "gs\032\035.cisco_dialout.MdtDialoutArgs\"\000(\0010\001b"
-  "\006proto3"
+  "\n\023cisco_dialout.proto\022\013mdt_dialout\"=\n\016Md"
+  "tDialoutArgs\022\r\n\005ReqId\030\001 \001(\003\022\014\n\004data\030\002 \001("
+  "\014\022\016\n\006errors\030\003 \001(\t2^\n\016gRPCMdtDialout\022L\n\nM"
+  "dtDialout\022\033.mdt_dialout.MdtDialoutArgs\032\033"
+  ".mdt_dialout.MdtDialoutArgs\"\000(\0010\001b\006proto"
+  "3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_cisco_5fdialout_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_cisco_5fdialout_2eproto = {
-  false, false, 207, descriptor_table_protodef_cisco_5fdialout_2eproto, "cisco_dialout.proto", 
+  false, false, 201, descriptor_table_protodef_cisco_5fdialout_2eproto, "cisco_dialout.proto", 
   &descriptor_table_cisco_5fdialout_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_cisco_5fdialout_2eproto::offsets,
   file_level_metadata_cisco_5fdialout_2eproto, file_level_enum_descriptors_cisco_5fdialout_2eproto, file_level_service_descriptors_cisco_5fdialout_2eproto,
@@ -76,7 +76,7 @@ PROTOBUF_ATTRIBUTE_WEAK const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable
 
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY static ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptorsRunner dynamic_init_dummy_cisco_5fdialout_2eproto(&descriptor_table_cisco_5fdialout_2eproto);
-namespace cisco_dialout {
+namespace mdt_dialout {
 
 // ===================================================================
 
@@ -91,7 +91,7 @@ MdtDialoutArgs::MdtDialoutArgs(::PROTOBUF_NAMESPACE_ID::Arena* arena,
   if (!is_message_owned) {
     RegisterArenaDtor(arena);
   }
-  // @@protoc_insertion_point(arena_constructor:cisco_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(arena_constructor:mdt_dialout.MdtDialoutArgs)
 }
 MdtDialoutArgs::MdtDialoutArgs(const MdtDialoutArgs& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
@@ -113,7 +113,7 @@ MdtDialoutArgs::MdtDialoutArgs(const MdtDialoutArgs& from)
       GetArenaForAllocation());
   }
   reqid_ = from.reqid_;
-  // @@protoc_insertion_point(copy_constructor:cisco_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(copy_constructor:mdt_dialout.MdtDialoutArgs)
 }
 
 inline void MdtDialoutArgs::SharedCtor() {
@@ -129,7 +129,7 @@ reqid_ = int64_t{0};
 }
 
 MdtDialoutArgs::~MdtDialoutArgs() {
-  // @@protoc_insertion_point(destructor:cisco_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(destructor:mdt_dialout.MdtDialoutArgs)
   if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -152,7 +152,7 @@ void MdtDialoutArgs::SetCachedSize(int size) const {
 }
 
 void MdtDialoutArgs::Clear() {
-// @@protoc_insertion_point(message_clear_start:cisco_dialout.MdtDialoutArgs)
+// @@protoc_insertion_point(message_clear_start:mdt_dialout.MdtDialoutArgs)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -191,7 +191,7 @@ const char* MdtDialoutArgs::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_errors();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "cisco_dialout.MdtDialoutArgs.errors"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mdt_dialout.MdtDialoutArgs.errors"));
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -221,7 +221,7 @@ failure:
 
 uint8_t* MdtDialoutArgs::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:cisco_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(serialize_to_array_start:mdt_dialout.MdtDialoutArgs)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -242,7 +242,7 @@ uint8_t* MdtDialoutArgs::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_errors().data(), static_cast<int>(this->_internal_errors().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "cisco_dialout.MdtDialoutArgs.errors");
+      "mdt_dialout.MdtDialoutArgs.errors");
     target = stream->WriteStringMaybeAliased(
         3, this->_internal_errors(), target);
   }
@@ -251,12 +251,12 @@ uint8_t* MdtDialoutArgs::_InternalSerialize(
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:cisco_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(serialize_to_array_end:mdt_dialout.MdtDialoutArgs)
   return target;
 }
 
 size_t MdtDialoutArgs::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:cisco_dialout.MdtDialoutArgs)
+// @@protoc_insertion_point(message_byte_size_start:mdt_dialout.MdtDialoutArgs)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -299,7 +299,7 @@ void MdtDialoutArgs::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 
 
 void MdtDialoutArgs::MergeFrom(const MdtDialoutArgs& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:cisco_dialout.MdtDialoutArgs)
+// @@protoc_insertion_point(class_specific_merge_from_start:mdt_dialout.MdtDialoutArgs)
   GOOGLE_DCHECK_NE(&from, this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -317,7 +317,7 @@ void MdtDialoutArgs::MergeFrom(const MdtDialoutArgs& from) {
 }
 
 void MdtDialoutArgs::CopyFrom(const MdtDialoutArgs& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:cisco_dialout.MdtDialoutArgs)
+// @@protoc_insertion_point(class_specific_copy_from_start:mdt_dialout.MdtDialoutArgs)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -352,10 +352,10 @@ void MdtDialoutArgs::InternalSwap(MdtDialoutArgs* other) {
 }
 
 // @@protoc_insertion_point(namespace_scope)
-}  // namespace cisco_dialout
+}  // namespace mdt_dialout
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::cisco_dialout::MdtDialoutArgs* Arena::CreateMaybeMessage< ::cisco_dialout::MdtDialoutArgs >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::cisco_dialout::MdtDialoutArgs >(arena);
+template<> PROTOBUF_NOINLINE ::mdt_dialout::MdtDialoutArgs* Arena::CreateMaybeMessage< ::mdt_dialout::MdtDialoutArgs >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::mdt_dialout::MdtDialoutArgs >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

@@ -18,15 +18,15 @@ public:
     void Bind(std::string srv_addr);
 
 private:
-    cisco_dialout::gRPCMdtDialout::AsyncService cisco_service_;
-    //huawei_dialout::gRPCDataservice::AsyncService huawei_service_;
+    mdt_dialout::gRPCMdtDialout::AsyncService cisco_service_;
+    huawei_dialout::gRPCDataservice::AsyncService huawei_service_;
     std::unique_ptr<grpc::ServerCompletionQueue> cq_;
     std::unique_ptr<grpc::Server> server_;
     void FsmCtrl();
 
     class CiscoStream {
     public:
-        CiscoStream(cisco_dialout::gRPCMdtDialout::AsyncService *cisco_service,
+        CiscoStream(mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cq);
         void Start();
         void Stop();
@@ -36,15 +36,14 @@ private:
     private:
         enum StreamStatus { START, FLOW, END };
         StreamStatus stream_status;
-        cisco_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
+        mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
         grpc::ServerCompletionQueue *cq_;
         grpc::ServerContext server_ctx;
-        cisco_dialout::MdtDialoutArgs cisco_stream;
-        grpc::ServerAsyncReaderWriter<cisco_dialout::MdtDialoutArgs,
-                                    cisco_dialout::MdtDialoutArgs> cisco_resp;
+        mdt_dialout::MdtDialoutArgs cisco_stream;
+        grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
+                                    mdt_dialout::MdtDialoutArgs> cisco_resp;
     };
 
-    /*
     class HuaweiStream {
     public:
         HuaweiStream(huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
@@ -64,7 +63,6 @@ private:
         grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
                                     huawei_dialout::serviceArgs> huawei_resp;
     };
-    */
 };
 
 #endif

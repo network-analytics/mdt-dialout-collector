@@ -25,54 +25,54 @@
 #include <grpcpp/impl/codegen/stub_options.h>
 #include <grpcpp/impl/codegen/sync_stream.h>
 
-namespace cisco_dialout {
+namespace mdt_dialout {
 
 class gRPCMdtDialout final {
  public:
   static constexpr char const* service_full_name() {
-    return "cisco_dialout.gRPCMdtDialout";
+    return "mdt_dialout.gRPCMdtDialout";
   }
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
+    std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
+    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
     }
-    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
+    std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
     }
     class async_interface {
      public:
       virtual ~async_interface() {}
-      virtual void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::cisco_dialout::MdtDialoutArgs,::cisco_dialout::MdtDialoutArgs>* reactor) = 0;
+      virtual void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
    private:
-    virtual ::grpc::ClientReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
-    virtual ::grpc::ClientAsyncReaderWriterInterface< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) = 0;
+    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderWriterInterface< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    std::unique_ptr< ::grpc::ClientReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
-      return std::unique_ptr< ::grpc::ClientReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
+    std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> MdtDialout(::grpc::ClientContext* context) {
+      return std::unique_ptr< ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(MdtDialoutRaw(context));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
+    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> AsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(AsyncMdtDialoutRaw(context, cq, tag));
     }
-    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
+    std::unique_ptr<  ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>> PrepareAsyncMdtDialout(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>>(PrepareAsyncMdtDialoutRaw(context, cq));
     }
     class async final :
       public StubInterface::async_interface {
      public:
-      void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::cisco_dialout::MdtDialoutArgs,::cisco_dialout::MdtDialoutArgs>* reactor) override;
+      void MdtDialout(::grpc::ClientContext* context, ::grpc::ClientBidiReactor< ::mdt_dialout::MdtDialoutArgs,::mdt_dialout::MdtDialoutArgs>* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -84,9 +84,9 @@ class gRPCMdtDialout final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class async async_stub_{this};
-    ::grpc::ClientReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) override;
-    ::grpc::ClientAsyncReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
-    ::grpc::ClientAsyncReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialoutRaw(::grpc::ClientContext* context) override;
+    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* AsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* PrepareAsyncMdtDialoutRaw(::grpc::ClientContext* context, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_MdtDialout_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
@@ -95,7 +95,7 @@ class gRPCMdtDialout final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status MdtDialout(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* stream);
+    virtual ::grpc::Status MdtDialout(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* stream);
   };
   template <class BaseClass>
   class WithAsyncMethod_MdtDialout : public BaseClass {
@@ -109,11 +109,11 @@ class gRPCMdtDialout final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestMdtDialout(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestMdtDialout(::grpc::ServerContext* context, ::grpc::ServerAsyncReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* stream, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncBidiStreaming(0, context, stream, new_call_cq, notification_cq, tag);
     }
   };
@@ -125,7 +125,7 @@ class gRPCMdtDialout final {
    public:
     WithCallbackMethod_MdtDialout() {
       ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackBidiHandler< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>(
+          new ::grpc::internal::CallbackBidiHandler< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>(
             [this](
                    ::grpc::CallbackServerContext* context) { return this->MdtDialout(context); }));
     }
@@ -133,11 +133,11 @@ class gRPCMdtDialout final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerBidiReactor< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* MdtDialout(
+    virtual ::grpc::ServerBidiReactor< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* MdtDialout(
       ::grpc::CallbackServerContext* /*context*/)
       { return nullptr; }
   };
@@ -155,7 +155,7 @@ class gRPCMdtDialout final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -172,7 +172,7 @@ class gRPCMdtDialout final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -195,7 +195,7 @@ class gRPCMdtDialout final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::cisco_dialout::MdtDialoutArgs, ::cisco_dialout::MdtDialoutArgs>* /*stream*/)  override {
+    ::grpc::Status MdtDialout(::grpc::ServerContext* /*context*/, ::grpc::ServerReaderWriter< ::mdt_dialout::MdtDialoutArgs, ::mdt_dialout::MdtDialoutArgs>* /*stream*/)  override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -208,7 +208,7 @@ class gRPCMdtDialout final {
   typedef Service StreamedService;
 };
 
-}  // namespace cisco_dialout
+}  // namespace mdt_dialout
 
 
 #endif  // GRPC_cisco_5fdialout_2eproto__INCLUDED

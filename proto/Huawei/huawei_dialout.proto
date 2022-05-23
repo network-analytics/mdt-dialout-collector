@@ -9,8 +9,8 @@ service gRPCDataservice {
 message serviceArgs {
 	int64 ReqId = 1;
   oneof MessageData {
-  	bytes data = 2;
-  	string data_json = 4;
+    bytes data = 2;
+    string data_json = 4;
 	}
 	string errors = 3;
 }

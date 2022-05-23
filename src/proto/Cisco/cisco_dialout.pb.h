@@ -53,20 +53,20 @@ struct TableStruct_cisco_5fdialout_2eproto {
   static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_cisco_5fdialout_2eproto;
-namespace cisco_dialout {
+namespace mdt_dialout {
 class MdtDialoutArgs;
 struct MdtDialoutArgsDefaultTypeInternal;
 extern MdtDialoutArgsDefaultTypeInternal _MdtDialoutArgs_default_instance_;
-}  // namespace cisco_dialout
+}  // namespace mdt_dialout
 PROTOBUF_NAMESPACE_OPEN
-template<> ::cisco_dialout::MdtDialoutArgs* Arena::CreateMaybeMessage<::cisco_dialout::MdtDialoutArgs>(Arena*);
+template<> ::mdt_dialout::MdtDialoutArgs* Arena::CreateMaybeMessage<::mdt_dialout::MdtDialoutArgs>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
-namespace cisco_dialout {
+namespace mdt_dialout {
 
 // ===================================================================
 
 class MdtDialoutArgs final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:cisco_dialout.MdtDialoutArgs) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mdt_dialout.MdtDialoutArgs) */ {
  public:
   inline MdtDialoutArgs() : MdtDialoutArgs(nullptr) {}
   ~MdtDialoutArgs() override;
@@ -167,7 +167,7 @@ class MdtDialoutArgs final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "cisco_dialout.MdtDialoutArgs";
+    return "mdt_dialout.MdtDialoutArgs";
   }
   protected:
   explicit MdtDialoutArgs(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -228,7 +228,7 @@ class MdtDialoutArgs final :
   void _internal_set_reqid(int64_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:cisco_dialout.MdtDialoutArgs)
+  // @@protoc_insertion_point(class_scope:mdt_dialout.MdtDialoutArgs)
  private:
   class _Internal;
 
@@ -260,7 +260,7 @@ inline int64_t MdtDialoutArgs::_internal_reqid() const {
   return reqid_;
 }
 inline int64_t MdtDialoutArgs::reqid() const {
-  // @@protoc_insertion_point(field_get:cisco_dialout.MdtDialoutArgs.ReqId)
+  // @@protoc_insertion_point(field_get:mdt_dialout.MdtDialoutArgs.ReqId)
   return _internal_reqid();
 }
 inline void MdtDialoutArgs::_internal_set_reqid(int64_t value) {
@@ -269,7 +269,7 @@ inline void MdtDialoutArgs::_internal_set_reqid(int64_t value) {
 }
 inline void MdtDialoutArgs::set_reqid(int64_t value) {
   _internal_set_reqid(value);
-  // @@protoc_insertion_point(field_set:cisco_dialout.MdtDialoutArgs.ReqId)
+  // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.ReqId)
 }
 
 // bytes data = 2;
@@ -277,7 +277,7 @@ inline void MdtDialoutArgs::clear_data() {
   data_.ClearToEmpty();
 }
 inline const std::string& MdtDialoutArgs::data() const {
-  // @@protoc_insertion_point(field_get:cisco_dialout.MdtDialoutArgs.data)
+  // @@protoc_insertion_point(field_get:mdt_dialout.MdtDialoutArgs.data)
   return _internal_data();
 }
 template <typename ArgT0, typename... ArgT>
@@ -285,11 +285,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void MdtDialoutArgs::set_data(ArgT0&& arg0, ArgT... args) {
  
  data_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:cisco_dialout.MdtDialoutArgs.data)
+  // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.data)
 }
 inline std::string* MdtDialoutArgs::mutable_data() {
   std::string* _s = _internal_mutable_data();
-  // @@protoc_insertion_point(field_mutable:cisco_dialout.MdtDialoutArgs.data)
+  // @@protoc_insertion_point(field_mutable:mdt_dialout.MdtDialoutArgs.data)
   return _s;
 }
 inline const std::string& MdtDialoutArgs::_internal_data() const {
@@ -304,7 +304,7 @@ inline std::string* MdtDialoutArgs::_internal_mutable_data() {
   return data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
 inline std::string* MdtDialoutArgs::release_data() {
-  // @@protoc_insertion_point(field_release:cisco_dialout.MdtDialoutArgs.data)
+  // @@protoc_insertion_point(field_release:mdt_dialout.MdtDialoutArgs.data)
   return data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
 inline void MdtDialoutArgs::set_allocated_data(std::string* data) {
@@ -320,7 +320,7 @@ inline void MdtDialoutArgs::set_allocated_data(std::string* data) {
     data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:cisco_dialout.MdtDialoutArgs.data)
+  // @@protoc_insertion_point(field_set_allocated:mdt_dialout.MdtDialoutArgs.data)
 }
 
 // string errors = 3;
@@ -328,7 +328,7 @@ inline void MdtDialoutArgs::clear_errors() {
   errors_.ClearToEmpty();
 }
 inline const std::string& MdtDialoutArgs::errors() const {
-  // @@protoc_insertion_point(field_get:cisco_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_get:mdt_dialout.MdtDialoutArgs.errors)
   return _internal_errors();
 }
 template <typename ArgT0, typename... ArgT>
@@ -336,11 +336,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void MdtDialoutArgs::set_errors(ArgT0&& arg0, ArgT... args) {
  
  errors_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:cisco_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_set:mdt_dialout.MdtDialoutArgs.errors)
 }
 inline std::string* MdtDialoutArgs::mutable_errors() {
   std::string* _s = _internal_mutable_errors();
-  // @@protoc_insertion_point(field_mutable:cisco_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_mutable:mdt_dialout.MdtDialoutArgs.errors)
   return _s;
 }
 inline const std::string& MdtDialoutArgs::_internal_errors() const {
@@ -355,7 +355,7 @@ inline std::string* MdtDialoutArgs::_internal_mutable_errors() {
   return errors_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
 inline std::string* MdtDialoutArgs::release_errors() {
-  // @@protoc_insertion_point(field_release:cisco_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_release:mdt_dialout.MdtDialoutArgs.errors)
   return errors_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
 inline void MdtDialoutArgs::set_allocated_errors(std::string* errors) {
@@ -371,7 +371,7 @@ inline void MdtDialoutArgs::set_allocated_errors(std::string* errors) {
     errors_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:cisco_dialout.MdtDialoutArgs.errors)
+  // @@protoc_insertion_point(field_set_allocated:mdt_dialout.MdtDialoutArgs.errors)
 }
 
 #ifdef __GNUC__
@@ -380,7 +380,7 @@ inline void MdtDialoutArgs::set_allocated_errors(std::string* errors) {
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace cisco_dialout
+}  // namespace mdt_dialout
 
 // @@protoc_insertion_point(global_scope)
 
