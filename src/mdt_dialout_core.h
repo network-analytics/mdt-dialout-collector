@@ -29,7 +29,8 @@ private:
 
     class CiscoStream {
     public:
-        CiscoStream(mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
+        CiscoStream(
+            mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
         void Start();
         void Stop();
@@ -46,7 +47,8 @@ private:
 
     class HuaweiStream {
     public:
-        HuaweiStream(huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
+        HuaweiStream(
+            huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *huawei_cq);
         void Start();
         void Stop();

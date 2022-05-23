@@ -27,7 +27,8 @@ Srv::~Srv()
 void Srv::CiscoBind(std::string cisco_srv_socket)
 {
     grpc::ServerBuilder cisco_builder;
-    cisco_builder.AddListeningPort(cisco_srv_socket, grpc::InsecureServerCredentials());
+    cisco_builder.AddListeningPort(cisco_srv_socket,
+                                grpc::InsecureServerCredentials());
     cisco_builder.RegisterService(&cisco_service_);
     cisco_cq_ = cisco_builder.AddCompletionQueue();
     cisco_server_ = cisco_builder.BuildAndStart();
@@ -44,7 +45,8 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
 void Srv::HuaweiBind(std::string huawei_srv_socket)
 {
     grpc::ServerBuilder huawei_builder;
-    huawei_builder.AddListeningPort(huawei_srv_socket, grpc::InsecureServerCredentials());
+    huawei_builder.AddListeningPort(huawei_srv_socket,
+                                grpc::InsecureServerCredentials());
     huawei_builder.RegisterService(&huawei_service_);
     huawei_cq_ = huawei_builder.AddCompletionQueue();
     huawei_server_ = huawei_builder.BuildAndStart();
@@ -67,7 +69,6 @@ void Srv::CiscoFsmCtrl()
     while (true) {
         //std::cout << "Cisco: " << cisco_counter << std::endl;
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
-        //GPR_ASSERT(ok);
         if (!cisco_ok) {
             static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Stop();
             continue;
@@ -86,7 +87,6 @@ void Srv::HuaweiFsmCtrl()
     while (true) {
         //std::cout << "Huawei: " << huawei_counter << std::endl;
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
-        //GPR_ASSERT(ok);
         if (!huawei_ok) {
             static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Stop();
             continue;
@@ -96,20 +96,24 @@ void Srv::HuaweiFsmCtrl()
     }
 }
 
-Srv::CiscoStream::CiscoStream(mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
-                    grpc::ServerCompletionQueue *cisco_cq) : cisco_service_ {cisco_service},
-                                                        cisco_cq_ {cisco_cq},
-                                                        cisco_resp {&cisco_server_ctx},
-                                                        cisco_stream_status {START}
+Srv::CiscoStream::CiscoStream(
+                    mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
+                    grpc::ServerCompletionQueue *cisco_cq) :
+                                        cisco_service_ {cisco_service},
+                                        cisco_cq_ {cisco_cq},
+                                        cisco_resp {&cisco_server_ctx},
+                                        cisco_stream_status {START}
 {
     Srv::CiscoStream::Start();
 }
 
-Srv::HuaweiStream::HuaweiStream(huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
-                    grpc::ServerCompletionQueue *huawei_cq) : huawei_service_ {huawei_service},
-                                                        huawei_cq_ {huawei_cq},
-                                                        huawei_resp {&huawei_server_ctx},
-                                                        huawei_stream_status {START}
+Srv::HuaweiStream::HuaweiStream(
+                    huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
+                    grpc::ServerCompletionQueue *huawei_cq) :
+                                        huawei_service_ {huawei_service},
+                                        huawei_cq_ {huawei_cq},
+                                        huawei_resp {&huawei_server_ctx},
+                                        huawei_stream_status {START}
 {
     Srv::HuaweiStream::Start();
 }
@@ -120,7 +124,12 @@ void Srv::CiscoStream::Start()
      * Initial stream_status set to START
      */
     if (cisco_stream_status == START) {
-        cisco_service_->RequestMdtDialout(&cisco_server_ctx, &cisco_resp, cisco_cq_, cisco_cq_, this);
+        cisco_service_->RequestMdtDialout(
+                                        &cisco_server_ctx,
+                                        &cisco_resp,
+                                        cisco_cq_,
+                                        cisco_cq_,
+                                        this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
@@ -143,7 +152,10 @@ void Srv::CiscoStream::Start()
         if (cisco_tlm->ParseFromString(cisco_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(*cisco_tlm, &stream_data, opt);
+            google::protobuf::util::MessageToJsonString(
+                                            *cisco_tlm,
+                                            &stream_data,
+                                            opt);
             //Srv::async_kafka_prod(stream_data);
             std::cout << stream_data << std::endl;
         } else {
@@ -159,7 +171,12 @@ void Srv::CiscoStream::Start()
 void Srv::HuaweiStream::Start()
 {
     if (huawei_stream_status == START) {
-        huawei_service_->RequestdataPublish(&huawei_server_ctx, &huawei_resp, huawei_cq_, huawei_cq_, this);
+        huawei_service_->RequestdataPublish(
+                                    &huawei_server_ctx,
+                                    &huawei_resp,
+                                    huawei_cq_,
+                                    huawei_cq_,
+                                    this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
@@ -175,7 +192,10 @@ void Srv::HuaweiStream::Start()
         if (huawei_tlm->ParseFromString(huawei_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(*huawei_tlm, &stream_data, opt);
+            google::protobuf::util::MessageToJsonString(
+                                            *huawei_tlm,
+                                            &stream_data,
+                                            opt);
             //Srv::async_kafka_prod(stream_data);
             std::cout << stream_data << std::endl;
         } else {
