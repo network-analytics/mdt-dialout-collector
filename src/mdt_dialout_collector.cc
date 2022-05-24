@@ -34,6 +34,6 @@ void *huawei_thread(void *huawei_ptr)
     std::string huawei_srv_socket {"0.0.0.0:10008"};
     Srv huawei_mdt_dialout_collector;
     huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
-    
+
     return (0);
 }

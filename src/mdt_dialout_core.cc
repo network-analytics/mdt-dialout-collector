@@ -74,7 +74,7 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
-        cisco_counter++;
+        //cisco_counter++;
     }
 }
 
@@ -92,7 +92,7 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start();
-        huawei_counter++;
+        //huawei_counter++;
     }
 }
 
@@ -108,8 +108,8 @@ Srv::CiscoStream::CiscoStream(
 }
 
 Srv::HuaweiStream::HuaweiStream(
-                    huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
-                    grpc::ServerCompletionQueue *huawei_cq) :
+                huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
+                grpc::ServerCompletionQueue *huawei_cq) :
                                         huawei_service_ {huawei_service},
                                         huawei_cq_ {huawei_cq},
                                         huawei_resp {&huawei_server_ctx},
@@ -120,9 +120,8 @@ Srv::HuaweiStream::HuaweiStream(
 
 void Srv::CiscoStream::Start()
 {
-    /**
-     * Initial stream_status set to START
-     */
+
+    // Initial stream_status set to START
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
                                         &cisco_server_ctx,
@@ -135,19 +134,22 @@ void Srv::CiscoStream::Start()
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
-        /* this is used as a unique TAG */
+        // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
 
         //auto type_info = typeid(stream.data()).name();
         //std::cout << type_info << std::endl;
 
         std::string stream_data;
-        //Srv::Stream::str2json(stream_data);
-        //if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
-        //    output << stream.data();
-        //} else {
-        //    std::exit(EXIT_FAILURE);
-        //}
+        /*
+         * Srv::Stream::str2json(stream_data);
+         * if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
+         *   output << stream.data();
+         * }
+         * else {
+         *   std::exit(EXIT_FAILURE);
+         * }
+         */
         google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
         if (cisco_tlm->ParseFromString(cisco_stream.data())) {
             google::protobuf::util::JsonOptions opt;
@@ -182,12 +184,10 @@ void Srv::HuaweiStream::Start()
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         huawei_resp.Read(&huawei_stream, this);
 
-        /**
-         * Huawei JSON format
-         */
+        // Huawei JSON format
         std::cout << huawei_stream.data_json() << std::endl;
         std::string stream_data;
-        
+
         google::protobuf::Message *huawei_tlm = new huawei_telemetry::Telemetry;
         if (huawei_tlm->ParseFromString(huawei_stream.data())) {
             google::protobuf::util::JsonOptions opt;
@@ -207,7 +207,6 @@ void Srv::HuaweiStream::Start()
         delete this;
     }
 }
-
 
 void Srv::CiscoStream::Stop()
 {
