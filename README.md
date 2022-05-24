@@ -30,3 +30,11 @@ file to implement a solution to fully operate the network.
 With what concerning gRPC dial-in/dial-out The data-stream is always pushed-out from the router, however in case of Dial-in the connection
 is initiated by the collector, vice-versa with Dial-out the connection is initiated by the router.
 The biggest benefit of Dial-in over Dial-out is that you're gonna have a single channel usable for both telemetry & routers configuration.
+
+---
+
+### MDT Dial-out collector
+
+The main aim of this project it to use the gRPC framework to implement a multi-vendor gRPC Dial-out server. Currently the application is implementing
+the both [Cisco's gRPC Dial-out .proto file](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)
+and the [Huawei's gRPC Dial-out .proto file](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files).
