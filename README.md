@@ -10,3 +10,8 @@ via NETCONF is usually going over SSH (or, more generic, TLS).
 Around five years ago, Google srated working on a new RPC framework called [gRPC](https://www.grpc.io) which is now adopted by
 all the main Vendors to retrieve/send data to the network devices. The most famous implementation are [gNMI](https://github.com/openconfig/gnmi)
 and [gRPC Dial-in\/Dial-out](https://xrdocs.io/telemetry/blogs/2017-01-20-model-driven-telemetry-dial-in-or-dial-out/)
+
+### gRPC vs NETCONF _short version_
+
+- gRPC is generally faster to develop with: it's using [Protocol Buffers](https://developers.google.com/protocol-buffers/) as the
+Interface Description Language and an ad-hoc compiler to automagically generate the associated code.
