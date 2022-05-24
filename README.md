@@ -22,10 +22,10 @@ independently from the existing implementations (the Protobuff file is pre-defin
 - gRPC is efficient and scalable: it's taking advantage of the efficiency coming from [HTTP/2](https://datatracker.ietf.org/doc/html/rfc7540)
 and thanks to Protocol Buffers, the transit data is binary encoded which considerably reduces the message size.
 
-### gRPC Dial-in vs gRPC Dial-out vs gNMI
+### gRPC Dial-in vs gRPC Dial-out vs gNMI _short version_
 
-gNMI (gRPC Network Management Interface) is using the gRPC framework and a standardized Protobuff file to implement a solution to
-fully operate the network.
+gNMI (gRPC Network Management Interface) is using the gRPC framework and a [standardized Protobuff](https://www.openconfig.net/projects/rpc/)
+file to implement a solution to fully operate the network.
 
 With what concerning gRPC dial-in/dial-out The data-stream is always pushed-out from the router, however in case of Dial-in the connection
 is initiated by the collector, vice-versa with Dial-out the connection is initiated by the router.
