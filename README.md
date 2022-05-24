@@ -20,6 +20,4 @@ Interface Description Language and an ad-hoc compiler to automagically generate 
 independently from the existing implementations (the Protobuff file is pre-defining the specs for both client and server).
 
 - gRPC is efficient and scalable: it's taking advantage of the efficiency coming from [HTTP/2](https://datatracker.ietf.org/doc/html/rfc7540)
-and thanks to Protocol Buffers, the transit data is Binary encoded.
-
-
+and thanks to Protocol Buffers, the transit data is binary encoded which considerably reduces the message size.
