@@ -49,7 +49,10 @@ With the limits imposed by the Vendors implementations, both JSON and GPB-KV are
 
 #### How to build
 
-TBD
+It's recommended to compile gRPC and all associated libraries from scratch.
+The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) is describing in detail the compile/install procedure.
+
+If you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation. 
 
 #### How to run
 
