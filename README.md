@@ -56,7 +56,7 @@ you're running a Debian derived Linux distribution you can also refer to the [Al
 - Libraries like jsoncpp & librdkafka are also required.
 ```TEXT
 Debian: sudo apt install libjsoncpp-dev librdkafka-dev 
-CentOS: sudo yum install jsoncpp-devel librdkafka-devel
+Redhat: sudo yum install jsoncpp-devel librdkafka-devel
 ```
 
 #### How to run
