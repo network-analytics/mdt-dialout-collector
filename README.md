@@ -54,12 +54,19 @@ The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) i
 you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation. 
 
 - Libraries like jsoncpp & librdkafka are also required.
-```TEXT
+```SHELL
 Debian: sudo apt install libjsoncpp-dev librdkafka-dev 
 Redhat: sudo yum install jsoncpp-devel librdkafka-devel
 ```
 
-#### How to run
+- git Clone, Compile and Run
+```SHELL
+$ git clone https://github.com/scuzzilla/mdt-dialout-collector.git
 
-TBD
+$ cd mdt-dialout-collector
+$ mkdir build
+$ cmake ../
+
+$ ./mdt-dialout-collector
+```
 
