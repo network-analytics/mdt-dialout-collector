@@ -49,12 +49,11 @@ With the limits imposed by the Vendors implementations, both JSON and GPB-KV are
 
 #### How to build
 
-It's recommended to compile gRPC and all the associated libraries from scratch.
-The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) is describing in detail the compile/install procedure.
+- It's recommended to compile gRPC and all the associated libraries from scratch.
+The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) is describing in detail the compile/install procedure.If
+you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation. 
 
-If you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation. 
-
-Libraries like jsoncpp & librdkafka are also required
+- Libraries like jsoncpp & librdkafka are also required
 ```TEXT
 Debian: sudo apt install libjsoncpp-dev librdkafka-dev 
 CentOS: sudo yum install jsoncpp-devel librdkafka-devel
