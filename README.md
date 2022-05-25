@@ -59,7 +59,7 @@ Debian: sudo apt install libjsoncpp-dev librdkafka-dev
 Redhat: sudo yum install jsoncpp-devel librdkafka-devel
 ```
 
-- git Clone, Compile and Run
+#### git Clone, Compile and Run
 ```SHELL
 $ git clone https://github.com/scuzzilla/mdt-dialout-collector.git
 
