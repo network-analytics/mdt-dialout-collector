@@ -70,3 +70,17 @@ $ cmake ../
 $ ./mdt-dialout-collector
 ```
 
+#### Additional Install notes
+
+If you refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation to compile gRPC, you might want to statically configure the path to your local
+"libs/header" folder.
+```SHELL
+$ export MY_INSTALL_DIR=$HOME/.local
+$ export PATH="$MY_INSTALL_DIR/bin:$PATH"
+```
+
+On CentOS you might need to modify the pkg-config path to allow cmake to find all required libraries.
+```SHELL
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
+```  
+
