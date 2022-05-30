@@ -133,6 +133,7 @@ void Srv::CiscoStream::Start()
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
+        Srv *srv_utils = new Srv();
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
@@ -151,18 +152,19 @@ void Srv::CiscoStream::Start()
          * }
          */
         google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
-        if (cisco_tlm->ParseFromString(cisco_stream.data())) {
+        if (cisco_tlm->ParseFromString(cisco_stream.data()) and 
+                                                cisco_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
                                             *cisco_tlm,
                                             &stream_data,
                                             opt);
-            //Srv::async_kafka_prod(stream_data);
-            std::cout << stream_data << std::endl;
+            srv_utils->async_kafka_prod(stream_data);
+            //std::cout << stream_data << std::endl;
         } else {
-            //Srv::async_kafka_prod(stream.data());
-            std::cout << cisco_stream.data() << std::endl;
+            srv_utils->async_kafka_prod(cisco_stream.data());
+            //std::cout << cisco_stream.data() << std::endl;
         }
     } else {
         GPR_ASSERT(cisco_stream_status == END);
@@ -181,26 +183,29 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
+        Srv *srv_utils = new Srv();
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         huawei_resp.Read(&huawei_stream, this);
 
         // Huawei JSON format
-        std::cout << huawei_stream.data_json() << std::endl;
+        srv_utils->async_kafka_prod(huawei_stream.data_json());
+        //std::cout << huawei_stream.data_json() << std::endl;
         std::string stream_data;
 
         google::protobuf::Message *huawei_tlm = new huawei_telemetry::Telemetry;
-        if (huawei_tlm->ParseFromString(huawei_stream.data())) {
+        if (huawei_tlm->ParseFromString(huawei_stream.data()) and
+                                                huawei_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
                                             *huawei_tlm,
                                             &stream_data,
                                             opt);
-            //Srv::async_kafka_prod(stream_data);
-            std::cout << stream_data << std::endl;
+            srv_utils->async_kafka_prod(stream_data);
+            //std::cout << stream_data << std::endl;
         } else {
-            //Srv::async_kafka_prod(stream.data());
-            std::cout << huawei_stream.data_json() << std::endl;
+            srv_utils->async_kafka_prod(huawei_stream.data_json());
+            //std::cout << huawei_stream.data_json() << std::endl;
         }
     } else {
         GPR_ASSERT(huawei_stream_status == END);
@@ -254,14 +259,20 @@ int Srv::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
 
-    std::string brokers = "192.168.100.241";
-    kafka::Topic topic  = "quickstart";
+    std::string brokers = "kafka.sbd.corproot.net:9093";
+    kafka::Topic topic  = "daisy.dev.yang-json-raw-test";
+    std::string client_id = "mdt-dialout-collector";
 
     try {
         // Additional config options here
         kafka::Properties properties ({
             {"bootstrap.servers",  brokers},
             {"enable.idempotence", "true"},
+            {"client.id", client_id},
+            {"security.protocol", "ssl"},
+            {"ssl.key.location", "/opt/daisy/cert/dev/collectors.key"},
+            {"ssl.certificate.location", "/opt/daisy/cert/dev/collectors.crt"},
+            {"ssl.ca.location", "/opt/daisy/cert/dev/sbd_root_ca.crt"},
         });
 
         KafkaProducer producer(properties);

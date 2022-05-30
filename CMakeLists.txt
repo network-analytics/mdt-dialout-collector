@@ -1,6 +1,9 @@
 # Minimum CMake required
 cmake_minimum_required(VERSION 3.15)
 
+# pkg-config 
+find_package(PkgConfig REQUIRED)
+
 # Project
 project(mdt_dialout_collector)
 
@@ -33,8 +36,6 @@ get_filename_component(cisco_telemetry_proto_path "${cisco_telemetry_proto}" PAT
 # Proto file to be able to decode gpb-kv messages - Huawei
 get_filename_component(huawei_telemetry_proto "proto/Huawei/huawei_telemetry.proto" ABSOLUTE)
 get_filename_component(huawei_telemetry_proto_path "${huawei_telemetry_proto}" PATH)
-
-find_package(PkgConfig REQUIRED)
 
 # jsoncpp libs
 pkg_check_modules(JSONCPP jsoncpp)

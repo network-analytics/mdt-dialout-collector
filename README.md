@@ -45,7 +45,7 @@ With the limits imposed by the Vendors implementations, both JSON and GPB-KV are
 |--------|-------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | Cisco  | XR (...)    | JSON, GPB-KV | [XR Telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)  |
 | Cisco  | XE (...)    | GPB-KV       | [XE Telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)  |
-| Huawei | VRP (...)   | JSON, GPB-KV | [VRP Telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                   |
+| Huawei | VRP (...)   | JSON         | [VRP Telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                   |
 
 #### How to build
 
