@@ -82,7 +82,9 @@ $ export PATH="$MY_INSTALL_DIR/bin:$PATH"
 On CentOS you might need to modify the pkg-config path to allow cmake to find all required libraries.
 ```SHELL
 $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
-```  
+```
+---
+  
 #### Licenses matrix
 
 |  Libraries / .proto files                                                                                                                                                 | License                   |
