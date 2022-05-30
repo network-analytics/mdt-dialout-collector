@@ -153,7 +153,7 @@ void Srv::CiscoStream::Start()
          */
         google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
         if (cisco_tlm->ParseFromString(cisco_stream.data()) and 
-                                                cisco_stream.data().empty()) {
+                                                !cisco_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -194,7 +194,7 @@ void Srv::HuaweiStream::Start()
 
         google::protobuf::Message *huawei_tlm = new huawei_telemetry::Telemetry;
         if (huawei_tlm->ParseFromString(huawei_stream.data()) and
-                                                huawei_stream.data().empty()) {
+                                                !huawei_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
