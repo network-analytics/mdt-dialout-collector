@@ -83,4 +83,15 @@ On CentOS you might need to modify the pkg-config path to allow cmake to find al
 ```SHELL
 $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
 ```  
+#### Licenses matrix
 
+|  Libraries / .proto files                                                                                                                                                 | License                   |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
+| [JsonCpp](https://github.com/open-source-parsers/jsoncpp)                                                                                                                 | MIT License               |
+| [librdkafka](https://github.com/edenhill/librdkafka)                                                                                                                      | BSD 2-Clause License      |
+| [gRPC](https://github.com/grpc/grpc)                                                                                                                                      | BSD 3-Clause License      |
+| [Cisco dial-out .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)| Apache License Version 2.0|
+| [Cisco telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                       | Apache License Version 2.0|
+| [Huawei dial-out .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                         | N/A                       |
+| [Huawei telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                        | N/A                       |
+| [mdt-dialout-collector](https://github.com/scuzzilla/mdt-dialout-collector)                                                                                               | MIT License               |
