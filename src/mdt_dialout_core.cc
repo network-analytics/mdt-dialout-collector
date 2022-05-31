@@ -120,6 +120,7 @@ Srv::HuaweiStream::HuaweiStream(
 
 void Srv::CiscoStream::Start()
 {
+    Srv *srv_utils = new Srv();
 
     // Initial stream_status set to START
     if (cisco_stream_status == START) {
@@ -133,7 +134,6 @@ void Srv::CiscoStream::Start()
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
-        Srv *srv_utils = new Srv();
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
@@ -162,20 +162,22 @@ void Srv::CiscoStream::Start()
                                             opt);
             srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
-            delete srv_utils;
         } else {
             srv_utils->async_kafka_prod(cisco_stream.data());
             //std::cout << cisco_stream.data() << std::endl;
-            delete srv_utils;
         }
     } else {
         GPR_ASSERT(cisco_stream_status == END);
         delete this;
     }
+    
+    delete srv_utils;
 }
 
 void Srv::HuaweiStream::Start()
 {
+    Srv *srv_utils = new Srv();
+
     if (huawei_stream_status == START) {
         huawei_service_->RequestdataPublish(
                                     &huawei_server_ctx,
@@ -185,7 +187,6 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        Srv *srv_utils = new Srv();
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         huawei_resp.Read(&huawei_stream, this);
 
@@ -205,16 +206,16 @@ void Srv::HuaweiStream::Start()
                                             opt);
             srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
-            delete srv_utils;
         } else {
             srv_utils->async_kafka_prod(huawei_stream.data_json());
             //std::cout << huawei_stream.data_json() << std::endl;
-            delete srv_utils;
         }
     } else {
         GPR_ASSERT(huawei_stream_status == END);
         delete this;
     }
+    
+    delete srv_utils;
 }
 
 void Srv::CiscoStream::Stop()
