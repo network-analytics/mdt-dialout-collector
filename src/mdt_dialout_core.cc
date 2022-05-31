@@ -78,6 +78,7 @@ void Srv::CiscoFsmCtrl()
                                                                     srv_utils);
         //cisco_counter++;
     }
+    delete srv_utils;
 }
 
 void Srv::HuaweiFsmCtrl()
@@ -106,8 +107,9 @@ Srv::CiscoStream::CiscoStream(
                                         cisco_resp {&cisco_server_ctx},
                                         cisco_stream_status {START}
 {
-    Srv *srv_utils;
+    Srv *srv_utils = new Srv();
     Srv::CiscoStream::Start(srv_utils);
+    detele srv_utils;
 }
 
 Srv::HuaweiStream::HuaweiStream(
