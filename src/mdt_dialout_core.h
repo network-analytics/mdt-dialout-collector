@@ -32,7 +32,7 @@ private:
         CiscoStream(
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
-        void Start();
+        void Start(Srv *srv_utils);
         void Stop();
 
     private:

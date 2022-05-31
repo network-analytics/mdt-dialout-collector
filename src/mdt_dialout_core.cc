@@ -62,6 +62,7 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 
 void Srv::CiscoFsmCtrl()
 {
+    Srv *srv_utils = new Srv();
     new Srv::CiscoStream(&cisco_service_, cisco_cq_.get());
     int cisco_counter {0};
     void *cisco_tag {nullptr};
@@ -73,7 +74,8 @@ void Srv::CiscoFsmCtrl()
             static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Stop();
             continue;
         }
-        static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
+        static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
+                                                                    srv_utils);
         //cisco_counter++;
     }
 }
@@ -104,7 +106,8 @@ Srv::CiscoStream::CiscoStream(
                                         cisco_resp {&cisco_server_ctx},
                                         cisco_stream_status {START}
 {
-    Srv::CiscoStream::Start();
+    Srv *srv_utils;
+    Srv::CiscoStream::Start(srv_utils);
 }
 
 Srv::HuaweiStream::HuaweiStream(
@@ -118,10 +121,8 @@ Srv::HuaweiStream::HuaweiStream(
     Srv::HuaweiStream::Start();
 }
 
-void Srv::CiscoStream::Start()
+void Srv::CiscoStream::Start(Srv *srv_utils)
 {
-    Srv *srv_utils = new Srv();
-
     // Initial stream_status set to START
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
@@ -176,8 +177,6 @@ void Srv::CiscoStream::Start()
 
 void Srv::HuaweiStream::Start()
 {
-    Srv *srv_utils = new Srv();
-
     if (huawei_stream_status == START) {
         huawei_service_->RequestdataPublish(
                                     &huawei_server_ctx,
@@ -187,6 +186,7 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
+        Srv *srv_utils = new Srv();
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         huawei_resp.Read(&huawei_stream, this);
 
@@ -214,8 +214,6 @@ void Srv::HuaweiStream::Start()
         GPR_ASSERT(huawei_stream_status == END);
         delete this;
     }
-    
-    delete srv_utils;
 }
 
 void Srv::CiscoStream::Stop()
