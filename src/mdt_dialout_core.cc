@@ -62,7 +62,6 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 
 void Srv::CiscoFsmCtrl()
 {
-    Srv *srv_utils = new Srv();
     new Srv::CiscoStream(&cisco_service_, cisco_cq_.get());
     int cisco_counter {0};
     void *cisco_tag {nullptr};
@@ -74,8 +73,7 @@ void Srv::CiscoFsmCtrl()
             static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Stop();
             continue;
         }
-        static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-                                                                    srv_utils);
+        static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
         //cisco_counter++;
     }
     delete srv_utils;
@@ -107,9 +105,7 @@ Srv::CiscoStream::CiscoStream(
                                         cisco_resp {&cisco_server_ctx},
                                         cisco_stream_status {START}
 {
-    Srv *srv_utils = new Srv();
-    Srv::CiscoStream::Start(srv_utils);
-    detele srv_utils;
+    Srv::CiscoStream::Start();
 }
 
 Srv::HuaweiStream::HuaweiStream(
@@ -123,7 +119,7 @@ Srv::HuaweiStream::HuaweiStream(
     Srv::HuaweiStream::Start();
 }
 
-void Srv::CiscoStream::Start(Srv *srv_utils)
+void Srv::CiscoStream::Start()
 {
     // Initial stream_status set to START
     if (cisco_stream_status == START) {
@@ -137,6 +133,7 @@ void Srv::CiscoStream::Start(Srv *srv_utils)
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
+        Srv *srv_utils = new Srv();
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
@@ -173,8 +170,6 @@ void Srv::CiscoStream::Start(Srv *srv_utils)
         GPR_ASSERT(cisco_stream_status == END);
         delete this;
     }
-    
-    delete srv_utils;
 }
 
 void Srv::HuaweiStream::Start()
