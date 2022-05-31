@@ -162,9 +162,11 @@ void Srv::CiscoStream::Start()
                                             opt);
             srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
+            delete srv_utils;
         } else {
             srv_utils->async_kafka_prod(cisco_stream.data());
             //std::cout << cisco_stream.data() << std::endl;
+            delete srv_utils;
         }
     } else {
         GPR_ASSERT(cisco_stream_status == END);
@@ -203,9 +205,11 @@ void Srv::HuaweiStream::Start()
                                             opt);
             srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
+            delete srv_utils;
         } else {
             srv_utils->async_kafka_prod(huawei_stream.data_json());
             //std::cout << huawei_stream.data_json() << std::endl;
+            delete srv_utils;
         }
     } else {
         GPR_ASSERT(huawei_stream_status == END);
