@@ -76,7 +76,6 @@ void Srv::CiscoFsmCtrl()
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
         //cisco_counter++;
     }
-    delete srv_utils;
 }
 
 void Srv::HuaweiFsmCtrl()
