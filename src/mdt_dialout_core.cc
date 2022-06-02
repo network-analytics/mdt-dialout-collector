@@ -71,7 +71,7 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
 {
     gpr_free(mutator);
 }
-    
+
 Srv::~Srv()
 {
     cisco_server_->grpc::ServerInterface::Shutdown();
@@ -88,12 +88,12 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
                                     custom_socket_compare,
                                     custom_socket_destroy,
                                     nullptr};
-    
+
     grpc::ChannelArguments *custom_channel_args;
     grpc_socket_mutator *custom_user_mutator = static_cast<grpc_socket_mutator*> (gpr_malloc(sizeof(custom_user_mutator)));
     grpc_socket_mutator_init(custom_user_mutator, &custom_socket_mutator_vtable);
     custom_channel_args->SetSocketMutator(custom_user_mutator);
-    
+
     grpc::ServerBuilder cisco_builder;
     cisco_builder.AddListeningPort(cisco_srv_socket,
                                 grpc::InsecureServerCredentials());
@@ -223,7 +223,7 @@ void Srv::CiscoStream::Start()
          * }
          */
         google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
-        if (cisco_tlm->ParseFromString(cisco_stream.data()) and 
+        if (cisco_tlm->ParseFromString(cisco_stream.data()) and
                                                 !cisco_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;

@@ -12,7 +12,8 @@
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
 public:
     virtual void UpdateArguments(grpc::ChannelArguments *args) {}
-    virtual void UpdatePlugins(std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
+    virtual void UpdatePlugins(
+        std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
 private:
 };
 
