@@ -54,7 +54,7 @@ bool bindtodevice_socket_mutator(int fd, grpc_socket_mutator *btd_socket_mutator
             break;
     }
 
-    if (0 != setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, "eth0", strlen("eth0"))) {
+    if (0 != setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, "wg0", strlen("wg0"))) {
         std::cout << "Unable to bind to port"<< std::endl;
     }
 
@@ -72,20 +72,6 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
     gpr_free(mutator);
 }
     
-class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
-public:
-    //ServerBuilderOptionImpl(int tos) : tos(tos) {}
-    //~ServerBuilderOptionImpl() {}
-
-    // Alter the ChannelArguments used to create the gRPC server.
-    // This will be called inside ServerBuilder::BuildAndStart().
-    // We have to push any custom channel arguments into args.
-    virtual void UpdateArguments(grpc::ChannelArguments *args);
-    virtual void UpdatePlugins(std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
-private:
-    //int tos;
-};
-
 Srv::~Srv()
 {
     cisco_server_->grpc::ServerInterface::Shutdown();
@@ -103,17 +89,19 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
                                     custom_socket_destroy,
                                     nullptr};
     
-    grpc::ChannelArguments custom_channel_args;
+    grpc::ChannelArguments *custom_channel_args;
     grpc_socket_mutator *custom_user_mutator = static_cast<grpc_socket_mutator*> (gpr_malloc(sizeof(custom_user_mutator)));
     grpc_socket_mutator_init(custom_user_mutator, &custom_socket_mutator_vtable);
-    custom_channel_args.SetSocketMutator(custom_user_mutator);
+    custom_channel_args->SetSocketMutator(custom_user_mutator);
     
     grpc::ServerBuilder cisco_builder;
     cisco_builder.AddListeningPort(cisco_srv_socket,
                                 grpc::InsecureServerCredentials());
     cisco_builder.RegisterService(&cisco_service_);
     std::unique_ptr<ServerBuilderOptionImpl> csbo(new ServerBuilderOptionImpl());
-    //cisco_builder.SetOption(ServerBuilderOptionImpl::UpdateArguments(&custom_channel_args));
+    //ServerBuilderOptionImpl *csbo = new ServerBuilderOptionImpl();
+    csbo->UpdateArguments(custom_channel_args);
+    cisco_builder.SetOption(std::move(csbo));
     cisco_cq_ = cisco_builder.AddCompletionQueue();
     cisco_server_ = cisco_builder.BuildAndStart();
 
