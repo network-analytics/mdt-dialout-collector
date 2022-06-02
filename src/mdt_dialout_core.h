@@ -6,6 +6,7 @@
 //#include <json/json.h>
 #include "cisco_dialout.grpc.pb.h"
 #include "huawei_dialout.grpc.pb.h"
+#include "grpc/socket_mutator.h"
 
 
 class Srv final {
@@ -15,6 +16,9 @@ public:
     void HuaweiBind(std::string huawei_srv_socket);
 
 private:
+    //bool bindtodevice_socket_mutator(int fd, grpc_socket_mutator *btd_socket_mutator);
+    //int custom_socket_compare(grpc_socket_mutator *mutator1, grpc_socket_mutator *mutator2);
+    //void custom_socket_destroy(grpc_socket_mutator *mutator);
     mdt_dialout::gRPCMdtDialout::AsyncService cisco_service_;
     huawei_dialout::gRPCDataservice::AsyncService huawei_service_;
     std::unique_ptr<grpc::ServerCompletionQueue> cisco_cq_;

@@ -3,6 +3,11 @@
 #include <thread>
 #include <typeinfo>
 #include <grpcpp/grpcpp.h>
+#include "grpc/socket_mutator.h"
+#include <grpcpp/support/channel_arguments.h>
+#include <grpc/support/alloc.h>
+#include <grpc/support/log.h>
+#include <grpcpp/impl/server_builder_plugin.h>
 #include <json/json.h>
 //#include <librdkafka/rdkafkacpp.h>
 #include "kafka/KafkaProducer.h"
@@ -14,7 +19,72 @@
 #include <google/protobuf/arena.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/util/json_util.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::Status;
+
+
+bool bindtodevice_socket_mutator(int fd, grpc_socket_mutator *btd_socket_mutator)
+{
+    int type;
+    int length = sizeof( int );
+    socklen_t len = sizeof(type);
+
+    if (0 != getsockopt( fd, SOL_SOCKET, SO_TYPE, &type, &len )) {
+        std::cout << "Unable to get the type"<< std::endl;
+    }
+
+    switch (type)
+    {
+        case SOCK_STREAM:
+            printf("Stream socket.\n");
+            break;
+        case SOCK_DGRAM:
+            printf("Datagram socket.\n");
+            break;
+        case SOCK_RAW:
+            printf("Raw socket.\n");
+            break;
+        default:
+            printf("Unknown socket type.\n");
+            break;
+    }
+
+    if (0 != setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, "eth0", strlen("eth0"))) {
+        std::cout << "Unable to bind to port"<< std::endl;
+    }
+
+    return true;
+}
+
+int custom_socket_compare(grpc_socket_mutator *mutator1,
+                                grpc_socket_mutator *mutator2)
+{
+    return (0);
+}
+
+void custom_socket_destroy(grpc_socket_mutator *mutator)
+{
+    gpr_free(mutator);
+}
+    
+class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
+public:
+    //ServerBuilderOptionImpl(int tos) : tos(tos) {}
+    //~ServerBuilderOptionImpl() {}
+
+    // Alter the ChannelArguments used to create the gRPC server.
+    // This will be called inside ServerBuilder::BuildAndStart().
+    // We have to push any custom channel arguments into args.
+    virtual void UpdateArguments(grpc::ChannelArguments *args);
+    virtual void UpdatePlugins(std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
+private:
+    //int tos;
+};
 
 Srv::~Srv()
 {
@@ -26,10 +96,24 @@ Srv::~Srv()
 
 void Srv::CiscoBind(std::string cisco_srv_socket)
 {
+    const grpc_socket_mutator_vtable
+        custom_socket_mutator_vtable = grpc_socket_mutator_vtable{
+                                    bindtodevice_socket_mutator,
+                                    custom_socket_compare,
+                                    custom_socket_destroy,
+                                    nullptr};
+    
+    grpc::ChannelArguments custom_channel_args;
+    grpc_socket_mutator *custom_user_mutator = static_cast<grpc_socket_mutator*> (gpr_malloc(sizeof(custom_user_mutator)));
+    grpc_socket_mutator_init(custom_user_mutator, &custom_socket_mutator_vtable);
+    custom_channel_args.SetSocketMutator(custom_user_mutator);
+    
     grpc::ServerBuilder cisco_builder;
     cisco_builder.AddListeningPort(cisco_srv_socket,
                                 grpc::InsecureServerCredentials());
     cisco_builder.RegisterService(&cisco_service_);
+    std::unique_ptr<ServerBuilderOptionImpl> csbo(new ServerBuilderOptionImpl());
+    //cisco_builder.SetOption(ServerBuilderOptionImpl::UpdateArguments(&custom_channel_args));
     cisco_cq_ = cisco_builder.AddCompletionQueue();
     cisco_server_ = cisco_builder.BuildAndStart();
 
