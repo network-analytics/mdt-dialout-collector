@@ -34,10 +34,11 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     int length = sizeof(int);
     socklen_t len = sizeof(type);
 
-    if (getsockopt( fd, SOL_SOCKET, SO_TYPE, &type, &len ) != 0) {
-        std::cout << "Unable to get the type"<< std::endl;
+    if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
+        std::cout << "Issues with getting the type ..."<< std::endl;
     }
 
+    /*
     switch (type)
     {
         case SOCK_STREAM:
@@ -53,18 +54,19 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
             printf("Unknown socket type.\n");
             break;
     }
+    */
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
                                 "vrf300", strlen("vrf300")) != 0) {
-        std::cout << "Unable to bind to port"<< std::endl;
+        std::cout << "Issues with binding to iface ..."<< std::endl;
     }
 
     return true;
 }
 
-bool custom_mutator_mutate_fd(int fd, grpc_socket_mutator* pMutator) {
-    CustomSocketMutator* m = (CustomSocketMutator *)pMutator;
-    return m->bindtodevice_socket_mutator(fd);
+bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0) {
+    CustomSocketMutator *csm = (CustomSocketMutator *)mutator0;
+    return csm->bindtodevice_socket_mutator(fd);
 }
 
 #define GPR_ICMP(a, b) ((a) < (b) ? -1 : ((a) > (b) ? 1 : 0))
@@ -81,14 +83,15 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
 
 const grpc_socket_mutator_vtable
         custom_socket_mutator_vtable = grpc_socket_mutator_vtable{
-                                    custom_mutator_mutate_fd,
+                                    custom_socket_mutator_fd,
                                     custom_socket_compare,
                                     custom_socket_destroy,
                                     nullptr};
 
-void ServerBuilderOptionImpl::UpdateArguments(grpc::ChannelArguments *pArg) {
-    CustomSocketMutator *pSocketMutator = new CustomSocketMutator();
-    pArg->SetSocketMutator(pSocketMutator);
+void ServerBuilderOptionImpl::UpdateArguments(
+                                        grpc::ChannelArguments *custom_args) {
+    CustomSocketMutator *csm = new CustomSocketMutator();
+    custom_args->SetSocketMutator(csm);
 }
     
 CustomSocketMutator::CustomSocketMutator() {
