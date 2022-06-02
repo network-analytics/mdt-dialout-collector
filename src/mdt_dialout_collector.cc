@@ -37,3 +37,4 @@ void *huawei_thread(void *huawei_ptr)
 
     return (0);
 }
+

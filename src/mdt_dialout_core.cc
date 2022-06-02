@@ -75,7 +75,7 @@ void ServerBuilderOptionImpl::UpdateArguments(
     CustomSocketMutator *csm_ = new CustomSocketMutator();
     custom_args->SetSocketMutator(csm_);
 }
-    
+
 CustomSocketMutator::CustomSocketMutator() {
     grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
 }
@@ -375,3 +375,4 @@ int Srv::async_kafka_prod(const std::string& json_str)
 
     return EXIT_SUCCESS;
 }
+
