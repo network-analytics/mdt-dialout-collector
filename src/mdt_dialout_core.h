@@ -21,10 +21,8 @@ class CustomSocketMutator: public grpc_socket_mutator {
 public:
     CustomSocketMutator();
     ~CustomSocketMutator() {}
-    //bool mutate(grpc_fd_usage usage, int fd);
     bool bindtodevice_socket_mutator(int fd);
 private:
-    //std::string iface;
 };
 
 class Srv final {

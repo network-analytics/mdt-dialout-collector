@@ -38,8 +38,6 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         std::cout << "Unable to get the type"<< std::endl;
     }
 
-    printf("%u, %u", type, len);
-
     switch (type)
     {
         case SOCK_STREAM:
@@ -56,59 +54,13 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
             break;
     }
 
-    if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, "wg0", strlen("wg0")) != 0) {
+    if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
+                                "vrf300", strlen("vrf300")) != 0) {
         std::cout << "Unable to bind to port"<< std::endl;
     }
 
     return true;
 }
-
-/*
-bool CustomSocketMutator::mutate(grpc_fd_usage usage, int fd) {
-    struct sockaddr_in addr;
-    bzero(&addr, sizeof(addr));
-    socklen_t addr_len = sizeof(addr);
-    getsockname(fd, (struct sockaddr *) &addr, &addr_len);
-
-    std::cout << "Run CustomSocketMutator::mutate:Socketopt() fd=" << fd << " port:" << ntohs(addr.sin_port) << " usage: ";
-
-    switch(usage) {
-        case GRPC_FD_CLIENT_CONNECTION_USAGE:
-            std::cout << "GRPC_FD_CLIENT_CONNECTION_USAGE";
-            break;
-        case GRPC_FD_SERVER_LISTENER_USAGE:
-            // A client has connected to this server
-            std::cout << "GRPC_FD_SERVER_LISTENER_USAGE";
-            break;
-        case GRPC_FD_SERVER_CONNECTION_USAGE:
-            // A server socket has been created
-            std::cout << "GRPC_FD_SERVER_CONNECTION_USAGE";
-            break;
-        default:
-            std::cout << "<unknown>";
-    }
-    std::cout << std::endl;
-
-    int tos_read = 0;
-    socklen_t len = sizeof(tos_read);
-    if (getsockopt(fd, IPPROTO_IP, IP_TOS, &tos_read, &len) != 0) {
-        std::cout << "CustomSocketMutator::mutate:Socketopt(get) failed !" << std::endl;
-    }
-    std::cout << "Read IP_TOS before change: " << tos_read << std::endl;
-
-    if (setsockopt(fd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)) != 0) {
-        std::cout << "CustomSocketMutator::mutate:Socketopt(set) failed !" << std::endl;
-        return 0;
-    }
-
-    if (getsockopt(fd, IPPROTO_IP, IP_TOS, &tos_read, &len) != 0) {
-        std::cout << "CustomSocketMutator::mutate:Socketopt(get) failed !" << std::endl;
-    }
-    std::cout << "Read IP_TOS after change: " << tos_read << std::endl;
-
-    return 1;
-}
-*/
 
 bool custom_mutator_mutate_fd(int fd, grpc_socket_mutator* pMutator) {
     CustomSocketMutator* m = (CustomSocketMutator *)pMutator;
@@ -153,16 +105,10 @@ Srv::~Srv()
 
 void Srv::CiscoBind(std::string cisco_srv_socket)
 {
-    //grpc::ChannelArguments *custom_channel_args = new grpc::ChannelArguments();
-    //grpc_socket_mutator *custom_user_mutator = static_cast<grpc_socket_mutator*> (gpr_malloc(sizeof(custom_user_mutator)));
-    //grpc_socket_mutator_init(custom_user_mutator, &custom_socket_mutator_vtable);
-    //custom_channel_args->SetSocketMutator(custom_user_mutator);
-
     grpc::ServerBuilder cisco_builder;
     cisco_builder.RegisterService(&cisco_service_);
-    std::unique_ptr<ServerBuilderOptionImpl> csbo(new ServerBuilderOptionImpl());
-    //ServerBuilderOptionImpl *csbo = new ServerBuilderOptionImpl();
-    //csbo->UpdateArguments(custom_channel_args);
+    std::unique_ptr<ServerBuilderOptionImpl>
+                                        csbo(new ServerBuilderOptionImpl());
     cisco_builder.SetOption(std::move(csbo));
     cisco_builder.AddListeningPort(cisco_srv_socket,
                                 grpc::InsecureServerCredentials());
@@ -181,9 +127,12 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
 void Srv::HuaweiBind(std::string huawei_srv_socket)
 {
     grpc::ServerBuilder huawei_builder;
+    huawei_builder.RegisterService(&huawei_service_);
+    std::unique_ptr<ServerBuilderOptionImpl>
+                                        hsbo(new ServerBuilderOptionImpl());
+    huawei_builder.SetOption(std::move(hsbo));
     huawei_builder.AddListeningPort(huawei_srv_socket,
                                 grpc::InsecureServerCredentials());
-    huawei_builder.RegisterService(&huawei_service_);
     huawei_cq_ = huawei_builder.AddCompletionQueue();
     huawei_server_ = huawei_builder.BuildAndStart();
 
