@@ -28,13 +28,13 @@ using grpc::ClientContext;
 using grpc::Status;
 
 
-bool bindtodevice_socket_mutator(int fd, grpc_socket_mutator *btd_socket_mutator)
+bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
     int type;
     int length = sizeof(int);
     socklen_t len = sizeof(type);
 
-    if (0 != getsockopt( fd, SOL_SOCKET, SO_TYPE, &type, &len )) {
+    if (getsockopt( fd, SOL_SOCKET, SO_TYPE, &type, &len ) != 0) {
         std::cout << "Unable to get the type"<< std::endl;
     }
 
@@ -56,11 +56,63 @@ bool bindtodevice_socket_mutator(int fd, grpc_socket_mutator *btd_socket_mutator
             break;
     }
 
-    if (0 != setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, "wg0", strlen("wg0"))) {
+    if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, "wg0", strlen("wg0")) != 0) {
         std::cout << "Unable to bind to port"<< std::endl;
     }
 
     return true;
+}
+
+/*
+bool CustomSocketMutator::mutate(grpc_fd_usage usage, int fd) {
+    struct sockaddr_in addr;
+    bzero(&addr, sizeof(addr));
+    socklen_t addr_len = sizeof(addr);
+    getsockname(fd, (struct sockaddr *) &addr, &addr_len);
+
+    std::cout << "Run CustomSocketMutator::mutate:Socketopt() fd=" << fd << " port:" << ntohs(addr.sin_port) << " usage: ";
+
+    switch(usage) {
+        case GRPC_FD_CLIENT_CONNECTION_USAGE:
+            std::cout << "GRPC_FD_CLIENT_CONNECTION_USAGE";
+            break;
+        case GRPC_FD_SERVER_LISTENER_USAGE:
+            // A client has connected to this server
+            std::cout << "GRPC_FD_SERVER_LISTENER_USAGE";
+            break;
+        case GRPC_FD_SERVER_CONNECTION_USAGE:
+            // A server socket has been created
+            std::cout << "GRPC_FD_SERVER_CONNECTION_USAGE";
+            break;
+        default:
+            std::cout << "<unknown>";
+    }
+    std::cout << std::endl;
+
+    int tos_read = 0;
+    socklen_t len = sizeof(tos_read);
+    if (getsockopt(fd, IPPROTO_IP, IP_TOS, &tos_read, &len) != 0) {
+        std::cout << "CustomSocketMutator::mutate:Socketopt(get) failed !" << std::endl;
+    }
+    std::cout << "Read IP_TOS before change: " << tos_read << std::endl;
+
+    if (setsockopt(fd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)) != 0) {
+        std::cout << "CustomSocketMutator::mutate:Socketopt(set) failed !" << std::endl;
+        return 0;
+    }
+
+    if (getsockopt(fd, IPPROTO_IP, IP_TOS, &tos_read, &len) != 0) {
+        std::cout << "CustomSocketMutator::mutate:Socketopt(get) failed !" << std::endl;
+    }
+    std::cout << "Read IP_TOS after change: " << tos_read << std::endl;
+
+    return 1;
+}
+*/
+
+bool custom_mutator_mutate_fd(int fd, grpc_socket_mutator* pMutator) {
+    CustomSocketMutator* m = (CustomSocketMutator *)pMutator;
+    return m->bindtodevice_socket_mutator(fd);
 }
 
 #define GPR_ICMP(a, b) ((a) < (b) ? -1 : ((a) > (b) ? 1 : 0))
@@ -75,6 +127,22 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
     gpr_free(mutator);
 }
 
+const grpc_socket_mutator_vtable
+        custom_socket_mutator_vtable = grpc_socket_mutator_vtable{
+                                    custom_mutator_mutate_fd,
+                                    custom_socket_compare,
+                                    custom_socket_destroy,
+                                    nullptr};
+
+void ServerBuilderOptionImpl::UpdateArguments(grpc::ChannelArguments *pArg) {
+    CustomSocketMutator *pSocketMutator = new CustomSocketMutator();
+    pArg->SetSocketMutator(pSocketMutator);
+}
+    
+CustomSocketMutator::CustomSocketMutator() {
+    grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
+}
+
 Srv::~Srv()
 {
     cisco_server_->grpc::ServerInterface::Shutdown();
@@ -85,23 +153,16 @@ Srv::~Srv()
 
 void Srv::CiscoBind(std::string cisco_srv_socket)
 {
-    const grpc_socket_mutator_vtable
-        custom_socket_mutator_vtable = grpc_socket_mutator_vtable{
-                                    bindtodevice_socket_mutator,
-                                    custom_socket_compare,
-                                    custom_socket_destroy,
-                                    nullptr};
-
-    grpc::ChannelArguments *custom_channel_args = new grpc::ChannelArguments();
-    grpc_socket_mutator *custom_user_mutator = static_cast<grpc_socket_mutator*> (gpr_malloc(sizeof(custom_user_mutator)));
-    grpc_socket_mutator_init(custom_user_mutator, &custom_socket_mutator_vtable);
-    custom_channel_args->SetSocketMutator(custom_user_mutator);
+    //grpc::ChannelArguments *custom_channel_args = new grpc::ChannelArguments();
+    //grpc_socket_mutator *custom_user_mutator = static_cast<grpc_socket_mutator*> (gpr_malloc(sizeof(custom_user_mutator)));
+    //grpc_socket_mutator_init(custom_user_mutator, &custom_socket_mutator_vtable);
+    //custom_channel_args->SetSocketMutator(custom_user_mutator);
 
     grpc::ServerBuilder cisco_builder;
     cisco_builder.RegisterService(&cisco_service_);
     std::unique_ptr<ServerBuilderOptionImpl> csbo(new ServerBuilderOptionImpl());
     //ServerBuilderOptionImpl *csbo = new ServerBuilderOptionImpl();
-    csbo->UpdateArguments(custom_channel_args);
+    //csbo->UpdateArguments(custom_channel_args);
     cisco_builder.SetOption(std::move(csbo));
     cisco_builder.AddListeningPort(cisco_srv_socket,
                                 grpc::InsecureServerCredentials());

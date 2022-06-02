@@ -11,10 +11,20 @@
 
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
 public:
-    virtual void UpdateArguments(grpc::ChannelArguments *args) {}
+    virtual void UpdateArguments(grpc::ChannelArguments *args);
     virtual void UpdatePlugins(
         std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
 private:
+};
+
+class CustomSocketMutator: public grpc_socket_mutator {
+public:
+    CustomSocketMutator();
+    ~CustomSocketMutator() {}
+    //bool mutate(grpc_fd_usage usage, int fd);
+    bool bindtodevice_socket_mutator(int fd);
+private:
+    //std::string iface;
 };
 
 class Srv final {
