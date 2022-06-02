@@ -38,24 +38,6 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         std::cout << "Issues with getting the type ..."<< std::endl;
     }
 
-    /*
-    switch (type)
-    {
-        case SOCK_STREAM:
-            printf("Stream socket.\n");
-            break;
-        case SOCK_DGRAM:
-            printf("Datagram socket.\n");
-            break;
-        case SOCK_RAW:
-            printf("Raw socket.\n");
-            break;
-        default:
-            printf("Unknown socket type.\n");
-            break;
-    }
-    */
-
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
                                 "vrf300", strlen("vrf300")) != 0) {
         std::cout << "Issues with binding to iface ..."<< std::endl;
@@ -90,8 +72,8 @@ const grpc_socket_mutator_vtable
 
 void ServerBuilderOptionImpl::UpdateArguments(
                                         grpc::ChannelArguments *custom_args) {
-    CustomSocketMutator *csm = new CustomSocketMutator();
-    custom_args->SetSocketMutator(csm);
+    CustomSocketMutator *csm_ = new CustomSocketMutator();
+    custom_args->SetSocketMutator(csm_);
 }
     
 CustomSocketMutator::CustomSocketMutator() {
