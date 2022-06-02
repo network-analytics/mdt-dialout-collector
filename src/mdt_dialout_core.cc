@@ -35,12 +35,12 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     socklen_t len = sizeof(type);
 
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
-        std::cout << "Issues with getting the type ..."<< std::endl;
+        //std::cout << "Issues with getting the iface type ..." << std::endl;
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
                                 "vrf300", strlen("vrf300")) != 0) {
-        std::cout << "Issues with binding to iface ..."<< std::endl;
+        //std::cout << "Issues with iface binding for ..." << std::endl;
     }
 
     return true;
