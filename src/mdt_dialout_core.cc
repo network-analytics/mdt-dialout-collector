@@ -31,12 +31,14 @@ using grpc::Status;
 bool bindtodevice_socket_mutator(int fd, grpc_socket_mutator *btd_socket_mutator)
 {
     int type;
-    int length = sizeof( int );
+    int length = sizeof(int);
     socklen_t len = sizeof(type);
 
     if (0 != getsockopt( fd, SOL_SOCKET, SO_TYPE, &type, &len )) {
         std::cout << "Unable to get the type"<< std::endl;
     }
+
+    printf("%u, %u", type, len);
 
     switch (type)
     {
@@ -61,10 +63,11 @@ bool bindtodevice_socket_mutator(int fd, grpc_socket_mutator *btd_socket_mutator
     return true;
 }
 
+#define GPR_ICMP(a, b) ((a) < (b) ? -1 : ((a) > (b) ? 1 : 0))
 int custom_socket_compare(grpc_socket_mutator *mutator1,
                                 grpc_socket_mutator *mutator2)
 {
-    return (0);
+    return GPR_ICMP(mutator1, mutator2);
 }
 
 void custom_socket_destroy(grpc_socket_mutator *mutator)
@@ -89,19 +92,19 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
                                     custom_socket_destroy,
                                     nullptr};
 
-    grpc::ChannelArguments *custom_channel_args;
+    grpc::ChannelArguments *custom_channel_args = new grpc::ChannelArguments();
     grpc_socket_mutator *custom_user_mutator = static_cast<grpc_socket_mutator*> (gpr_malloc(sizeof(custom_user_mutator)));
     grpc_socket_mutator_init(custom_user_mutator, &custom_socket_mutator_vtable);
     custom_channel_args->SetSocketMutator(custom_user_mutator);
 
     grpc::ServerBuilder cisco_builder;
-    cisco_builder.AddListeningPort(cisco_srv_socket,
-                                grpc::InsecureServerCredentials());
     cisco_builder.RegisterService(&cisco_service_);
     std::unique_ptr<ServerBuilderOptionImpl> csbo(new ServerBuilderOptionImpl());
     //ServerBuilderOptionImpl *csbo = new ServerBuilderOptionImpl();
     csbo->UpdateArguments(custom_channel_args);
     cisco_builder.SetOption(std::move(csbo));
+    cisco_builder.AddListeningPort(cisco_srv_socket,
+                                grpc::InsecureServerCredentials());
     cisco_cq_ = cisco_builder.AddCompletionQueue();
     cisco_server_ = cisco_builder.BuildAndStart();
 
