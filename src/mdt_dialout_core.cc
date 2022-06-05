@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <memory>
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -202,7 +203,8 @@ void Srv::CiscoStream::Start()
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
-        std::unique_ptr<Srv> srv_utils(new Srv());
+        //std::unique_ptr<Srv> srv_utils(new Srv());
+        Srv srv_utils;
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
@@ -220,7 +222,8 @@ void Srv::CiscoStream::Start()
          *   std::exit(EXIT_FAILURE);
          * }
          */
-        google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
+        std::unique_ptr<google::protobuf::Message> cisco_tlm(new cisco_telemetry::Telemetry());
+        //google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
         if (cisco_tlm->ParseFromString(cisco_stream.data()) and
                                                 !cisco_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
@@ -229,10 +232,10 @@ void Srv::CiscoStream::Start()
                                             *cisco_tlm,
                                             &stream_data,
                                             opt);
-            srv_utils->async_kafka_prod(stream_data);
+            srv_utils.async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
         } else {
-            srv_utils->async_kafka_prod(cisco_stream.data());
+            srv_utils.async_kafka_prod(cisco_stream.data());
             //std::cout << cisco_stream.data() << std::endl;
         }
     } else {
