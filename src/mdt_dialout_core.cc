@@ -222,9 +222,8 @@ void Srv::CiscoStream::Start()
          */
         std::unique_ptr<google::protobuf::Message> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
-        //google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
         if (cisco_tlm->ParseFromString(cisco_stream.data()) and
-                                                !cisco_stream.data().empty()) {
+                                            !cisco_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -255,7 +254,7 @@ void Srv::HuaweiStream::Start()
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
         std::unique_ptr<Srv::HuaweiStream> srv_utils(
-                            new Srv::HuaweiStream(huawei_service_, huawei_cq_));
+                        new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_resp.Read(&huawei_stream, this);
 
         // Huawei JSON format
@@ -266,7 +265,7 @@ void Srv::HuaweiStream::Start()
         std::unique_ptr<google::protobuf::Message> huawei_tlm(
                                             new cisco_telemetry::Telemetry());
         if (huawei_tlm->ParseFromString(huawei_stream.data()) and
-                                                !huawei_stream.data().empty()) {
+                                            !huawei_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -308,7 +307,8 @@ int SrvUtils::str2json(const std::string& json_str)
     Json::CharReaderBuilder builderR;
     Json::StreamWriterBuilder builderW;
     const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
-    const std::unique_ptr<Json::StreamWriter> writer(builderW.newStreamWriter());
+    const std::unique_ptr<Json::StreamWriter> writer(
+                                                builderW.newStreamWriter());
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
                       &root, &err)) {
         std::cout << "error" << std::endl;
