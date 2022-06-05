@@ -48,8 +48,6 @@ private:
     void CiscoFsmCtrl();
     void HuaweiFsmCtrl();
     enum StreamStatus { START, FLOW, END };
-    int str2json(const std::string& json_str);
-    int async_kafka_prod(const std::string& json_str);
 
     class CiscoStream: public SrvUtils {
     public:
@@ -89,4 +87,3 @@ private:
 };
 
 #endif
-
