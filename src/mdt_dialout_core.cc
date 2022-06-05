@@ -188,8 +188,6 @@ Srv::HuaweiStream::HuaweiStream(
     Srv::HuaweiStream::Start();
 }
 
-std::unique_ptr<Srv> srv_utils(new Srv());
-
 void Srv::CiscoStream::Start()
 {
     // Initial stream_status set to START
@@ -204,8 +202,8 @@ void Srv::CiscoStream::Start()
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
-        //new Srv::CiscoStream(cisco_service_, cisco_cq_);
-        std::unique_ptr<Srv::CiscoStream> srv_utils2(new Srv::CiscoStream(cisco_service_, cisco_cq_));
+        std::unique_ptr<Srv::CiscoStream> srv_utils(
+                            new Srv::CiscoStream(cisco_service_, cisco_cq_));
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
 
@@ -233,10 +231,10 @@ void Srv::CiscoStream::Start()
                                             *cisco_tlm,
                                             &stream_data,
                                             opt);
-            srv_utils2->async_kafka_prod(stream_data);
+            srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
         } else {
-            srv_utils2->async_kafka_prod(cisco_stream.data());
+            srv_utils->async_kafka_prod(cisco_stream.data());
             //std::cout << cisco_stream.data() << std::endl;
         }
     } else {
@@ -256,7 +254,8 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        new Srv::HuaweiStream(huawei_service_, huawei_cq_);
+        std::unique_ptr<Srv::HuaweiStream> srv_utils(
+                            new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_resp.Read(&huawei_stream, this);
 
         // Huawei JSON format
@@ -301,7 +300,7 @@ void Srv::HuaweiStream::Stop()
 /**
  * string-to-json can be used for data manipulation
  */
-int Srv::str2json(const std::string& json_str)
+int SrvUtils::str2json(const std::string& json_str)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;
@@ -324,58 +323,6 @@ int Srv::str2json(const std::string& json_str)
     //std::cout << encoding_path << std::endl;
     //std::cout << msg_timestamp << std::endl;
     //std::cout << node_id_str << std::endl;
-
-    return EXIT_SUCCESS;
-}
-
-int Srv::async_kafka_prod(const std::string& json_str)
-{
-    using namespace kafka::clients;
-
-    std::string brokers = "kafka.sbd.corproot.net:9093";
-    kafka::Topic topic  = "daisy.dev.yang-json-raw-test";
-    std::string client_id = "mdt-dialout-collector";
-
-    try {
-        // Additional config options here
-        kafka::Properties properties ({
-            {"bootstrap.servers",  brokers},
-            {"enable.idempotence", "true"},
-            {"client.id", client_id},
-            {"security.protocol", "ssl"},
-            {"ssl.key.location", "/opt/daisy/cert/dev/collectors.key"},
-            {"ssl.certificate.location", "/opt/daisy/cert/dev/collectors.crt"},
-            {"ssl.ca.location", "/opt/daisy/cert/dev/sbd_root_ca.crt"},
-        });
-
-        KafkaProducer producer(properties);
-
-        if (json_str.empty()) {
-            // TBD
-            std::cout << "Empty json rcv ..." << std::endl;
-            return EXIT_FAILURE;
-        }
-
-        auto msg = producer::ProducerRecord(topic,
-                    kafka::NullKey,
-                    kafka::Value(json_str.c_str(), json_str.size()));
-
-        producer.send(
-            msg,
-            [](const producer::RecordMetadata& mdata,
-                const kafka::Error& err) {
-            if (!err) {
-                std::cout << "Msg delivered: "
-                        << mdata.toString() << std::endl;
-            } else {
-                std::cerr << "Msg delivery failed: "
-                        << err.message() << std::endl;
-            }
-        }, KafkaProducer::SendOption::ToCopyRecordValue);
-    } catch (const kafka::KafkaException& ex) {
-        std::cerr << "Unexpected exception: " << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
 
     return EXIT_SUCCESS;
 }

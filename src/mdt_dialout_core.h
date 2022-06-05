@@ -69,7 +69,7 @@ private:
                                     mdt_dialout::MdtDialoutArgs> cisco_resp;
     };
 
-    class HuaweiStream {
+    class HuaweiStream: public SrvUtils {
     public:
         HuaweiStream(
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
