@@ -378,3 +378,4 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
 
     return EXIT_SUCCESS;
 }
+
