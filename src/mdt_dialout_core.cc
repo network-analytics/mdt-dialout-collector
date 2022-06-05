@@ -202,7 +202,7 @@ void Srv::CiscoStream::Start()
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
-        Srv *srv_utils = new Srv();
+        std::unique_ptr<Srv> srv_utils(new Srv());
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
@@ -252,7 +252,7 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        Srv *srv_utils = new Srv();
+        std::unique_ptr<Srv> srv_utils(new Srv());
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         huawei_resp.Read(&huawei_stream, this);
 
