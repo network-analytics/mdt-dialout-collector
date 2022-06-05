@@ -25,6 +25,13 @@ public:
 private:
 };
 
+class SrvUtils {
+public:
+    int str2json(const std::string& json_str);
+    int async_kafka_prod(const std::string& json_str);
+private:
+};
+
 class Srv final {
 public:
     ~Srv();
@@ -44,7 +51,7 @@ private:
     int str2json(const std::string& json_str);
     int async_kafka_prod(const std::string& json_str);
 
-    class CiscoStream {
+    class CiscoStream: public SrvUtils {
     public:
         CiscoStream(
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
