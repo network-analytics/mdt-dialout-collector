@@ -189,6 +189,8 @@ Srv::HuaweiStream::HuaweiStream(
     Srv::HuaweiStream::Start();
 }
 
+std::unique_ptr<Srv> srv_utils(new Srv());
+
 void Srv::CiscoStream::Start()
 {
     // Initial stream_status set to START
@@ -203,8 +205,6 @@ void Srv::CiscoStream::Start()
     } else if (cisco_stream_status == FLOW) {
         //std::string peer = server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
-        //std::unique_ptr<Srv> srv_utils(new Srv());
-        Srv srv_utils;
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
@@ -222,7 +222,8 @@ void Srv::CiscoStream::Start()
          *   std::exit(EXIT_FAILURE);
          * }
          */
-        std::unique_ptr<google::protobuf::Message> cisco_tlm(new cisco_telemetry::Telemetry());
+        std::unique_ptr<google::protobuf::Message> cisco_tlm(
+                                            new cisco_telemetry::Telemetry());
         //google::protobuf::Message *cisco_tlm = new cisco_telemetry::Telemetry;
         if (cisco_tlm->ParseFromString(cisco_stream.data()) and
                                                 !cisco_stream.data().empty()) {
@@ -232,10 +233,10 @@ void Srv::CiscoStream::Start()
                                             *cisco_tlm,
                                             &stream_data,
                                             opt);
-            srv_utils.async_kafka_prod(stream_data);
+            srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
         } else {
-            srv_utils.async_kafka_prod(cisco_stream.data());
+            srv_utils->async_kafka_prod(cisco_stream.data());
             //std::cout << cisco_stream.data() << std::endl;
         }
     } else {
@@ -255,7 +256,6 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        std::unique_ptr<Srv> srv_utils(new Srv());
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         huawei_resp.Read(&huawei_stream, this);
 
@@ -264,7 +264,8 @@ void Srv::HuaweiStream::Start()
         //std::cout << huawei_stream.data_json() << std::endl;
         std::string stream_data;
 
-        google::protobuf::Message *huawei_tlm = new huawei_telemetry::Telemetry;
+        std::unique_ptr<google::protobuf::Message> huawei_tlm(
+                                            new cisco_telemetry::Telemetry());
         if (huawei_tlm->ParseFromString(huawei_stream.data()) and
                                                 !huawei_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
