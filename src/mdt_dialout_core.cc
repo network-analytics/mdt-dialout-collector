@@ -22,7 +22,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <memory>
 
 using grpc::Channel;
 using grpc::ClientContext;
