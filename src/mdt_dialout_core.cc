@@ -217,7 +217,7 @@ void Srv::CiscoStream::Start()
          * }
          */
 
-        std::string stream_data;
+        std::string stream_data = "";
         std::unique_ptr<google::protobuf::Message> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
 
@@ -231,7 +231,7 @@ void Srv::CiscoStream::Start()
             srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
         // Handling GPB-KV
-        } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
+        } else if (cisco_tlm->ParsePartialFromString(cisco_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -275,7 +275,7 @@ void Srv::HuaweiStream::Start()
                         new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_resp.Read(&huawei_stream, this);
         
-        std::string stream_data;
+        std::string stream_data = "";
         std::unique_ptr<google::protobuf::Message> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
 
@@ -291,7 +291,7 @@ void Srv::HuaweiStream::Start()
         }
         // Handling GPB-KV
         else {
-            if (huawei_tlm->ParseFromString(huawei_stream.data())) {
+            if (huawei_tlm->ParsePartialFromString(huawei_stream.data())) {
                 google::protobuf::util::JsonOptions opt;
                 opt.add_whitespace = true;
                 google::protobuf::util::MessageToJsonString(

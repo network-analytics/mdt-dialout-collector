@@ -180,5 +180,5 @@ message TelemetryRowGPB {
   // content, unambiguously represents an instance of the data set, as
   // defined in the Yang model, identified by the encoding-path in the
   // containing Telemetry message.
-bytes content = 11;
+  bytes content = 11;
 }
