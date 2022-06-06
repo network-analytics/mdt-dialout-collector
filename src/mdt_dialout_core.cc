@@ -222,19 +222,16 @@ void Srv::CiscoStream::Start()
                                             new cisco_telemetry::Telemetry());
 
         // Handling empty data
-        //if (cisco_stream.data().empty()) {
-        //    stream_data = "{ }";
-        //    // ---
-        //    auto type_info = typeid(stream_data).name();
-        //    std::cout << "Handling empty data: " << type_info << std::endl;
-        //    // ---
-        //    srv_utils->str2json(stream_data);
-        //    srv_utils->async_kafka_prod(stream_data);
-        //// Handling GPB-KV
-        //} else 
-        
-        if (cisco_tlm->ParsePartialFromString(cisco_stream.data()) and
-                                                !cisco_stream.data().empty()) {
+        if (cisco_stream.data().empty()) {
+            stream_data = "{ }";
+            // ---
+            auto type_info = typeid(stream_data).name();
+            std::cout << "Handling empty data: " << type_info << std::endl;
+            // ---
+            srv_utils->str2json(stream_data);
+            //srv_utils->async_kafka_prod(stream_data);
+        // Handling GPB-KV
+        } else if (cisco_tlm->ParsePartialFromString(cisco_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -291,7 +288,7 @@ void Srv::HuaweiStream::Start()
             std::cout << "Handling empty data: " << type_info << std::endl;
             // ---
             srv_utils->str2json(stream_data);
-            srv_utils->async_kafka_prod(stream_data);
+            //srv_utils->async_kafka_prod(stream_data);
         }
         // Handling GPB-KV
         else {
@@ -365,12 +362,13 @@ int SrvUtils::str2json(const std::string& json_str)
                                                 builderW.newStreamWriter());
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
                       &root, &err) and json_str_length != 0) {
-        std::cout << "error" << std::endl;
-        std::cout << "generating errors: " << json_str << std::endl;
+        std::cout << "ERROR parsing the string - conversion to JSON Failed!" 
+                                                                << std::endl;
+        //std::cout << "generating errors: " << json_str << std::endl;
         return EXIT_FAILURE;
     }
 
-    writer->write(root, &std::cout);
+    //writer->write(root, &std::cout);
     //const std::string encoding_path = root["encoding_path"].asString();
     //const std::string msg_timestamp = root["msg_timestamp"].asString();
     //const std::string node_id_str = root["node_id_str"].asString();
