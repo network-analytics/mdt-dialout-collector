@@ -245,8 +245,8 @@ void Srv::CiscoStream::Start()
             auto type_info = typeid(stream_data).name();
             std::cout << "Handling GPB-KV: " << type_info << std::endl;
             // ---
-            //srv_utils->str2json(stream_data);
-            std::cout << stream_data << std::endl;
+            srv_utils->str2json(stream_data);
+            //std::cout << stream_data << std::endl;
             srv_utils->async_kafka_prod(stream_data);
         // Handling JSON string
         } else {
@@ -353,7 +353,7 @@ void Srv::HuaweiStream::Stop()
 /**
  * string-to-json can be used for data manipulation
  */
-int SrvUtils::str2json(const std::string& json_str)
+int SrvUtils::str2json(const std::string json_str)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;
