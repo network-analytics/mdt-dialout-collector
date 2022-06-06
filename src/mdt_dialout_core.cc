@@ -231,7 +231,7 @@ void Srv::CiscoStream::Start()
             srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
         // Handling GPB-KV
-        } else if (cisco_tlm->ParseFromString(cisco_stream.data()) and stream_data != "{ }") {
+        } else if (cisco_tlm->ParseFromString(cisco_stream.data()) and !cisco_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
