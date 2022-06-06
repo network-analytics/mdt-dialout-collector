@@ -318,6 +318,7 @@ int SrvUtils::str2json(const std::string& json_str)
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
                       &root, &err)) {
         std::cout << "error" << std::endl;
+        std::cout << "generating errors: " << json_str << std::endl;
         return EXIT_FAILURE;
     }
 
