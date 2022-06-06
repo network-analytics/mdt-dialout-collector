@@ -222,16 +222,19 @@ void Srv::CiscoStream::Start()
                                             new cisco_telemetry::Telemetry());
 
         // Handling empty data
-        if (cisco_stream.data().empty()) {
-            stream_data = "{ }";
-            // ---
-            auto type_info = typeid(stream_data).name();
-            std::cout << "Handling empty data: " << type_info << std::endl;
-            // ---
-            srv_utils->str2json(stream_data);
-            srv_utils->async_kafka_prod(stream_data);
-        // Handling GPB-KV
-        } else if (cisco_tlm->ParsePartialFromString(cisco_stream.data())) {
+        //if (cisco_stream.data().empty()) {
+        //    stream_data = "{ }";
+        //    // ---
+        //    auto type_info = typeid(stream_data).name();
+        //    std::cout << "Handling empty data: " << type_info << std::endl;
+        //    // ---
+        //    srv_utils->str2json(stream_data);
+        //    srv_utils->async_kafka_prod(stream_data);
+        //// Handling GPB-KV
+        //} else 
+        
+        if (cisco_tlm->ParsePartialFromString(cisco_stream.data()) and
+                                                !cisco_stream.data().empty()) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
