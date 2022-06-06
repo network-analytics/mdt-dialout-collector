@@ -353,7 +353,7 @@ void Srv::HuaweiStream::Stop()
 /**
  * string-to-json can be used for data manipulation
  */
-int SrvUtils::str2json(const std::string json_str)
+int SrvUtils::str2json(const std::string& json_str)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;
@@ -370,7 +370,7 @@ int SrvUtils::str2json(const std::string json_str)
         return EXIT_FAILURE;
     }
 
-    //writer->write(root, &std::cout);
+    writer->write(root, &std::cout);
     //const std::string encoding_path = root["encoding_path"].asString();
     //const std::string msg_timestamp = root["msg_timestamp"].asString();
     //const std::string node_id_str = root["node_id_str"].asString();
