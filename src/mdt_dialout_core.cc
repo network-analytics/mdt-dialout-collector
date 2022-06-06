@@ -245,7 +245,8 @@ void Srv::CiscoStream::Start()
             auto type_info = typeid(stream_data).name();
             std::cout << "Handling GPB-KV: " << type_info << std::endl;
             // ---
-            srv_utils->str2json(stream_data);
+            //srv_utils->str2json(stream_data);
+            std::cout << stream_data << std::endl;
             srv_utils->async_kafka_prod(stream_data);
         // Handling JSON string
         } else {
