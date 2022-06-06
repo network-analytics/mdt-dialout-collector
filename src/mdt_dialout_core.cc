@@ -211,6 +211,8 @@ void Srv::CiscoStream::Start()
         //std::cout << type_info << std::endl;
 
         std::string stream_data;
+        srv_utils->str2json(stream_data);    
+
         /*
          * Srv::Stream::str2json(stream_data);
          * if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
@@ -220,6 +222,7 @@ void Srv::CiscoStream::Start()
          *   std::exit(EXIT_FAILURE);
          * }
          */
+
         std::unique_ptr<google::protobuf::Message> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
         if (cisco_tlm->ParseFromString(cisco_stream.data()) and
@@ -233,6 +236,7 @@ void Srv::CiscoStream::Start()
             srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
         } else {
+            srv_utils->str2json(cisco_stream.data());
             srv_utils->async_kafka_prod(cisco_stream.data());
             //std::cout << cisco_stream.data() << std::endl;
         }
@@ -258,6 +262,7 @@ void Srv::HuaweiStream::Start()
         huawei_resp.Read(&huawei_stream, this);
 
         // Huawei JSON format
+        srv_utils->str2json(huawei_stream.data_json());
         srv_utils->async_kafka_prod(huawei_stream.data_json());
         //std::cout << huawei_stream.data_json() << std::endl;
         std::string stream_data;
@@ -272,9 +277,11 @@ void Srv::HuaweiStream::Start()
                                             *huawei_tlm,
                                             &stream_data,
                                             opt);
+            srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
         } else {
+            srv_utils->str2json(huawei_stream.data_json());
             srv_utils->async_kafka_prod(huawei_stream.data_json());
             //std::cout << huawei_stream.data_json() << std::endl;
         }
