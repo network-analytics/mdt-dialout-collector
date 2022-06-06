@@ -207,11 +207,6 @@ void Srv::CiscoStream::Start()
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
 
-        //auto type_info = typeid(stream.data()).name();
-        //std::cout << type_info << std::endl;
-
-        std::string stream_data;
-
         /*
          * Srv::Stream::str2json(stream_data);
          * if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
@@ -222,12 +217,13 @@ void Srv::CiscoStream::Start()
          * }
          */
 
+        std::string stream_data;
         std::unique_ptr<google::protobuf::Message> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
 
         // Handling empty data
         if (cisco_stream.data().empty()) {
-            stream_data = "\{\}";
+            stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
             std::cout << "Handling empty data: " << type_info << std::endl;
@@ -278,29 +274,59 @@ void Srv::HuaweiStream::Start()
         std::unique_ptr<Srv::HuaweiStream> srv_utils(
                         new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_resp.Read(&huawei_stream, this);
-
-        // Huawei JSON format
-        srv_utils->str2json(huawei_stream.data_json());
-        srv_utils->async_kafka_prod(huawei_stream.data_json());
-        //std::cout << huawei_stream.data_json() << std::endl;
+        
         std::string stream_data;
-
         std::unique_ptr<google::protobuf::Message> huawei_tlm(
-                                            new cisco_telemetry::Telemetry());
-        if (huawei_tlm->ParseFromString(huawei_stream.data()) and
-                                            !huawei_stream.data().empty()) {
+                                            new huawei_telemetry::Telemetry());
+
+        // Handling empty data
+        if (huawei_stream.data().empty()) {
+            stream_data = "{ }";
+            // ---
+            auto type_info = typeid(stream_data).name();
+            std::cout << "Handling empty data: " << type_info << std::endl;
+            // ---
+            srv_utils->str2json(stream_data);
+            srv_utils->async_kafka_prod(stream_data);
+        }
+        // Handling GPB-KV
+        else if (huawei_tlm->ParseFromString(huawei_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
-                                            *huawei_tlm,
-                                            &stream_data,
-                                            opt);
+                                                        *huawei_tlm,
+                                                        &stream_data,
+                                                        opt);
+            // ---
+            auto type_info = typeid(stream_data).name();
+            std::cout << "Handling GPB-KV: " << type_info << std::endl;
+            // ---
+            srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
-            //std::cout << stream_data << std::endl;
-        } else {
-            srv_utils->str2json(huawei_stream.data_json());
-            srv_utils->async_kafka_prod(huawei_stream.data_json());
-            //std::cout << huawei_stream.data_json() << std::endl;
+        }
+        // Handling JSON
+        else {
+            // Handling empty data_json
+            if (huawei_stream.data_json().empty()) {
+                stream_data = "{ }";
+                // ---
+                auto type_info = typeid(stream_data).name();
+                std::cout << "Handling empty data_json: " << type_info 
+                                                            << std::endl;
+                // ---
+                srv_utils->str2json(stream_data);
+                srv_utils->async_kafka_prod(stream_data);
+            }    
+            // Handling JSON string
+            else {
+                stream_data = huawei_stream.data_json();
+                // ---
+                auto type_info = typeid(stream_data).name();
+                std::cout << "Handling JSON string: " << type_info << std::endl;
+                // ---
+                srv_utils->str2json(stream_data);
+                srv_utils->async_kafka_prod(stream_data);
+            }
         }
     } else {
         GPR_ASSERT(huawei_stream_status == END);
@@ -389,11 +415,11 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
             [](const producer::RecordMetadata& mdata,
                 const kafka::Error& err) {
             if (!err) {
-                std::cout << "Msg delivered: "
-                        << mdata.toString() << std::endl;
+                //std::cout << "Msg delivered: "
+                //        << mdata.toString() << std::endl;
             } else {
-                std::cerr << "Msg delivery failed: "
-                        << err.message() << std::endl;
+                //std::cerr << "Msg delivery failed: "
+                //        << err.message() << std::endl;
             }
         }, KafkaProducer::SendOption::ToCopyRecordValue);
     } catch (const kafka::KafkaException& ex) {
