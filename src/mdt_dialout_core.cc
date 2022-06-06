@@ -221,9 +221,17 @@ void Srv::CiscoStream::Start()
         std::unique_ptr<google::protobuf::Message> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
 
+        // Handling empty data
+        if (cisco_stream.data().empty()) {
+            stream_data = "{ }";
+            // ---
+            auto type_info = typeid(stream_data).name();
+            std::cout << "Handling empty data: " << type_info << std::endl;
+            // ---
+            srv_utils->str2json(stream_data);
+            srv_utils->async_kafka_prod(stream_data);
         // Handling GPB-KV
-        if (cisco_tlm->ParseFromString(cisco_stream.data()) 
-                                            and !cisco_stream.data().empty()) {
+        } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -234,30 +242,18 @@ void Srv::CiscoStream::Start()
             auto type_info = typeid(stream_data).name();
             std::cout << "Handling GPB-KV: " << type_info << std::endl;
             // ---
-            //srv_utils->str2json(stream_data);
+            srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
-        }
-        // Handling empty
-        else {
-            if (cisco_stream.data().empty()) {
-                stream_data = "{ }";
-                // ---
-                auto type_info = typeid(stream_data).name();
-                std::cout << "Handling empty data: " << type_info << std::endl;
-                // ---
-                srv_utils->str2json(stream_data);
-                srv_utils->async_kafka_prod(stream_data);
-            // Handling JSON string
-            } else {
-                stream_data = cisco_stream.data();
-                // ---
-                auto type_info = typeid(stream_data).name();
-                std::cout << "Handling JSON string: " << type_info << std::endl;
-                // ---
-                srv_utils->str2json(stream_data);
-                srv_utils->async_kafka_prod(stream_data);
-            }
-        }
+        // Handling JSON string
+        } else {
+            stream_data = cisco_stream.data();
+            // ---
+            auto type_info = typeid(stream_data).name();
+            std::cout << "Handling JSON string: " << type_info << std::endl;
+            // ---
+            srv_utils->str2json(stream_data);
+            srv_utils->async_kafka_prod(stream_data);
+        } 
     } else {
         GPR_ASSERT(cisco_stream_status == END);
         delete this;
