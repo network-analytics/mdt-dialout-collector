@@ -211,7 +211,6 @@ void Srv::CiscoStream::Start()
         //std::cout << type_info << std::endl;
 
         std::string stream_data;
-        srv_utils->str2json(stream_data);    
 
         /*
          * Srv::Stream::str2json(stream_data);
