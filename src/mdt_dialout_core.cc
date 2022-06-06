@@ -277,7 +277,6 @@ void Srv::HuaweiStream::Start()
                                             *huawei_tlm,
                                             &stream_data,
                                             opt);
-            srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
             //std::cout << stream_data << std::endl;
         } else {
