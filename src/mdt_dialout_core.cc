@@ -290,43 +290,43 @@ void Srv::HuaweiStream::Start()
             srv_utils->async_kafka_prod(stream_data);
         }
         // Handling GPB-KV
-        else if (huawei_tlm->ParseFromString(huawei_stream.data())) {
-            google::protobuf::util::JsonOptions opt;
-            opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(
-                                                        *huawei_tlm,
-                                                        &stream_data,
-                                                        opt);
-            // ---
-            auto type_info = typeid(stream_data).name();
-            std::cout << "Handling GPB-KV: " << type_info << std::endl;
-            // ---
-            srv_utils->str2json(stream_data);
-            srv_utils->async_kafka_prod(stream_data);
-        }
-        // Handling JSON
         else {
-            // Handling empty data_json
-            if (huawei_stream.data_json().empty()) {
-                stream_data = "{ }";
+            if (huawei_tlm->ParseFromString(huawei_stream.data())) {
+                google::protobuf::util::JsonOptions opt;
+                opt.add_whitespace = true;
+                google::protobuf::util::MessageToJsonString(
+                                                            *huawei_tlm,
+                                                            &stream_data,
+                                                            opt);
                 // ---
                 auto type_info = typeid(stream_data).name();
-                std::cout << "Handling empty data_json: " << type_info 
-                                                            << std::endl;
-                // ---
-                srv_utils->str2json(stream_data);
-                srv_utils->async_kafka_prod(stream_data);
-            }    
-            // Handling JSON string
-            else {
-                stream_data = huawei_stream.data_json();
-                // ---
-                auto type_info = typeid(stream_data).name();
-                std::cout << "Handling JSON string: " << type_info << std::endl;
+                std::cout << "Handling GPB-KV: " << type_info << std::endl;
                 // ---
                 srv_utils->str2json(stream_data);
                 srv_utils->async_kafka_prod(stream_data);
             }
+        }
+
+        // Handling empty data_json
+        if (huawei_stream.data_json().empty()) {
+            stream_data = "{ }";
+            // ---
+            auto type_info = typeid(stream_data).name();
+            std::cout << "Handling empty data_json: " << type_info 
+                                                            << std::endl;
+            // ---
+            srv_utils->str2json(stream_data);
+            srv_utils->async_kafka_prod(stream_data);
+        }    
+        // Handling JSON string
+        else {
+            stream_data = huawei_stream.data_json();
+            // ---
+            auto type_info = typeid(stream_data).name();
+            std::cout << "Handling JSON string: " << type_info << std::endl;
+            // ---
+            srv_utils->str2json(stream_data);
+            srv_utils->async_kafka_prod(stream_data);
         }
     } else {
         GPR_ASSERT(huawei_stream_status == END);
@@ -401,7 +401,7 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
         KafkaProducer producer(properties);
 
         if (json_str.empty()) {
-            // TBD
+            // Better handling
             std::cout << "Empty json rcv ..." << std::endl;
             return EXIT_FAILURE;
         }
