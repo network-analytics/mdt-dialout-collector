@@ -316,7 +316,7 @@ int SrvUtils::str2json(const std::string& json_str)
     const std::unique_ptr<Json::StreamWriter> writer(
                                                 builderW.newStreamWriter());
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
-                      &root, &err)) {
+                      &root, &err) and json_str_length != 0) {
         std::cout << "error" << std::endl;
         std::cout << "generating errors: " << json_str << std::endl;
         return EXIT_FAILURE;
