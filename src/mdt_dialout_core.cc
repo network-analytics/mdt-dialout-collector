@@ -231,7 +231,7 @@ void Srv::CiscoStream::Start()
             srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
         // Handling GPB-KV
-        } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
+        } else if (cisco_tlm->ParseFromString(cisco_stream.data()) and stream_data != "{ }") {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -415,11 +415,11 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
             [](const producer::RecordMetadata& mdata,
                 const kafka::Error& err) {
             if (!err) {
-                //std::cout << "Msg delivered: "
-                //        << mdata.toString() << std::endl;
+                std::cout << "Msg delivered: "
+                        << mdata.toString() << std::endl;
             } else {
-                //std::cerr << "Msg delivery failed: "
-                //        << err.message() << std::endl;
+                std::cerr << "Msg delivery failed: "
+                        << err.message() << std::endl;
             }
         }, KafkaProducer::SendOption::ToCopyRecordValue);
     } catch (const kafka::KafkaException& ex) {
