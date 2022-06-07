@@ -91,6 +91,7 @@ $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
 | [JsonCpp](https://github.com/open-source-parsers/jsoncpp)                                                                                                                 | MIT License               |
 | [librdkafka](https://github.com/edenhill/librdkafka)                                                                                                                      | BSD 2-Clause License      |
+| [Modern C++ Kafka API](https://github.com/morganstanley/modern-cpp-kafka)                                                                                                 | Apache License Version 2.0|
 | [gRPC](https://github.com/grpc/grpc)                                                                                                                                      | BSD 3-Clause License      |
 | [Cisco dial-out .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)| Apache License Version 2.0|
 | [Cisco telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                       | Apache License Version 2.0|
