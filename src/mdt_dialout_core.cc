@@ -39,7 +39,7 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
-                                "vrf300", strlen("vrf300")) != 0) {
+                                "ens224", strlen("ens224")) != 0) {
         //std::cout << "Issues with iface binding for ..." << std::endl;
     }
 
@@ -200,7 +200,7 @@ void Srv::CiscoStream::Start()
                                         this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
-        //std::string peer = server_ctx.peer();
+        std::string peer = cisco_server_ctx.peer();
         //std::cout << "Peer: " + peer << std::endl;
         std::unique_ptr<Srv::CiscoStream> srv_utils(
                             new Srv::CiscoStream(cisco_service_, cisco_cq_));
@@ -226,13 +226,13 @@ void Srv::CiscoStream::Start()
             stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "CISCO Handling empty data: " << type_info 
-                                                            << std::endl;
+            std::cout << peer << " CISCO Handling empty data: " << type_info
+                                                                << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             //srv_utils->async_kafka_prod(stream_data);
         // Handling GPB-KV
-        } else if (cisco_tlm->ParsePartialFromString(cisco_stream.data())) {
+        } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
@@ -241,22 +241,24 @@ void Srv::CiscoStream::Start()
                                                         opt);
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "CISCO Handling GPB-KV: " << type_info << std::endl;
+            //std::cout << peer << " CISCO Handling GPB-KV: " << type_info
+            //                                                << std::endl;
             // ---
-            srv_utils->str2json(stream_data);
-            //std::cout << stream_data << std::endl;
-            srv_utils->async_kafka_prod(stream_data);
+            if (srv_utils->str2json(stream_data) != 1) {
+                srv_utils->async_kafka_prod(stream_data);
+            }
         // Handling JSON string
         } else {
             stream_data = cisco_stream.data();
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "CISCO Handling JSON string: " << type_info 
-                                                            << std::endl;
+            std::cout << peer << " CISCO Handling JSON string: " << type_info
+                                                                << std::endl;
             // ---
-            srv_utils->str2json(stream_data);
-            srv_utils->async_kafka_prod(stream_data);
-        } 
+            if (srv_utils->str2json(stream_data) != 1) {
+                srv_utils->async_kafka_prod(stream_data);
+            }
+        }
     } else {
         GPR_ASSERT(cisco_stream_status == END);
         delete this;
@@ -274,10 +276,11 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
+        std::string peer = huawei_server_ctx.peer();
         std::unique_ptr<Srv::HuaweiStream> srv_utils(
                         new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_resp.Read(&huawei_stream, this);
-        
+
         std::string stream_data = "";
         std::unique_ptr<google::protobuf::Message> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
@@ -287,15 +290,15 @@ void Srv::HuaweiStream::Start()
             stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "HUAWEI Handling empty data: " << type_info 
-                                                            << std::endl;
+            std::cout << peer << " HUAWEI Handling empty data: " << type_info
+                                                                << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             //srv_utils->async_kafka_prod(stream_data);
         }
         // Handling GPB-KV
         else {
-            if (huawei_tlm->ParsePartialFromString(huawei_stream.data())) {
+            if (huawei_tlm->ParseFromString(huawei_stream.data())) {
                 google::protobuf::util::JsonOptions opt;
                 opt.add_whitespace = true;
                 google::protobuf::util::MessageToJsonString(
@@ -304,11 +307,12 @@ void Srv::HuaweiStream::Start()
                                                             opt);
                 // ---
                 auto type_info = typeid(stream_data).name();
-                std::cout << "HUAWEI Handling GPB-KV: " << type_info 
-                                                            << std::endl;
+                std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
+                                                                << std::endl;
                 // ---
-                srv_utils->str2json(stream_data);
-                srv_utils->async_kafka_prod(stream_data);
+                if (srv_utils->str2json(stream_data) != 1) {
+                    srv_utils->async_kafka_prod(stream_data);
+                }
             }
         }
 
@@ -317,21 +321,25 @@ void Srv::HuaweiStream::Start()
             stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "HUAWEI Handling empty data_json: " << type_info 
+            std::cout << peer << " HUAWEI Handling empty data_json: "
+                                                                << type_info
                                                                 << std::endl;
             // ---
-            srv_utils->str2json(stream_data);
-            srv_utils->async_kafka_prod(stream_data);
-        }    
+            if (srv_utils->str2json(stream_data) != 1) {
+                srv_utils->async_kafka_prod(stream_data);
+            }
+        }
         // Handling JSON string
         else {
             stream_data = huawei_stream.data_json();
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "HUAWEI Handling JSON string: " << type_info << std::endl;
+            std::cout << peer << " HUAWEI Handling JSON string: " << type_info
+                                                                << std::endl;
             // ---
-            srv_utils->str2json(stream_data);
-            srv_utils->async_kafka_prod(stream_data);
+            if (srv_utils->str2json(stream_data) != 1) {
+                srv_utils->async_kafka_prod(stream_data);
+            }
         }
     } else {
         GPR_ASSERT(huawei_stream_status == END);
@@ -366,18 +374,18 @@ int SrvUtils::str2json(const std::string& json_str)
                                                 builderW.newStreamWriter());
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
                       &root, &err) and json_str_length != 0) {
-        std::cout << "ERROR parsing the string - conversion to JSON Failed!" 
+        std::cout << "ERROR parsing the string - conversion to JSON Failed!"
                                                                 << std::endl;
         //std::cout << "generating errors: " << json_str << std::endl;
         return EXIT_FAILURE;
     }
 
     //writer->write(root, &std::cout);
-    //const std::string encoding_path = root["encoding_path"].asString();
+    const std::string encoding_path = root["encodingPath"].asString();
     //const std::string msg_timestamp = root["msg_timestamp"].asString();
     //const std::string node_id_str = root["node_id_str"].asString();
 
-    //std::cout << encoding_path << std::endl;
+    std::cout << "encodingPath: " << encoding_path << std::endl;
     //std::cout << msg_timestamp << std::endl;
     //std::cout << node_id_str << std::endl;
 
@@ -402,13 +410,14 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
             {"ssl.key.location", "/opt/daisy/cert/dev/collectors.key"},
             {"ssl.certificate.location", "/opt/daisy/cert/dev/collectors.crt"},
             {"ssl.ca.location", "/opt/daisy/cert/dev/sbd_root_ca.crt"},
+            {"log_level", "0"},
         });
 
         KafkaProducer producer(properties);
 
         if (json_str.empty()) {
             // Better handling
-            std::cout << "Empty json rcv ..." << std::endl;
+            std::cout << "KAFKA - Empty JSON received " << std::endl;
             return EXIT_FAILURE;
         }
 
@@ -421,8 +430,8 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
             [](const producer::RecordMetadata& mdata,
                 const kafka::Error& err) {
             if (!err) {
-                std::cout << "Msg delivered: "
-                        << mdata.toString() << std::endl;
+                //std::cout << "Msg delivered: "
+                //        << mdata.toString() << std::endl;
             } else {
                 std::cerr << "Msg delivery failed: "
                         << err.message() << std::endl;

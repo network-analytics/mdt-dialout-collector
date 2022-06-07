@@ -211,6 +211,7 @@ class Telemetry final :
   enum : int {
     kDataGpbkvFieldNumber = 11,
     kEncodingPathFieldNumber = 6,
+    kModelVersionFieldNumber = 7,
     kDataGpbFieldNumber = 12,
     kCollectionIdFieldNumber = 8,
     kCollectionStartTimeFieldNumber = 9,
@@ -249,6 +250,20 @@ class Telemetry final :
   const std::string& _internal_encoding_path() const;
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_encoding_path(const std::string& value);
   std::string* _internal_mutable_encoding_path();
+  public:
+
+  // string model_version = 7;
+  void clear_model_version();
+  const std::string& model_version() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_model_version(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_model_version();
+  PROTOBUF_NODISCARD std::string* release_model_version();
+  void set_allocated_model_version(std::string* model_version);
+  private:
+  const std::string& _internal_model_version() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_model_version(const std::string& value);
+  std::string* _internal_mutable_model_version();
   public:
 
   // .cisco_telemetry.TelemetryGPBTable data_gpb = 12;
@@ -362,6 +377,7 @@ class Telemetry final :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::cisco_telemetry::TelemetryField > data_gpbkv_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr encoding_path_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr model_version_;
   ::cisco_telemetry::TelemetryGPBTable* data_gpb_;
   uint64_t collection_id_;
   uint64_t collection_start_time_;
@@ -522,6 +538,7 @@ class TelemetryField final :
     kFieldsFieldNumber = 15,
     kNameFieldNumber = 2,
     kTimestampFieldNumber = 1,
+    kDeleteFieldNumber = 16,
     kBytesValueFieldNumber = 4,
     kStringValueFieldNumber = 5,
     kBoolValueFieldNumber = 6,
@@ -571,6 +588,15 @@ class TelemetryField final :
   private:
   uint64_t _internal_timestamp() const;
   void _internal_set_timestamp(uint64_t value);
+  public:
+
+  // bool delete = 16;
+  void clear_delete_();
+  bool delete_() const;
+  void set_delete_(bool value);
+  private:
+  bool _internal_delete_() const;
+  void _internal_set_delete_(bool value);
   public:
 
   // bytes bytes_value = 4;
@@ -724,6 +750,7 @@ class TelemetryField final :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::cisco_telemetry::TelemetryField > fields_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   uint64_t timestamp_;
+  bool delete__;
   union ValueByTypeUnion {
     constexpr ValueByTypeUnion() : _constinit_{} {}
       ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
@@ -1299,6 +1326,57 @@ inline void Telemetry::set_allocated_encoding_path(std::string* encoding_path) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:cisco_telemetry.Telemetry.encoding_path)
+}
+
+// string model_version = 7;
+inline void Telemetry::clear_model_version() {
+  model_version_.ClearToEmpty();
+}
+inline const std::string& Telemetry::model_version() const {
+  // @@protoc_insertion_point(field_get:cisco_telemetry.Telemetry.model_version)
+  return _internal_model_version();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Telemetry::set_model_version(ArgT0&& arg0, ArgT... args) {
+ 
+ model_version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:cisco_telemetry.Telemetry.model_version)
+}
+inline std::string* Telemetry::mutable_model_version() {
+  std::string* _s = _internal_mutable_model_version();
+  // @@protoc_insertion_point(field_mutable:cisco_telemetry.Telemetry.model_version)
+  return _s;
+}
+inline const std::string& Telemetry::_internal_model_version() const {
+  return model_version_.Get();
+}
+inline void Telemetry::_internal_set_model_version(const std::string& value) {
+  
+  model_version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* Telemetry::_internal_mutable_model_version() {
+  
+  return model_version_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* Telemetry::release_model_version() {
+  // @@protoc_insertion_point(field_release:cisco_telemetry.Telemetry.model_version)
+  return model_version_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void Telemetry::set_allocated_model_version(std::string* model_version) {
+  if (model_version != nullptr) {
+    
+  } else {
+    
+  }
+  model_version_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), model_version,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (model_version_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    model_version_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:cisco_telemetry.Telemetry.model_version)
 }
 
 // uint64 collection_id = 8;
@@ -2072,6 +2150,26 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::cisco_telemetry::Telem
 TelemetryField::fields() const {
   // @@protoc_insertion_point(field_list:cisco_telemetry.TelemetryField.fields)
   return fields_;
+}
+
+// bool delete = 16;
+inline void TelemetryField::clear_delete_() {
+  delete__ = false;
+}
+inline bool TelemetryField::_internal_delete_() const {
+  return delete__;
+}
+inline bool TelemetryField::delete_() const {
+  // @@protoc_insertion_point(field_get:cisco_telemetry.TelemetryField.delete)
+  return _internal_delete_();
+}
+inline void TelemetryField::_internal_set_delete_(bool value) {
+  
+  delete__ = value;
+}
+inline void TelemetryField::set_delete_(bool value) {
+  _internal_set_delete_(value);
+  // @@protoc_insertion_point(field_set:cisco_telemetry.TelemetryField.delete)
 }
 
 inline bool TelemetryField::has_value_by_type() const {

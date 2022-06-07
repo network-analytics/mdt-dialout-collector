@@ -21,6 +21,7 @@ constexpr Telemetry::Telemetry(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : data_gpbkv_()
   , encoding_path_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , model_version_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , data_gpb_(nullptr)
   , collection_id_(uint64_t{0u})
   , collection_start_time_(uint64_t{0u})
@@ -41,6 +42,7 @@ constexpr TelemetryField::TelemetryField(
   : fields_()
   , name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , timestamp_(uint64_t{0u})
+  , delete__(false)
   , _oneof_case_{}{}
 struct TelemetryFieldDefaultTypeInternal {
   constexpr TelemetryFieldDefaultTypeInternal()
@@ -92,6 +94,7 @@ const uint32_t TableStruct_cisco_5ftelemetry_2eproto::offsets[] PROTOBUF_SECTION
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::cisco_telemetry::Telemetry, encoding_path_),
+  PROTOBUF_FIELD_OFFSET(::cisco_telemetry::Telemetry, model_version_),
   PROTOBUF_FIELD_OFFSET(::cisco_telemetry::Telemetry, collection_id_),
   PROTOBUF_FIELD_OFFSET(::cisco_telemetry::Telemetry, collection_start_time_),
   PROTOBUF_FIELD_OFFSET(::cisco_telemetry::Telemetry, msg_timestamp_),
@@ -118,6 +121,7 @@ const uint32_t TableStruct_cisco_5ftelemetry_2eproto::offsets[] PROTOBUF_SECTION
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::cisco_telemetry::TelemetryField, fields_),
+  PROTOBUF_FIELD_OFFSET(::cisco_telemetry::TelemetryField, delete__),
   PROTOBUF_FIELD_OFFSET(::cisco_telemetry::TelemetryField, value_by_type_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::cisco_telemetry::TelemetryGPBTable, _internal_metadata_),
@@ -138,9 +142,9 @@ const uint32_t TableStruct_cisco_5ftelemetry_2eproto::offsets[] PROTOBUF_SECTION
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::cisco_telemetry::Telemetry)},
-  { 17, -1, -1, sizeof(::cisco_telemetry::TelemetryField)},
-  { 36, -1, -1, sizeof(::cisco_telemetry::TelemetryGPBTable)},
-  { 43, -1, -1, sizeof(::cisco_telemetry::TelemetryRowGPB)},
+  { 18, -1, -1, sizeof(::cisco_telemetry::TelemetryField)},
+  { 38, -1, -1, sizeof(::cisco_telemetry::TelemetryGPBTable)},
+  { 45, -1, -1, sizeof(::cisco_telemetry::TelemetryRowGPB)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -152,31 +156,32 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_cisco_5ftelemetry_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\025cisco_telemetry.proto\022\017cisco_telemetry"
-  "\"\310\002\n\tTelemetry\022\025\n\013node_id_str\030\001 \001(\tH\000\022\035\n"
+  "\"\337\002\n\tTelemetry\022\025\n\013node_id_str\030\001 \001(\tH\000\022\035\n"
   "\023subscription_id_str\030\003 \001(\tH\001\022\025\n\rencoding"
-  "_path\030\006 \001(\t\022\025\n\rcollection_id\030\010 \001(\004\022\035\n\025co"
-  "llection_start_time\030\t \001(\004\022\025\n\rmsg_timesta"
-  "mp\030\n \001(\004\0223\n\ndata_gpbkv\030\013 \003(\0132\037.cisco_tel"
-  "emetry.TelemetryField\0224\n\010data_gpb\030\014 \001(\0132"
-  "\".cisco_telemetry.TelemetryGPBTable\022\033\n\023c"
-  "ollection_end_time\030\r \001(\004B\t\n\007node_idB\016\n\014s"
-  "ubscription\"\307\002\n\016TelemetryField\022\021\n\ttimest"
-  "amp\030\001 \001(\004\022\014\n\004name\030\002 \001(\t\022\025\n\013bytes_value\030\004"
-  " \001(\014H\000\022\026\n\014string_value\030\005 \001(\tH\000\022\024\n\nbool_v"
-  "alue\030\006 \001(\010H\000\022\026\n\014uint32_value\030\007 \001(\rH\000\022\026\n\014"
-  "uint64_value\030\010 \001(\004H\000\022\026\n\014sint32_value\030\t \001"
-  "(\021H\000\022\026\n\014sint64_value\030\n \001(\022H\000\022\026\n\014double_v"
-  "alue\030\013 \001(\001H\000\022\025\n\013float_value\030\014 \001(\002H\000\022/\n\006f"
-  "ields\030\017 \003(\0132\037.cisco_telemetry.TelemetryF"
-  "ieldB\017\n\rvalue_by_type\"B\n\021TelemetryGPBTab"
-  "le\022-\n\003row\030\001 \003(\0132 .cisco_telemetry.Teleme"
-  "tryRowGPB\"C\n\017TelemetryRowGPB\022\021\n\ttimestam"
-  "p\030\001 \001(\004\022\014\n\004keys\030\n \001(\014\022\017\n\007content\030\013 \001(\014b\006"
-  "proto3"
+  "_path\030\006 \001(\t\022\025\n\rmodel_version\030\007 \001(\t\022\025\n\rco"
+  "llection_id\030\010 \001(\004\022\035\n\025collection_start_ti"
+  "me\030\t \001(\004\022\025\n\rmsg_timestamp\030\n \001(\004\0223\n\ndata_"
+  "gpbkv\030\013 \003(\0132\037.cisco_telemetry.TelemetryF"
+  "ield\0224\n\010data_gpb\030\014 \001(\0132\".cisco_telemetry"
+  ".TelemetryGPBTable\022\033\n\023collection_end_tim"
+  "e\030\r \001(\004B\t\n\007node_idB\016\n\014subscription\"\327\002\n\016T"
+  "elemetryField\022\021\n\ttimestamp\030\001 \001(\004\022\014\n\004name"
+  "\030\002 \001(\t\022\025\n\013bytes_value\030\004 \001(\014H\000\022\026\n\014string_"
+  "value\030\005 \001(\tH\000\022\024\n\nbool_value\030\006 \001(\010H\000\022\026\n\014u"
+  "int32_value\030\007 \001(\rH\000\022\026\n\014uint64_value\030\010 \001("
+  "\004H\000\022\026\n\014sint32_value\030\t \001(\021H\000\022\026\n\014sint64_va"
+  "lue\030\n \001(\022H\000\022\026\n\014double_value\030\013 \001(\001H\000\022\025\n\013f"
+  "loat_value\030\014 \001(\002H\000\022/\n\006fields\030\017 \003(\0132\037.cis"
+  "co_telemetry.TelemetryField\022\016\n\006delete\030\020 "
+  "\001(\010B\017\n\rvalue_by_type\"B\n\021TelemetryGPBTabl"
+  "e\022-\n\003row\030\001 \003(\0132 .cisco_telemetry.Telemet"
+  "ryRowGPB\"C\n\017TelemetryRowGPB\022\021\n\ttimestamp"
+  "\030\001 \001(\004\022\014\n\004keys\030\n \001(\014\022\017\n\007content\030\013 \001(\014b\006p"
+  "roto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_cisco_5ftelemetry_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_cisco_5ftelemetry_2eproto = {
-  false, false, 846, descriptor_table_protodef_cisco_5ftelemetry_2eproto, "cisco_telemetry.proto", 
+  false, false, 885, descriptor_table_protodef_cisco_5ftelemetry_2eproto, "cisco_telemetry.proto", 
   &descriptor_table_cisco_5ftelemetry_2eproto_once, nullptr, 0, 4,
   schemas, file_default_instances, TableStruct_cisco_5ftelemetry_2eproto::offsets,
   file_level_metadata_cisco_5ftelemetry_2eproto, file_level_enum_descriptors_cisco_5ftelemetry_2eproto, file_level_service_descriptors_cisco_5ftelemetry_2eproto,
@@ -222,6 +227,14 @@ Telemetry::Telemetry(const Telemetry& from)
     encoding_path_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_encoding_path(), 
       GetArenaForAllocation());
   }
+  model_version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    model_version_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_model_version().empty()) {
+    model_version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_model_version(), 
+      GetArenaForAllocation());
+  }
   if (from._internal_has_data_gpb()) {
     data_gpb_ = new ::cisco_telemetry::TelemetryGPBTable(*from.data_gpb_);
   } else {
@@ -258,6 +271,10 @@ encoding_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStri
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
   encoding_path_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+model_version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  model_version_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&data_gpb_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&collection_end_time_) -
@@ -276,6 +293,7 @@ Telemetry::~Telemetry() {
 inline void Telemetry::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   encoding_path_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  model_version_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete data_gpb_;
   if (has_node_id()) {
     clear_node_id();
@@ -332,6 +350,7 @@ void Telemetry::Clear() {
 
   data_gpbkv_.Clear();
   encoding_path_.ClearToEmpty();
+  model_version_.ClearToEmpty();
   if (GetArenaForAllocation() == nullptr && data_gpb_ != nullptr) {
     delete data_gpb_;
   }
@@ -376,6 +395,16 @@ const char* Telemetry::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
           auto str = _internal_mutable_encoding_path();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "cisco_telemetry.Telemetry.encoding_path"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string model_version = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 58)) {
+          auto str = _internal_mutable_model_version();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "cisco_telemetry.Telemetry.model_version"));
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -492,6 +521,16 @@ uint8_t* Telemetry::_InternalSerialize(
         6, this->_internal_encoding_path(), target);
   }
 
+  // string model_version = 7;
+  if (!this->_internal_model_version().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_model_version().data(), static_cast<int>(this->_internal_model_version().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "cisco_telemetry.Telemetry.model_version");
+    target = stream->WriteStringMaybeAliased(
+        7, this->_internal_model_version(), target);
+  }
+
   // uint64 collection_id = 8;
   if (this->_internal_collection_id() != 0) {
     target = stream->EnsureSpace(target);
@@ -560,6 +599,13 @@ size_t Telemetry::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_encoding_path());
+  }
+
+  // string model_version = 7;
+  if (!this->_internal_model_version().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_model_version());
   }
 
   // .cisco_telemetry.TelemetryGPBTable data_gpb = 12;
@@ -639,6 +685,9 @@ void Telemetry::MergeFrom(const Telemetry& from) {
   if (!from._internal_encoding_path().empty()) {
     _internal_set_encoding_path(from._internal_encoding_path());
   }
+  if (!from._internal_model_version().empty()) {
+    _internal_set_model_version(from._internal_model_version());
+  }
   if (from._internal_has_data_gpb()) {
     _internal_mutable_data_gpb()->::cisco_telemetry::TelemetryGPBTable::MergeFrom(from._internal_data_gpb());
   }
@@ -697,6 +746,11 @@ void Telemetry::InternalSwap(Telemetry* other) {
       &encoding_path_, lhs_arena,
       &other->encoding_path_, rhs_arena
   );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &model_version_, lhs_arena,
+      &other->model_version_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Telemetry, collection_end_time_)
       + sizeof(Telemetry::collection_end_time_)
@@ -743,7 +797,9 @@ TelemetryField::TelemetryField(const TelemetryField& from)
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
   }
-  timestamp_ = from.timestamp_;
+  ::memcpy(&timestamp_, &from.timestamp_,
+    static_cast<size_t>(reinterpret_cast<char*>(&delete__) -
+    reinterpret_cast<char*>(&timestamp_)) + sizeof(delete__));
   clear_has_value_by_type();
   switch (from.value_by_type_case()) {
     case kBytesValue: {
@@ -794,7 +850,10 @@ name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlready
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-timestamp_ = uint64_t{0u};
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&timestamp_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&delete__) -
+    reinterpret_cast<char*>(&timestamp_)) + sizeof(delete__));
 clear_has_value_by_type();
 }
 
@@ -878,7 +937,9 @@ void TelemetryField::Clear() {
 
   fields_.Clear();
   name_.ClearToEmpty();
-  timestamp_ = uint64_t{0u};
+  ::memset(&timestamp_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&delete__) -
+      reinterpret_cast<char*>(&timestamp_)) + sizeof(delete__));
   clear_value_by_type();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -995,6 +1056,14 @@ const char* TelemetryField::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
         } else
           goto handle_unusual;
         continue;
+      // bool delete = 16;
+      case 16:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 128)) {
+          delete__ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -1106,6 +1175,12 @@ uint8_t* TelemetryField::_InternalSerialize(
       InternalWriteMessage(15, this->_internal_fields(i), target, stream);
   }
 
+  // bool delete = 16;
+  if (this->_internal_delete_() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(16, this->_internal_delete_(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1139,6 +1214,11 @@ size_t TelemetryField::ByteSizeLong() const {
   // uint64 timestamp = 1;
   if (this->_internal_timestamp() != 0) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_timestamp());
+  }
+
+  // bool delete = 16;
+  if (this->_internal_delete_() != 0) {
+    total_size += 2 + 1;
   }
 
   switch (value_by_type_case()) {
@@ -1224,6 +1304,9 @@ void TelemetryField::MergeFrom(const TelemetryField& from) {
   if (from._internal_timestamp() != 0) {
     _internal_set_timestamp(from._internal_timestamp());
   }
+  if (from._internal_delete_() != 0) {
+    _internal_set_delete_(from._internal_delete_());
+  }
   switch (from.value_by_type_case()) {
     case kBytesValue: {
       _internal_set_bytes_value(from._internal_bytes_value());
@@ -1290,7 +1373,12 @@ void TelemetryField::InternalSwap(TelemetryField* other) {
       &name_, lhs_arena,
       &other->name_, rhs_arena
   );
-  swap(timestamp_, other->timestamp_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(TelemetryField, delete__)
+      + sizeof(TelemetryField::delete__)
+      - PROTOBUF_FIELD_OFFSET(TelemetryField, timestamp_)>(
+          reinterpret_cast<char*>(&timestamp_),
+          reinterpret_cast<char*>(&other->timestamp_));
   swap(value_by_type_, other->value_by_type_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
