@@ -226,7 +226,8 @@ void Srv::CiscoStream::Start()
             stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "Handling empty data: " << type_info << std::endl;
+            std::cout << "CISCO Handling empty data: " << type_info 
+                                                            << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             //srv_utils->async_kafka_prod(stream_data);
@@ -240,7 +241,7 @@ void Srv::CiscoStream::Start()
                                                         opt);
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "Handling GPB-KV: " << type_info << std::endl;
+            std::cout << "CISCO Handling GPB-KV: " << type_info << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             //std::cout << stream_data << std::endl;
@@ -250,7 +251,8 @@ void Srv::CiscoStream::Start()
             stream_data = cisco_stream.data();
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "Handling JSON string: " << type_info << std::endl;
+            std::cout << "CISCO Handling JSON string: " << type_info 
+                                                            << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
@@ -285,7 +287,8 @@ void Srv::HuaweiStream::Start()
             stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "Handling empty data: " << type_info << std::endl;
+            std::cout << "HUAWEI Handling empty data: " << type_info 
+                                                            << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             //srv_utils->async_kafka_prod(stream_data);
@@ -301,7 +304,8 @@ void Srv::HuaweiStream::Start()
                                                             opt);
                 // ---
                 auto type_info = typeid(stream_data).name();
-                std::cout << "Handling GPB-KV: " << type_info << std::endl;
+                std::cout << "HUAWEI Handling GPB-KV: " << type_info 
+                                                            << std::endl;
                 // ---
                 srv_utils->str2json(stream_data);
                 srv_utils->async_kafka_prod(stream_data);
@@ -313,8 +317,8 @@ void Srv::HuaweiStream::Start()
             stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "Handling empty data_json: " << type_info 
-                                                            << std::endl;
+            std::cout << "HUAWEI Handling empty data_json: " << type_info 
+                                                                << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
@@ -324,7 +328,7 @@ void Srv::HuaweiStream::Start()
             stream_data = huawei_stream.data_json();
             // ---
             auto type_info = typeid(stream_data).name();
-            std::cout << "Handling JSON string: " << type_info << std::endl;
+            std::cout << "HUAWEI Handling JSON string: " << type_info << std::endl;
             // ---
             srv_utils->str2json(stream_data);
             srv_utils->async_kafka_prod(stream_data);
