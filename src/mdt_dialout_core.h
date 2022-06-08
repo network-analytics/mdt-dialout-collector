@@ -28,6 +28,7 @@ private:
 class SrvUtils {
 public:
     int str2json(const std::string& json_str);
+    int str2json_(const std::string& json_str, std::string& json_str_out);
     int async_kafka_prod(const std::string& json_str);
 private:
 };
