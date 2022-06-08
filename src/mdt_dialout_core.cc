@@ -391,13 +391,6 @@ int SrvUtils::str2json(const std::string& json_str)
     //std::cout << msg_timestamp << std::endl;
     //std::cout << node_id_str << std::endl;
 
-    Json::Value label;
-    std::string node_id = "node_id";
-    std::string platform_id = "platform_id";
-    label.append(node_id);
-    label.append(platform_id);
-    root["label"] = label;
-
     const std::string node_id_ = root["label"][0].asString();
     const std::string platform_id_ = root["label"][1].asString();
 
@@ -417,9 +410,12 @@ int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
     const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
     const std::unique_ptr<Json::StreamWriter> writer(
                                                 builderW.newStreamWriter());
-    Json::Value label;
-    std::string node_id = "node_id";
-    std::string platform_id = "platform_id";
+    //Json::Value label;
+    //std::string node_id = "node_id";
+    //std::string platform_id = "platform_id";
+    Json::Value label_map;
+    label_map["node_id"] = "node_id";
+    label_map["platform_id"] = "platform_id";
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
                       &root, &err) and json_str_length != 0) {
@@ -428,9 +424,10 @@ int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
         return EXIT_FAILURE;
     }
 
-    label.append(node_id);
-    label.append(platform_id);
-    root["label"] = label;
+    //label.append(node_id);
+    //label.append(platform_id);
+    //root["label"] = label;
+    root["label"] = label_map;
     json_str_out = Json::writeString(builderW, root);
 
     return EXIT_SUCCESS;
