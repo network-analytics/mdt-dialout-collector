@@ -217,7 +217,8 @@ void Srv::CiscoStream::Start()
          * }
          */
 
-        std::string stream_data;
+        std::string stream_data = "";
+        std::string stream_data_out = "";
         std::unique_ptr<google::protobuf::Message> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
 
@@ -229,7 +230,7 @@ void Srv::CiscoStream::Start()
             std::cout << peer << " CISCO Handling empty data: " << type_info
                                                                 << std::endl;
             // ---
-            srv_utils->str2json(stream_data);
+            srv_utils->str2json_(stream_data, stream_data_out);
             //srv_utils->async_kafka_prod(stream_data);
         // Handling GPB-KV
         } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
@@ -244,8 +245,8 @@ void Srv::CiscoStream::Start()
             //std::cout << peer << " CISCO Handling GPB-KV: " << type_info
             //                                                << std::endl;
             // ---
-            if (srv_utils->str2json(stream_data) != 1) {
-                srv_utils->async_kafka_prod(stream_data);
+            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
+                srv_utils->async_kafka_prod(stream_data_out);
             }
         // Handling JSON string
         } else {
@@ -255,8 +256,8 @@ void Srv::CiscoStream::Start()
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (srv_utils->str2json(stream_data) != 1) {
-                srv_utils->async_kafka_prod(stream_data);
+            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
+                srv_utils->async_kafka_prod(stream_data_out);
             }
         }
     } else {
@@ -281,7 +282,8 @@ void Srv::HuaweiStream::Start()
                         new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_resp.Read(&huawei_stream, this);
 
-        std::string stream_data;
+        std::string stream_data = "";
+        std::string stream_data_out = "";
         std::unique_ptr<google::protobuf::Message> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
 
@@ -293,7 +295,7 @@ void Srv::HuaweiStream::Start()
             std::cout << peer << " HUAWEI Handling empty data: " << type_info
                                                                 << std::endl;
             // ---
-            srv_utils->str2json(stream_data);
+            srv_utils->str2json_(stream_data, stream_data_out);
             //srv_utils->async_kafka_prod(stream_data);
         }
         // Handling GPB-KV
@@ -310,8 +312,8 @@ void Srv::HuaweiStream::Start()
                 std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
                                                                 << std::endl;
                 // ---
-                if (srv_utils->str2json(stream_data) != 1) {
-                    srv_utils->async_kafka_prod(stream_data);
+                if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
+                    srv_utils->async_kafka_prod(stream_data_out);
                 }
             }
         }
@@ -325,8 +327,8 @@ void Srv::HuaweiStream::Start()
                                                                 << type_info
                                                                 << std::endl;
             // ---
-            if (srv_utils->str2json(stream_data) != 1) {
-                srv_utils->async_kafka_prod(stream_data);
+            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
+                srv_utils->async_kafka_prod(stream_data_out);
             }
         }
         // Handling JSON string
@@ -337,8 +339,8 @@ void Srv::HuaweiStream::Start()
             std::cout << peer << " HUAWEI Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (srv_utils->str2json(stream_data) != 1) {
-                srv_utils->async_kafka_prod(stream_data);
+            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
+                srv_utils->async_kafka_prod(stream_data_out);
             }
         }
     } else {
@@ -388,6 +390,48 @@ int SrvUtils::str2json(const std::string& json_str)
     std::cout << "encodingPath: " << encoding_path << std::endl;
     //std::cout << msg_timestamp << std::endl;
     //std::cout << node_id_str << std::endl;
+
+    Json::Value label;
+    std::string node_id = "node_id";
+    std::string platform_id = "platform_id";
+    label.append(node_id);
+    label.append(platform_id);
+    root["label"] = label;
+
+    const std::string node_id_ = root["label"][0].asString();
+    const std::string platform_id_ = root["label"][1].asString();
+
+    std::cout << "node_id: " << node_id_ << std::endl;
+    std::cout << "platform_id: " << platform_id_ << std::endl;
+
+    return EXIT_SUCCESS;
+}
+
+int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
+{
+    const auto json_str_length = static_cast<int>(json_str.length());
+    JSONCPP_STRING err;
+    Json::Value root;
+    Json::CharReaderBuilder builderR;
+    Json::StreamWriterBuilder builderW;
+    const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
+    const std::unique_ptr<Json::StreamWriter> writer(
+                                                builderW.newStreamWriter());
+    Json::Value label;
+    std::string node_id = "node_id";
+    std::string platform_id = "platform_id";
+
+    if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
+                      &root, &err) and json_str_length != 0) {
+        std::cout << "ERROR parsing the string - conversion to JSON Failed!"
+                                                                << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    label.append(node_id);
+    label.append(platform_id);
+    root["label"] = label;
+    json_str_out = Json::writeString(builderW, root);
 
     return EXIT_SUCCESS;
 }
