@@ -217,8 +217,8 @@ void Srv::CiscoStream::Start()
          * }
          */
 
-        std::string stream_data = "";
-        std::string stream_data_out = "";
+        std::string stream_data;
+        std::string stream_data_out;
         std::unique_ptr<google::protobuf::Message> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
 
@@ -282,8 +282,8 @@ void Srv::HuaweiStream::Start()
                         new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_resp.Read(&huawei_stream, this);
 
-        std::string stream_data = "";
-        std::string stream_data_out = "";
+        std::string stream_data;
+        std::string stream_data_out;
         std::unique_ptr<google::protobuf::Message> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
 
