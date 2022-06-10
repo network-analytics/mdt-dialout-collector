@@ -39,3 +39,6 @@
 
 # BUILD
 build/*
+
+# CFGs
+configs/*.cfg
