@@ -20,15 +20,15 @@ public:
     std::string get_kafka_ssl_ca_location() { return ssl_ca_location; };
     std::string get_kafka_log_level() { return log_level; };
 private:
-    const char *topic;
-    const char *bootstrap_servers;
-    const char *enable_idempotence;
-    const char *client_id;
-    const char *security_protocol;
-    const char *ssl_key_location;
-    const char *ssl_certificate_location;
-    const char *ssl_ca_location;
-    const char *log_level;
+    const char *topic = NULL;
+    const char *bootstrap_servers = NULL;
+    const char *enable_idempotence = NULL;
+    const char *client_id = NULL;
+    const char *security_protocol = NULL;
+    const char *ssl_key_location = NULL;
+    const char *ssl_certificate_location = NULL;
+    const char *ssl_ca_location = NULL;
+    const char *log_level = NULL;
 };
 
 #endif

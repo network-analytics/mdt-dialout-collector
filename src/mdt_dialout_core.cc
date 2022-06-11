@@ -439,29 +439,39 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
     using namespace kafka::clients;
 
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
-    kafka::Topic topic = 
+    kafka::Topic topic =
                         kafka_cfg_handler->get_kafka_topic();
-    std::string brokers = 
+    std::string bootstrap_servers =
                         kafka_cfg_handler->get_kafka_bootstrap_servers();
-    std::string enable_idempotence = 
+    std::string enable_idempotence =
                         kafka_cfg_handler->get_kafka_enable_idempotence();
-    std::string client_id = 
+    std::string client_id =
                         kafka_cfg_handler->get_kafka_client_id();
-    std::string security_protocol = 
+    std::string security_protocol =
                         kafka_cfg_handler->get_kafka_security_protocol();
-    std::string ssl_key_location = 
+    std::string ssl_key_location =
                         kafka_cfg_handler->get_kafka_ssl_key_location();
-    std::string ssl_certificate_location = 
+    std::string ssl_certificate_location =
                         kafka_cfg_handler->get_kafka_ssl_certificate_location();
-    std::string ssl_ca_location = 
+    std::string ssl_ca_location =
                         kafka_cfg_handler->get_kafka_ssl_ca_location();
-    std::string log_level = 
+    std::string log_level =
                         kafka_cfg_handler->get_kafka_log_level();
+
+    //std::cout << topic << std::endl;
+    //std::cout << bootstrap_servers << std::endl;
+    //std::cout << enable_idempotence << std::endl;
+    //std::cout << client_id << std::endl;
+    //std::cout << security_protocol << std::endl;
+    //std::cout << ssl_key_location << std::endl;
+    //std::cout << ssl_certificate_location << std::endl;
+    //std::cout << ssl_ca_location << std::endl;
+    //std::cout << log_level << std::endl;
 
     try {
         // Additional kafka producer's config options here
         kafka::Properties properties ({
-            {"bootstrap.servers",  brokers},
+            {"bootstrap.servers",  bootstrap_servers},
             {"enable.idempotence", enable_idempotence},
             {"client.id", client_id},
             {"security.protocol", security_protocol},
