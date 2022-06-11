@@ -439,28 +439,42 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
     using namespace kafka::clients;
 
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
-
-    std::string brokers = "kafka.sbd.corproot.net:9093";
-    kafka::Topic topic  = "daisy.dev.yang-json-raw-test";
-    std::string client_id = "mdt-dialout-collector";
+    kafka::Topic topic = 
+                        kafka_cfg_handler->get_kafka_topic();
+    std::string brokers = 
+                        kafka_cfg_handler->get_kafka_bootstrap_servers();
+    std::string enable_idempotence = 
+                        kafka_cfg_handler->get_kafka_enable_idempotence();
+    std::string client_id = 
+                        kafka_cfg_handler->get_kafka_client_id();
+    std::string security_protocol = 
+                        kafka_cfg_handler->get_kafka_security_protocol();
+    std::string ssl_key_location = 
+                        kafka_cfg_handler->get_kafka_ssl_key_location();
+    std::string ssl_certificate_location = 
+                        kafka_cfg_handler->get_kafka_ssl_certificate_location();
+    std::string ssl_ca_location = 
+                        kafka_cfg_handler->get_kafka_ssl_ca_location();
+    std::string log_level = 
+                        kafka_cfg_handler->get_kafka_log_level();
 
     try {
-        // Additional config options here
+        // Additional kafka producer's config options here
         kafka::Properties properties ({
             {"bootstrap.servers",  brokers},
-            {"enable.idempotence", "true"},
+            {"enable.idempotence", enable_idempotence},
             {"client.id", client_id},
-            {"security.protocol", "ssl"},
-            {"ssl.key.location", "/opt/daisy/cert/dev/collectors.key"},
-            {"ssl.certificate.location", "/opt/daisy/cert/dev/collectors.crt"},
-            {"ssl.ca.location", "/opt/daisy/cert/dev/sbd_root_ca.crt"},
-            {"log_level", "0"},
+            {"security.protocol", security_protocol},
+            {"ssl.key.location", ssl_key_location},
+            {"ssl.certificate.location", ssl_certificate_location},
+            {"ssl.ca.location", ssl_ca_location},
+            {"log_level", log_level},
         });
 
         KafkaProducer producer(properties);
 
         if (json_str.empty()) {
-            // Better handling
+            // Implementing a better handling
             std::cout << "KAFKA - Empty JSON received " << std::endl;
             return EXIT_FAILURE;
         }

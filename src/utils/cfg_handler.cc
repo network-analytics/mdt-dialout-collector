@@ -2,27 +2,35 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
+#include <memory>
 #include <libconfig.h++>
 #include "cfg_handler.h"
 
 
+std::unique_ptr<libconfig::Config> kafka_params(new libconfig::Config());
+
 KafkaCfgHandler::KafkaCfgHandler()
 {
-    libconfig::Config kafka_params;
-    kafka_params.setIncludeDir("configs/");
-    kafka_params.readFile("main.cfg");
-    std::string test = kafka_params.lookup("bootstrap_servers");
-    std::cout << test << std::endl;
+
+    if (lookup_kafka_parameters(
+    "/home/toto/Projects/mdt-dialout-collector/configs/kafka_producer.cfg")) {
+        topic = kafka_params->lookup("topic");
+        bootstrap_servers = kafka_params->lookup("bootstrap_servers");
+        enable_idempotence = kafka_params->lookup("enable_idempotence");
+        client_id = kafka_params->lookup("client_id");
+        security_protocol = kafka_params->lookup("security_protocol");
+        ssl_key_location = kafka_params->lookup("ssl_key_location");
+        ssl_certificate_location = kafka_params->lookup("certificate_location");
+        ssl_ca_location = kafka_params->lookup("ssl_ca_location");
+        log_level = kafka_params->lookup("log_level");
+    }
 }
 
-/*
-int KafkaCfgHandler::lookup_kafka_parameters(
-										libconfig::Config kafka_parameters)
+int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path)
 {
-    kafka_parameters.setIncludeDir("../../configs");
-
     try {
-        kafka_parameters.readFile("main.cfg");
+        kafka_params->readFile(cfg_path.c_str());
     } catch (const libconfig::FileIOException &fioex) {
         std::cerr << "I/O error while reading file." << std::endl;
         return(EXIT_FAILURE);
@@ -34,11 +42,3 @@ int KafkaCfgHandler::lookup_kafka_parameters(
 
     return EXIT_SUCCESS;
 }
-
-
-void KafkaCfgHandler::get_kafka_parameters()
-{
-
-}
-*/
-
