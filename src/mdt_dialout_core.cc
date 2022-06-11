@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "cfg_handler.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -436,6 +437,8 @@ int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
 int SrvUtils::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
+
+    std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
 
     std::string brokers = "kafka.sbd.corproot.net:9093";
     kafka::Topic topic  = "daisy.dev.yang-json-raw-test";

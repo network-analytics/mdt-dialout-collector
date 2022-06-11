@@ -1,7 +1,7 @@
 # Minimum CMake required
 cmake_minimum_required(VERSION 3.15)
 
-# pkg-config 
+# pkg-config
 find_package(PkgConfig REQUIRED)
 
 # Project
@@ -56,6 +56,13 @@ link_libraries(${RDKAFKA_LIBRARIES})
 message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
 set(RDKAFKA_INCLUDE_DIR /usr/local/include)
 include_directories("${RDKAFKA_INCLUDE_DIR}")
+
+# libconfig
+pkg_check_modules(LIBCONFIG_CPP libconfig++)
+link_libraries(${LIBCONFIG_CPP_LIBRARIES})
+message(STATUS "Using libconfig++ ${LIBCONFIG_CPP_VERSION}")
+set(LIBCONFIG_CPP_INCLUDE_DIR /usr/include)
+include_directories("${LIBCONFIG_CPP_INCLUDE_DIR}")
 
 # Protobuf generated "gRPC dial-out" - Cisco
 set(cisco_dialout_pb_cc
@@ -142,6 +149,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils")
 
 # Compile
 foreach(_target "mdt_dialout_collector")
@@ -149,6 +157,7 @@ foreach(_target "mdt_dialout_collector")
         ${_target}
         "${CMAKE_CURRENT_SOURCE_DIR}/src/${_target}.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/mdt_dialout_core.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
         ${cisco_telemetry_pb_cc}
@@ -165,5 +174,6 @@ foreach(_target "mdt_dialout_collector")
         ${JSONCPP_LIBRARIES}
         ${RDKAFKA_CPP_LIBRARIES}
         ${RDKAFKA_LIBRARIES}
+        ${LIBCONFIG_CPP_LIBRARIES}
     )
 endforeach()

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include "mdt_dialout_core.h"
+#include "cfg_handler.h"
 
 
 void *cisco_thread(void *);
@@ -22,6 +23,7 @@ int main(void)
 
 void *cisco_thread(void *cisco_ptr)
 {
+    std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
     std::string cisco_srv_socket {"0.0.0.0:10007"};
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
