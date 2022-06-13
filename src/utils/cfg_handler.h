@@ -14,34 +14,34 @@ public:
     int lookup_kafka_parameters(std::string cfg_path);
 
     // Getters
-    const std::string get_kafka_topic() {
-                            return topic; };
-    const std::string get_kafka_bootstrap_servers() {
-                            return bootstrap_servers; };
-    const std::string get_kafka_enable_idempotence() {
-                            return enable_idempotence; };
-    const std::string get_kafka_client_id() {
-                            return client_id; };
-    const std::string get_kafka_security_protocol() {
-                            return security_protocol; };
-    const std::string get_kafka_ssl_key_location() {
-                            return ssl_key_location; };
-    const std::string get_kafka_ssl_certificate_location() {
-                            return ssl_certificate_location; };
-    const std::string get_kafka_ssl_ca_location() {
-                            return ssl_ca_location; };
-    const std::string get_kafka_log_level() {
+    std::string get_kafka_topic() {
+                      return topic; };
+    std::string get_kafka_bootstrap_servers() {
+                      return bootstrap_servers; };
+    std::string get_kafka_enable_idempotence() {
+                      return enable_idempotence; };
+    std::string get_kafka_client_id() {
+                      return client_id; };
+    std::string get_kafka_security_protocol() {
+                      return security_protocol; };
+    std::string get_kafka_ssl_key_location() {
+                      return ssl_key_location; };
+    std::string get_kafka_ssl_certificate_location() {
+                      return ssl_certificate_location; };
+    std::string get_kafka_ssl_ca_location() {
+                      return ssl_ca_location; };
+    std::string get_kafka_log_level() {
                             return log_level; };
 private:
-    const std::string topic;
-    const std::string bootstrap_servers;
-    const std::string enable_idempotence;
-    const std::string client_id;
-    const std::string security_protocol;
-    const std::string ssl_key_location;
-    const std::string ssl_certificate_location;
-    const std::string ssl_ca_location;
-    const std::string log_level;
+    std::string topic;
+    std::string bootstrap_servers;
+    std::string enable_idempotence;
+    std::string client_id;
+    std::string security_protocol;
+    std::string ssl_key_location;
+    std::string ssl_certificate_location;
+    std::string ssl_ca_location;
+    std::string log_level;
 };
 
 #endif
