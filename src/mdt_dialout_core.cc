@@ -437,36 +437,36 @@ int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
 int SrvUtils::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
-
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
-    kafka::Topic topic =
+
+    kafka::Topic topic = //"daisy.dev.yang-json-raw-test";
                         kafka_cfg_handler->get_kafka_topic();
-    std::string bootstrap_servers =
+    std::string bootstrap_servers = //"kafka.sbd.corproot.net:9093";
                         kafka_cfg_handler->get_kafka_bootstrap_servers();
-    std::string enable_idempotence =
+    std::string enable_idempotence = //"true";
                         kafka_cfg_handler->get_kafka_enable_idempotence();
-    std::string client_id =
+    std::string client_id = //"mdt-dialout-collector";
                         kafka_cfg_handler->get_kafka_client_id();
-    std::string security_protocol =
+    std::string security_protocol = //"ssl";
                         kafka_cfg_handler->get_kafka_security_protocol();
-    std::string ssl_key_location =
+    std::string ssl_key_location = //"/opt/daisy/cert/dev/collectors.key";
                         kafka_cfg_handler->get_kafka_ssl_key_location();
-    std::string ssl_certificate_location =
+    std::string ssl_certificate_location = //"/opt/daisy/cert/dev/collectors.crt";
                         kafka_cfg_handler->get_kafka_ssl_certificate_location();
-    std::string ssl_ca_location =
+    std::string ssl_ca_location = //"/opt/daisy/cert/dev/sbd_root_ca.crt";
                         kafka_cfg_handler->get_kafka_ssl_ca_location();
-    std::string log_level =
+    std::string log_level = //"0";
                         kafka_cfg_handler->get_kafka_log_level();
 
-    //std::cout << topic << std::endl;
-    //std::cout << bootstrap_servers << std::endl;
-    //std::cout << enable_idempotence << std::endl;
-    //std::cout << client_id << std::endl;
-    //std::cout << security_protocol << std::endl;
-    //std::cout << ssl_key_location << std::endl;
-    //std::cout << ssl_certificate_location << std::endl;
-    //std::cout << ssl_ca_location << std::endl;
-    //std::cout << log_level << std::endl;
+    std::cout << topic << std::endl;
+    std::cout << bootstrap_servers << std::endl;
+    std::cout << enable_idempotence << std::endl;
+    std::cout << client_id << std::endl;
+    std::cout << security_protocol << std::endl;
+    std::cout << ssl_key_location << std::endl;
+    std::cout << ssl_certificate_location << std::endl;
+    std::cout << ssl_ca_location << std::endl;
+    std::cout << log_level << std::endl;
 
     try {
         // Additional kafka producer's config options here
