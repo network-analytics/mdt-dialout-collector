@@ -9,13 +9,12 @@
 
 
 std::unique_ptr<libconfig::Config> kafka_params(new libconfig::Config());
-//libconfig::Config kafka_params;
+const std::string kafka_cfg = 
+    "/home/tzhcusa1/Projects/mdt-dialout-collector/configs/kafka_producer.cfg";
 
 KafkaCfgHandler::KafkaCfgHandler()
 {
-    if (lookup_kafka_parameters(
-"/home/tzhcusa1/Projects/mdt-dialout-collector/configs/kafka_producer.cfg")) {
-
+    if (!lookup_kafka_parameters(kafka_cfg)) {
         libconfig::Setting& topic_ =
             kafka_params->lookup("topic");
         libconfig::Setting& bootstrap_servers_ =
@@ -35,15 +34,24 @@ KafkaCfgHandler::KafkaCfgHandler()
         libconfig::Setting& log_level_ =
             kafka_params->lookup("log_level");
 
-        this->topic = (const char *) topic_;
-        this->bootstrap_servers = (const char *) bootstrap_servers_;
-        this->enable_idempotence = (const char *) enable_idempotence_;
-        this->client_id = (const char *) client_id_;
-        this->security_protocol = (const char *) security_protocol_;
-        this->ssl_key_location = (const char *) ssl_key_location_;
-        this->ssl_certificate_location = (const char *) ssl_certificate_location_;
-        this->ssl_ca_location = (const char *) ssl_ca_location_;
-        this->log_level = (const char *) log_level_;
+        this->topic =
+            (const char *) topic_;
+        this->bootstrap_servers =
+            (const char *) bootstrap_servers_;
+        this->enable_idempotence =
+            (const char *) enable_idempotence_;
+        this->client_id =
+            (const char *) client_id_;
+        this->security_protocol =
+            (const char *) security_protocol_;
+        this->ssl_key_location =
+            (const char *) ssl_key_location_;
+        this->ssl_certificate_location =
+            (const char *) ssl_certificate_location_;
+        this->ssl_ca_location =
+            (const char *) ssl_ca_location_;
+        this->log_level =
+            (const char *) log_level_;
     }   
 }
 
