@@ -10,51 +10,13 @@
 #include "cfg_handler.h"
 
 
-extern const std::string kafka_cfg = 
+extern const std::string kafka_cfg =
     "/home/toto/Projects/mdt-dialout-collector/configs/kafka_producer.cfg";
 std::map<std::string, std::string> params;
 
 KafkaCfgHandler::KafkaCfgHandler()
 {
     if (!lookup_kafka_parameters(kafka_cfg, params)) {
-        //libconfig::Setting& topic_ =
-        //    kafka_params->lookup("topic");
-        //libconfig::Setting& bootstrap_servers_ =
-        //    kafka_params->lookup("bootstrap_servers");
-        //libconfig::Setting& enable_idempotence_ =
-        //    kafka_params->lookup("enable_idempotence");
-        //libconfig::Setting& client_id_ =
-        //    kafka_params->lookup("client_id");
-        //libconfig::Setting& security_protocol_ =
-        //    kafka_params->lookup("security_protocol");
-        //libconfig::Setting& ssl_key_location_ =
-        //    kafka_params->lookup("ssl_key_location");
-        //libconfig::Setting& ssl_certificate_location_ =
-        //    kafka_params->lookup("ssl_certificate_location");
-        //libconfig::Setting& ssl_ca_location_ =
-        //    kafka_params->lookup("ssl_ca_location");
-        //libconfig::Setting& log_level_ =
-        //    kafka_params->lookup("log_level");
-
-        //this->topic =
-        //    (const char *) params.at("topic");
-        //this->bootstrap_servers =
-        //    (const char *) params.at("bootstrap_servers");
-        //this->enable_idempotence =
-        //    (const char *) params.at("enable_idempotence");
-        //this->client_id =
-        //    (const char *) params.at("client_id");
-        //this->security_protocol =
-        //    (const char *) params.at("security_protocol");
-        //this->ssl_key_location =
-        //    (const char *) params.at("ssl_key_location");
-        //this->ssl_certificate_location =
-        //    (const char *) params.at("ssl_certificate_location");
-        //this->ssl_ca_location =
-        //    (const char *) params.at("ssl_ca_location");
-        //this->log_level =
-        //    (const char *) params.at("log_level");
-        
         this->topic =
             params.at("topic").c_str();
         this->bootstrap_servers =
@@ -73,10 +35,10 @@ KafkaCfgHandler::KafkaCfgHandler()
             params.at("ssl_ca_location").c_str();
         this->log_level =
             params.at("log_level").c_str();
-    }   
+    }
 }
 
-int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path, 
+int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
                                 std::map<std::string, std::string>& params)
 {
     std::unique_ptr<libconfig::Config> kafka_params(new libconfig::Config());
@@ -110,6 +72,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
             kafka_params->lookup("ssl_ca_location");
         libconfig::Setting& log_level_ =
             kafka_params->lookup("log_level");
+
         params.insert({"topic", topic_});
         params.insert({"bootstrap_servers", bootstrap_servers_});
         params.insert({"enable_idempotence", enable_idempotence_});
@@ -129,3 +92,4 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
 
     return EXIT_SUCCESS;
 }
+
