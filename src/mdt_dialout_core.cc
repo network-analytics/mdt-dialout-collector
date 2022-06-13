@@ -437,6 +437,7 @@ int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
 int SrvUtils::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
+    
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
 
     kafka::Topic topic = //"daisy.dev.yang-json-raw-test";

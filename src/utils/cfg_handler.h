@@ -11,7 +11,8 @@ public:
     KafkaCfgHandler();
 
     // Setters - directly from the configuration file
-    int lookup_kafka_parameters(std::string cfg_path);
+    int lookup_kafka_parameters(std::string cfg_path,
+                                std::map<std::string, std::string>& params);
 
     // Getters
     std::string get_kafka_topic() {
