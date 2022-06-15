@@ -99,11 +99,11 @@ Here below is an *example* of configuration:
 ## physical interface where to bind the daemon
 iface = "eth0";
 
-## socket dedicated to the vendor 1 data-stream
-ipv4_socket_v1 = "0.0.0.0:10007";
+## socket dedicated to cisco's data-stream
+ipv4_socket_cisco = "0.0.0.0:10007";
 
-## socket dedicated to the vendor 2 data-stream
-ipv4_socket_v2 = "0.0.0.0:10008";
+## socket dedicated to huawei's data-stream
+ipv4_socket_huawei = "0.0.0.0:10008";
 
 
 #### mdt-dialout-collector - kafka-producer

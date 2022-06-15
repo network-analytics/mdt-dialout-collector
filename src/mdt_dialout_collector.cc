@@ -25,10 +25,10 @@ void *cisco_thread(void *cisco_ptr)
 {
     // --- Required for config parameters ---
     std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
-    std::string ipv4_socket_v1 = main_cfg_handler->get_ipv4_socket_v1();
+    std::string ipv4_socket_cisco = main_cfg_handler->get_ipv4_socket_cisco();
     // --- Required for config parameters ---
 
-    std::string cisco_srv_socket {ipv4_socket_v1};
+    std::string cisco_srv_socket {ipv4_socket_cisco};
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
 
@@ -39,10 +39,10 @@ void *huawei_thread(void *huawei_ptr)
 {
     // --- Required for config parameters ---
     std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
-    std::string ipv4_socket_v2 = main_cfg_handler->get_ipv4_socket_v2();
+    std::string ipv4_socket_huawei = main_cfg_handler->get_ipv4_socket_huawei();
     // --- Required for config parameters ---
 
-    std::string huawei_srv_socket {ipv4_socket_v2};
+    std::string huawei_srv_socket {ipv4_socket_huawei};
     Srv huawei_mdt_dialout_collector;
     huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
 

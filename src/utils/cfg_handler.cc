@@ -16,10 +16,10 @@ MainCfgHandler::MainCfgHandler()
                                 this->parameters)) {
         this->iface =
             parameters.at("iface").c_str();
-        this->ipv4_socket_v1 =
-            parameters.at("ipv4_socket_v1").c_str();
-        this->ipv4_socket_v2 =
-            parameters.at("ipv4_socket_v2").c_str();
+        this->ipv4_socket_cisco =
+            parameters.at("ipv4_socket_cisco").c_str();
+        this->ipv4_socket_huawei =
+            parameters.at("ipv4_socket_huawei").c_str();
     }
 }
 
@@ -41,14 +41,14 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     try {
         libconfig::Setting& iface =
             main_params->lookup("iface");
-        libconfig::Setting& ipv4_socket_v1 =
-            main_params->lookup("ipv4_socket_v1");
-        libconfig::Setting& ipv4_socket_v2 =
-            main_params->lookup("ipv4_socket_v2");
+        libconfig::Setting& ipv4_socket_cisco =
+            main_params->lookup("ipv4_socket_cisco");
+        libconfig::Setting& ipv4_socket_huawei =
+            main_params->lookup("ipv4_socket_huawei");
 
         params.insert({"iface", iface});
-        params.insert({"ipv4_socket_v1", ipv4_socket_v1});
-        params.insert({"ipv4_socket_v2", ipv4_socket_v2});
+        params.insert({"ipv4_socket_cisco", ipv4_socket_cisco});
+        params.insert({"ipv4_socket_huawei", ipv4_socket_cisco});
     } catch(libconfig::SettingNotFoundException &snfex) {
         std::cout << "libconfig::SettingNotFoundException" << std::endl;
         return(EXIT_FAILURE);

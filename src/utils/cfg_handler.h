@@ -27,14 +27,14 @@ public:
     // Getters
     std::string get_iface() {
                       return iface; };
-    std::string get_ipv4_socket_v1() {
-                      return ipv4_socket_v1; };
-    std::string get_ipv4_socket_v2() {
-                      return ipv4_socket_v2; };
+    std::string get_ipv4_socket_cisco() {
+                      return ipv4_socket_cisco; };
+    std::string get_ipv4_socket_huawei() {
+                      return ipv4_socket_huawei; };
 private:
     std::string iface;
-    std::string ipv4_socket_v1;
-    std::string ipv4_socket_v2;
+    std::string ipv4_socket_cisco;
+    std::string ipv4_socket_huawei;
 };
 
 class KafkaCfgHandler : public CfgHandler {
