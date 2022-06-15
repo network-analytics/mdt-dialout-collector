@@ -11,7 +11,7 @@ public:
 
 protected:
     const std::string mdt_dialout_collector_conf =
-"/home/toto/Projects/mdt-dialout-collector/configs/mdt_dialout_collector.conf";
+                "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
     std::map<std::string, std::string> parameters;
 };
 
