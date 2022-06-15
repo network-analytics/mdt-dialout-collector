@@ -51,12 +51,12 @@ With the limits imposed by the Vendors implementations, both JSON and GPB-KV are
 
 - It's recommended to compile gRPC and all the associated libraries from scratch.
 The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) is describing in detail the compile/install procedure. If
-you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation. 
+you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation.
 
 - Libraries like jsoncpp & librdkafka are also required.
 ```SHELL
-Debian$ sudo apt install libjsoncpp-dev librdkafka-dev 
-Redhat$ sudo yum install jsoncpp-devel librdkafka-devel
+Debian$ sudo apt install libjsoncpp-dev librdkafka-dev libconfig++-dev
+Redhat$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel
 ```
 
 #### git Clone, Compile and Run
@@ -84,7 +84,7 @@ On CentOS you might need to modify the pkg-config path to allow cmake to find al
 $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
 ```
 ---
-  
+
 #### Licenses matrix
 
 |  Libraries / .proto files                                                                                                                                                 | License                   |
@@ -92,6 +92,7 @@ $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
 | [JsonCpp](https://github.com/open-source-parsers/jsoncpp)                                                                                                                 | MIT License               |
 | [librdkafka](https://github.com/edenhill/librdkafka)                                                                                                                      | BSD 2-Clause License      |
 | [Modern C++ Kafka API](https://github.com/morganstanley/modern-cpp-kafka)                                                                                                 | Apache License Version 2.0|
+| [libconfig](http://hyperrealm.github.io/libconfig/)                                                                                                                       | LGPL v2.1                 |
 | [gRPC](https://github.com/grpc/grpc)                                                                                                                                      | BSD 3-Clause License      |
 | [Cisco dial-out .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)| Apache License Version 2.0|
 | [Cisco telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                       | Apache License Version 2.0|
