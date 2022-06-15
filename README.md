@@ -99,10 +99,10 @@ Here below is an *example* of configuration:
 ## physical interface where to bind the daemon
 iface = "eth0";
 
-## socket dedicated to cisco's data-stream
+## socket dedicated to the cisco's data-stream
 ipv4_socket_cisco = "0.0.0.0:10007";
 
-## socket dedicated to huawei's data-stream
+## socket dedicated to the huawei's data-stream
 ipv4_socket_huawei = "0.0.0.0:10008";
 
 
