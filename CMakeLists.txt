@@ -151,6 +151,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils")
 
+# set the bin folder
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
 # Compile
 foreach(_target "mdt_dialout_collector")
     add_executable(

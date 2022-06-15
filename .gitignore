@@ -40,5 +40,5 @@
 # BUILD
 build/*
 
-# CFGs
-configs/*.conf
+# BIN
+bin/mdt_dialout_collector
