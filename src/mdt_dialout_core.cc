@@ -36,8 +36,10 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     int length = sizeof(int);
     socklen_t len = sizeof(type);
 
+    // --- Required for config parameters ---
     std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
     std::string iface = main_cfg_handler->get_iface();
+    // --- Required for config parameters ---
 
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
         //std::cout << "Issues with getting the iface type ..." << std::endl;
@@ -442,6 +444,7 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
 {
     using namespace kafka::clients;
 
+    // --- Required for config parameters ---
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
 
     kafka::Topic topic =
@@ -462,16 +465,7 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
                         kafka_cfg_handler->get_kafka_ssl_ca_location();
     std::string log_level =
                         kafka_cfg_handler->get_kafka_log_level();
-
-    //std::cout << topic << std::endl;
-    //std::cout << bootstrap_servers << std::endl;
-    //std::cout << enable_idempotence << std::endl;
-    //std::cout << client_id << std::endl;
-    //std::cout << security_protocol << std::endl;
-    //std::cout << ssl_key_location << std::endl;
-    //std::cout << ssl_certificate_location << std::endl;
-    //std::cout << ssl_ca_location << std::endl;
-    //std::cout << log_level << std::endl;
+    // --- Required for config parameters ---
 
     try {
         // Additional kafka producer's config options here
