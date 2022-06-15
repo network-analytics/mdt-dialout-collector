@@ -61,13 +61,14 @@ Redhat$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel
 
 #### git Clone, Compile and Run
 ```SHELL
+$ cd /opt
 $ git clone https://github.com/scuzzilla/mdt-dialout-collector.git
 
 $ cd mdt-dialout-collector
 $ mkdir build
 $ cmake ../
 
-$ ./mdt-dialout-collector
+$ ./bin/mdt-dialout-collector
 ```
 
 #### Additional Install notes
@@ -83,6 +84,41 @@ On CentOS you might need to modify the pkg-config path to allow cmake to find al
 ```SHELL
 $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
 ```
+
+#### Configuration parameters
+
+The default configuration location is following the [FHS](https://refspecs.linuxfoundation.org/fhs.shtml) recommendation, therefore:
+- the application itself is located within the "/opt" folder
+- its configuration is located within the "/etc/opt/mdt-dialout-collector" folder
+
+Here below is an *example* of configuration:
+
+```SHELL
+#### mdt-dialout-collector - main
+
+## physical interface where to bind the daemon
+iface = "eth0";
+
+## socket dedicated to the vendor 1 data-stream
+ipv4_socket_v1 = "0.0.0.0:10007";
+
+## socket dedicated to the vendor 2 data-stream
+ipv4_socket_v2 = "0.0.0.0:10008";
+
+
+#### mdt-dialout-collector - kafka-producer
+
+bootstrap_servers = "kafka.brockers.net:9093";
+topic = "json.topic";
+enable_idempotence = "true";
+client_id = "mdt-dialout-collector";
+security_protocol = "ssl";
+ssl_key_location = "/opt/mdt-dialout-collector/cert/collectors.key";
+ssl_certificate_location = "/opt/mdt-dialout-collector/cert/collectors.crt";
+ssl_ca_location = "/opt/mdt-dialout-collector/cert/sbd_root_ca.crt";
+log_level = "0";
+```
+
 ---
 
 #### Licenses matrix
