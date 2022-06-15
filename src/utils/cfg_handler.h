@@ -5,7 +5,39 @@
 #include <libconfig.h++>
 
 
-class KafkaCfgHandler final {
+class CfgHandler {
+public:
+    //TBC
+
+protected:
+    const std::string mdt_dialout_collector_conf =
+"/home/toto/Projects/mdt-dialout-collector/configs/mdt_dialout_collector.conf";
+    std::map<std::string, std::string> parameters;
+};
+
+class MainCfgHandler : public CfgHandler {
+public:
+    // Params are initialized within the constructor
+    MainCfgHandler();
+
+    // Setters - directly from the configuration file
+    int lookup_main_parameters(std::string cfg_path,
+                                std::map<std::string, std::string>& params);
+
+    // Getters
+    std::string get_iface() {
+                      return iface; };
+    std::string get_ipv4_socket_v1() {
+                      return ipv4_socket_v1; };
+    std::string get_ipv4_socket_v2() {
+                      return ipv4_socket_v2; };
+private:
+    std::string iface;
+    std::string ipv4_socket_v1;
+    std::string ipv4_socket_v2;
+};
+
+class KafkaCfgHandler : public CfgHandler {
 public:
     // Params are initialized within the constructor
     KafkaCfgHandler();

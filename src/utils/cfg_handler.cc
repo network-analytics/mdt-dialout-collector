@@ -10,31 +10,78 @@
 #include "cfg_handler.h"
 
 
-extern const std::string kafka_cfg =
-    "/home/toto/Projects/mdt-dialout-collector/configs/kafka_producer.cfg";
-std::map<std::string, std::string> params;
+MainCfgHandler::MainCfgHandler()
+{
+    if (!lookup_main_parameters(this->mdt_dialout_collector_conf,
+                                this->parameters)) {
+        this->iface =
+            parameters.at("iface").c_str();
+        this->ipv4_socket_v1 =
+            parameters.at("ipv4_socket_v1").c_str();
+        this->ipv4_socket_v2 =
+            parameters.at("ipv4_socket_v2").c_str();
+    }
+}
+
+int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
+                                std::map<std::string, std::string>& params)
+{
+    std::unique_ptr<libconfig::Config> main_params(new libconfig::Config());
+
+    try {
+        main_params->readFile(cfg_path.c_str());
+    } catch (const libconfig::FileIOException &fioex) {
+        std::cout << "libconfig::FileIOException" << std::endl;
+        return(EXIT_FAILURE);
+    } catch(const libconfig::ParseException &pex) {
+        std::cout << "libconfig::ParseException" << std::endl;
+        return(EXIT_FAILURE);
+    }
+
+    try {
+        libconfig::Setting& iface =
+            main_params->lookup("iface");
+        libconfig::Setting& ipv4_socket_v1 =
+            main_params->lookup("ipv4_socket_v1");
+        libconfig::Setting& ipv4_socket_v2 =
+            main_params->lookup("ipv4_socket_v2");
+
+        params.insert({"iface", iface});
+        params.insert({"ipv4_socket_v1", ipv4_socket_v1});
+        params.insert({"ipv4_socket_v2", ipv4_socket_v2});
+    } catch(libconfig::SettingNotFoundException &snfex) {
+        std::cout << "libconfig::SettingNotFoundException" << std::endl;
+        return(EXIT_FAILURE);
+    } catch (libconfig::SettingTypeException &stex){
+        std::cout << "libconfig::SettingTypeException" << std::endl;
+        return(EXIT_FAILURE);
+    }
+
+    return EXIT_SUCCESS;
+}
 
 KafkaCfgHandler::KafkaCfgHandler()
 {
-    if (!lookup_kafka_parameters(kafka_cfg, params)) {
+    if (!lookup_kafka_parameters(this->mdt_dialout_collector_conf,
+                                this->parameters)) {
         this->topic =
-            params.at("topic").c_str();
+            parameters.at("topic").c_str();
         this->bootstrap_servers =
-            params.at("bootstrap_servers").c_str();
+            parameters.at("bootstrap_servers").c_str();
         this->enable_idempotence =
-            params.at("enable_idempotence").c_str();
+            parameters.at("enable_idempotence").c_str();
         this->client_id =
-            params.at("client_id").c_str();
+            parameters.at("client_id").c_str();
         this->security_protocol =
-            params.at("security_protocol").c_str();
+            parameters.at("security_protocol").c_str();
         this->ssl_key_location =
-            params.at("ssl_key_location").c_str();
+            parameters.at("ssl_key_location").c_str();
         this->ssl_certificate_location =
-            params.at("ssl_certificate_location").c_str();
+            parameters.at("ssl_certificate_location").c_str();
         this->ssl_ca_location =
-            params.at("ssl_ca_location").c_str();
+            parameters.at("ssl_ca_location").c_str();
         this->log_level =
-            params.at("log_level").c_str();
+            parameters.at("log_level").c_str();
     }
 }
 
@@ -54,34 +101,34 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
     }
 
     try {
-        libconfig::Setting& topic_ =
+        libconfig::Setting& topic =
             kafka_params->lookup("topic");
-        libconfig::Setting& bootstrap_servers_ =
+        libconfig::Setting& bootstrap_servers =
             kafka_params->lookup("bootstrap_servers");
-        libconfig::Setting& enable_idempotence_ =
+        libconfig::Setting& enable_idempotence =
             kafka_params->lookup("enable_idempotence");
-        libconfig::Setting& client_id_ =
+        libconfig::Setting& client_id =
             kafka_params->lookup("client_id");
-        libconfig::Setting& security_protocol_ =
+        libconfig::Setting& security_protocol =
             kafka_params->lookup("security_protocol");
-        libconfig::Setting& ssl_key_location_ =
+        libconfig::Setting& ssl_key_location =
             kafka_params->lookup("ssl_key_location");
-        libconfig::Setting& ssl_certificate_location_ =
+        libconfig::Setting& ssl_certificate_location =
             kafka_params->lookup("ssl_certificate_location");
-        libconfig::Setting& ssl_ca_location_ =
+        libconfig::Setting& ssl_ca_location =
             kafka_params->lookup("ssl_ca_location");
-        libconfig::Setting& log_level_ =
+        libconfig::Setting& log_level =
             kafka_params->lookup("log_level");
 
-        params.insert({"topic", topic_});
-        params.insert({"bootstrap_servers", bootstrap_servers_});
-        params.insert({"enable_idempotence", enable_idempotence_});
-        params.insert({"client_id", client_id_});
-        params.insert({"security_protocol", security_protocol_});
-        params.insert({"ssl_key_location", ssl_key_location_});
-        params.insert({"ssl_certificate_location", ssl_certificate_location_});
-        params.insert({"ssl_ca_location", ssl_ca_location_});
-        params.insert({"log_level", log_level_});
+        params.insert({"topic", topic});
+        params.insert({"bootstrap_servers", bootstrap_servers});
+        params.insert({"enable_idempotence", enable_idempotence});
+        params.insert({"client_id", client_id});
+        params.insert({"security_protocol", security_protocol});
+        params.insert({"ssl_key_location", ssl_key_location});
+        params.insert({"ssl_certificate_location", ssl_certificate_location});
+        params.insert({"ssl_ca_location", ssl_ca_location});
+        params.insert({"log_level", log_level});
     } catch(libconfig::SettingNotFoundException &snfex) {
         std::cout << "libconfig::SettingNotFoundException" << std::endl;
         return(EXIT_FAILURE);

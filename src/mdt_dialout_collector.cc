@@ -23,8 +23,10 @@ int main(void)
 
 void *cisco_thread(void *cisco_ptr)
 {
-    std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
-    std::string cisco_srv_socket {"0.0.0.0:10007"};
+    std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
+    std::string ipv4_socket_v1 = main_cfg_handler->get_ipv4_socket_v1();
+
+    std::string cisco_srv_socket {ipv4_socket_v1};
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
 
@@ -33,7 +35,10 @@ void *cisco_thread(void *cisco_ptr)
 
 void *huawei_thread(void *huawei_ptr)
 {
-    std::string huawei_srv_socket {"0.0.0.0:10008"};
+    std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
+    std::string ipv4_socket_v2 = main_cfg_handler->get_ipv4_socket_v2();
+
+    std::string huawei_srv_socket {ipv4_socket_v2};
     Srv huawei_mdt_dialout_collector;
     huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
 

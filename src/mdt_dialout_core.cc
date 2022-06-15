@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <cstring>
 #include "cfg_handler.h"
 
 using grpc::Channel;
@@ -35,12 +36,15 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     int length = sizeof(int);
     socklen_t len = sizeof(type);
 
+    std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
+    std::string iface = main_cfg_handler->get_iface();
+
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
         //std::cout << "Issues with getting the iface type ..." << std::endl;
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
-                                "ens224", strlen("ens224")) != 0) {
+                                iface.c_str(), strlen(iface.c_str())) != 0) {
         //std::cout << "Issues with iface binding for ..." << std::endl;
     }
 
