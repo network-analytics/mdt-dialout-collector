@@ -226,7 +226,7 @@ void Srv::CiscoStream::Start()
 
         std::string stream_data;
         std::string stream_data_out;
-        std::unique_ptr<google::protobuf::Message> cisco_tlm(
+        std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
                                             new cisco_telemetry::Telemetry());
 
         // Handling empty data
@@ -241,12 +241,17 @@ void Srv::CiscoStream::Start()
             //srv_utils->async_kafka_prod(stream_data);
         // Handling GPB-KV
         } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
-            google::protobuf::util::JsonOptions opt;
-            opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(
+            if (cisco_tlm->has_data_gpb() == true) {
+                google::protobuf::util::JsonOptions opt;
+                opt.add_whitespace = true;
+                google::protobuf::util::MessageToJsonString(
                                                         *cisco_tlm,
                                                         &stream_data,
                                                         opt);
+            } else {
+                SrvUtils::cisco_gpbkv2json(cisco_tlm, stream_data);
+            }
+
             // ---
             auto type_info = typeid(stream_data).name();
             //std::cout << peer << " CISCO Handling GPB-KV: " << type_info
@@ -378,6 +383,7 @@ int SrvUtils::str2json(const std::string& json_str)
     Json::Value root;
     Json::CharReaderBuilder builderR;
     Json::StreamWriterBuilder builderW;
+    builderW["indentation"] = "";
     const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
     const std::unique_ptr<Json::StreamWriter> writer(
                                                 builderW.newStreamWriter());
@@ -414,6 +420,7 @@ int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
     Json::Value root;
     Json::CharReaderBuilder builderR;
     Json::StreamWriterBuilder builderW;
+    builderW["indentation"] = "";
     const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
     const std::unique_ptr<Json::StreamWriter> writer(
                                                 builderW.newStreamWriter());
@@ -512,3 +519,102 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
     return EXIT_SUCCESS;
 }
 
+
+int SrvUtils::cisco_gpbkv2json(
+    const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
+    std::string& json_str_out)
+{
+     Json::Value root;
+    // First read the metadata defined in cisco_telemtry.proto
+    if (cisco_tlm->has_node_id_str()) {
+        root["node_id"] = cisco_tlm->node_id_str();
+    }
+    if (cisco_tlm->has_subscription_id_str()) {
+        root["subscription_id"] = cisco_tlm->subscription_id_str();
+    }
+    root["encoding_path"] = cisco_tlm->encoding_path();
+    root["collection_id"] = (Json::UInt64) cisco_tlm->collection_id();
+    root["collection_start_time"] = (Json::UInt64) cisco_tlm->collection_start_time();
+    root["msg_timestamp"] = (Json::UInt64) cisco_tlm->msg_timestamp();
+    root["collection_end_time"] = (Json::UInt64) cisco_tlm->collection_end_time();
+
+    // Iterate through the key/values in data_gpbkv
+    Json::Value gpbkv;
+    for (auto const& field: cisco_tlm->data_gpbkv()) {
+        Json::Value value = SrvUtils::cisco_gpbkv_field2json(field);
+        if (field.name().empty()) {
+            gpbkv.append(value);
+        } else {
+            Json::Value json_field;
+            json_field[field.name()] = value;
+            gpbkv.append(json_field);
+        }
+    }
+    root["data_gpbkv"] = gpbkv;
+
+    // Serialize the JSON value into a string
+    Json::StreamWriterBuilder builderW;
+    builderW["indentation"] = "";
+    const std::unique_ptr<Json::StreamWriter> writer(
+                                                builderW.newStreamWriter());
+    json_str_out = Json::writeString(builderW, root);
+
+    return EXIT_SUCCESS;
+}
+
+
+Json::Value SrvUtils::cisco_gpbkv_field2json(const cisco_telemetry::TelemetryField& field)
+{
+    Json::Value root;
+    // gpbkv allows for nested kv fields, we recursively decode each one of them.
+    Json::Value sub_fields;
+    for (const cisco_telemetry::TelemetryField& sub_field: field.fields()) {
+        Json::Value sub_field_value = SrvUtils::cisco_gpbkv_field2json(sub_field);
+        Json::Value sub_field_json;
+        if (sub_field.name().size() == 0) {
+            sub_fields.append(sub_field_value);
+        } else {
+            sub_field_json[sub_field.name()] = sub_field_value;
+            sub_fields.append(sub_field_json);
+        }
+    }
+
+    // the value of the field can be one of several predefined types, or null.
+    Json::Value value;
+    if (field.has_bytes_value()) {
+        value = field.bytes_value();
+    } else if (field.has_string_value()) {
+        value = field.string_value();
+    } else if (field.has_bool_value()) {
+        value = field.bool_value();
+    } else if (field.has_uint32_value()) {
+        value = field.uint32_value();
+    } else if (field.has_uint64_value()) {
+        value = (Json::UInt64) field.uint64_value();
+    } else if (field.has_sint32_value()) {
+        value = field.sint32_value();
+    } else if (field.has_sint64_value()) {
+        value = (Json::Int64) field.sint64_value();
+    } else if (field.has_double_value()) {
+        value = field.double_value();
+    }  else if (field.has_float_value()) {
+        value = field.float_value();
+    }
+
+    // timestamp is required field for each field, routers send zero for basic fields (e.g., int64)
+    if (field.timestamp() != 0) {
+        root["timestamp"] = (Json::UInt64) field.timestamp();
+    }
+
+    // Clean up the output to send only the properties that have values
+    if (!sub_fields.empty()) {
+        root["fields"] = sub_fields;
+    }
+    if (!root.empty()) {
+        if (!value.empty()) {
+            root["value"] = value;
+        }
+        return root;
+    }
+    return value;
+}
