@@ -38,31 +38,31 @@ get_filename_component(huawei_telemetry_proto "proto/Huawei/huawei_telemetry.pro
 get_filename_component(huawei_telemetry_proto_path "${huawei_telemetry_proto}" PATH)
 
 # jsoncpp libs
-pkg_check_modules(JSONCPP jsoncpp)
-link_libraries(${JSONCPP_LIBRARIES})
-message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
 set(JSONCPP_INCLUDE_DIR /usr/include/jsoncpp)
 include_directories("${JSONCPP_INCLUDE_DIR}")
+pkg_check_modules(JSONCPP REQUIRED jsoncpp>=1.8.4)
+link_libraries(${JSONCPP_LIBRARIES})
+message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
 
 # librdkafka
-pkg_check_modules(RDKAFKA_CPP rdkafka++)
+set(RDKAFKACPP_INCLUDE_DIR /usr/local/include)
+include_directories("${RDKAFKACPP_INCLUDE_DIR}")
+pkg_check_modules(RDKAFKA_CPP REQUIRED rdkafka++>=1.6.2)
 link_libraries(${RDKAFKA_CPP_LIBRARIES})
 message(STATUS "Using librdkafka++ ${RDKAFKA_CPP_VERSION}")
-set(RDKAFKA_CPP_INCLUDE_DIR /usr/local/include)
-include_directories("${RDKAFKA_CPP_INCLUDE_DIR}")
 
-pkg_check_modules(RDKAFKA rdkafka)
-link_libraries(${RDKAFKA_LIBRARIES})
-message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
 set(RDKAFKA_INCLUDE_DIR /usr/local/include)
 include_directories("${RDKAFKA_INCLUDE_DIR}")
+pkg_check_modules(RDKAFKA REQUIRED rdkafka>=1.6.2)
+link_libraries(${RDKAFKA_LIBRARIES})
+message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
 
 # libconfig
-pkg_check_modules(LIBCONFIG_CPP libconfig++)
-link_libraries(${LIBCONFIG_CPP_LIBRARIES})
-message(STATUS "Using libconfig++ ${LIBCONFIG_CPP_VERSION}")
 set(LIBCONFIG_CPP_INCLUDE_DIR /usr/include)
 include_directories("${LIBCONFIG_CPP_INCLUDE_DIR}")
+pkg_check_modules(LIBCONFIG_CPP libconfig++>=1.5)
+link_libraries(${LIBCONFIG_CPP_LIBRARIES})
+message(STATUS "Using libconfig++ ${LIBCONFIG_CPP_VERSION}")
 
 # Protobuf generated "gRPC dial-out" - Cisco
 set(cisco_dialout_pb_cc
