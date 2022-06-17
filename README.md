@@ -67,6 +67,7 @@ $ git clone https://github.com/scuzzilla/mdt-dialout-collector.git
 $ cd mdt-dialout-collector
 $ mkdir build
 $ cmake ../
+$ make
 
 $ ./bin/mdt-dialout-collector
 ```
