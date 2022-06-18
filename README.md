@@ -108,12 +108,13 @@ ipv4_socket_huawei = "0.0.0.0:10008";
 
 
 #### mdt-dialout-collector - kafka-producer
-# https://kafka.apache.org/documentation/#producerconfigs
+# https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
 
 bootstrap_servers = "kafka.brockers.net:9093";
 topic = "json.topic";
 enable_idempotence = "true";
 client_id = "mdt-dialout-collector";
+# valid options are either plaintext or ssl
 security_protocol = "ssl";
 ssl_key_location = "/opt/mdt-dialout-collector/cert/collectors.key";
 ssl_certificate_location = "/opt/mdt-dialout-collector/cert/collectors.crt";

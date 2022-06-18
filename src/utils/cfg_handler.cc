@@ -64,24 +64,17 @@ KafkaCfgHandler::KafkaCfgHandler()
 {
     if (!lookup_kafka_parameters(this->mdt_dialout_collector_conf,
                                 this->parameters)) {
-        this->topic =
-            parameters.at("topic").c_str();
-        this->bootstrap_servers =
-            parameters.at("bootstrap_servers").c_str();
-        this->enable_idempotence =
-            parameters.at("enable_idempotence").c_str();
-        this->client_id =
-            parameters.at("client_id").c_str();
-        this->security_protocol =
-            parameters.at("security_protocol").c_str();
-        this->ssl_key_location =
-            parameters.at("ssl_key_location").c_str();
-        this->ssl_certificate_location =
-            parameters.at("ssl_certificate_location").c_str();
-        this->ssl_ca_location =
-            parameters.at("ssl_ca_location").c_str();
-        this->log_level =
-            parameters.at("log_level").c_str();
+        this->topic = parameters.at("topic");
+        this->bootstrap_servers = parameters.at("bootstrap_servers");
+        this->enable_idempotence = parameters.at("enable_idempotence");
+        this->client_id = parameters.at("client_id"); 
+        this->security_protocol = parameters.at("security_protocol");
+        this->ssl_key_location = parameters.at("ssl_key_location");
+        this->ssl_certificate_location = parameters.at("ssl_certificate_location");
+        this->ssl_ca_location = parameters.at("ssl_ca_location");
+        this->log_level = parameters.at("log_level");
+    } else {
+        throw std::exception();
     }
 }
 
@@ -100,54 +93,133 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
         return(EXIT_FAILURE);
     }
 
-    try {
-        libconfig::Setting& topic =
-            kafka_params->lookup("topic");
-            params.insert({"topic", topic});
-        libconfig::Setting& bootstrap_servers =
-            kafka_params->lookup("bootstrap_servers");
-            params.insert({"bootstrap_servers", bootstrap_servers});
-        libconfig::Setting& enable_idempotence =
-            kafka_params->lookup("enable_idempotence");
-            params.insert({"enable_idempotence", enable_idempotence});
-        libconfig::Setting& client_id =
-            kafka_params->lookup("client_id");
-            params.insert({"client_id", client_id});
-        libconfig::Setting& security_protocol =
-            kafka_params->lookup("security_protocol");
-            params.insert({"security_protocol", security_protocol});
-            if (security_protocol == "plaintext" or
-                security_protocol == "PLAINTEXT") {
-                    return(EXIT_SUCCESS);
-            } else if (security_protocol == "ssl" or
-                        security_protocol == "SSL") {
-                libconfig::Setting& ssl_key_location =
-                    kafka_params->lookup("ssl_key_location");
-                    params.insert({"ssl_key_location",
-                                    ssl_key_location});
-                libconfig::Setting& ssl_certificate_location =
-                    kafka_params->lookup("ssl_certificate_location");
-                    params.insert({"ssl_certificate_location",
-                                    ssl_certificate_location});
-                libconfig::Setting& ssl_ca_location =
-                    kafka_params->lookup("ssl_ca_location");
-                    params.insert({"ssl_ca_location",
-                                    ssl_ca_location});
-                libconfig::Setting& log_level =
-                    kafka_params->lookup("log_level");
-                    params.insert({"log_level",
-                                    log_level});           
-            } else {
-                std::cout << "security.protocol: Protocol not supported, "
-                    "valid options are either PLAINTEXT or SSL" << std::endl;
-            }
+    // Parameters evaluation
+    bool topic = kafka_params->exists("topic");
+    if (topic) {
+        libconfig::Setting& topic = kafka_params->lookup("topic");
+        std::string topic_s = topic.c_str();
+        if (!topic_s.empty()) {
+            params.insert({"topic", topic_s});
+        } else {
+            std::cout << "empty topic not allowed" << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        throw libconfig::SettingNotFoundException(
+            "kafka-producer: topic mandatory");
+        return(EXIT_FAILURE);
+    }
 
-    } catch(libconfig::SettingNotFoundException &snfex) {
-        std::cout << "libconfig::SettingNotFoundException" << std::endl;
+    bool bootstrap_servers = kafka_params->exists("bootstrap_servers");
+    if (bootstrap_servers) {
+        libconfig::Setting& bootstrap_servers = kafka_params->lookup("bootstrap_servers");
+        std::string bootstrap_servers_s = bootstrap_servers.c_str();
+        if (!bootstrap_servers_s.empty()) {
+            params.insert({"bootstrap_servers", bootstrap_servers_s});
+        } else {
+            std::cout << "empty bootstrap_servers not allowed" << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        throw libconfig::SettingNotFoundException(
+            "kafka-producer: bootstrap_servers mandatory");
         return(EXIT_FAILURE);
-    } catch (libconfig::SettingTypeException &stex){
-        std::cout << "libconfig::SettingTypeException" << std::endl;
+    }
+
+    bool enable_idempotence = kafka_params->exists("enable_idempotence");
+    if (enable_idempotence) {
+        libconfig::Setting& enable_idempotence = kafka_params->lookup("enable_idempotence");
+        std::string enable_idempotence_s = enable_idempotence.c_str();
+        if (!enable_idempotence_s.empty() and
+            (enable_idempotence_s.compare("true") or
+                enable_idempotence_s.compare("false"))) {
+            params.insert({"enable_idempotence", enable_idempotence_s});
+        } else {
+            std::cout << "enable_idempotence: valid value <true | false>" << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"enable_idempotence", "true"});
+    }
+    
+    bool client_id = kafka_params->exists("client_id");
+    if (client_id) {
+        libconfig::Setting& client_id = kafka_params->lookup("client_id");
+        std::string client_id_s = client_id.c_str();
+        if (!client_id_s.empty()) {
+            params.insert({"client_id", client_id_s});
+        } else {
+            std::cout << "client_id: valid value not empty" << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"client_id", "mdt-dialout-collector"});
+    }
+
+    bool log_level = kafka_params->exists("log_level");
+    if (log_level) {
+        libconfig::Setting& log_level = kafka_params->lookup("log_level");
+        std::string log_level_s = log_level.c_str();
+        if (!log_level_s.empty()) {
+            params.insert({"log_level", log_level_s});
+        } else {
+            std::cout << "log_level: valid value 0..7" << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"log_level", "6"});
+    }
+    
+    bool security_protocol = kafka_params->exists("security_protocol");
+    if (security_protocol) {
+        libconfig::Setting& security_protocol = kafka_params->lookup("security_protocol");
+        std::string security_protocol_s = security_protocol.c_str(); 
+        if (!security_protocol_s.empty() and 
+            (security_protocol_s.compare("ssl") or
+            security_protocol_s.compare("plaintext"))) {
+            params.insert({"security_protocol", security_protocol.c_str()});
+        } else {
+            std::cout << "security_protocol: valid values <ssl | plaintext>" << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        throw libconfig::SettingNotFoundException(
+            "kafka-producer: security_protocol mandatory");
         return(EXIT_FAILURE);
+    }
+
+    if (params.at("security_protocol").compare("ssh")) {
+        bool ssl_key_location = kafka_params->exists("ssl_key_location");
+        bool ssl_certificate_location = kafka_params->exists("ssl_certificate_location");
+        bool ssl_ca_location = kafka_params->exists("ssl_ca_location");
+    
+        if (ssl_key_location and ssl_certificate_location and ssl_ca_location) {
+            libconfig::Setting& ssl_key_location = kafka_params->lookup("ssl_key_location");
+            libconfig::Setting& ssl_certificate_location = kafka_params->lookup("ssl_certificate_location");
+            libconfig::Setting& ssl_ca_location = kafka_params->lookup("ssl_ca_location");
+
+            std::string ssl_key_location_s = ssl_key_location.c_str();
+            std::string ssl_certificate_location_s = ssl_certificate_location.c_str();
+            std::string ssl_ca_location_s = ssl_ca_location.c_str();
+            if (!ssl_key_location_s.empty() and
+                !ssl_certificate_location_s.empty() and 
+                !ssl_ca_location_s.empty()) {
+                params.insert({"ssl_key_location", ssl_key_location_s});
+                params.insert({"ssl_certificate_location", ssl_certificate_location_s});
+                params.insert({"ssl_ca_location", ssl_ca_location_s});
+            } else {
+                std::cout << "security_protocol: valid values not empty" << std::endl;
+                return(EXIT_FAILURE);
+            }
+        } else {
+            throw libconfig::SettingNotFoundException(
+                "kafka-producer: security_protocol options mandatory");
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"ssl_key_location", "NULL"});
+        params.insert({"ssl_certificate_location", "NULL"});
+        params.insert({"ssl_ca_location", "NULL"});
     }
 
     return EXIT_SUCCESS;
