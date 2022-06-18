@@ -91,6 +91,7 @@ $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
 The default configuration location is following the [FHS](https://refspecs.linuxfoundation.org/fhs.shtml) recommendation, therefore:
 - the application itself is located within the "/opt/mdt-dialout-collector/bin" folder
 - its configuration is located within the "/etc/opt/mdt-dialout-collector" folder
+
 Here below is an *example* of configuration:
 ```SHELL
 #### mdt-dialout-collector - main
