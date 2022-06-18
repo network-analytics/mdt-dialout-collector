@@ -131,8 +131,8 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
         libconfig::Setting& enable_idempotence = kafka_params->lookup("enable_idempotence");
         std::string enable_idempotence_s = enable_idempotence.c_str();
         if (!enable_idempotence_s.empty() and
-            (enable_idempotence_s.compare("true") or
-                enable_idempotence_s.compare("false"))) {
+            (enable_idempotence_s.compare("true") == 0 or
+                enable_idempotence_s.compare("false") == 0)) {
             params.insert({"enable_idempotence", enable_idempotence_s});
         } else {
             std::cout << "enable_idempotence: valid value <true | false>" << std::endl;
@@ -175,9 +175,9 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
         libconfig::Setting& security_protocol = kafka_params->lookup("security_protocol");
         std::string security_protocol_s = security_protocol.c_str(); 
         if (!security_protocol_s.empty() and 
-            (security_protocol_s.compare("ssl") or
-            security_protocol_s.compare("plaintext"))) {
-            params.insert({"security_protocol", security_protocol.c_str()});
+            (security_protocol_s.compare("ssl") == 0 or
+            security_protocol_s.compare("plaintext") == 0)) {
+            params.insert({"security_protocol", security_protocol_s});
         } else {
             std::cout << "security_protocol: valid values <ssl | plaintext>" << std::endl;
             return(EXIT_FAILURE);
@@ -188,7 +188,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
         return(EXIT_FAILURE);
     }
 
-    if (params.at("security_protocol").compare("ssh")) {
+    if (params.at("security_protocol").compare("ssl") == 0) {
         bool ssl_key_location = kafka_params->exists("ssl_key_location");
         bool ssl_certificate_location = kafka_params->exists("ssl_certificate_location");
         bool ssl_ca_location = kafka_params->exists("ssl_ca_location");
