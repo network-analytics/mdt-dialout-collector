@@ -108,6 +108,7 @@ ipv4_socket_huawei = "0.0.0.0:10008";
 
 
 #### mdt-dialout-collector - kafka-producer
+# https://kafka.apache.org/documentation/#producerconfigs
 
 bootstrap_servers = "kafka.brockers.net:9093";
 topic = "json.topic";

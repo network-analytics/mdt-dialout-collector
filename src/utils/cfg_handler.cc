@@ -103,32 +103,45 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
     try {
         libconfig::Setting& topic =
             kafka_params->lookup("topic");
+            params.insert({"topic", topic});
         libconfig::Setting& bootstrap_servers =
             kafka_params->lookup("bootstrap_servers");
+            params.insert({"bootstrap_servers", bootstrap_servers});
         libconfig::Setting& enable_idempotence =
             kafka_params->lookup("enable_idempotence");
+            params.insert({"enable_idempotence", enable_idempotence});
         libconfig::Setting& client_id =
             kafka_params->lookup("client_id");
+            params.insert({"client_id", client_id});
         libconfig::Setting& security_protocol =
             kafka_params->lookup("security_protocol");
-        libconfig::Setting& ssl_key_location =
-            kafka_params->lookup("ssl_key_location");
-        libconfig::Setting& ssl_certificate_location =
-            kafka_params->lookup("ssl_certificate_location");
-        libconfig::Setting& ssl_ca_location =
-            kafka_params->lookup("ssl_ca_location");
-        libconfig::Setting& log_level =
-            kafka_params->lookup("log_level");
+            params.insert({"security_protocol", security_protocol});
+            if (security_protocol == "plaintext" or
+                security_protocol == "PLAINTEXT") {
+                    return(EXIT_SUCCESS);
+            } else if (security_protocol == "ssl" or
+                        security_protocol == "SSL") {
+                libconfig::Setting& ssl_key_location =
+                    kafka_params->lookup("ssl_key_location");
+                    params.insert({"ssl_key_location",
+                                    ssl_key_location});
+                libconfig::Setting& ssl_certificate_location =
+                    kafka_params->lookup("ssl_certificate_location");
+                    params.insert({"ssl_certificate_location",
+                                    ssl_certificate_location});
+                libconfig::Setting& ssl_ca_location =
+                    kafka_params->lookup("ssl_ca_location");
+                    params.insert({"ssl_ca_location",
+                                    ssl_ca_location});
+                libconfig::Setting& log_level =
+                    kafka_params->lookup("log_level");
+                    params.insert({"log_level",
+                                    log_level});           
+            } else {
+                std::cout << "security.protocol: Protocol not supported, "
+                    "valid options are either PLAINTEXT or SSL" << std::endl;
+            }
 
-        params.insert({"topic", topic});
-        params.insert({"bootstrap_servers", bootstrap_servers});
-        params.insert({"enable_idempotence", enable_idempotence});
-        params.insert({"client_id", client_id});
-        params.insert({"security_protocol", security_protocol});
-        params.insert({"ssl_key_location", ssl_key_location});
-        params.insert({"ssl_certificate_location", ssl_certificate_location});
-        params.insert({"ssl_ca_location", ssl_ca_location});
-        params.insert({"log_level", log_level});
     } catch(libconfig::SettingNotFoundException &snfex) {
         std::cout << "libconfig::SettingNotFoundException" << std::endl;
         return(EXIT_FAILURE);
