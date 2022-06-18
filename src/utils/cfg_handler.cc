@@ -105,9 +105,8 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
             return(EXIT_FAILURE);
         }
     } else {
-        throw libconfig::SettingNotFoundException(
-            "kafka-producer: topic mandatory");
-        return(EXIT_FAILURE);
+        std::cout << "kafka-producer: topic mandatory" << std::endl;
+        throw libconfig::SettingNotFoundException("topic");
     }
 
     bool bootstrap_servers = kafka_params->exists("bootstrap_servers");
@@ -121,9 +120,8 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
             return(EXIT_FAILURE);
         }
     } else {
-        throw libconfig::SettingNotFoundException(
-            "kafka-producer: bootstrap_servers mandatory");
-        return(EXIT_FAILURE);
+        std::cout << "kafka-producer: bootstrap_servers mandatory" << std::endl;
+        throw libconfig::SettingNotFoundException("bootstrap_servers");
     }
 
     bool enable_idempotence = kafka_params->exists("enable_idempotence");
@@ -183,9 +181,8 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
             return(EXIT_FAILURE);
         }
     } else {
-        throw libconfig::SettingNotFoundException(
-            "kafka-producer: security_protocol mandatory");
-        return(EXIT_FAILURE);
+        std::cout << "kafka-producer: security_protocol mandatory" << std::endl;
+        throw libconfig::SettingNotFoundException("security_protocol");
     }
 
     if (params.at("security_protocol").compare("ssl") == 0) {
@@ -212,9 +209,8 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
                 return(EXIT_FAILURE);
             }
         } else {
-            throw libconfig::SettingNotFoundException(
-                "kafka-producer: security_protocol options mandatory");
-            return(EXIT_FAILURE);
+            std::cout << "kafka-producer: security_protocol options mandatory" << std::endl;
+            throw libconfig::SettingNotFoundException("security_protocol options");
         }
     } else {
         params.insert({"ssl_key_location", "NULL"});
