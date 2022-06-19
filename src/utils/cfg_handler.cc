@@ -66,7 +66,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
             return(EXIT_FAILURE);
         }
     } else {
-        params.insert({"ipv4_socket_cisco", "0.0.0.0:10001"});
+        params.insert({"ipv4_socket_cisco", ""});
     }
 
     bool ipv4_socket_huawei = main_params->exists("ipv4_socket_huawei");
@@ -82,7 +82,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
             return(EXIT_FAILURE);
         }
     } else {
-        params.insert({"ipv4_socket_huawei", "0.0.0.0:10002"});
+        params.insert({"ipv4_socket_huawei", ""});
     }
 
     return EXIT_SUCCESS;

@@ -12,16 +12,38 @@ std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
 
 int main(void)
 {
-    void *cisco_ptr {nullptr};
-    void *huawei_ptr {nullptr};
+    std::vector<std::thread> vendors;
 
-    std::thread cisco_t(&cisco_thread, cisco_ptr);
-    std::thread huawei_t(&huawei_thread, huawei_ptr);
+    if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
+        (main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
+            std::cout << "no ipv4 sockets were configured" << std::endl;
+            return(EXIT_FAILURE);
+    }
 
-    cisco_t.join();
-    huawei_t.join();
+    if (!(main_cfg_handler->get_ipv4_socket_cisco()).empty()) {
+        void *cisco_ptr {nullptr};
+        std::thread cisco_t(&cisco_thread, cisco_ptr);
+        std::cout << "mdt-dialout-collector listening on "
+            << main_cfg_handler->get_ipv4_socket_cisco() << "..." << std::endl;
+        vendors.push_back(std::move(cisco_t));
+    }
 
-    return (0);
+    if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
+        void *huawei_ptr {nullptr};
+        std::thread huawei_t(&huawei_thread, huawei_ptr);
+        std::cout << "mdt-dialout-collector listening on "
+            << main_cfg_handler->get_ipv4_socket_huawei() << "..." << std::endl;
+        vendors.push_back(std::move(huawei_t));
+    }
+
+    // Handling only required threads
+    for(std::thread& v : vendors) {
+        if(v.joinable()) {
+            v.join();
+        }
+    }
+    
+    return (EXIT_SUCCESS);
 }
 
 void *cisco_thread(void *cisco_ptr)
@@ -34,7 +56,7 @@ void *cisco_thread(void *cisco_ptr)
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
 
-    return (0);
+    return (EXIT_SUCCESS);
 }
 
 void *huawei_thread(void *huawei_ptr)
@@ -47,6 +69,6 @@ void *huawei_thread(void *huawei_ptr)
     Srv huawei_mdt_dialout_collector;
     huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
 
-    return (0);
+    return (EXIT_SUCCESS);
 }
 
