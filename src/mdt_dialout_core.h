@@ -34,7 +34,8 @@ public:
     int cisco_gpbkv2json(
         const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
         std::string& json_str_out);
-    Json::Value cisco_gpbkv_field2json(const cisco_telemetry::TelemetryField& field);
+    Json::Value cisco_gpbkv_field2json(
+        const cisco_telemetry::TelemetryField& field);
 
 private:
 };

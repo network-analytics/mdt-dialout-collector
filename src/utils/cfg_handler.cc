@@ -14,12 +14,11 @@ MainCfgHandler::MainCfgHandler()
 {
     if (!lookup_main_parameters(this->mdt_dialout_collector_conf,
                                 this->parameters)) {
-        this->iface =
-            parameters.at("iface").c_str();
-        this->ipv4_socket_cisco =
-            parameters.at("ipv4_socket_cisco").c_str();
-        this->ipv4_socket_huawei =
-            parameters.at("ipv4_socket_huawei").c_str();
+        this->iface = parameters.at("iface");
+        this->ipv4_socket_cisco = parameters.at("ipv4_socket_cisco");
+        this->ipv4_socket_huawei = parameters.at("ipv4_socket_huawei");
+    } else {
+        throw std::exception();
     }
 }
 
@@ -38,23 +37,52 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
         return(EXIT_FAILURE);
     }
 
-    try {
-        libconfig::Setting& iface =
-            main_params->lookup("iface");
-        libconfig::Setting& ipv4_socket_cisco =
-            main_params->lookup("ipv4_socket_cisco");
-        libconfig::Setting& ipv4_socket_huawei =
-            main_params->lookup("ipv4_socket_huawei");
+    // Main parameters evaluation
+    bool iface = main_params->exists("iface");
+    if (iface) {
+        libconfig::Setting& iface = main_params->lookup("iface");
+        std::string iface_s = iface;
+        if (!iface_s.empty()) {
+            params.insert({"iface", iface_s});
+        } else {
+            std::cout << "empty iface not allowed" << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        std::cout << "mdt-dialout-collector: iface mandatory" << std::endl;
+        throw libconfig::SettingNotFoundException("iface");
+    }
 
-        params.insert({"iface", iface});
-        params.insert({"ipv4_socket_cisco", ipv4_socket_cisco});
-        params.insert({"ipv4_socket_huawei", ipv4_socket_cisco});
-    } catch(libconfig::SettingNotFoundException &snfex) {
-        std::cout << "libconfig::SettingNotFoundException" << std::endl;
-        return(EXIT_FAILURE);
-    } catch (libconfig::SettingTypeException &stex){
-        std::cout << "libconfig::SettingTypeException" << std::endl;
-        return(EXIT_FAILURE);
+    bool ipv4_socket_cisco = main_params->exists("ipv4_socket_cisco");
+    if (ipv4_socket_cisco) {
+        libconfig::Setting& ipv4_socket_cisco =
+            main_params->lookup("ipv4_scoket_cisco");
+        std::string ipv4_socket_cisco_s = ipv4_socket_cisco;
+        if (!ipv4_socket_cisco_s.empty()) {
+            params.insert({"ipv4_socket_cisco", ipv4_socket_cisco_s});
+        } else {
+            std::cout << "ipv4_socket_cisco: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"ipv4_socket_cisco", "0.0.0.0:10001"});
+    }
+
+    bool ipv4_socket_huawei = main_params->exists("ipv4_socket_huawei");
+    if (ipv4_socket_huawei) {
+        libconfig::Setting& ipv4_socket_huawei =
+            main_params->lookup("ipv4_scoket_huawei");
+        std::string ipv4_socket_huawei_s = ipv4_socket_huawei;
+        if (!ipv4_socket_huawei_s.empty()) {
+            params.insert({"ipv4_socket_huawei", ipv4_socket_huawei_s});
+        } else {
+            std::cout << "ipv4_socket_huawei: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"ipv4_socket_huawei", "0.0.0.0:10002"});
     }
 
     return EXIT_SUCCESS;
@@ -94,7 +122,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
         return(EXIT_FAILURE);
     }
 
-    // Parameters evaluation
+    // Kafka arameters evaluation
     bool topic = kafka_params->exists("topic");
     if (topic) {
         libconfig::Setting& topic = kafka_params->lookup("topic");
