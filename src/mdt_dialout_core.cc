@@ -465,16 +465,6 @@ int SrvUtils::async_kafka_prod(const std::string& json_str)
                         kafka_cfg_handler->get_kafka_ssl_ca_location();
     std::string log_level =
                         kafka_cfg_handler->get_kafka_log_level();
-    
-    std::cout << topic << std::endl;
-    std::cout << bootstrap_servers << std::endl;
-    std::cout << enable_idempotence << std::endl;
-    std::cout << client_id << std::endl;
-    std::cout << security_protocol << std::endl;
-    std::cout << ssl_key_location << std::endl;
-    std::cout << ssl_certificate_location << std::endl;
-    std::cout << ssl_ca_location << std::endl;
-    std::cout << log_level << std::endl;
     // --- Required for config parameters ---
 
     try {
