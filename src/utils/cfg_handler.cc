@@ -56,7 +56,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     bool ipv4_socket_cisco = main_params->exists("ipv4_socket_cisco");
     if (ipv4_socket_cisco) {
         libconfig::Setting& ipv4_socket_cisco =
-            main_params->lookup("ipv4_scoket_cisco");
+            main_params->lookup("ipv4_socket_cisco");
         std::string ipv4_socket_cisco_s = ipv4_socket_cisco;
         if (!ipv4_socket_cisco_s.empty()) {
             params.insert({"ipv4_socket_cisco", ipv4_socket_cisco_s});
@@ -72,7 +72,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     bool ipv4_socket_huawei = main_params->exists("ipv4_socket_huawei");
     if (ipv4_socket_huawei) {
         libconfig::Setting& ipv4_socket_huawei =
-            main_params->lookup("ipv4_scoket_huawei");
+            main_params->lookup("ipv4_socket_huawei");
         std::string ipv4_socket_huawei_s = ipv4_socket_huawei;
         if (!ipv4_socket_huawei_s.empty()) {
             params.insert({"ipv4_socket_huawei", ipv4_socket_huawei_s});
