@@ -234,7 +234,9 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
-        } else if (cisco_tlm->data_gpbkv_size() != 0 and parsing_str == true) {
+        } else if (cisco_tlm->data_gpbkv_size() != 0 and
+                    cisco_tlm->encoding_path().compare("Cisco-IOS-XR") > 0 and 
+                    parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
