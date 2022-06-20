@@ -222,7 +222,7 @@ void Srv::CiscoStream::Start()
         cisco_resp.Read(&cisco_stream, this);
         // returns true for GPB-KV & GPB, false for JSON
         parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
-        
+
         stream_data_in = cisco_stream.data();
 
         // Handling empty data
@@ -242,15 +242,15 @@ void Srv::CiscoStream::Start()
             // ---
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
-            
+
             data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data_in);
             if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
                 data_delivery->async_kafka_producer(stream_data_out);
             }
-        
+
         // Handling GPB
-        } else if (cisco_tlm->has_data_gpb() == true and parsing_str == true) {    
+        } else if (cisco_tlm->has_data_gpb() == true and parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB: " << type_info
@@ -301,7 +301,7 @@ void Srv::HuaweiStream::Start()
         parsing_str = huawei_tlm->ParseFromString(huawei_stream.data());
 
         stream_data_in = huawei_stream.data();
-        
+
         // Handling empty data
         if (stream_data_in.empty()) {
             // ---

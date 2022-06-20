@@ -42,7 +42,7 @@ int main(void)
             v.join();
         }
     }
-    
+
     return (EXIT_SUCCESS);
 }
 
