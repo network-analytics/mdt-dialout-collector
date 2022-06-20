@@ -207,7 +207,8 @@ void Srv::CiscoStream::Start()
                                         this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
-        std::string stream_data;
+        bool parsing_str;
+        std::string stream_data_in;
         std::string stream_data_out;
         std::string peer = cisco_server_ctx.peer();
 
@@ -219,47 +220,51 @@ void Srv::CiscoStream::Start()
 
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
+        // returns true for GPB-KV & GPB, false for JSON
+        parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
+        
+        stream_data_in = cisco_stream.data();
 
         // Handling empty data
-        if (cisco_stream.data().empty()) {
-            //stream_data = "{ }";
+        if (stream_data_in.empty()) {
             // ---
-            auto type_info = typeid(stream_data).name();
+            auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling empty data: " << type_info
                                                                 << std::endl;
             // ---
-            //data_delivery->async_kafka_producer(stream_data);
 
         // Handling GPB-KV
-        } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
-            if (cisco_tlm->has_data_gpb() == true) {
-                google::protobuf::util::JsonOptions opt;
-                opt.add_whitespace = true;
-                google::protobuf::util::MessageToJsonString(
-                                                        *cisco_tlm,
-                                                        &stream_data,
-                                                        opt);
-            } else {
-                data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data);
-            }
-
+        } else if (!(cisco_tlm->data_gpbkv()).empty() and parsing_str == true) {
             // ---
-            auto type_info = typeid(stream_data).name();
+            auto type_info = typeid(stream_data_in).name();
+            std::cout << peer << " CISCO Handling GPB-KV: " << type_info
+                                                            << std::endl;
             // ---
-            if (data_manipulation->append_label_map(stream_data,
+            google::protobuf::util::JsonOptions opt;
+            opt.add_whitespace = true;
+            
+            data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data_in);
+            if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
                 data_delivery->async_kafka_producer(stream_data_out);
             }
+        
+        // Handling GPB
+        } else if (cisco_tlm->has_data_gpb() == true and parsing_str == true) {    
+            // ---
+            auto type_info = typeid(stream_data_in).name();
+            std::cout << peer << " CISCO Handling GPB: " << type_info
+                                                        << std::endl;
+            // ---
 
         // Handling JSON string
         } else {
-            stream_data = cisco_stream.data();
             // ---
-            auto type_info = typeid(stream_data).name();
+            auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (data_manipulation->append_label_map(stream_data,
+            if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
                 data_delivery->async_kafka_producer(stream_data_out);
             }
@@ -281,75 +286,71 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        std::string stream_data;
+        bool parsing_str;
+        std::string stream_data_in;
         std::string stream_data_out;
         std::string peer = huawei_server_ctx.peer();
 
         std::unique_ptr<DataManipulation> data_manipulation(
                 new DataManipulation());
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
-        //std::unique_ptr<google::protobuf::Message> huawei_tlm(
-        //                                    new huawei_telemetry::Telemetry());
         std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
 
         huawei_resp.Read(&huawei_stream, this);
+        parsing_str = huawei_tlm->ParseFromString(huawei_stream.data());
 
+        stream_data_in = huawei_stream.data();
+        
         // Handling empty data
-        if (huawei_stream.data().empty()) {
-            //stream_data = "{ }";
+        if (stream_data_in.empty()) {
             // ---
-            auto type_info = typeid(stream_data).name();
+            auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " HUAWEI Handling empty data: " << type_info
                                                                 << std::endl;
             // ---
-            //data_delivery->async_kafka_producer(stream_data);
         }
 
-        // Handling GPB-KV
+        // Handling GPB
         else {
-            if (huawei_tlm->ParseFromString(huawei_stream.data())) {
+            if (!(huawei_tlm->has_data_gpb() == true and parsing_str == true)) {
                 google::protobuf::util::JsonOptions opt;
                 opt.add_whitespace = true;
                 google::protobuf::util::MessageToJsonString(
                                                             *huawei_tlm,
-                                                            &stream_data,
+                                                            &stream_data_in,
                                                             opt);
                 // ---
-                auto type_info = typeid(stream_data).name();
+                auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
                                                                 << std::endl;
                 // ---
-                if (data_manipulation->append_label_map(stream_data,
+                if (data_manipulation->append_label_map(stream_data_in,
                             stream_data_out) == 0) {
                     data_delivery->async_kafka_producer(stream_data_out);
                 }
             }
         }
 
+        stream_data_in = huawei_stream.data_json();
+
         // Handling empty data_json
-        if (huawei_stream.data_json().empty()) {
-            stream_data = "{ }";
+        if (stream_data_in.empty()) {
             // ---
-            auto type_info = typeid(stream_data).name();
+            auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " HUAWEI Handling empty data_json: "
                                                                 << type_info
                                                                 << std::endl;
             // ---
-            if (data_manipulation->append_label_map(stream_data,
-                        stream_data_out) == 0) {
-                data_delivery->async_kafka_producer(stream_data_out);
-            }
         }
         // Handling JSON string
         else {
-            stream_data = huawei_stream.data_json();
             // ---
-            auto type_info = typeid(stream_data).name();
+            auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " HUAWEI Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (data_manipulation->append_label_map(stream_data,
+            if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
                 data_delivery->async_kafka_producer(stream_data_out);
             }
@@ -391,7 +392,8 @@ int DataManipulation::append_label_map(const std::string& json_str,
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
                       &root, &err) and json_str_length != 0) {
-        std::cout << "ERROR parsing the string - conversion to JSON Failed!"
+        std::cout << "ERROR parsing the string, conversion to JSON Failed!"
+                                                                << err
                                                                 << std::endl;
         return EXIT_FAILURE;
     }
