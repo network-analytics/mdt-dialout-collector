@@ -40,5 +40,11 @@
 # BUILD
 build/*
 
+# Protobuf & gRPC helpers
+src/proto/Cisco/*.cc
+src/proto/Cisco/*.h
+src/proto/Huawei/*.cc
+src/proto/Huawei/*.h
+
 # BIN
 bin/mdt_dialout_collector
