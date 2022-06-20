@@ -224,10 +224,6 @@ void Srv::CiscoStream::Start()
         parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
 
         stream_data_in = cisco_stream.data();
-        std::string tmp = cisco_stream.GetDescriptor()->FindFieldByNumber(2)->name();
-        std::cout << tmp << std::endl;
-        std::string tmp1 = cisco_tlm->GetDescriptor()->FindFieldByNumber(11)->name();
-        std::cout << "here: " << tmp1 << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
@@ -246,6 +242,10 @@ void Srv::CiscoStream::Start()
             // ---
             google::protobuf::util::JsonOptions opt;
             opt.add_whitespace = true;
+            google::protobuf::util::MessageToJsonString(
+                                                        *cisco_tlm,
+                                                        &stream_data_in,
+                                                        opt);
 
             data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data_in);
             if (data_manipulation->append_label_map(stream_data_in,
