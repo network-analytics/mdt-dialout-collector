@@ -234,9 +234,7 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
-        } else if (cisco_tlm->data_gpbkv_size() != 0 and
-                    cisco_tlm->encoding_path().compare("Cisco-IOS-XR") > 0 and 
-                    parsing_str == true) {
+        } else if (!(cisco_tlm->data_gpbkv().empty()) and parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
@@ -263,12 +261,6 @@ void Srv::CiscoStream::Start()
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
-            google::protobuf::util::JsonOptions opt;
-            opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(
-                                                        *cisco_tlm,
-                                                        &stream_data_in,
-                                                        opt);
             // ---
             if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
