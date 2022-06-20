@@ -224,6 +224,10 @@ void Srv::CiscoStream::Start()
         parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
 
         stream_data_in = cisco_stream.data();
+        std::string tmp = cisco_stream.GetDescriptor()->FindFieldByNumber(2)->name();
+        std::cout << tmp << std::endl;
+        std::string tmp1 = cisco_tlm->GetDescriptor()->FindFieldByNumber(11)->name();
+        std::cout << "here: " << tmp1 << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
@@ -234,7 +238,7 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
-        } else if (!(cisco_tlm->data_gpbkv()).empty() and parsing_str == true) {
+        } else if (cisco_tlm->data_gpbkv_size() != 0 and parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
