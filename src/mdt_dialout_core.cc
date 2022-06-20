@@ -393,7 +393,7 @@ int DataManipulation::append_label_map(const std::string& json_str,
         std::cout << "ERROR parsing the string, conversion to JSON Failed!"
                                                                 << err
                                                                 << std::endl;
-        std::cout << "Failing str : " << json_str << std::endl;
+        std::cout << "Failing message: " << json_str << std::endl;
         return EXIT_FAILURE;
     }
 
