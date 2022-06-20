@@ -14,7 +14,7 @@ and [gRPC Dial-in\/Dial-out](https://xrdocs.io/telemetry/blogs/2017-01-20-model-
 ### gRPC vs NETCONF _short version_
 
 - gRPC is generally faster to develop with: it's using [Protocol Buffers](https://developers.google.com/protocol-buffers/) as the
-Interface Description Language and an ad-hoc compiler to automagically generate the associated code.
+Interface Description Language and an ad-hoc compiler to automagically generate the associated skeleton code.
 
 - gRPC is out-of-the-box supporting multiple programming languages and gives you the freedom to choose the one which fits best your skills,
 independently from the existing implementations (the Protobuff file is pre-defining the specs for both client and server).
