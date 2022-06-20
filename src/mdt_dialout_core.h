@@ -26,18 +26,22 @@ public:
 private:
 };
 
-class SrvUtils {
+class DataDelivery {
 public:
-    int str2json(const std::string& json_str);
-    int str2json_(const std::string& json_str, std::string& json_str_out);
-    int async_kafka_prod(const std::string& json_str);
-    int cisco_gpbkv2json(
-        const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
-        std::string& json_str_out);
-    Json::Value cisco_gpbkv_field2json(
-        const cisco_telemetry::TelemetryField& field);
+    // Handling data delivery to KAFKA
+    int async_kafka_producer(const std::string& json_str);
+};
 
-private:
+class DataManipulation {
+public:
+    // Handling data manipulation functions
+    int append_label_map(const std::string& json_str,
+            std::string& json_str_out);
+    int cisco_gpbkv2json(
+            const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
+            std::string& json_str_out);
+    Json::Value cisco_gpbkv_field2json(
+            const cisco_telemetry::TelemetryField& field);
 };
 
 class Srv final {
@@ -57,7 +61,7 @@ private:
     void HuaweiFsmCtrl();
     enum StreamStatus { START, FLOW, END };
 
-    class CiscoStream: public SrvUtils {
+    class CiscoStream {
     public:
         CiscoStream(
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
@@ -75,7 +79,7 @@ private:
                                     mdt_dialout::MdtDialoutArgs> cisco_resp;
     };
 
-    class HuaweiStream: public SrvUtils {
+    class HuaweiStream {
     public:
         HuaweiStream(
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,

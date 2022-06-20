@@ -207,38 +207,29 @@ void Srv::CiscoStream::Start()
                                         this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
+        std::string stream_data;
+        std::string stream_data_out;
         std::string peer = cisco_server_ctx.peer();
-        //std::cout << "Peer: " + peer << std::endl;
-        std::unique_ptr<Srv::CiscoStream> srv_utils(
-                            new Srv::CiscoStream(cisco_service_, cisco_cq_));
+
+        std::unique_ptr<DataManipulation> data_manipulation(
+                new DataManipulation());
+        std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
+        std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
+                new cisco_telemetry::Telemetry());
+
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
 
-        /*
-         * Srv::Stream::str2json(stream_data);
-         * if (std::ofstream output{"gpbkv.bin", std::ios::app}) {
-         *   output << stream.data();
-         * }
-         * else {
-         *   std::exit(EXIT_FAILURE);
-         * }
-         */
-
-        std::string stream_data;
-        std::string stream_data_out;
-        std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
-                                            new cisco_telemetry::Telemetry());
-
         // Handling empty data
         if (cisco_stream.data().empty()) {
-            stream_data = "{ }";
+            //stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
             std::cout << peer << " CISCO Handling empty data: " << type_info
                                                                 << std::endl;
             // ---
-            srv_utils->str2json_(stream_data, stream_data_out);
-            //srv_utils->async_kafka_prod(stream_data);
+            //data_delivery->async_kafka_producer(stream_data);
+
         // Handling GPB-KV
         } else if (cisco_tlm->ParseFromString(cisco_stream.data())) {
             if (cisco_tlm->has_data_gpb() == true) {
@@ -249,17 +240,17 @@ void Srv::CiscoStream::Start()
                                                         &stream_data,
                                                         opt);
             } else {
-                SrvUtils::cisco_gpbkv2json(cisco_tlm, stream_data);
+                data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data);
             }
 
             // ---
             auto type_info = typeid(stream_data).name();
-            //std::cout << peer << " CISCO Handling GPB-KV: " << type_info
-            //                                                << std::endl;
             // ---
-            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
-                srv_utils->async_kafka_prod(stream_data_out);
+            if (data_manipulation->append_label_map(stream_data,
+                        stream_data_out) == 0) {
+                data_delivery->async_kafka_producer(stream_data_out);
             }
+
         // Handling JSON string
         } else {
             stream_data = cisco_stream.data();
@@ -268,8 +259,9 @@ void Srv::CiscoStream::Start()
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
-                srv_utils->async_kafka_prod(stream_data_out);
+            if (data_manipulation->append_label_map(stream_data,
+                        stream_data_out) == 0) {
+                data_delivery->async_kafka_producer(stream_data_out);
             }
         }
     } else {
@@ -289,27 +281,31 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        std::string peer = huawei_server_ctx.peer();
-        std::unique_ptr<Srv::HuaweiStream> srv_utils(
-                        new Srv::HuaweiStream(huawei_service_, huawei_cq_));
-        huawei_resp.Read(&huawei_stream, this);
-
         std::string stream_data;
         std::string stream_data_out;
-        std::unique_ptr<google::protobuf::Message> huawei_tlm(
+        std::string peer = huawei_server_ctx.peer();
+
+        std::unique_ptr<DataManipulation> data_manipulation(
+                new DataManipulation());
+        std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
+        //std::unique_ptr<google::protobuf::Message> huawei_tlm(
+        //                                    new huawei_telemetry::Telemetry());
+        std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
+
+        huawei_resp.Read(&huawei_stream, this);
 
         // Handling empty data
         if (huawei_stream.data().empty()) {
-            stream_data = "{ }";
+            //stream_data = "{ }";
             // ---
             auto type_info = typeid(stream_data).name();
             std::cout << peer << " HUAWEI Handling empty data: " << type_info
                                                                 << std::endl;
             // ---
-            srv_utils->str2json_(stream_data, stream_data_out);
-            //srv_utils->async_kafka_prod(stream_data);
+            //data_delivery->async_kafka_producer(stream_data);
         }
+
         // Handling GPB-KV
         else {
             if (huawei_tlm->ParseFromString(huawei_stream.data())) {
@@ -324,8 +320,9 @@ void Srv::HuaweiStream::Start()
                 std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
                                                                 << std::endl;
                 // ---
-                if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
-                    srv_utils->async_kafka_prod(stream_data_out);
+                if (data_manipulation->append_label_map(stream_data,
+                            stream_data_out) == 0) {
+                    data_delivery->async_kafka_producer(stream_data_out);
                 }
             }
         }
@@ -339,8 +336,9 @@ void Srv::HuaweiStream::Start()
                                                                 << type_info
                                                                 << std::endl;
             // ---
-            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
-                srv_utils->async_kafka_prod(stream_data_out);
+            if (data_manipulation->append_label_map(stream_data,
+                        stream_data_out) == 0) {
+                data_delivery->async_kafka_producer(stream_data_out);
             }
         }
         // Handling JSON string
@@ -351,8 +349,9 @@ void Srv::HuaweiStream::Start()
             std::cout << peer << " HUAWEI Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (srv_utils->str2json_(stream_data, stream_data_out) != 1) {
-                srv_utils->async_kafka_prod(stream_data_out);
+            if (data_manipulation->append_label_map(stream_data,
+                        stream_data_out) == 0) {
+                data_delivery->async_kafka_producer(stream_data_out);
             }
         }
     } else {
@@ -373,10 +372,9 @@ void Srv::HuaweiStream::Stop()
     huawei_stream_status = END;
 }
 
-/**
- * string-to-json can be used for data manipulation
- */
-int SrvUtils::str2json(const std::string& json_str)
+// forge JSON & enrich with MAP (node_id/platform_id)
+int DataManipulation::append_label_map(const std::string& json_str,
+                                    std::string& json_str_out)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;
@@ -387,46 +385,6 @@ int SrvUtils::str2json(const std::string& json_str)
     const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
     const std::unique_ptr<Json::StreamWriter> writer(
                                                 builderW.newStreamWriter());
-    if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
-                      &root, &err) and json_str_length != 0) {
-        std::cout << "ERROR parsing the string - conversion to JSON Failed!"
-                                                                << std::endl;
-        //std::cout << "generating errors: " << json_str << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    //writer->write(root, &std::cout);
-    const std::string encoding_path = root["encodingPath"].asString();
-    //const std::string msg_timestamp = root["msg_timestamp"].asString();
-    //const std::string node_id_str = root["node_id_str"].asString();
-
-    std::cout << "encodingPath: " << encoding_path << std::endl;
-    //std::cout << msg_timestamp << std::endl;
-    //std::cout << node_id_str << std::endl;
-
-    const std::string node_id_ = root["label"][0].asString();
-    const std::string platform_id_ = root["label"][1].asString();
-
-    std::cout << "node_id: " << node_id_ << std::endl;
-    std::cout << "platform_id: " << platform_id_ << std::endl;
-
-    return EXIT_SUCCESS;
-}
-
-int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
-{
-    const auto json_str_length = static_cast<int>(json_str.length());
-    JSONCPP_STRING err;
-    Json::Value root;
-    Json::CharReaderBuilder builderR;
-    Json::StreamWriterBuilder builderW;
-    builderW["indentation"] = "";
-    const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
-    const std::unique_ptr<Json::StreamWriter> writer(
-                                                builderW.newStreamWriter());
-    //Json::Value label;
-    //std::string node_id = "node_id";
-    //std::string platform_id = "platform_id";
     Json::Value label_map;
     label_map["node_id"] = "node_id";
     label_map["platform_id"] = "platform_id";
@@ -438,16 +396,13 @@ int SrvUtils::str2json_(const std::string& json_str, std::string& json_str_out)
         return EXIT_FAILURE;
     }
 
-    //label.append(node_id);
-    //label.append(platform_id);
-    //root["label"] = label;
     root["label"] = label_map;
     json_str_out = Json::writeString(builderW, root);
 
     return EXIT_SUCCESS;
 }
 
-int SrvUtils::cisco_gpbkv2json(
+int DataManipulation::cisco_gpbkv2json(
     const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
     std::string& json_str_out)
 {
@@ -471,7 +426,7 @@ int SrvUtils::cisco_gpbkv2json(
     // Iterate through the key/values in data_gpbkv
     Json::Value gpbkv;
     for (auto const& field: cisco_tlm->data_gpbkv()) {
-        Json::Value value = SrvUtils::cisco_gpbkv_field2json(field);
+        Json::Value value = DataManipulation::cisco_gpbkv_field2json(field);
         if (field.name().empty()) {
             gpbkv.append(value);
         } else {
@@ -492,7 +447,7 @@ int SrvUtils::cisco_gpbkv2json(
     return EXIT_SUCCESS;
 }
 
-Json::Value SrvUtils::cisco_gpbkv_field2json(
+Json::Value DataManipulation::cisco_gpbkv_field2json(
                                 const cisco_telemetry::TelemetryField& field)
 {
     Json::Value root;
@@ -500,7 +455,7 @@ Json::Value SrvUtils::cisco_gpbkv_field2json(
     Json::Value sub_fields;
     for (const cisco_telemetry::TelemetryField& sub_field: field.fields()) {
         Json::Value sub_field_value =
-            SrvUtils::cisco_gpbkv_field2json(sub_field);
+            DataManipulation::cisco_gpbkv_field2json(sub_field);
         Json::Value sub_field_json;
         if (sub_field.name().size() == 0) {
             sub_fields.append(sub_field_value);
@@ -551,7 +506,7 @@ Json::Value SrvUtils::cisco_gpbkv_field2json(
     return value;
 }
 
-int SrvUtils::async_kafka_prod(const std::string& json_str)
+int DataDelivery::async_kafka_producer(const std::string& json_str)
 {
     using namespace kafka::clients;
 
