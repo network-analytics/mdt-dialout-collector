@@ -240,12 +240,6 @@ void Srv::CiscoStream::Start()
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
                                                             << std::endl;
             // ---
-            google::protobuf::util::JsonOptions opt;
-            opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(
-                                                        *cisco_tlm,
-                                                        &stream_data_in,
-                                                        opt);
 
             data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data_in);
             if (data_manipulation->append_label_map(stream_data_in,
@@ -267,6 +261,12 @@ void Srv::CiscoStream::Start()
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
+            google::protobuf::util::JsonOptions opt;
+            opt.add_whitespace = true;
+            google::protobuf::util::MessageToJsonString(
+                                                        *cisco_tlm,
+                                                        &stream_data_in,
+                                                        opt);
             // ---
             if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
