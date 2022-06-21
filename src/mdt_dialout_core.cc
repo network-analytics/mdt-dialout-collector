@@ -220,7 +220,7 @@ void Srv::CiscoStream::Start()
 
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
-        // returns true for GPB-KV & GPB, false for JSON
+        // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
         parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
 
         stream_data_in = cisco_stream.data();
@@ -258,6 +258,7 @@ void Srv::CiscoStream::Start()
         // Handling JSON string
         } else {
             // ---
+            std::cout << "parsing_str: " << parsing_str << std::endl;
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
