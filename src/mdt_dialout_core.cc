@@ -259,6 +259,7 @@ void Srv::CiscoStream::Start()
         } else {
             // ---
             std::cout << "parsing_str: " << parsing_str << std::endl;
+            std::cout << "!(cisco_tlm->data_gpbkv().empty()): " << !(cisco_tlm->data_gpbkv().empty()) << std::endl;
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
