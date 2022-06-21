@@ -248,7 +248,7 @@ void Srv::CiscoStream::Start()
             }
 
         // Handling GPB
-        } else if (cisco_tlm->has_data_gpb() == true and parsing_str == true) {
+        } else if (cisco_tlm->has_data_gpb() == true or parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB: " << type_info
@@ -258,8 +258,6 @@ void Srv::CiscoStream::Start()
         // Handling JSON string
         } else {
             // ---
-            std::cout << "parsing_str: " << parsing_str << std::endl;
-            std::cout << "!(cisco_tlm->data_gpbkv().empty()): " << !(cisco_tlm->data_gpbkv().empty()) << std::endl;
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
@@ -313,7 +311,7 @@ void Srv::HuaweiStream::Start()
 
         // Handling GPB
         else {
-            if (!(huawei_tlm->has_data_gpb() == true and parsing_str == true)) {
+            if (!(huawei_tlm->has_data_gpb() == true or parsing_str == true)) {
                 google::protobuf::util::JsonOptions opt;
                 opt.add_whitespace = true;
                 google::protobuf::util::MessageToJsonString(
@@ -395,7 +393,7 @@ int DataManipulation::append_label_map(const std::string& json_str,
         std::cout << "ERROR parsing the string, conversion to JSON Failed!"
                                                                 << err
                                                                 << std::endl;
-        std::cout << "Failing message: " << json_str << std::endl;
+        //std::cout << "Failing message: " << json_str << std::endl;
         return EXIT_FAILURE;
     }
 
