@@ -33,7 +33,6 @@ using grpc::Status;
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
     int type;
-    int length = sizeof(int);
     socklen_t len = sizeof(type);
 
     // --- Required for config parameters ---
@@ -140,7 +139,7 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 void Srv::CiscoFsmCtrl()
 {
     new Srv::CiscoStream(&cisco_service_, cisco_cq_.get());
-    int cisco_counter {0};
+    //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
     while (true) {
@@ -158,7 +157,7 @@ void Srv::CiscoFsmCtrl()
 void Srv::HuaweiFsmCtrl()
 {
     new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get());
-    int huawei_counter {0};
+    //int huawei_counter {0};
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
     while (true) {

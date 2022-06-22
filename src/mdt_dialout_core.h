@@ -70,13 +70,13 @@ private:
         void Stop();
 
     private:
-        StreamStatus cisco_stream_status;
         mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
         grpc::ServerCompletionQueue *cisco_cq_;
         grpc::ServerContext cisco_server_ctx;
         mdt_dialout::MdtDialoutArgs cisco_stream;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
                                     mdt_dialout::MdtDialoutArgs> cisco_resp;
+        StreamStatus cisco_stream_status;
     };
 
     class HuaweiStream {
@@ -88,13 +88,13 @@ private:
         void Stop();
 
     private:
-        StreamStatus huawei_stream_status;
         huawei_dialout::gRPCDataservice::AsyncService *huawei_service_;
         grpc::ServerCompletionQueue *huawei_cq_;
         grpc::ServerContext huawei_server_ctx;
         huawei_dialout::serviceArgs huawei_stream;
         grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
                                     huawei_dialout::serviceArgs> huawei_resp;
+        StreamStatus huawei_stream_status;
     };
 };
 

@@ -1,6 +1,11 @@
 # Minimum CMake required
 cmake_minimum_required(VERSION 3.15)
 
+# Set compiler options
+set(CMAKE_CXX_FLAGS "-Wall -pedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
 # pkg-config
 find_package(PkgConfig REQUIRED)
 
