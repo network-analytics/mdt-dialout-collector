@@ -194,6 +194,17 @@ Srv::HuaweiStream::HuaweiStream(
     Srv::HuaweiStream::Start();
 }
 
+// --- Required for config parameters ---
+std::unique_ptr<DataManipulationCfgHandler>
+    data_manipulation_cfg_handler(new DataManipulationCfgHandler());
+std::string enable_cisco_gpbkv2json =
+    data_manipulation_cfg_handler->get_enable_cisco_gpbkv2json();
+std::string enable_cisco_message_to_json_string =
+    data_manipulation_cfg_handler->get_enable_cisco_message_to_json_string();
+std::string enable_label_encode_as_map =
+    data_manipulation_cfg_handler->get_enable_label_encode_as_map();
+// --- Required for config parameters ---
+
 void Srv::CiscoStream::Start()
 {
     // Initial stream_status set to START
@@ -240,10 +251,32 @@ void Srv::CiscoStream::Start()
                                                             << std::endl;
             // ---
 
-            data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data_in);
-            if (data_manipulation->append_label_map(stream_data_in,
-                        stream_data_out) == 0) {
-                data_delivery->async_kafka_producer(stream_data_out);
+            if (enable_cisco_gpbkv2json.compare("true") == 0) {
+                data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data_in);
+            } else if (enable_cisco_message_to_json_string.compare("true")
+                                                                    == 0) {
+                // MessageToJson is working directly on the PROTO-Obj
+                stream_data_in.clear();
+                google::protobuf::util::JsonPrintOptions opt;
+                opt.add_whitespace = true;
+                google::protobuf::util::MessageToJsonString(
+                                                            *cisco_tlm,
+                                                            &stream_data_in,
+                                                            opt);
+                // Data enrichment with label (node_id/platform_id)
+                if (enable_label_encode_as_map.compare("true") == 0) {
+                    if (data_manipulation->append_label_map(stream_data_in,
+                            stream_data_out) == 0) {
+                        data_delivery->async_kafka_producer(stream_data_out);
+                    }
+                } else {
+                    stream_data_out = stream_data_in;
+                    data_delivery->async_kafka_producer(stream_data_out);
+                }
+            } else {
+                // Use Case: both data manipulation funcs set to false:
+                // TBD: at the meoment simply send binary format to stdout
+                std::cout << stream_data_in << std::endl;
             }
 
         // Handling GPB
@@ -254,6 +287,8 @@ void Srv::CiscoStream::Start()
                                                         << std::endl;
             // ---
 
+            // TBD
+
         // Handling JSON string
         } else {
             // ---
@@ -261,8 +296,15 @@ void Srv::CiscoStream::Start()
             std::cout << peer << " CISCO Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (data_manipulation->append_label_map(stream_data_in,
+
+            // Data enrichment with label (node_id/platform_id)
+            if (enable_label_encode_as_map.compare("true") == 0) {
+                if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
+                    data_delivery->async_kafka_producer(stream_data_out);
+                }
+            } else {
+                stream_data_out = stream_data_in;
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }
@@ -311,21 +353,28 @@ void Srv::HuaweiStream::Start()
         // Handling GPB
         else {
             if (!(huawei_tlm->has_data_gpb() == true or parsing_str == true)) {
-                google::protobuf::util::JsonOptions opt;
-                opt.add_whitespace = true;
-                google::protobuf::util::MessageToJsonString(
-                                                            *huawei_tlm,
-                                                            &stream_data_in,
-                                                            opt);
                 // ---
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
                                                                 << std::endl;
                 // ---
+                google::protobuf::util::JsonPrintOptions opt;
+                opt.add_whitespace = true;
+                google::protobuf::util::MessageToJsonString(
+                                                            *huawei_tlm,
+                                                            &stream_data_in,
+                                                            opt);
+            }
+
+            // Data enrichment with label (node_id/platform_id)
+            if (enable_label_encode_as_map.compare("true") == 0) {
                 if (data_manipulation->append_label_map(stream_data_in,
-                            stream_data_out) == 0) {
+                        stream_data_out) == 0) {
                     data_delivery->async_kafka_producer(stream_data_out);
                 }
+            } else {
+                stream_data_out = stream_data_in;
+                data_delivery->async_kafka_producer(stream_data_out);
             }
         }
 
@@ -347,8 +396,15 @@ void Srv::HuaweiStream::Start()
             std::cout << peer << " HUAWEI Handling JSON string: " << type_info
                                                                 << std::endl;
             // ---
-            if (data_manipulation->append_label_map(stream_data_in,
+
+            // Data enrichment with label (node_id/platform_id)
+            if (enable_label_encode_as_map.compare("true") == 0) {
+                if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
+                    data_delivery->async_kafka_producer(stream_data_out);
+                }
+            } else {
+                stream_data_out = stream_data_in;
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }

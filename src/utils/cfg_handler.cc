@@ -88,6 +88,100 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     return EXIT_SUCCESS;
 }
 
+DataManipulationCfgHandler::DataManipulationCfgHandler()
+{
+    if (!lookup_main_parameters(this->mdt_dialout_collector_conf,
+                                this->parameters)) {
+        this->enable_cisco_message_to_json_string =
+            parameters.at("enable_cisco_message_to_json_string");
+        this->enable_cisco_gpbkv2json =
+            parameters.at("enable_cisco_gpbkv2json");
+        this->enable_label_encode_as_map =
+            parameters.at("enable_label_encode_as_map");
+    } else {
+        throw std::exception();
+    }
+}
+
+int DataManipulationCfgHandler::lookup_main_parameters(std::string cfg_path,
+                                std::map<std::string, std::string>& params)
+{
+    std::unique_ptr<libconfig::Config>
+        data_manipulation_params(new libconfig::Config());
+
+    try {
+        data_manipulation_params->readFile(cfg_path.c_str());
+    } catch (const libconfig::FileIOException &fioex) {
+        std::cout << "libconfig::FileIOException" << std::endl;
+        return(EXIT_FAILURE);
+    } catch(const libconfig::ParseException &pex) {
+        std::cout << "libconfig::ParseException" << std::endl;
+        return(EXIT_FAILURE);
+    }
+
+    // Data manipulation parameters evaluation
+    bool enable_cisco_message_to_json_string =
+        data_manipulation_params->exists("enable_cisco_message_to_json_string");
+    if (enable_cisco_message_to_json_string) {
+        libconfig::Setting& enable_cisco_message_to_json_string =
+            data_manipulation_params->lookup(
+                    "enable_cisco_message_to_json_string");
+        std::string enable_cisco_message_to_json_string_s =
+            enable_cisco_message_to_json_string;
+        if (!enable_cisco_message_to_json_string_s.empty()) {
+            params.insert({"enable_cisco_message_to_json_string",
+                    enable_cisco_message_to_json_string_s});
+        } else {
+            std::cout <<
+                "enable_cisco_message_to_json_string: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"enable_message_to_json_string", "false"});
+    }
+
+    bool enable_cisco_gpbkv2json =
+        data_manipulation_params->exists("enable_cisco_gpbkv2json");
+    if (enable_cisco_gpbkv2json) {
+        libconfig::Setting& enable_cisco_gpbkv2json =
+            data_manipulation_params->lookup("enable_cisco_gpbkv2json");
+        std::string enable_cisco_gpbkv2json_s =
+            enable_cisco_gpbkv2json;
+        if (!enable_cisco_gpbkv2json_s.empty()) {
+            params.insert({"enable_cisco_gpbkv2json",
+                    enable_cisco_gpbkv2json_s});
+        } else {
+            std::cout << "enable_cisco_gpbkv2json: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"enable_cisco_gpbkv2json", "true"});
+    }
+
+    bool enable_label_encode_as_map =
+        data_manipulation_params->exists("enable_label_encode_as_map");
+    if (enable_label_encode_as_map) {
+        libconfig::Setting& enable_label_encode_as_map =
+            data_manipulation_params->lookup("enable_label_encode_as_map");
+        std::string enable_label_encode_as_map_s =
+            enable_label_encode_as_map;
+        if (!enable_label_encode_as_map_s.empty()) {
+            params.insert({"enable_label_encode_as_map",
+                    enable_label_encode_as_map_s});
+        } else {
+            std::cout << "enable_label_encode_as_map: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"enable_label_encode_as_map", "false"});
+    }
+
+    return EXIT_SUCCESS;
+}
+
 KafkaCfgHandler::KafkaCfgHandler()
 {
     if (!lookup_kafka_parameters(this->mdt_dialout_collector_conf,

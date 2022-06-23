@@ -15,6 +15,7 @@ protected:
     std::map<std::string, std::string> parameters;
 };
 
+// Main configuration parameters
 class MainCfgHandler : public CfgHandler {
 public:
     // Params are initialized within the constructor
@@ -37,6 +38,30 @@ private:
     std::string ipv4_socket_huawei;
 };
 
+// Data manipulation configuration parameters
+class DataManipulationCfgHandler : public CfgHandler {
+public:
+    // Params are initialized within the constructor
+    DataManipulationCfgHandler();
+
+    // Setters - directly from the configuration file
+    int lookup_main_parameters(std::string cfg_path,
+                                std::map<std::string, std::string>& params);
+
+    // Getters
+    std::string get_enable_cisco_message_to_json_string() {
+                      return enable_cisco_message_to_json_string; };
+    std::string get_enable_cisco_gpbkv2json() {
+                      return enable_cisco_gpbkv2json; };
+    std::string get_enable_label_encode_as_map() {
+                      return enable_label_encode_as_map; };
+private:
+    std::string enable_cisco_message_to_json_string;
+    std::string enable_cisco_gpbkv2json;
+    std::string enable_label_encode_as_map;
+};
+
+// Kafka configuration parameters
 class KafkaCfgHandler : public CfgHandler {
 public:
     // Params are initialized within the constructor
