@@ -49,16 +49,21 @@ class Srv final {
 public:
     ~Srv();
     void CiscoBind(std::string cisco_srv_socket);
+    void JuniperBind(std::string juniper_srv_socket);
     void HuaweiBind(std::string huawei_srv_socket);
 
 private:
     mdt_dialout::gRPCMdtDialout::AsyncService cisco_service_;
+    Subscriber::AsyncService juniper_service_;
     huawei_dialout::gRPCDataservice::AsyncService huawei_service_;
     std::unique_ptr<grpc::ServerCompletionQueue> cisco_cq_;
+    std::unique_ptr<grpc::ServerCompletionQueue> juniper_cq_;
     std::unique_ptr<grpc::ServerCompletionQueue> huawei_cq_;
     std::unique_ptr<grpc::Server> cisco_server_;
+    std::unique_ptr<grpc::Server> juniper_server_;
     std::unique_ptr<grpc::Server> huawei_server_;
     void CiscoFsmCtrl();
+    void JuniperFsmCtrl();
     void HuaweiFsmCtrl();
     enum StreamStatus { START, FLOW, END };
 
@@ -78,6 +83,24 @@ private:
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
                                     mdt_dialout::MdtDialoutArgs> cisco_resp;
         StreamStatus cisco_stream_status;
+    };
+
+    class JuniperStream {
+    public:
+        JuniperStream(
+            Subscriber::AsyncService *juniper_service,
+            grpc::ServerCompletionQueue *juniper_cq);
+        void Start();
+        void Stop();
+
+    private:
+        Subscriber::AsyncService *juniper_service_;
+        grpc::ServerCompletionQueue *juniper_cq_;
+        grpc::ServerContext juniper_server_ctx;
+        gnmi::SubscribeResponse juniper_stream;
+        grpc::ServerAsyncReaderWriter<gnmi::SubscribeRequest,
+                                    gnmi::SubscribeResponse> juniper_resp;
+        StreamStatus juniper_stream_status;
     };
 
     class HuaweiStream {

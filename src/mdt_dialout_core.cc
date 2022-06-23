@@ -14,6 +14,8 @@
 #include "mdt_dialout_core.h"
 #include "cisco_dialout.grpc.pb.h"
 #include "cisco_telemetry.pb.h"
+#include "juniper_dialout.grpc.pb.h"
+//#include "juniper_telemetry.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "huawei_telemetry.pb.h"
 #include <google/protobuf/arena.h>
@@ -89,8 +91,10 @@ CustomSocketMutator::CustomSocketMutator() {
 Srv::~Srv()
 {
     cisco_server_->grpc::ServerInterface::Shutdown();
+    juniper_server_->grpc::ServerInterface::Shutdown();
     huawei_server_->grpc::ServerInterface::Shutdown();
     cisco_cq_->grpc::ServerCompletionQueue::Shutdown();
+    juniper_cq_->grpc::ServerCompletionQueue::Shutdown();
     huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
 }
 
@@ -109,6 +113,27 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
     std::thread t1(&Srv::CiscoFsmCtrl, this);
     std::thread t2(&Srv::CiscoFsmCtrl, this);
     std::thread t3(&Srv::CiscoFsmCtrl, this);
+
+    t1.join();
+    t2.join();
+    t3.join();
+}
+
+void Srv::JuniperBind(std::string juniper_srv_socket)
+{
+    grpc::ServerBuilder juniper_builder;
+    juniper_builder.RegisterService(&juniper_service_);
+    std::unique_ptr<ServerBuilderOptionImpl>
+                                        jsbo(new ServerBuilderOptionImpl());
+    juniper_builder.SetOption(std::move(jsbo));
+    juniper_builder.AddListeningPort(juniper_srv_socket,
+                                grpc::InsecureServerCredentials());
+    juniper_cq_ = juniper_builder.AddCompletionQueue();
+    juniper_server_ = juniper_builder.BuildAndStart();
+
+    std::thread t1(&Srv::JuniperFsmCtrl, this);
+    std::thread t2(&Srv::JuniperFsmCtrl, this);
+    std::thread t3(&Srv::JuniperFsmCtrl, this);
 
     t1.join();
     t2.join();
@@ -154,6 +179,25 @@ void Srv::CiscoFsmCtrl()
     }
 }
 
+void Srv::JuniperFsmCtrl()
+{
+    new Srv::JuniperStream(&juniper_service_, juniper_cq_.get());
+    //int juniper_counter {0};
+    void *juniper_tag {nullptr};
+    bool juniper_ok {false};
+    while (true) {
+        //std::cout << "Juniper: " << juniper_counter << std::endl;
+        GPR_ASSERT(juniper_cq_->Next(&juniper_tag, &juniper_ok));
+        if (!juniper_ok) {
+            static_cast<JuniperStream *>(juniper_tag)->
+                Srv::JuniperStream::Stop();
+            continue;
+        }
+        static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start();
+        //juniper_counter++;
+    }
+}
+
 void Srv::HuaweiFsmCtrl()
 {
     new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get());
@@ -181,6 +225,17 @@ Srv::CiscoStream::CiscoStream(
                                         cisco_stream_status {START}
 {
     Srv::CiscoStream::Start();
+}
+
+Srv::JuniperStream::JuniperStream(
+                    Subscriber::AsyncService *juniper_service,
+                    grpc::ServerCompletionQueue *juniper_cq) :
+                                        juniper_service_ {juniper_service},
+                                        juniper_cq_ {juniper_cq},
+                                        juniper_resp {&juniper_server_ctx},
+                                        juniper_stream_status {START}
+{
+    Srv::JuniperStream::Start();
 }
 
 Srv::HuaweiStream::HuaweiStream(
@@ -316,6 +371,118 @@ void Srv::CiscoStream::Start()
     }
 }
 
+void Srv::JuniperStream::Start()
+{
+    // Initial stream_status set to START
+    if (juniper_stream_status == START) {
+        juniper_service_->RequestDialOutSubscriber(
+                                        &juniper_server_ctx,
+                                        &juniper_resp,
+                                        juniper_cq_,
+                                        juniper_cq_,
+                                        this);
+        juniper_stream_status = FLOW;
+    } else if (juniper_stream_status == FLOW) {
+        //bool parsing_str;
+        // From the network
+        std::string stream_data_in;
+        // After data enrichment
+        std::string stream_data_out;
+        std::string peer = juniper_server_ctx.peer();
+
+        std::unique_ptr<DataManipulation> data_manipulation(
+                new DataManipulation());
+        std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
+        //std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
+        //        new cisco_telemetry::Telemetry());
+
+        // the key-word "this" is used as a unique TAG
+        juniper_resp.Read(&juniper_stream, this);
+        // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
+        //parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
+
+        //stream_data_in = juniper_stream.;
+
+        // Handling empty data
+        if (stream_data_in.empty()) {
+            // ---
+            auto type_info = typeid(stream_data_in).name();
+            std::cout << peer << " Juniper Handling empty data: " << type_info
+                                                                << std::endl;
+            // ---
+
+        // Handling GPB-KV
+        //} else if (!(cisco_tlm->data_gpbkv().empty()) or parsing_str == true) {
+        //    // ---
+        //    auto type_info = typeid(stream_data_in).name();
+        //    std::cout << peer << " CISCO Handling GPB-KV: " << type_info
+        //                                                    << std::endl;
+        //    // ---
+
+        //    if (enable_cisco_gpbkv2json.compare("true") == 0) {
+        //        data_manipulation->cisco_gpbkv2json(cisco_tlm, stream_data_in);
+        //    } else if (enable_cisco_message_to_json_string.compare("true")
+        //                                                            == 0) {
+        //        // MessageToJson is working directly on the PROTO-Obj
+        //        stream_data_in.clear();
+        //        google::protobuf::util::JsonPrintOptions opt;
+        //        opt.add_whitespace = true;
+        //        google::protobuf::util::MessageToJsonString(
+        //                                                    *cisco_tlm,
+        //                                                    &stream_data_in,
+        //                                                    opt);
+        //        // Data enrichment with label (node_id/platform_id)
+        //        if (enable_label_encode_as_map.compare("true") == 0) {
+        //            if (data_manipulation->append_label_map(stream_data_in,
+        //                    stream_data_out) == 0) {
+        //                data_delivery->async_kafka_producer(stream_data_out);
+        //            }
+        //        } else {
+        //            stream_data_out = stream_data_in;
+        //            data_delivery->async_kafka_producer(stream_data_out);
+        //        }
+        //    } else {
+        //        // Use Case: both data manipulation funcs set to false:
+        //        // TBD: at the meoment simply send binary format to stdout
+        //        std::cout << stream_data_in << std::endl;
+        //    }
+
+        //// Handling GPB
+        //} else if (cisco_tlm->has_data_gpb() == true or parsing_str == true) {
+        //    // ---
+        //    auto type_info = typeid(stream_data_in).name();
+        //    std::cout << peer << " CISCO Handling GPB: " << type_info
+        //                                                << std::endl;
+        //    // ---
+
+        //    // TBD
+
+        //// Handling JSON string
+        //}
+        } else {
+            // ---
+            auto type_info = typeid(stream_data_in).name();
+            std::cout << peer << " JUNIPER Handling JSON string: " << type_info
+                                                                << std::endl;
+            // ---
+
+            // Data enrichment with label (node_id/platform_id)
+            //if (enable_label_encode_as_map.compare("true") == 0) {
+            //    if (data_manipulation->append_label_map(stream_data_in,
+            //            stream_data_out) == 0) {
+            //        data_delivery->async_kafka_producer(stream_data_out);
+            //    }
+            //} else {
+                stream_data_out = stream_data_in;
+                data_delivery->async_kafka_producer(stream_data_out);
+            //}
+        }
+    } else {
+        GPR_ASSERT(juniper_stream_status == END);
+        delete this;
+    }
+}
+
 void Srv::HuaweiStream::Start()
 {
     if (huawei_stream_status == START) {
@@ -422,6 +589,12 @@ void Srv::CiscoStream::Stop()
 {
     //std::cout << "Streaming Interrupted ..." << std::endl;
     cisco_stream_status = END;
+}
+
+void Srv::JuniperStream::Stop()
+{
+    //std::cout << "Streaming Interrupted ..." << std::endl;
+    juniper_stream_status = END;
 }
 
 void Srv::HuaweiStream::Stop()

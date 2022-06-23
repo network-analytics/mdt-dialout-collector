@@ -6,6 +6,7 @@
 
 void *cisco_thread(void *);
 void *huawei_thread(void *);
+void *juniper_thread(void *);
 // --- Required for config parameters ---
 std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
 // --- Required for config parameters ---
@@ -26,6 +27,14 @@ int main(void)
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_cisco() << "..." << std::endl;
         vendors.push_back(std::move(cisco_t));
+    }
+
+    if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
+        void *juniper_ptr {nullptr};
+        std::thread juniper_t(&juniper_thread, juniper_ptr);
+        std::cout << "mdt-dialout-collector listening on "
+        << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
+        vendors.push_back(std::move(juniper_t));
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
@@ -55,6 +64,20 @@ void *cisco_thread(void *cisco_ptr)
     std::string cisco_srv_socket {ipv4_socket_cisco};
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
+
+    return (EXIT_SUCCESS);
+}
+
+void *juniper_thread(void *juniper_ptr)
+{
+    // --- Required for config parameters ---
+    std::string ipv4_socket_juniper =
+        main_cfg_handler->get_ipv4_socket_juniper();
+    // --- Required for config parameters ---
+
+    std::string juniper_srv_socket {ipv4_socket_juniper};
+    Srv juniper_mdt_dialout_collector;
+    juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
 
     return (EXIT_SUCCESS);
 }

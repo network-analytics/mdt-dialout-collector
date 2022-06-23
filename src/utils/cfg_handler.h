@@ -30,11 +30,14 @@ public:
                       return iface; };
     std::string get_ipv4_socket_cisco() {
                       return ipv4_socket_cisco; };
+    std::string get_ipv4_socket_juniper() {
+                      return ipv4_socket_juniper; };
     std::string get_ipv4_socket_huawei() {
                       return ipv4_socket_huawei; };
 private:
     std::string iface;
     std::string ipv4_socket_cisco;
+    std::string ipv4_socket_juniper;
     std::string ipv4_socket_huawei;
 };
 

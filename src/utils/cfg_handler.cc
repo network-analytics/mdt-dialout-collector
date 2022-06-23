@@ -16,6 +16,7 @@ MainCfgHandler::MainCfgHandler()
                                 this->parameters)) {
         this->iface = parameters.at("iface");
         this->ipv4_socket_cisco = parameters.at("ipv4_socket_cisco");
+        this->ipv4_socket_juniper = parameters.at("ipv4_socket_juniper");
         this->ipv4_socket_huawei = parameters.at("ipv4_socket_huawei");
     } else {
         throw std::exception();
@@ -67,6 +68,22 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
         }
     } else {
         params.insert({"ipv4_socket_cisco", ""});
+    }
+
+    bool ipv4_socket_juniper = main_params->exists("ipv4_socket_juniper");
+    if (ipv4_socket_juniper) {
+        libconfig::Setting& ipv4_socket_juniper =
+            main_params->lookup("ipv4_socket_juniper");
+        std::string ipv4_socket_juniper_s = ipv4_socket_juniper;
+        if (!ipv4_socket_juniper_s.empty()) {
+            params.insert({"ipv4_socket_juniper", ipv4_socket_juniper_s});
+        } else {
+            std::cout << "ipv4_socket_juniper: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"ipv4_socket_juniper", ""});
     }
 
     bool ipv4_socket_huawei = main_params->exists("ipv4_socket_huawei");
