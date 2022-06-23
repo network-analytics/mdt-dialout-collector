@@ -5,8 +5,9 @@
 #include <grpcpp/grpcpp.h>
 #include <json/json.h>
 #include "cisco_dialout.grpc.pb.h"
-#include "cisco_telemetry.grpc.pb.h"
+#include "cisco_telemetry.pb.h"
 #include "huawei_dialout.grpc.pb.h"
+#include "juniper_dialout.grpc.pb.h"
 #include "grpc/socket_mutator.h"
 
 
