@@ -31,8 +31,14 @@ get_filename_component(cisco_dialout_proto "proto/Cisco/cisco_dialout.proto" ABS
 get_filename_component(cisco_dialout_proto_path "${cisco_dialout_proto}" PATH)
 
 # Proto file gRPC dial-out - Juniper
-get_filename_component(juniper_dialout_proto "proto/Juniper/juniper_dialout.proto" ABSOLUTE)
-get_filename_component(juniper_dialout_proto_path "${juniper_dialout_proto}" PATH)
+get_filename_component(juniper_gnmi_proto "proto/Juniper/gnmi.proto" ABSOLUTE)
+get_filename_component(juniper_gnmi_proto_path "${juniper_gnmi_proto}" PATH)
+
+get_filename_component(juniper_gnmi_ext_proto "proto/Juniper/gnmi_ext.proto" ABSOLUTE)
+get_filename_component(juniper_gnmi_ext_proto_path "${juniper_gnmi_ext_proto}" PATH)
+
+get_filename_component(juniper_gnmi_dialout_proto "proto/Juniper/gnmi_dialout.proto" ABSOLUTE)
+get_filename_component(juniper_gnmi_dialout_proto_path "${juniper_gnmi_dialout_proto}" PATH)
 
 # Proto file gRPC dial-out - Huawei
 get_filename_component(huawei_dialout_proto "proto/Huawei/huawei_dialout.proto" ABSOLUTE)
@@ -101,26 +107,42 @@ add_custom_command(
 )
 
 # Protobuf generated "gRPC dial-out" - Juniper
-set(juniper_dialout_pb_cc
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.pb.cc")
-set(juniper_dialout_pb_h
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.pb.h")
-set(juniper_dialout_pb_grpc_cc
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.grpc.pb.cc")
-set(juniper_dialout_pb_grpc_h
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.grpc.pb.h")
+set(juniper_gnmi_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi.pb.cc")
+set(juniper_gnmi_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi.pb.h")
+set(juniper_gnmi_ext_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi_ext.pb.cc")
+set(juniper_gnmi_ext_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi_ext.pb.h")
+set(juniper_gnmi_dialout_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi_dialout.pb.cc")
+set(juniper_gnmi_dialout_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi_dialout.pb.h")
+set(juniper_gnmi_dialout_pb_grpc_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi_dialout.grpc.pb.cc")
+set(juniper_gnmi_dialout_pb_grpc_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/gnmi_dialout.grpc.pb.h")
 add_custom_command(
-    OUTPUT "${juniper_dialout_pb_cc}"
-            "${juniper_dialout_pb_h}"
-            "${juniper_dialout_pb_grpc_cc}"
-            "${juniper_dialout_pb_grpc_h}"
+    OUTPUT "${juniper_gnmi_pb_cc}"
+            "${juniper_gnmi_pb_h}"
+            "${juniper_gnmi_ext_pb_cc}"
+            "${juniper_gnmi_ext_pb_h}"
+            "${juniper_gnmi_dialout_pb_cc}"
+            "${juniper_gnmi_dialout_pb_h}"
+            "${juniper_gnmi_dialout_pb_grpc_cc}"
+            "${juniper_gnmi_dialout_pb_grpc_h}"
     COMMAND ${_PROTOBUF_PROTOC}
     ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
     --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
-        -I "${juniper_dialout_proto_path}"
+        -I "${juniper_gnmi_dialout_proto_path}"
         --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${juniper_dialout_proto}"
-    DEPENDS "${juniper_dialout_proto}"
+        "${juniper_gnmi_proto}"
+        "${juniper_gnmi_ext_proto}"
+        "${juniper_gnmi_dialout_proto}"
+    DEPENDS "${juniper_gnmi_proto}"
+            "${juniper_gnmi_ext_proto}"
+            "${juniper_gnmi_dialout_proto}"
 )
 
 # Protobuf generated "gRPC dial-out" - Huawei
@@ -218,8 +240,10 @@ foreach(_target "mdt_dialout_collector")
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
         ${cisco_telemetry_pb_cc}
-        ${juniper_dialout_pb_cc}
-        ${juniper_dialout_pb_grpc_cc}
+        ${juniper_gnmi_pb_cc}
+        ${juniper_gnmi_ext_pb_cc}
+        ${juniper_gnmi_dialout_pb_cc}
+        ${juniper_gnmi_dialout_pb_grpc_cc}
 #       ${juniper_telemetry_pb_cc}
         ${huawei_dialout_pb_cc}
         ${huawei_dialout_pb_grpc_cc}
