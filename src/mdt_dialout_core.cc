@@ -401,7 +401,7 @@ void Srv::JuniperStream::Start()
         // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
         //parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
 
-        //stream_data_in = juniper_stream.;
+        juniper_stream.SerializeToString(&stream_data_in);
 
         // Handling empty data
         if (stream_data_in.empty()) {
@@ -473,9 +473,10 @@ void Srv::JuniperStream::Start()
             //        data_delivery->async_kafka_producer(stream_data_out);
             //    }
             //} else {
-                stream_data_out = stream_data_in;
-                data_delivery->async_kafka_producer(stream_data_out);
+            //    stream_data_out = stream_data_in;
+            //    data_delivery->async_kafka_producer(stream_data_out);
             //}
+            std::cout << stream_data_in << std::endl;
         }
     } else {
         GPR_ASSERT(juniper_stream_status == END);
