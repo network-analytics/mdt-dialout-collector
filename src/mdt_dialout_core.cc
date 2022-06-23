@@ -218,7 +218,9 @@ void Srv::CiscoStream::Start()
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
         bool parsing_str;
+        // From the network
         std::string stream_data_in;
+        // After data enrichment
         std::string stream_data_out;
         std::string peer = cisco_server_ctx.peer();
 
@@ -326,7 +328,9 @@ void Srv::HuaweiStream::Start()
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
         bool parsing_str;
+        // From the network
         std::string stream_data_in;
+        // Afetr data enrichment
         std::string stream_data_out;
         std::string peer = huawei_server_ctx.peer();
 

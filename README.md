@@ -92,7 +92,7 @@ The default configuration location is following the [FHS](https://refspecs.linux
 - the application itself is located within the "/opt/mdt-dialout-collector/bin" folder
 - its configuration is located within the "/etc/opt/mdt-dialout-collector" folder
 
-Here below is an *example* of configuration:
+Here below is an *example* of commented configuration:
 ```SHELL
 #### mdt-dialout-collector - main
 
@@ -104,6 +104,18 @@ ipv4_socket_cisco = "0.0.0.0:10007";
 
 ## socket dedicated to the huawei's data-stream
 ipv4_socket_huawei = "0.0.0.0:10008";
+
+
+### mdt-dialout-collector - data-flow manipulation
+
+## simplified JSON after GPB/GPB-KV decoding - default = "true"
+enable_cisco_gpbkv2json = "false";
+
+## standard JSON after GPB/GPB-KV deconding - default = "false"
+enable_cisco_message_to_json_string = "true";
+
+## data-flow enrichment with node_id/platform_id (WIP) - default = "false"
+enable_label_encode_as_map = "true";
 
 
 #### mdt-dialout-collector - kafka-producer
