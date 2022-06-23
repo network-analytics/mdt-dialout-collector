@@ -30,6 +30,10 @@ set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 get_filename_component(cisco_dialout_proto "proto/Cisco/cisco_dialout.proto" ABSOLUTE)
 get_filename_component(cisco_dialout_proto_path "${cisco_dialout_proto}" PATH)
 
+# Proto file gRPC dial-out - Juniper
+get_filename_component(juniper_dialout_proto "proto/Juniper/juniper_dialout.proto" ABSOLUTE)
+get_filename_component(juniper_dialout_proto_path "${juniper_dialout_proto}" PATH)
+
 # Proto file gRPC dial-out - Huawei
 get_filename_component(huawei_dialout_proto "proto/Huawei/huawei_dialout.proto" ABSOLUTE)
 get_filename_component(huawei_dialout_proto_path "${huawei_dialout_proto}" PATH)
@@ -37,6 +41,10 @@ get_filename_component(huawei_dialout_proto_path "${huawei_dialout_proto}" PATH)
 # Proto file to be able to decode gpb-kv messages - Cisco
 get_filename_component(cisco_telemetry_proto "proto/Cisco/cisco_telemetry.proto" ABSOLUTE)
 get_filename_component(cisco_telemetry_proto_path "${cisco_telemetry_proto}" PATH)
+
+# Proto file to be able to decode gpb-kv messages - Juniper
+#get_filename_component(juniper_telemetry_proto "proto/Juniper/juniper_telemetry.proto" ABSOLUTE)
+#get_filename_component(juniper_telemetry_proto_path "${juniper_telemetry_proto}" PATH)
 
 # Proto file to be able to decode gpb-kv messages - Huawei
 get_filename_component(huawei_telemetry_proto "proto/Huawei/huawei_telemetry.proto" ABSOLUTE)
@@ -92,6 +100,29 @@ add_custom_command(
     DEPENDS "${cisco_dialout_proto}"
 )
 
+# Protobuf generated "gRPC dial-out" - Juniper
+set(juniper_dialout_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.pb.cc")
+set(juniper_dialout_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.pb.h")
+set(juniper_dialout_pb_grpc_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.grpc.pb.cc")
+set(juniper_dialout_pb_grpc_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_dialout.grpc.pb.h")
+add_custom_command(
+    OUTPUT "${juniper_dialout_pb_cc}"
+            "${juniper_dialout_pb_h}"
+            "${juniper_dialout_pb_grpc_cc}"
+            "${juniper_dialout_pb_grpc_h}"
+    COMMAND ${_PROTOBUF_PROTOC}
+    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
+    --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
+        -I "${juniper_dialout_proto_path}"
+        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+        "${juniper_dialout_proto}"
+    DEPENDS "${juniper_dialout_proto}"
+)
+
 # Protobuf generated "gRPC dial-out" - Huawei
 set(huawei_dialout_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei/huawei_dialout.pb.cc")
@@ -132,6 +163,23 @@ add_custom_command(
     DEPENDS "${cisco_telemetry_proto}"
 )
 
+# Protobuf generated support "GPB-KV" encoding - Juniper
+#set(juniper_telemetry_pb_cc
+#  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telemetry.pb.cc")
+#set(juniper_telemetry_pb_h
+#  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telementry.pb.h")
+#add_custom_command(
+#    OUTPUT "${juniper_telemetry_pb_cc}"
+#            "${juniper_telemetry_pb_h}"
+#    COMMAND ${_PROTOBUF_PROTOC}
+#    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
+#    --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
+#        -I "${juniper_telemetry_proto_path}"
+#        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+#        "${juniper_telemetry_proto}"
+#    DEPENDS "${juniper_telemetry_proto}"
+#)
+
 # Protobuf generated support "GPB-KV" encoding - Huawei
 set(huawei_telemetry_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei/huawei_telemetry.pb.cc")
@@ -151,6 +199,7 @@ add_custom_command(
 
 # Include local header files
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
@@ -169,6 +218,9 @@ foreach(_target "mdt_dialout_collector")
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
         ${cisco_telemetry_pb_cc}
+        ${juniper_dialout_pb_cc}
+        ${juniper_dialout_pb_grpc_cc}
+#       ${juniper_telemetry_pb_cc}
         ${huawei_dialout_pb_cc}
         ${huawei_dialout_pb_grpc_cc}
         ${huawei_telemetry_pb_cc}
