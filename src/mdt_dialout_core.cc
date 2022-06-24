@@ -404,7 +404,7 @@ void Srv::JuniperStream::Start()
         google::protobuf::util::JsonPrintOptions opt;
         opt.add_whitespace = true;
         google::protobuf::util::MessageToJsonString(
-                                                    *juniper_stream,
+                                                    *juniper_stream.extension().data(),
                                                     &stream_data_in,
                                                     opt);
         std::cout << stream_data_in << std::endl;
