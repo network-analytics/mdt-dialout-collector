@@ -399,12 +399,15 @@ void Srv::JuniperStream::Start()
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
         // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
-        //parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
+        //parsing_str = juniper_tlm->ParseFromString(cisco_stream.data());
 
-        //juniper_stream.SerializeToString(&stream_data_in);
-        //auto desc = juniper_stream.descriptor()->DebugString();
-        auto desc = juniper_stream.update().update().data();
-        std::cout << desc << std::endl;
+        google::protobuf::util::JsonPrintOptions opt;
+        opt.add_whitespace = true;
+        google::protobuf::util::MessageToJsonString(
+                                                    *juniper_stream,
+                                                    &stream_data_in,
+                                                    opt);
+        std::cout << stream_data_in << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
