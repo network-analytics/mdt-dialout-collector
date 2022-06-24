@@ -16,7 +16,8 @@ int main(void)
     std::vector<std::thread> vendors;
 
     if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
-        (main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
+        (main_cfg_handler->get_ipv4_socket_huawei()).empty() and
+        (main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
             std::cout << "no ipv4 sockets were configured" << std::endl;
             return(EXIT_FAILURE);
     }
