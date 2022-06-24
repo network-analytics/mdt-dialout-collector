@@ -408,9 +408,12 @@ void Srv::JuniperStream::Start()
         //                                            &stream_data_in,
         //                                            opt);
         //std::cout << juniper_stream.extension().at(0).registered_ext() << std::endl;
-        std::cout << juniper_stream.extension().Get().registered_ext().msg() << std::endl;
-        
-        // Handling empty data
+        //std::cout << juniper_stream.extension().Get().registered_ext().msg() << std::endl;
+        auto id = juniper_stream.extension().at(0).registered_ext().id();
+        std::cout << id << std::endl;
+
+
+        // handling empty data
         if (stream_data_in.empty()) {
             // ---
             //auto type_info = typeid(stream_data_in).name();
