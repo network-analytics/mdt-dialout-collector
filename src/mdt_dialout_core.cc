@@ -15,7 +15,7 @@
 #include "cisco_dialout.grpc.pb.h"
 #include "cisco_telemetry.pb.h"
 #include "juniper_dialout.grpc.pb.h"
-//#include "juniper_telemetry.pb.h"
+#include "juniper_telemetry.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "huawei_telemetry.pb.h"
 #include <google/protobuf/arena.h>
@@ -383,7 +383,7 @@ void Srv::JuniperStream::Start()
                                         this);
         juniper_stream_status = FLOW;
     } else if (juniper_stream_status == FLOW) {
-        //bool parsing_str;
+        bool parsing_str;
         // From the network
         std::string stream_data_in;
         // After data enrichment
@@ -393,26 +393,25 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<DataManipulation> data_manipulation(
                 new DataManipulation());
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
-        //std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
-        //        new cisco_telemetry::Telemetry());
+        std::unique_ptr<TelemetryStream> juniper_tlm(
+                new TelemetryStream());
 
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
         // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
-        //parsing_str = juniper_tlm->ParseFromString(cisco_stream.data());
-
-        //google::protobuf::util::JsonPrintOptions opt;
-        //opt.add_whitespace = true;
-        //google::protobuf::util::MessageToJsonString(
-        //                                            *juniper_stream.extension().data(),
-        //                                            &stream_data_in,
-        //                                            opt);
-        std::cout << juniper_stream.extension().data() << std::endl;
+        parsing_str = juniper_tlm->ParseFromString(juniper_stream.update().alias().c_str());
+        
+        google::protobuf::util::JsonPrintOptions opt;
+        opt.add_whitespace = true;
+        google::protobuf::util::MessageToJsonString(
+                                                    *juniper_tlm,
+                                                    &stream_data_in,
+                                                    opt);
 
         // Handling empty data
         if (stream_data_in.empty()) {
             // ---
-            auto type_info = typeid(stream_data_in).name();
+            //auto type_info = typeid(stream_data_in).name();
             //std::cout << peer << " Juniper Handling empty data: " << type_info
             //                                                    << std::endl;
             // ---

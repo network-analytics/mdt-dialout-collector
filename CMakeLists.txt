@@ -49,8 +49,8 @@ get_filename_component(cisco_telemetry_proto "proto/Cisco/cisco_telemetry.proto"
 get_filename_component(cisco_telemetry_proto_path "${cisco_telemetry_proto}" PATH)
 
 # Proto file to be able to decode gpb-kv messages - Juniper
-#get_filename_component(juniper_telemetry_proto "proto/Juniper/juniper_telemetry.proto" ABSOLUTE)
-#get_filename_component(juniper_telemetry_proto_path "${juniper_telemetry_proto}" PATH)
+get_filename_component(juniper_telemetry_proto "proto/Juniper/juniper_telemetry.proto" ABSOLUTE)
+get_filename_component(juniper_telemetry_proto_path "${juniper_telemetry_proto}" PATH)
 
 # Proto file to be able to decode gpb-kv messages - Huawei
 get_filename_component(huawei_telemetry_proto "proto/Huawei/huawei_telemetry.proto" ABSOLUTE)
@@ -186,21 +186,21 @@ add_custom_command(
 )
 
 # Protobuf generated support "GPB-KV" encoding - Juniper
-#set(juniper_telemetry_pb_cc
-#  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telemetry.pb.cc")
-#set(juniper_telemetry_pb_h
-#  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telementry.pb.h")
-#add_custom_command(
-#    OUTPUT "${juniper_telemetry_pb_cc}"
-#            "${juniper_telemetry_pb_h}"
-#    COMMAND ${_PROTOBUF_PROTOC}
-#    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
-#    --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
-#        -I "${juniper_telemetry_proto_path}"
-#        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-#        "${juniper_telemetry_proto}"
-#    DEPENDS "${juniper_telemetry_proto}"
-#)
+set(juniper_telemetry_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telemetry.pb.cc")
+set(juniper_telemetry_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telementry.pb.h")
+add_custom_command(
+    OUTPUT "${juniper_telemetry_pb_cc}"
+            "${juniper_telemetry_pb_h}"
+    COMMAND ${_PROTOBUF_PROTOC}
+    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
+    --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
+        -I "${juniper_telemetry_proto_path}"
+        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+        "${juniper_telemetry_proto}"
+    DEPENDS "${juniper_telemetry_proto}"
+)
 
 # Protobuf generated support "GPB-KV" encoding - Huawei
 set(huawei_telemetry_pb_cc
@@ -244,7 +244,7 @@ foreach(_target "mdt_dialout_collector")
         ${juniper_gnmi_ext_pb_cc}
         ${juniper_gnmi_dialout_pb_cc}
         ${juniper_gnmi_dialout_pb_grpc_cc}
-#       ${juniper_telemetry_pb_cc}
+        ${juniper_telemetry_pb_cc}
         ${huawei_dialout_pb_cc}
         ${huawei_dialout_pb_grpc_cc}
         ${huawei_telemetry_pb_cc}
