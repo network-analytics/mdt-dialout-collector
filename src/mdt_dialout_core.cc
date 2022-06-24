@@ -403,6 +403,7 @@ void Srv::JuniperStream::Start()
 
         //juniper_stream.SerializeToString(&stream_data_in);
         auto desc = juniper_stream.descriptor();
+        std::cout << desc << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
@@ -477,7 +478,6 @@ void Srv::JuniperStream::Start()
             //    stream_data_out = stream_data_in;
             //    data_delivery->async_kafka_producer(stream_data_out);
             //}
-            std::cout << desc << std::endl;
         }
     } else {
         GPR_ASSERT(juniper_stream_status == END);
