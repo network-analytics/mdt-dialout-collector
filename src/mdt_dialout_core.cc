@@ -407,7 +407,8 @@ void Srv::JuniperStream::Start()
         //                                            *juniper_stream.get,
         //                                            &stream_data_in,
         //                                            opt);
-        std::cout << juniper_stream.extension().at(0).registered_ext().msg() << std::endl;
+        //std::cout << juniper_stream.extension().at(0).registered_ext() << std::endl;
+        std::cout << juniper_stream.extension().Get().registered_ext().msg() << std::endl;
         
         // Handling empty data
         if (stream_data_in.empty()) {
