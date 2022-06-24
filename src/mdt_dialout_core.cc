@@ -404,11 +404,11 @@ void Srv::JuniperStream::Start()
         //google::protobuf::util::JsonPrintOptions opt;
         //opt.add_whitespace = true;
         //google::protobuf::util::MessageToJsonString(
-        //                                            *juniper_tlm,
+        //                                            *juniper_stream.get,
         //                                            &stream_data_in,
         //                                            opt);
-        std::cout << juniper_stream.extension().Get().DebugString() << std::endl;
-
+        std::cout << juniper_stream.extension_size() << std::endl;
+        
         // Handling empty data
         if (stream_data_in.empty()) {
             // ---
