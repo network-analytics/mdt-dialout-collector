@@ -401,13 +401,13 @@ void Srv::JuniperStream::Start()
         // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
         //parsing_str = juniper_tlm->ParseFromString(cisco_stream.data());
 
-        google::protobuf::util::JsonPrintOptions opt;
-        opt.add_whitespace = true;
-        google::protobuf::util::MessageToJsonString(
-                                                    *juniper_stream.extension().data(),
-                                                    &stream_data_in,
-                                                    opt);
-        std::cout << stream_data_in << std::endl;
+        //google::protobuf::util::JsonPrintOptions opt;
+        //opt.add_whitespace = true;
+        //google::protobuf::util::MessageToJsonString(
+        //                                            *juniper_stream.extension().data(),
+        //                                            &stream_data_in,
+        //                                            opt);
+        std::cout << juniper_stream.extension().data() << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
