@@ -402,15 +402,15 @@ void Srv::JuniperStream::Start()
         //parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
 
         //juniper_stream.SerializeToString(&stream_data_in);
-        auto desc = juniper_stream.descriptor();
+        auto desc = juniper_stream.descriptor()->DebugString();
         std::cout << desc << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
             // ---
             auto type_info = typeid(stream_data_in).name();
-            std::cout << peer << " Juniper Handling empty data: " << type_info
-                                                                << std::endl;
+            //std::cout << peer << " Juniper Handling empty data: " << type_info
+            //                                                    << std::endl;
             // ---
 
         // Handling GPB-KV
