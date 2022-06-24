@@ -399,14 +399,15 @@ void Srv::JuniperStream::Start()
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
         // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
-        parsing_str = juniper_tlm->ParseFromString(juniper_stream.update().alias().c_str());
+        //parsing_str = juniper_tlm->ParseFromString(juniper_stream.update().alias().c_str());
         
-        google::protobuf::util::JsonPrintOptions opt;
-        opt.add_whitespace = true;
-        google::protobuf::util::MessageToJsonString(
-                                                    *juniper_tlm,
-                                                    &stream_data_in,
-                                                    opt);
+        //google::protobuf::util::JsonPrintOptions opt;
+        //opt.add_whitespace = true;
+        //google::protobuf::util::MessageToJsonString(
+        //                                            *juniper_tlm,
+        //                                            &stream_data_in,
+        //                                            opt);
+        std::cout << juniper_stream.update().alias().c_str() << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
