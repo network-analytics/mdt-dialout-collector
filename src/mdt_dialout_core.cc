@@ -402,7 +402,8 @@ void Srv::JuniperStream::Start()
         //parsing_str = cisco_tlm->ParseFromString(cisco_stream.data());
 
         //juniper_stream.SerializeToString(&stream_data_in);
-        auto desc = juniper_stream.descriptor()->DebugString();
+        //auto desc = juniper_stream.descriptor()->DebugString();
+        auto desc = juniper_stream.update().update().data();
         std::cout << desc << std::endl;
 
         // Handling empty data
