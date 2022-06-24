@@ -407,7 +407,7 @@ void Srv::JuniperStream::Start()
         //                                            *juniper_tlm,
         //                                            &stream_data_in,
         //                                            opt);
-        std::cout << juniper_stream.update().descriptor()->name() << std::endl;
+        std::cout << juniper_stream.extension().Get().DebugString() << std::endl;
 
         // Handling empty data
         if (stream_data_in.empty()) {
