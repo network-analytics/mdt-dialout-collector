@@ -400,8 +400,8 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<TelemetryStream> juniper_tlm(
                 new TelemetryStream());
         //GnmiJuniperTelemetryHeaderExtension
-        std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_ext(
-                new GnmiJuniperTelemetryHeader());
+        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_ext(
+                new GnmiJuniperTelemetryHeaderExtension());
 
 
         // the key-word "this" is used as a unique TAG
@@ -431,12 +431,12 @@ void Srv::JuniperStream::Start()
             stream_data_in.clear();
             stream_data_in = iter->registered_ext().msg();
 
-            google::protobuf::util::JsonPrintOptions opt;
-            opt.add_whitespace = true;
-            google::protobuf::util::MessageToJsonString(
-                                                    *juniper_tlm_ext,
-                                                    &stream_data_in,
-                                                    opt);
+            //google::protobuf::util::JsonPrintOptions opt;
+            //opt.add_whitespace = true;
+            //google::protobuf::util::MessageToJsonString(
+            //                                        *juniper_tlm_ext,
+            //                                        &stream_data_in,
+            //                                        opt);
             stream_data_out = stream_data_in;
             std::cout << stream_data_in << "\n";
         }
