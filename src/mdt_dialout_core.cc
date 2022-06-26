@@ -430,8 +430,9 @@ void Srv::JuniperStream::Start()
 
         int stream_data_in_size_ = stream_data_in_.Capacity();
         std::cout << stream_data_in_size_ << "\n";
-        for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
-            std::cout << iter->DebugString().c_str() << "\n";
+        //for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
+        for (auto& iter : stream_data_in_) {
+            std::cout << iter.DebugString().c_str() << "\n";
             //std::cout << iter->registered_ext().msg() << "\n";
             //parsing_str = juniper_tlm_header_ext->ParseFromString(iter->registered_ext().msg());
             //parsing_str = juniper_tlm->ParseFromString(iter->val().any_val().value());
