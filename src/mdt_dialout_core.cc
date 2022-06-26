@@ -425,8 +425,8 @@ void Srv::JuniperStream::Start()
         //    std::cout << data.val().any_val().value();
         //}
 
-        auto stream_data_in_ = juniper_stream.update().update();
-        //auto stream_data_in_ = juniper_stream.extension();
+        auto& stream_data_in_ = juniper_stream.update().update();
+        //auto& stream_data_in_ = juniper_stream.extension();
 
         for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
             std::cout << iter->DebugString() << "\n";
