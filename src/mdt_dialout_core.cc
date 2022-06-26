@@ -429,25 +429,26 @@ void Srv::JuniperStream::Start()
         //auto stream_data_in_ = juniper_stream.extension();
 
         for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
+            std::cout << iter->val().json_val() << "\n";
             //std::cout << iter->registered_ext().msg() << "\n";
             //parsing_str = juniper_tlm_header_ext->ParseFromString(iter->registered_ext().msg());
-            parsing_str = juniper_tlm->ParseFromString(iter->val().any_val().value());
-            if (parsing_str) {
-                //stream_data_in.clear();
-                //stream_data_in = iter->registered_ext().msg();
-                stream_data_in = iter->val().any_val().value();
+            //parsing_str = juniper_tlm->ParseFromString(iter->val().any_val().value());
+            //if (parsing_str) {
+            //    //stream_data_in.clear();
+            //    //stream_data_in = iter->registered_ext().msg();
+            //    stream_data_in = iter->val().any_val().value();
 
-                //google::protobuf::util::JsonPrintOptions opt;
-                //opt.add_whitespace = true;
-                //google::protobuf::util::MessageToJsonString(
-                //                                        *juniper_tlm_ext,
-                //                                        &stream_data_in,
-                //                                        opt);
-                //stream_data_out = stream_data_in;
-                std::cout << stream_data_in << "\n";
-            } else {
-                std::cout << "Parsing ERROR \n";
-            }
+            //    //google::protobuf::util::JsonPrintOptions opt;
+            //    //opt.add_whitespace = true;
+            //    //google::protobuf::util::MessageToJsonString(
+            //    //                                        *juniper_tlm_ext,
+            //    //                                        &stream_data_in,
+            //    //                                        opt);
+            //    //stream_data_out = stream_data_in;
+            //    std::cout << stream_data_in << "\n";
+            //} else {
+            //    std::cout << "Parsing ERROR \n";
+            //}
         }
 
         // handling empty data
