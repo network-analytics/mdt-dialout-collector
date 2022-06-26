@@ -7,7 +7,7 @@
 #include "cisco_dialout.grpc.pb.h"
 #include "cisco_telemetry.pb.h"
 #include "huawei_dialout.grpc.pb.h"
-#include "gnmi.pb.h"
+#include "juniper_gnmi.pb.h"
 #include "juniper_dialout.grpc.pb.h"
 #include "grpc/socket_mutator.h"
 

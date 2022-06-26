@@ -17,7 +17,7 @@ syntax = "proto3";
 
 import "google/protobuf/any.proto";
 import "google/protobuf/descriptor.proto";
-import "gnmi_ext.proto";
+import "juniper_gnmi_ext.proto";
 
 // Package gNMI defines a service specification for the gRPC Network Management
 // Interface. This interface is defined to be a standard interface via which

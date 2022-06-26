@@ -1,7 +1,7 @@
 
 syntax = "proto3";
 
-import "gnmi.proto";
+import "juniper_gnmi.proto";
 
    // new grpc service definition having DialOutSubscriber as the RPC name.
 service Subscriber {
