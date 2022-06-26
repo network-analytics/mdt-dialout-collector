@@ -400,8 +400,10 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<TelemetryStream> juniper_tlm(
                 new TelemetryStream());
         //GnmiJuniperTelemetryHeaderExtension
-        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_ext(
+        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_header_ext(
                 new GnmiJuniperTelemetryHeaderExtension());
+        std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_header(
+                new GnmiJuniperTelemetryHeader());
 
 
         // the key-word "this" is used as a unique TAG
@@ -427,10 +429,10 @@ void Srv::JuniperStream::Start()
 
         for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
             //std::cout << iter->registered_ext().msg() << "\n";
-            //parsing_str = juniper_tlm_ext->ParseFromString(iter->registered_ext().msg());
+            //parsing_str = juniper_tlm_header_ext->ParseFromString(iter->registered_ext().msg());
             parsing_str = juniper_tlm->ParseFromString(iter->val().any_val().value());
             if (parsing_str) {
-                stream_data_in.clear();
+                //stream_data_in.clear();
                 //stream_data_in = iter->registered_ext().msg();
                 stream_data_in = iter->val().any_val().value();
 
@@ -441,7 +443,7 @@ void Srv::JuniperStream::Start()
                 //                                        &stream_data_in,
                 //                                        opt);
                 stream_data_out = stream_data_in;
-                std::cout << stream_data_in << "\n";
+                std::cout << stream_data_out << "\n";
             } else {
                 std::cout << "Parsing ERROR \n";
             }
