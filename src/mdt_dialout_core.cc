@@ -399,11 +399,12 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
         std::unique_ptr<TelemetryStream> juniper_tlm(
                 new TelemetryStream());
+        //GnmiJuniperTelemetryHeader
+        std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_header(
+                new GnmiJuniperTelemetryHeader());
         //GnmiJuniperTelemetryHeaderExtension
         std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_header_ext(
                 new GnmiJuniperTelemetryHeaderExtension());
-        std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_header(
-                new GnmiJuniperTelemetryHeader());
 
 
         // the key-word "this" is used as a unique TAG
@@ -430,7 +431,7 @@ void Srv::JuniperStream::Start()
         for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
             //std::cout << iter->registered_ext().msg() << "\n";
             //parsing_str = juniper_tlm_header_ext->ParseFromString(iter->registered_ext().msg());
-            parsing_str = juniper_tlm_header->ParseFromString(iter->val().any_val().value());
+            parsing_str = juniper_tlm_header_ext->ParseFromString(iter->val().any_val().value());
             if (parsing_str) {
                 //stream_data_in.clear();
                 //stream_data_in = iter->registered_ext().msg();
