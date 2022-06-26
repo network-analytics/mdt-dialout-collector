@@ -442,8 +442,8 @@ void Srv::JuniperStream::Start()
                 //                                        *juniper_tlm_ext,
                 //                                        &stream_data_in,
                 //                                        opt);
-                stream_data_out = stream_data_in;
-                std::cout << stream_data_out << "\n";
+                //stream_data_out = stream_data_in;
+                std::cout << stream_data_in << "\n";
             } else {
                 std::cout << "Parsing ERROR \n";
             }
