@@ -18,6 +18,7 @@
 #include "juniper_telemetry.pb.h"
 #include "juniper_gnmi.pb.h"
 #include "juniper_gnmi_ext.pb.h"
+#include "juniper_telemetry_header.pb.h"
 #include "juniper_telemetry_header_extension.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "huawei_telemetry.pb.h"
@@ -399,8 +400,8 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<TelemetryStream> juniper_tlm(
                 new TelemetryStream());
         //GnmiJuniperTelemetryHeaderExtension
-        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_ext(
-                new GnmiJuniperTelemetryHeaderExtension());
+        std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_ext(
+                new GnmiJuniperTelemetryHeader());
 
 
         // the key-word "this" is used as a unique TAG
