@@ -99,17 +99,21 @@ set(cisco_dialout_pb_grpc_cc
 set(cisco_dialout_pb_grpc_h
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco/cisco_dialout.grpc.pb.h")
 add_custom_command(
-    OUTPUT "${cisco_dialout_pb_cc}"
-            "${cisco_dialout_pb_h}"
-            "${cisco_dialout_pb_grpc_cc}"
-            "${cisco_dialout_pb_grpc_h}"
-    COMMAND ${_PROTOBUF_PROTOC}
-    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco"
+    OUTPUT
+    "${cisco_dialout_pb_cc}"
+    "${cisco_dialout_pb_h}"
+    "${cisco_dialout_pb_grpc_cc}"
+    "${cisco_dialout_pb_grpc_h}"
+    COMMAND
+    ${_PROTOBUF_PROTOC}
+    ARGS
+    -I "${cisco_dialout_proto_path}"
     --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco"
-        -I "${cisco_dialout_proto_path}"
-        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${cisco_dialout_proto}"
-    DEPENDS "${cisco_dialout_proto}"
+    "${cisco_dialout_proto}"
+    --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco"
+    --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+    DEPENDS
+    "${cisco_dialout_proto}"
 )
 
 # Protobuf generated "gRPC dial-out" - Juniper
@@ -164,34 +168,40 @@ set(huawei_dialout_pb_grpc_cc
 set(huawei_dialout_pb_grpc_h
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei/huawei_dialout.grpc.pb.h")
 add_custom_command(
-    OUTPUT "${huawei_dialout_pb_cc}"
-            "${huawei_dialout_pb_h}"
-            "${huawei_dialout_pb_grpc_cc}"
-            "${huawei_dialout_pb_grpc_h}"
-    COMMAND ${_PROTOBUF_PROTOC}
-    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei"
+    OUTPUT
+    "${huawei_dialout_pb_cc}"
+    "${huawei_dialout_pb_h}"
+    "${huawei_dialout_pb_grpc_cc}"
+    "${huawei_dialout_pb_grpc_h}"
+    COMMAND
+    ${_PROTOBUF_PROTOC}
+    ARGS
+    -I "${huawei_dialout_proto_path}"
     --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei"
-        -I "${huawei_dialout_proto_path}"
-        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${huawei_dialout_proto}"
-    DEPENDS "${huawei_dialout_proto}"
+    "${huawei_dialout_proto}"
+    --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei"
+    --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+    DEPENDS
+    "${huawei_dialout_proto}"
 )
 
 # Protobuf generated support "GPB-KV" encoding - Cisco
 set(cisco_telemetry_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco/cisco_telemetry.pb.cc")
 set(cisco_telemetry_pb_h
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco/cisco_telementry.pb.h")
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco/cisco_telemetry.pb.h")
 add_custom_command(
-    OUTPUT "${cisco_telemetry_pb_cc}"
-            "${cisco_telemetry_pb_h}"
-    COMMAND ${_PROTOBUF_PROTOC}
-    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco"
+    OUTPUT
+    "${cisco_telemetry_pb_cc}"
+    "${cisco_telemetry_pb_h}"
+    COMMAND
+    ${_PROTOBUF_PROTOC}
+    ARGS
+    -I "${cisco_telemetry_proto_path}"
     --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco"
-        -I "${cisco_telemetry_proto_path}"
-        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${cisco_telemetry_proto}"
-    DEPENDS "${cisco_telemetry_proto}"
+    "${cisco_telemetry_proto}"
+    DEPENDS
+    "${cisco_telemetry_proto}"
 )
 
 # Protobuf generated support "GPB-KV" encoding - Juniper
@@ -244,17 +254,19 @@ add_custom_command(
 set(huawei_telemetry_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei/huawei_telemetry.pb.cc")
 set(huawei_telemetry_pb_h
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei/huawei_telementry.pb.h")
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei/huawei_telemetry.pb.h")
 add_custom_command(
-    OUTPUT "${huawei_telemetry_pb_cc}"
-            "${huawei_telemetry_pb_h}"
-    COMMAND ${_PROTOBUF_PROTOC}
-    ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei"
+    OUTPUT
+    "${huawei_telemetry_pb_cc}"
+    "${huawei_telemetry_pb_h}"
+    COMMAND
+    ${_PROTOBUF_PROTOC}
+    ARGS
+    -I "${huawei_telemetry_proto_path}"
     --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei"
-        -I "${huawei_telemetry_proto_path}"
-        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${huawei_telemetry_proto}"
-    DEPENDS "${huawei_telemetry_proto}"
+    "${huawei_telemetry_proto}"
+    DEPENDS
+    "${huawei_telemetry_proto}"
 )
 
 # Include local header files
