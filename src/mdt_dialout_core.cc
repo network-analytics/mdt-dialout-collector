@@ -426,7 +426,7 @@ void Srv::JuniperStream::Start()
 
         for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
             //std::cout << iter->registered_ext().msg() << "\n";
-            parsing_str = juniper_tlm->ParseFromString(iter->registered_ext().msg());
+            parsing_str = juniper_tlm_ext->ParseFromString(iter->registered_ext().msg());
             stream_data_in.clear();
             stream_data_in = iter->registered_ext().msg();
 
