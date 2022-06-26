@@ -18,6 +18,7 @@
 #include "juniper_telemetry.pb.h"
 #include "gnmi.pb.h"
 #include "gnmi_ext.pb.h"
+#include "juniper_telemetry_header_extension.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "huawei_telemetry.pb.h"
 #include <google/protobuf/arena.h>
@@ -397,6 +398,10 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
         std::unique_ptr<TelemetryStream> juniper_tlm(
                 new TelemetryStream());
+        //GnmiJuniperTelemetryHeaderExtension
+        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_ext(
+                new GnmiJuniperTelemetryHeaderExtension());
+
 
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
@@ -428,7 +433,7 @@ void Srv::JuniperStream::Start()
             google::protobuf::util::JsonPrintOptions opt;
             opt.add_whitespace = true;
             google::protobuf::util::MessageToJsonString(
-                                                    *juniper_tlm,
+                                                    *juniper_tlm_ext,
                                                     &stream_data_in,
                                                     opt);
             stream_data_out = stream_data_in;
