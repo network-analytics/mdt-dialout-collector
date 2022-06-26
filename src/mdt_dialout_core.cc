@@ -16,6 +16,8 @@
 #include "cisco_telemetry.pb.h"
 #include "juniper_dialout.grpc.pb.h"
 #include "juniper_telemetry.pb.h"
+#include "gnmi.pb.h"
+#include "gnmi_ext.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "huawei_telemetry.pb.h"
 #include <google/protobuf/arena.h>
@@ -399,22 +401,42 @@ void Srv::JuniperStream::Start()
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
         // returns true for GPB-KV & GPB, false for JSON (from protobuf libs)
-        //parsing_str = juniper_tlm->ParseFromString(juniper_stream.update().alias().c_str());
-        
+        //parsing_str = juniper_tlm->ParseFromString(juniper_stream.update().update().data());
+
         //google::protobuf::util::JsonPrintOptions opt;
         //opt.add_whitespace = true;
         //google::protobuf::util::MessageToJsonString(
-        //                                            *juniper_stream.get,
+        //                                            *juniper_tlm,
         //                                            &stream_data_in,
         //                                            opt);
-        //std::cout << juniper_stream.extension().at(0).registered_ext() << std::endl;
-        //std::cout << juniper_stream.extension().Get().registered_ext().msg() << std::endl;
-        auto id = juniper_stream.extension().at(0).registered_ext().id();
-        std::cout << id << std::endl;
+        //std::cout << juniper_stream.update(). << std::endl;
+        //std::cout << juniper_stream.extension().at()).registered_ext().msg() << std::endl;
 
+        //for (auto const& data : &juniper_stream.update().update()) {
+        //    std::cout << data.val().any_val().value();
+        //}
+
+        //auto stream_data_in_ = juniper_stream.update().update();
+        auto stream_data_in_ = juniper_stream.extension();
+
+        for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
+            //std::cout << iter->registered_ext().msg() << "\n";
+            parsing_str = juniper_tlm->ParseFromString(iter->registered_ext().msg());
+            stream_data_in.clear();
+            stream_data_in = iter->registered_ext().msg();
+
+            google::protobuf::util::JsonPrintOptions opt;
+            opt.add_whitespace = true;
+            google::protobuf::util::MessageToJsonString(
+                                                    *juniper_tlm,
+                                                    &stream_data_in,
+                                                    opt);
+            stream_data_out = stream_data_in;
+            std::cout << stream_data_in << "\n";
+        }
 
         // handling empty data
-        if (stream_data_in.empty()) {
+        //if (stream_data_in.empty()) {
             // ---
             //auto type_info = typeid(stream_data_in).name();
             //std::cout << peer << " Juniper Handling empty data: " << type_info
@@ -469,11 +491,11 @@ void Srv::JuniperStream::Start()
 
         //// Handling JSON string
         //}
-        } else {
+        //} else {
             // ---
-            auto type_info = typeid(stream_data_in).name();
-            std::cout << peer << " JUNIPER Handling JSON string: " << type_info
-                                                                << std::endl;
+            //auto type_info = typeid(stream_data_in).name();
+            //std::cout << peer << " JUNIPER Handling JSON string: " << type_info
+            //                                                    << std::endl;
             // ---
 
             // Data enrichment with label (node_id/platform_id)
@@ -486,7 +508,7 @@ void Srv::JuniperStream::Start()
             //    stream_data_out = stream_data_in;
             //    data_delivery->async_kafka_producer(stream_data_out);
             //}
-        }
+        //}
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;

@@ -30,15 +30,15 @@ set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 get_filename_component(cisco_dialout_proto "proto/Cisco/cisco_dialout.proto" ABSOLUTE)
 get_filename_component(cisco_dialout_proto_path "${cisco_dialout_proto}" PATH)
 
-# Proto file gRPC dial-out - Juniper
+# Proto file gRPC dial-out / gnmi / gnmi extensions - Juniper
+get_filename_component(juniper_gnmi_dialout_proto "proto/Juniper/juniper_dialout.proto" ABSOLUTE)
+get_filename_component(juniper_gnmi_dialout_proto_path "${juniper_gnmi_dialout_proto}" PATH)
+
 get_filename_component(juniper_gnmi_proto "proto/Juniper/gnmi.proto" ABSOLUTE)
 get_filename_component(juniper_gnmi_proto_path "${juniper_gnmi_proto}" PATH)
 
 get_filename_component(juniper_gnmi_ext_proto "proto/Juniper/gnmi_ext.proto" ABSOLUTE)
 get_filename_component(juniper_gnmi_ext_proto_path "${juniper_gnmi_ext_proto}" PATH)
-
-get_filename_component(juniper_gnmi_dialout_proto "proto/Juniper/juniper_dialout.proto" ABSOLUTE)
-get_filename_component(juniper_gnmi_dialout_proto_path "${juniper_gnmi_dialout_proto}" PATH)
 
 # Proto file gRPC dial-out - Huawei
 get_filename_component(huawei_dialout_proto "proto/Huawei/huawei_dialout.proto" ABSOLUTE)
@@ -48,9 +48,15 @@ get_filename_component(huawei_dialout_proto_path "${huawei_dialout_proto}" PATH)
 get_filename_component(cisco_telemetry_proto "proto/Cisco/cisco_telemetry.proto" ABSOLUTE)
 get_filename_component(cisco_telemetry_proto_path "${cisco_telemetry_proto}" PATH)
 
-# Proto file to be able to decode gpb-kv messages - Juniper
+# Proto file to be able to decode gpb-kv messages - Telemetry / Telemetry Header / Telemetry Header Extensions - Juniper
 get_filename_component(juniper_telemetry_proto "proto/Juniper/juniper_telemetry.proto" ABSOLUTE)
 get_filename_component(juniper_telemetry_proto_path "${juniper_telemetry_proto}" PATH)
+
+get_filename_component(juniper_telemetry_header_proto "proto/Juniper/GnmiJuniperTelemetryHeader.proto" ABSOLUTE)
+get_filename_component(juniper_telemetry_header_proto_path "${juniper_telemetry_header_proto}" PATH)
+
+get_filename_component(juniper_telemetry_header_extension_proto "proto/Juniper/GnmiJuniperTelemetryHeaderExtension.proto" ABSOLUTE)
+get_filename_component(juniper_telementry_header_extension_proto_path "${juniper_telemetry_header_extension_proto}" PATH)
 
 # Proto file to be able to decode gpb-kv messages - Huawei
 get_filename_component(huawei_telemetry_proto "proto/Huawei/huawei_telemetry.proto" ABSOLUTE)
@@ -190,9 +196,21 @@ set(juniper_telemetry_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telemetry.pb.cc")
 set(juniper_telemetry_pb_h
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telementry.pb.h")
+set(juniper_telemetry_header_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telemetry_header.pb.cc")
+set(juniper_telemetry_header_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telementry_header.pb.h")
+set(juniper_telemetry_header_extension_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telemetry_header_extension.pb.cc")
+set(juniper_telemetry_header_extension_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_telementry_header_extension.pb.h")
 add_custom_command(
     OUTPUT "${juniper_telemetry_pb_cc}"
             "${juniper_telemetry_pb_h}"
+            "${juniper_telemetry_header_pb_cc}"
+            "${juniper_telemetry_header_pb_h}"
+            "${juniper_telemetry_header_extension_pb_cc}"
+            "${juniper_telemetry_header_extension_pb_h}"
     COMMAND ${_PROTOBUF_PROTOC}
     ARGS --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
     --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper"
@@ -245,6 +263,8 @@ foreach(_target "mdt_dialout_collector")
         ${juniper_gnmi_dialout_pb_cc}
         ${juniper_gnmi_dialout_pb_grpc_cc}
         ${juniper_telemetry_pb_cc}
+        ${juniper_telemetry_pb_header_cc}
+        ${juniper_telemetry_pb_header_extension_cc}
         ${huawei_dialout_pb_cc}
         ${huawei_dialout_pb_grpc_cc}
         ${huawei_telemetry_pb_cc}
