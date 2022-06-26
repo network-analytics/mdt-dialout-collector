@@ -429,7 +429,7 @@ void Srv::JuniperStream::Start()
         //auto stream_data_in_ = juniper_stream.extension();
 
         for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
-            std::cout << iter->val().json_val() << "\n";
+            std::cout << iter->DebugString() << "\n";
             //std::cout << iter->registered_ext().msg() << "\n";
             //parsing_str = juniper_tlm_header_ext->ParseFromString(iter->registered_ext().msg());
             //parsing_str = juniper_tlm->ParseFromString(iter->val().any_val().value());
