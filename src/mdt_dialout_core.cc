@@ -412,8 +412,11 @@ void Srv::JuniperStream::Start()
         
         for (const auto& r_ext : juniper_stream.extension()) {
             //std::cout << iter.registered_ext().msg() << "\n";
-            if (r_ext.registered_ext().id() == gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
-                parsing_str = juniper_tlm_header_ext->ParseFromString(r_ext.registered_ext().msg());
+            if (r_ext.has_registered_ext() and
+                r_ext.registered_ext().id() ==
+                    gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
+                parsing_str = juniper_tlm_header_ext->ParseFromString(
+                    r_ext.registered_ext().msg());
                 if (parsing_str) {
                     stream_data_in.clear();
                     google::protobuf::util::JsonPrintOptions opt;
@@ -423,7 +426,6 @@ void Srv::JuniperStream::Start()
                                                     &stream_data_in,
                                                     opt);
                     std::cout << stream_data_in << "\n";
-                    //std::cout << juniper_tlm_header_ext->streamed_path() << "\n";
                 } else {
                     std::cout << "Parsing ERROR - extension \n";
                 }
