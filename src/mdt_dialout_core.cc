@@ -454,14 +454,22 @@ void Srv::JuniperStream::Start()
         }
         
         int counter = 0;
+        std::string path_;
+        std::string val_;
         for (const auto& _jup : jupdate) {
             std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
             counter++;
             if (_jup.has_path()) {
                 for (const auto& _path : _jup.path().elem()) {
-                    std::cout << "PATH: " << _path.name() << "\n";
+                    path_ = _path.name();
                 }
             }
+            if(_jup.has_val()) {
+                for (const auto& _val : _jup.val().string_val()) {
+                    val_ = _val;                 
+                }
+            }
+            std::cout << path_  << ": " << val_ << "\n";
         }
         
         std::cout << "------- \n";
