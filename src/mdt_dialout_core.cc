@@ -465,7 +465,7 @@ void Srv::JuniperStream::Start()
                 }
             }
             if(_jup.has_val()) {
-                for (const auto& _val : _jup.val().json_val()) {
+                for (const auto& _val : _jup.val().json_val().data()) {
                     val_ = _val;                 
                 }
             }
