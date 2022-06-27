@@ -461,6 +461,7 @@ void Srv::JuniperStream::Start()
         
         std::cout << "------- \n";
         sleep(1);
+        jupdate.clear();
 
         //if (juniper_stream.has_update()) { 
         //    for (const auto& _update : juniper_stream.update().update()) {
