@@ -447,15 +447,30 @@ void Srv::JuniperStream::Start()
         //        std::cout << "Parsing ERROR - update \n";
         //    }
 
-        if (juniper_stream.has_update()) { 
-            for (const auto& _update : juniper_stream.update().update()) {
-                if (_update.has_path()) {
-                    for (const auto& _path : _update.path().elem()) { 
-                        std::cout << "PATH: " << _path.name() << "\n";
-                    }
-                }
-            }
+
+        int update_size = juniper_stream.update().update().size();
+
+        std::vector<gnmi::SubscribeResponse> jstream;
+
+        jstream.push_back(juniper_stream);
+        int counter = 0;
+
+        for (const auto& js : jstream) {
+            std::cout << counter << "-->" << js.update().update().size() << "\n";
+            counter++;
         }
+
+        //if (juniper_stream.has_update()) { 
+        //    for (const auto& _update : juniper_stream.update().update()) {
+        //        if (_update.has_path() and _update.IsInitialized()) {
+        //            for (const auto& _path : _update.path().elem()) {
+        //                if (_path.IsInitialized() and _path.name().empty) 
+        //                std::cout << "PATH: " << _path.name() << "\n";
+        //            }
+        //        }
+        //    }
+        //    juniper_stream.Clear();
+        //}
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
