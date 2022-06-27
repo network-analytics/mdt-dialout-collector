@@ -460,7 +460,10 @@ void Srv::JuniperStream::Start()
             std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
             counter++;
             if (_jup.has_path()) {
-                path_ = _jup.path().target();
+                for (const auto& _path : _jup.path().elem())
+                path_ = _path.name();
+            }
+            if (_jup.has_val()) {
                 val_ = _jup.val().json_val();
             }
             std::cout << path_  << ": " << val_ << "\n";
