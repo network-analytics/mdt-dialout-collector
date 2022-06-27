@@ -467,10 +467,10 @@ void Srv::JuniperStream::Start()
                 val_ = _jup.val().json_val();
             }
             std::cout << path_  << ": " << val_ << "\n";
+            sleep(10);
         }
         
         std::cout << "------- \n";
-        sleep(10);
         jupdate.clear();
 
         //if (juniper_stream.has_update()) { 
