@@ -433,7 +433,35 @@ void Srv::JuniperStream::Start()
         //google::protobuf::Message *juniper_msg; 
         for (const auto& updt : juniper_stream.update().update()) {
             for (const auto& leaf : updt.val().leaflist_val().element()) {
-                std::cout << leaf.json_val() << "\n";
+                if (leaf.has_any_val()) {
+                    std::cout << "has_any_val\n";
+                } else if (leaf.has_ascii_val()) {
+                    std::cout << "has_ascii_val\n";
+                } else if (leaf.has_bool_val()) {
+                    std::cout << "has_bool_val\n";
+                } else if (leaf.has_bytes_val()) {
+                    std::cout << "has_bytes_val\n";
+                } else if (leaf.has_decimal_val()) {
+                    std::cout << "has_decimal_val\n";
+                } else if (leaf.has_float_val()) {
+                    std::cout << "has_float_val\n";
+                } else if (leaf.has_int_val()) {
+                    std::cout << "has_int_val\n";
+                } else if (leaf.has_json_ietf_val()) {
+                    std::cout << "has_json_val\n";
+                } else if (leaf.has_any_val()) {
+                    std::cout << "has_any_val\n";
+                } else if (leaf.has_leaflist_val()) {
+                    std::cout << "has_leaflist_val\n";
+                } else if (leaf.has_proto_bytes()) {
+                    std::cout << "has_proto_val\n";
+                } else if (leaf.has_string_val()) {
+                    std::cout << "has_string_val\n";
+                } else if (leaf.has_uint_val()) {
+                    std::cout << "has_unit_val\n";
+                } else {
+                    std::cout << "unknown data type" << "\n";
+                }
         //    std::cout << updt.val().any_val() << "\n";
         //    updt.val().any_val().UnpackTo(&juniper_msg);
         //    if (parsing_str) {
