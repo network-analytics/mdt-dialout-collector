@@ -429,22 +429,26 @@ void Srv::JuniperStream::Start()
                 }
             }
         }
-        
+
+        //google::protobuf::Message *juniper_msg; 
         for (const auto& updt : juniper_stream.update().update()) {
-            //std::cout << updt.val().any_val() << "\n";
-            parsing_str = juniper_tlm->ParseFromString(updt.val().proto_bytes());
-            if (parsing_str) {
-                stream_data_in.clear();
-                google::protobuf::util::JsonPrintOptions opt;
-                opt.add_whitespace = true;
-                google::protobuf::util::MessageToJsonString(
-                                                *juniper_tlm,
-                                                &stream_data_in,
-                                                opt);
-                std::cout << stream_data_in << "\n";
-                //std::cout << juniper_tlm_header_ext->streamed_path() << "\n";
-            } else {
-                std::cout << "Parsing ERROR - update \n";
+            for (const auto& leaf : updt.val().leaflist_val().element()) {
+                std::cout << leaf.json_val() << "\n";
+        //    std::cout << updt.val().any_val() << "\n";
+        //    updt.val().any_val().UnpackTo(&juniper_msg);
+        //    if (parsing_str) {
+        //        stream_data_in.clear();
+        //        google::protobuf::util::JsonPrintOptions opt;
+        //        opt.add_whitespace = true;
+        //        google::protobuf::util::MessageToJsonString(
+        //                                        *juniper_msg,
+        //                                        &stream_data_in,
+        //                                        opt);
+        //        std::cout << stream_data_in << "\n";
+        //        //std::cout << juniper_tlm_header_ext->streamed_path() << "\n";
+        //    } else {
+        //        std::cout << "Parsing ERROR - update \n";
+        //    }
             }
         }
     } else {
