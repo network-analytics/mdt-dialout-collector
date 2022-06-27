@@ -387,7 +387,7 @@ void Srv::JuniperStream::Start()
                                         this);
         juniper_stream_status = FLOW;
     } else if (juniper_stream_status == FLOW) {
-        bool parsing_str;
+        //bool parsing_str;
         // From the network
         std::string stream_data_in;
         // After data enrichment
@@ -447,20 +447,20 @@ void Srv::JuniperStream::Start()
         //        std::cout << "Parsing ERROR - update \n";
         //    }
 
-        std::vector<gnmi::Update> jstream;
+        std::vector<gnmi::Update> jupdate;
 
-
-        for (auto& n : juniper_stream.update().update()) {            
-            jstream.push_back(n);
+        for (auto& jup : juniper_stream.update().update()) {            
+            jupdate.push_back(jup);
         }
         
         int counter = 0;
-        for (const auto& js : jstream) {
-            std::cout << counter << "-->" << js.ByteSizeLong() << "\n";
+        for (const auto& jup_size : jupdate) {
+            std::cout << counter << "-->" << jup_size.ByteSizeLong() << "\n";
             counter++;
         }
         
-        std::cout << " ------- \n";
+        std::cout << "------- \n";
+        sleep(1);
 
         //if (juniper_stream.has_update()) { 
         //    for (const auto& _update : juniper_stream.update().update()) {
