@@ -467,23 +467,11 @@ void Srv::JuniperStream::Start()
                 val_ = _jup.val().json_val();
             }
             std::cout << path_  << ": " << val_ << "\n";
-            sleep(10);
         }
         
         std::cout << "------- \n";
         jupdate.clear();
-
-        //if (juniper_stream.has_update()) { 
-        //    for (const auto& _update : juniper_stream.update().update()) {
-        //        if (_update.has_path() and _update.IsInitialized()) {
-        //            for (const auto& _path : _update.path().elem()) {
-        //                if (_path.IsInitialized() and _path.name().empty) 
-        //                std::cout << "PATH: " << _path.name() << "\n";
-        //            }
-        //        }
-        //    }
-        //    juniper_stream.Clear();
-        //}
+        sleep(10);
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
