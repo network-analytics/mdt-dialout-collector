@@ -410,27 +410,27 @@ void Srv::JuniperStream::Start()
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
         
-        for (const auto& r_ext : juniper_stream.extension()) {
-            //std::cout << iter.registered_ext().msg() << "\n";
-            if (r_ext.has_registered_ext() and
-                r_ext.registered_ext().id() ==
-                    gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
-                parsing_str = juniper_tlm_header_ext->ParseFromString(
-                    r_ext.registered_ext().msg());
-                if (parsing_str) {
-                    stream_data_in.clear();
-                    google::protobuf::util::JsonPrintOptions opt;
-                    opt.add_whitespace = true;
-                    google::protobuf::util::MessageToJsonString(
-                                                    *juniper_tlm_header_ext,
-                                                    &stream_data_in,
-                                                    opt);
-                    std::cout << stream_data_in << "\n";
-                } else {
-                    std::cout << "Parsing ERROR - extension \n";
-                }
-            }
-        }
+        //for (const auto& r_ext : juniper_stream.extension()) {
+        //    //std::cout << iter.registered_ext().msg() << "\n";
+        //    if (r_ext.has_registered_ext() and
+        //        r_ext.registered_ext().id() ==
+        //            gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
+        //        parsing_str = juniper_tlm_header_ext->ParseFromString(
+        //            r_ext.registered_ext().msg());
+        //        if (parsing_str) {
+        //            stream_data_in.clear();
+        //            google::protobuf::util::JsonPrintOptions opt;
+        //            opt.add_whitespace = true;
+        //            google::protobuf::util::MessageToJsonString(
+        //                                            *juniper_tlm_header_ext,
+        //                                            &stream_data_in,
+        //                                            opt);
+        //            std::cout << stream_data_in << "\n";
+        //        } else {
+        //            std::cout << "Parsing ERROR - extension \n";
+        //        }
+        //    }
+        //}
         //    std::cout << updt.val().any_val() << "\n";
         //    updt.val().any_val().UnpackTo(&juniper_msg);
         //    if (parsing_str) {
@@ -446,9 +446,6 @@ void Srv::JuniperStream::Start()
         //    } else {
         //        std::cout << "Parsing ERROR - update \n";
         //    }
-
-
-        int update_size = juniper_stream.update().update().size();
 
         std::vector<gnmi::SubscribeResponse> jstream;
 
