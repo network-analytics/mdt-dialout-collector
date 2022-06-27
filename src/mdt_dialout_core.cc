@@ -462,11 +462,7 @@ void Srv::JuniperStream::Start()
             if (_jup.has_path()) {
                 for (const auto& _path : _jup.path().elem()) {
                     path_ = _path.name();
-                }
-            }
-            if(_jup.has_val()) {
-                for (const auto& _val : _jup.val().json_val().c_str()) {
-                    val_ = _val;                 
+                    val_ = _path.key().at(path_);
                 }
             }
             std::cout << path_  << ": " << val_ << "\n";
