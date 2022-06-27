@@ -433,7 +433,7 @@ void Srv::JuniperStream::Start()
             //std::cout << stream_data_in_size_ << "\n";
             //for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
         for (const auto& iter : juniper_stream.extension()) {
-            std::cout << iter.registered_ext().msg() << "\n";
+            //std::cout << iter.registered_ext().msg() << "\n";
             if (iter.registered_ext().id() == gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
                 parsing_str = juniper_tlm_header_ext->ParseFromString(iter.registered_ext().msg());
                 if (parsing_str) {
