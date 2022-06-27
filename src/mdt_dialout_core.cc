@@ -437,14 +437,14 @@ void Srv::JuniperStream::Start()
             if (iter.registered_ext().id() == gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
                 parsing_str = juniper_tlm_header_ext->ParseFromString(iter.registered_ext().msg());
                 if (parsing_str) {
-                    //google::protobuf::util::JsonPrintOptions opt;
-                    //opt.add_whitespace = true;
-                    //google::protobuf::util::MessageToJsonString(
-                    //                                *juniper_tlm_header_ext,
-                    //                                &stream_data_in,
-                    //                                opt);
-                    //std::cout << stream_data_in << "\n";
-                    std::cout << juniper_tlm_header_ext->streamed_path() << "\n";
+                    google::protobuf::util::JsonPrintOptions opt;
+                    opt.add_whitespace = true;
+                    google::protobuf::util::MessageToJsonString(
+                                                    *juniper_tlm_header_ext,
+                                                    &stream_data_in,
+                                                    opt);
+                    std::cout << stream_data_in << "\n";
+                    //std::cout << juniper_tlm_header_ext->streamed_path() << "\n";
                 } else {
                     std::cout << "Parsing ERROR \n";
                 }
