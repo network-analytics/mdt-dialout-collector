@@ -470,7 +470,7 @@ void Srv::JuniperStream::Start()
         }
         
         std::cout << "------- \n";
-        sleep(5);
+        sleep(10);
         jupdate.clear();
 
         //if (juniper_stream.has_update()) { 
