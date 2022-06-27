@@ -449,18 +449,17 @@ void Srv::JuniperStream::Start()
 
         std::vector<gnmi::Update> jupdate;
 
-        for (auto& jup : juniper_stream.update().update()) {            
+        for (const auto& jup : juniper_stream.update().update()) {            
             jupdate.push_back(jup);
         }
         
         int counter = 0;
-        for (const auto& jup_size : jupdate) {
-            std::cout << counter << "-->" << jup_size.ByteSizeLong() << "\n";
+        for (const auto& _jup : jupdate) {
+            std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
             counter++;
         }
         
         std::cout << "------- \n";
-        sleep(1);
         jupdate.clear();
 
         //if (juniper_stream.has_update()) { 
