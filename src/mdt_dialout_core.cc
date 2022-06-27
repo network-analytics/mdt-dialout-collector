@@ -425,15 +425,27 @@ void Srv::JuniperStream::Start()
         //    std::cout << data.val().any_val().value();
         //}
 
-        if (juniper_stream.has_update()) {
-            auto stream_data_in_ = juniper_stream.update().update();
+        //if (juniper_stream.has_update()) {
+            //auto stream_data_in_ = juniper_stream.update().update();
             //auto stream_data_in_ = juniper_stream.extension();
 
             //int stream_data_in_size_ = stream_data_in_.Capacity();
             //std::cout << stream_data_in_size_ << "\n";
             //for (auto iter = stream_data_in_.begin(); iter < stream_data_in_.end() and !stream_data_in_.empty(); iter++) {
-            for (auto& iter : stream_data_in_) {
-                std::cout << iter.DebugString().c_str() << "\n";
+            for (const auto& iter : juniper_stream.extension()) {
+                std::cout << iter.registered_ext().msg() << "\n";
+                parsing_str = juniper_tlm_header_ext->ParseFromString(iter.registered_ext().msg());
+                if (parsing_str) {
+                    google::protobuf::util::JsonPrintOptions opt;
+                    opt.add_whitespace = true;
+                    google::protobuf::util::MessageToJsonString(
+                                                        *juniper_tlm_header_ext,
+                                                        &stream_data_in,
+                                                        opt);
+                    std::cout << stream_data_in << "\n";
+                } else {
+                    std::cout << "Parsing ERROR \n";
+                }
             //std::cout << iter->registered_ext().msg() << "\n";
             //parsing_str = juniper_tlm_header_ext->ParseFromString(iter->registered_ext().msg());
             //parsing_str = juniper_tlm->ParseFromString(iter->val().any_val().value());
@@ -454,7 +466,7 @@ void Srv::JuniperStream::Start()
             //    std::cout << "Parsing ERROR \n";
             //}
             }
-        }
+        //}
 
         // handling empty data
         //if (stream_data_in.empty()) {
