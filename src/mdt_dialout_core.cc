@@ -447,13 +447,16 @@ void Srv::JuniperStream::Start()
         //        std::cout << "Parsing ERROR - update \n";
         //    }
 
-        std::vector<gnmi::Notification> jstream;
+        std::vector<gnmi::Update> jstream;
 
-        jstream.push_back(juniper_stream.update());
+
+        for (auto& n : juniper_stream.update().update()) {            
+            jstream.push_back(n);
+        }
+        
         int counter = 0;
-
         for (const auto& js : jstream) {
-            std::cout << counter << "-->" << js.update().size() << "\n";
+            std::cout << counter << "-->" << js.ByteSizeLong() << "\n";
             counter++;
         }
         
