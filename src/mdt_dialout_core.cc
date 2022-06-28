@@ -466,7 +466,7 @@ void Srv::JuniperStream::Start()
             if (_jup.has_val()) {
                 val_ = _jup.val().json_val();
             }
-            std::cout << path_  << ": " << val_ << "\n";
+            std::cout << peer << "-->" << path_  << ": " << val_ << "\n";
         }
         
         std::cout << "------- \n";
