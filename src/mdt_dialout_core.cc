@@ -430,22 +430,23 @@ void Srv::JuniperStream::Start()
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
 
         const auto& _jup = juniper_stream.update();
-    
-        int counter = 0;
-        std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
-        counter++;
-        if (_jup.has_prefix()) {
-            //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
-            //std::cout << "Target: " << _jup.update().prefix().target() << "\n";
-            for (const auto& _path : _jup.prefix().elem()) {
-                for (const auto& map : _path.key()) {
-                    std::cout << map.first << "--->" << map.second << "\n";
+
+        if (_jup.atomic()) {
+            int counter = 0;
+            std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
+            counter++;
+            if (_jup.has_prefix()) {
+                //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
+                //std::cout << "Target: " << _jup.update().prefix().target() << "\n";
+                for (const auto& _path : _jup.prefix().elem()) {
+                    for (const auto& map : _path.key()) {
+                        std::cout << map.first << "--->" << map.second << "\n";
+                    }
+                    counter++;
                 }
-                counter++;
             }
-           
         }
-        
+
         std::cout << "------- \n";
         //sleep(10);
 
