@@ -441,6 +441,7 @@ void Srv::JuniperStream::Start()
         //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
+        /*
         const auto& jup = juniper_stream.update();
 
         std::cout << "-------> " << jup.ByteSizeLong() << "\n";
@@ -457,6 +458,7 @@ void Srv::JuniperStream::Start()
 
         std::cout << "-------> \n";
         //sleep(10);
+        */
 
         //SubscribeResponse
         //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
@@ -475,21 +477,20 @@ void Srv::JuniperStream::Start()
         std::string key;
         std::string value;
         int path_idx = 0;
-        std::cout << "-------> " << jup.ByteSizeLong() << "\n";
+        std::cout << "-------> " << _jup.ByteSizeLong() << "\n";
         for (const auto& __jup : _jup.update()) {
-            //value = __jup.val().json_val();
+            value = __jup.val().json_val();
             //std::cout << "DebugString: " << __jup.path().Utf8DebugString() << "\n";
             //std::cout << "elem_size(): " << __jup.path().elem_size() << "\n";
 
-            for (const auto& _elem : __jup.path().elem()) {
+            //for (const auto& _elem : __jup.path().elem()) {
                 while (path_idx < __jup.path().elem_size()) {
-                    std::cout << _elem.name().at(path_idx) << " ---> ";
+                    std::cout << __jup.path().elem().at(path_idx).name() << " ---> ";
                     path_idx++;
                 }
                 //std::cout << "Path: " << _elem.name() << "\n";
-                value = _elem.key().contains(_elem.name());
                 std::cout << value << "\n";
-            }
+            //}
             //std::cout << "Origin: " << __jup.path().origin() << "\n";
             //std::cout << "Target: " << __jup.path().target() << "\n";
 
