@@ -474,18 +474,21 @@ void Srv::JuniperStream::Start()
 
         std::string key;
         std::string value;
+        int path_idx = 0;
         std::cout << "-------> " << jup.ByteSizeLong() << "\n";
         for (const auto& __jup : _jup.update()) {
             //value = __jup.val().json_val();
-            std::cout << "DebugString: " << __jup.path().Utf8DebugString() << "\n";
-            int _counter  = 0;
-            std::cout << "elem_size(): " << __jup.path().elem_size() << "\n";
+            //std::cout << "DebugString: " << __jup.path().Utf8DebugString() << "\n";
+            //std::cout << "elem_size(): " << __jup.path().elem_size() << "\n";
 
             for (const auto& _elem : __jup.path().elem()) {
+                while (path_idx < __jup.path().elem_size()) {
+                    std::cout << _elem.name().at(path_idx) << " ---> ";
+                    path_idx++;
+                }
                 //std::cout << "Path: " << _elem.name() << "\n";
-                key = _elem.name();
                 value = _elem.key().contains(_elem.name());
-                _counter++;
+                std::cout << value << "\n";
             }
             //std::cout << "Origin: " << __jup.path().origin() << "\n";
             //std::cout << "Target: " << __jup.path().target() << "\n";
