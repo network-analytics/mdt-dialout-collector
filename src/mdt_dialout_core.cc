@@ -479,6 +479,8 @@ void Srv::JuniperStream::Start()
             //value = __jup.val().json_val();
             std::cout << "DebugString: " << __jup.path().Utf8DebugString() << "\n";
             int _counter  = 0;
+            std::cout << "elem_size(): " << __jup.path().elem_size() << "\n";
+
             for (const auto& _elem : __jup.path().elem()) {
                 //std::cout << "Path: " << _elem.name() << "\n";
                 key = _elem.name();
