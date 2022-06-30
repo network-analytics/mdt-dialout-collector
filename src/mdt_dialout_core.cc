@@ -431,7 +431,7 @@ void Srv::JuniperStream::Start()
 
         const auto& _jup = juniper_stream.update();
 
-        if (_jup.atomic()) {
+        if (_jup.atomic() != 0) {
             int counter = 0;
             std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
             counter++;
