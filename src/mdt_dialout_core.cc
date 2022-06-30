@@ -419,7 +419,27 @@ void Srv::JuniperStream::Start()
         //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
+        const auto& jup = juniper_stream.update();
 
+        int counter = 0;
+        std::cout << counter << "-->" << jup.ByteSizeLong() << "\n";
+        if (jup.has_prefix()) {
+            //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
+            //std::cout << "Target: " << _jup.prefix().target() << "\n";
+            for (const auto& elem : jup.prefix().elem()) {
+                for (const auto& map : elem.key()) {
+                    std::cout << map.first << "--->" << map.second << "\n";
+                }
+                counter++;
+            }
+        }
+
+        std::cout << "------- \n";
+        //sleep(10);
+
+        //SubscribeResponse
+        //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
+        //---> Notification update = 1;                                 Changed or sampled value for a path.
         //     ---> (repeated) Update update = 4;
         //          ---> TypedValue val = 3;                            The explicitly typed update value.
         //          ---> Path path = 1;                                 The path (key) for the update.
@@ -428,27 +448,22 @@ void Srv::JuniperStream::Start()
         //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
-
         const auto& _jup = juniper_stream.update();
 
-        if (_jup.atomic() != 0) {
-            int counter = 0;
-            std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
-            counter++;
-            if (_jup.has_prefix()) {
-                //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
-                //std::cout << "Target: " << _jup.update().prefix().target() << "\n";
-                for (const auto& _path : _jup.prefix().elem()) {
-                    for (const auto& map : _path.key()) {
-                        std::cout << map.first << "--->" << map.second << "\n";
+        int _counter = 0;
+        std::cout << _counter << "-->" << _jup.ByteSizeLong() << "\n";
+        for (const auto& __jup : _jup.update()) {
+            if (__jup.has_path()) {
+                std::cout << "Origin: " << __jup.path().origin() << "\n";
+                std::cout << "Target: " << __jup.path().target() << "\n";
+                for (const auto& _elem : __jup.path().elem()) {
+                    for (const auto& _map : _elem.key()) {
+                        std::cout << _map.first << "--->" << _map.second << "\n";
                     }
-                    counter++;
+                    _counter++;
                 }
             }
         }
-
-        std::cout << "------- \n";
-        //sleep(10);
 
         //for (const auto& r_ext : juniper_stream.extension()) {
         //    //std::cout << iter.registered_ext().msg() << "\n";
