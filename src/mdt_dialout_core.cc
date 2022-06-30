@@ -408,7 +408,7 @@ void Srv::JuniperStream::Start()
 
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
-        
+
         //for (const auto& r_ext : juniper_stream.extension()) {
         //    //std::cout << iter.registered_ext().msg() << "\n";
         //    if (r_ext.has_registered_ext() and
@@ -430,7 +430,7 @@ void Srv::JuniperStream::Start()
         //        }
         //    }
         //}
-        
+
         //SubscribeResponse
         //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
         //---> Notification update = 1;                                 Changed or sampled value for a path.
