@@ -445,7 +445,10 @@ void Srv::JuniperStream::Start()
             std::cout << "Target: " << _jup.prefix().target() << "\n";
             for (const auto& _path : _jup.prefix().elem()) {
                 std::cout << "Name: " << _path.name() << "\n";
-                std::cout << "Value: " << _path.key().at(_path.name()) << "\n";
+                //std::cout << "Value: " << _path.key().at(_path.name()) << "\n";
+                for (const auto& map : _path.key()) {
+                    std::cout << "Name: " << map.first << "Value: " << map.second << "\n";
+                }
             }
         }
         
