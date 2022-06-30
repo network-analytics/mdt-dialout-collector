@@ -476,12 +476,12 @@ void Srv::JuniperStream::Start()
 
         //std::string key;
         std::string value;
-        int path_idx = 0;
         std::cout << "-------> " << _jup.ByteSizeLong() << "\n\n";
         for (const auto& __jup : _jup.update()) {
             //std::cout << "DebugString: " << __jup.path().Utf8DebugString() << "\n";
             //std::cout << "elem_size(): " << __jup.path().elem_size() << "\n";
 
+            int path_idx = 0;
             //for (const auto& _elem : __jup.path().elem()) {
                 while (path_idx < __jup.path().elem_size()) {
                     std::cout << __jup.path().elem().at(path_idx).name() << " ---> ";
