@@ -408,72 +408,7 @@ void Srv::JuniperStream::Start()
 
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
-
-        //SubscribeResponse
-        //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
-        //---> Notification update = 1;                                 Changed or sampled value for a path.
-        //     ---> (        ) bool atomic = 6;
-        //     ---> (        ) Path prefix = 2;
-        //          ---> (        ) string origin = 2;                  Label to disambiguate path.
-        //          ---> (        ) string target = 4;                  The name of the target
-        //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
-        //                          ---> string name = 1;               The name of the element in the path.
-        //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
-        /*
-        const auto& jup = juniper_stream.update();
-
-        int counter = 0;
-        std::cout << counter << "-->" << jup.ByteSizeLong() << "\n";
-        if (jup.has_prefix()) {
-            //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
-            //std::cout << "Target: " << _jup.prefix().target() << "\n";
-            for (const auto& elem : jup.prefix().elem()) {
-                for (const auto& map : elem.key()) {
-                    std::cout << map.first << "--->" << map.second << "\n";
-                }
-                counter++;
-            }
-        }
-
-        std::cout << "------- \n";
-        //sleep(10);
-        */
-
-        //SubscribeResponse
-        //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
-        //---> Notification update = 1;                                 Changed or sampled value for a path.
-        //     ---> (repeated) Update update = 4;
-        //          ---> TypedValue val = 3;                            The explicitly typed update value.
-        //          ---> Path path = 1;                                 The path (key) for the update.
-        //          ---> (        ) string origin = 2;                  Label to disambiguate path.
-        //          ---> (        ) string target = 4;                  The name of the target
-        //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
-        //                          ---> string name = 1;               The name of the element in the path.
-        //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
-        const auto& _jup = juniper_stream.update();
-
-        int _counter = 0;
-        std::string path;
-        std::string value;
-        std::cout << _counter << "-->" << _jup.ByteSizeLong() << "\n";
-        for (const auto& __jup : _jup.update()) {
-            value = __jup.val().json_val();
-            //for (const auto& _elem : __jup.path().elem()) {
-            //    //std::cout << "Path: " << _elem.name() << "\n";
-            //    path = _elem.name();
-            //    _counter++;
-            //}
-            //std::cout << "Origin: " << __jup.path().origin() << "\n";
-            //std::cout << "Target: " << __jup.path().target() << "\n";
-
-            //std::cout << "Val: " << __jup.val().json_val() << "\n";
-            std::cout << "Path" << "--->" << value << "\n";
-            _counter++;
-        }
-
-        std::cout << "------- \n";
-        //sleep(10);
-
+        
         //for (const auto& r_ext : juniper_stream.extension()) {
         //    //std::cout << iter.registered_ext().msg() << "\n";
         //    if (r_ext.has_registered_ext() and
@@ -495,21 +430,69 @@ void Srv::JuniperStream::Start()
         //        }
         //    }
         //}
-        //    std::cout << updt.val().any_val() << "\n";
-        //    updt.val().any_val().UnpackTo(&juniper_msg);
-        //    if (parsing_str) {
-        //        stream_data_in.clear();
-        //        google::protobuf::util::JsonPrintOptions opt;
-        //        opt.add_whitespace = true;
-        //        google::protobuf::util::MessageToJsonString(
-        //                                        *juniper_msg,
-        //                                        &stream_data_in,
-        //                                        opt);
-        //        std::cout << stream_data_in << "\n";
-        //        //std::cout << juniper_tlm_header_ext->streamed_path() << "\n";
-        //    } else {
-        //        std::cout << "Parsing ERROR - update \n";
-        //    }
+        
+        //SubscribeResponse
+        //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
+        //---> Notification update = 1;                                 Changed or sampled value for a path.
+        //     ---> (        ) bool atomic = 6;
+        //     ---> (        ) Path prefix = 2;
+        //          ---> (        ) string origin = 2;                  Label to disambiguate path.
+        //          ---> (        ) string target = 4;                  The name of the target
+        //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
+        //                          ---> string name = 1;               The name of the element in the path.
+        //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
+        /*
+        const auto& jup = juniper_stream.update();
+
+        std::cout << counter << "-->" << jup.ByteSizeLong() << "\n";
+        if (jup.has_prefix()) {
+            //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
+            //std::cout << "Target: " << _jup.prefix().target() << "\n";
+            for (const auto& elem : jup.prefix().elem()) {
+                for (const auto& map : elem.key()) {
+                    std::cout << map.first << "--->" << map.second << "\n";
+                }
+            }
+        }
+
+        std::cout << "------- \n";
+        //sleep(10);
+        */
+
+        //SubscribeResponse
+        //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
+        //---> Notification update = 1;                                 Changed or sampled value for a path.
+        //     ---> (repeated) Update update = 4;
+        //          ---> TypedValue val = 3;                            The explicitly typed update value.
+        //          ---> Path path = 1;                                 The path (key) for the update.
+        //          ---> (        ) string origin = 2;                  Label to disambiguate path.
+        //          ---> (        ) string target = 4;                  The name of the target
+        //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
+        //                          ---> string name = 1;               The name of the element in the path.
+        //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
+        const auto& _jup = juniper_stream.update();
+
+        std::string path;
+        std::string value;
+        std::cout << _jup.ByteSizeLong() << "\n";
+        for (const auto& __jup : _jup.update()) {
+            value = __jup.val().json_val();
+            std::cout << "DebugString: " << __jup.path().DebugString() << "\n";
+            //int _counter  = 0;
+            //for (const auto& _elem : __jup.path().elem()) {
+            //    //std::cout << "Path: " << _elem.name() << "\n";
+            //    path = _elem.name();
+            //    _counter++;
+            //}
+            //std::cout << "Origin: " << __jup.path().origin() << "\n";
+            //std::cout << "Target: " << __jup.path().target() << "\n";
+
+            //std::cout << "Val: " << __jup.val().json_val() << "\n";
+            //std::cout << "Path" << "--->" << value << "\n";
+        }
+
+        std::cout << "------- \n";
+        //sleep(10);
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
