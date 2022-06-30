@@ -435,16 +435,16 @@ void Srv::JuniperStream::Start()
         //    jupdate.push_back(jup);
         //}
         
-        const auto& _jup = juniper_stream.update();
+        //const auto& _jup = juniper_stream.update();
     
         int counter = 0;
-        std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
+        std::cout << counter << "-->" << juniper_stream.update().ByteSizeLong() << "\n";
         counter++;
-        if (_jup.has_prefix()) {
-            std::cout << "Origin: " << _jup.prefix().origin() << "\n";
-            std::cout << "Target: " << _jup.prefix().target() << "\n";
-            for (const auto& _path : _jup.prefix().elem()) {
-                std::cout << "Name: " << _path.name() << "\n";
+        if (juniper_stream.update().has_prefix()) {
+            std::cout << "Origin: " << juniper_stream.update().prefix().origin() << "\n";
+            std::cout << "Target: " << juniper_stream.update().prefix().target() << "\n";
+            for (const auto& _path : juniper_stream.update().prefix().elem()) {
+                //std::cout << "Name: " << _path.name() << "\n";
                 //std::cout << "Value: " << _path.key().at(_path.name()) << "\n";
                 for (const auto& map : _path.key()) {
                     std::cout << "Name: " << map.first << "Value: " << map.second << "\n";
