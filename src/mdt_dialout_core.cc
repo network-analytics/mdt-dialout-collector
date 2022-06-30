@@ -443,19 +443,19 @@ void Srv::JuniperStream::Start()
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
         const auto& jup = juniper_stream.update();
 
-        std::cout << "-------" << jup.ByteSizeLong() << "\n";
+        std::cout << "-------> " << jup.ByteSizeLong() << "\n";
         if (jup.has_prefix()) {
             //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
             //std::cout << "Target: " << _jup.prefix().target() << "\n";
             std::cout << "DebugString: " << jup.prefix().DebugString() << "\n";
-            for (const auto& elem : jup.prefix().elem()) {
-                for (const auto& map : elem.key()) {
-                    std::cout << map.first << "--->" << map.second << "\n";
-                }
-            }
+            //for (const auto& elem : jup.prefix().elem()) {
+            //    for (const auto& map : elem.key()) {
+            //        std::cout << map.first << "--->" << map.second << "\n";
+            //    }
+            //}
         }
 
-        std::cout << "------- \n";
+        std::cout << "-------> \n";
         //sleep(10);
 
         //SubscribeResponse
@@ -469,14 +469,14 @@ void Srv::JuniperStream::Start()
         //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
-        /*
+
         const auto& _jup = juniper_stream.update();
 
-        std::string path;
-        std::string value;
-        std::cout << "-------" << jup.ByteSizeLong() << "\n";
+        //std::string path;
+        //std::string value;
+        std::cout << "-------> " << jup.ByteSizeLong() << "\n";
         for (const auto& __jup : _jup.update()) {
-            value = __jup.val().json_val();
+            //value = __jup.val().json_val();
             std::cout << "DebugString: " << __jup.path().DebugString() << "\n";
             //int _counter  = 0;
             //for (const auto& _elem : __jup.path().elem()) {
@@ -491,9 +491,8 @@ void Srv::JuniperStream::Start()
             //std::cout << "Path" << "--->" << value << "\n";
         }
 
-        std::cout << "------- \n";
+        std::cout << "-------> \n";
         //sleep(10);
-        */
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
