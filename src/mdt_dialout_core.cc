@@ -474,12 +474,11 @@ void Srv::JuniperStream::Start()
 
         const auto& _jup = juniper_stream.update();
 
-        std::string key;
+        //std::string key;
         std::string value;
         int path_idx = 0;
-        std::cout << "-------> " << _jup.ByteSizeLong() << "\n";
+        std::cout << "-------> " << _jup.ByteSizeLong() << "\n\n";
         for (const auto& __jup : _jup.update()) {
-            value = __jup.val().json_val();
             //std::cout << "DebugString: " << __jup.path().Utf8DebugString() << "\n";
             //std::cout << "elem_size(): " << __jup.path().elem_size() << "\n";
 
@@ -489,16 +488,17 @@ void Srv::JuniperStream::Start()
                     path_idx++;
                 }
                 //std::cout << "Path: " << _elem.name() << "\n";
+                value = __jup.val().json_val();
                 std::cout << value << "\n";
             //}
             //std::cout << "Origin: " << __jup.path().origin() << "\n";
             //std::cout << "Target: " << __jup.path().target() << "\n";
 
             //std::cout << "Val: " << __jup.val().json_val() << "\n";
-            std::cout << key << "--->" << value << "\n";
+            //std::cout << key << "--->" << value << "\n";
         }
 
-        std::cout << "-------> \n";
+        std::cout << "-------> \n\n";
         //sleep(10);
     } else {
         GPR_ASSERT(juniper_stream_status == END);
