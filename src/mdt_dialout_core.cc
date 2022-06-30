@@ -447,7 +447,7 @@ void Srv::JuniperStream::Start()
         if (jup.has_prefix()) {
             //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
             //std::cout << "Target: " << _jup.prefix().target() << "\n";
-            std::cout << "DebugString: " << jup.prefix().DebugString() << "\n";
+            std::cout << "DebugString: " << jup.prefix().Utf8DebugString() << "\n";
             //for (const auto& elem : jup.prefix().elem()) {
             //    for (const auto& map : elem.key()) {
             //        std::cout << map.first << "--->" << map.second << "\n";
@@ -477,7 +477,7 @@ void Srv::JuniperStream::Start()
         std::cout << "-------> " << jup.ByteSizeLong() << "\n";
         for (const auto& __jup : _jup.update()) {
             //value = __jup.val().json_val();
-            std::cout << "DebugString: " << __jup.path().DebugString() << "\n";
+            std::cout << "DebugString: " << __jup.path().Utf8DebugString() << "\n";
             //int _counter  = 0;
             //for (const auto& _elem : __jup.path().elem()) {
             //    //std::cout << "Path: " << _elem.name() << "\n";
