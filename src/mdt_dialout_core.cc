@@ -419,6 +419,7 @@ void Srv::JuniperStream::Start()
         //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
+        /*
         const auto& jup = juniper_stream.update();
 
         int counter = 0;
@@ -436,6 +437,7 @@ void Srv::JuniperStream::Start()
 
         std::cout << "------- \n";
         //sleep(10);
+        */
 
         //SubscribeResponse
         //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
@@ -453,9 +455,10 @@ void Srv::JuniperStream::Start()
         int _counter = 0;
         std::cout << _counter << "-->" << _jup.ByteSizeLong() << "\n";
         for (const auto& __jup : _jup.update()) {
+            std::cout << "Val: " << __jup.val().json_val() << "\n";
             if (__jup.has_path()) {
-                std::cout << "Origin: " << __jup.path().origin() << "\n";
-                std::cout << "Target: " << __jup.path().target() << "\n";
+                //std::cout << "Origin: " << __jup.path().origin() << "\n";
+                //std::cout << "Target: " << __jup.path().target() << "\n";
                 for (const auto& _elem : __jup.path().elem()) {
                     for (const auto& _map : _elem.key()) {
                         std::cout << _map.first << "--->" << _map.second << "\n";
@@ -464,6 +467,9 @@ void Srv::JuniperStream::Start()
                 }
             }
         }
+
+        std::cout << "------- \n";
+        //sleep(10);
 
         //for (const auto& r_ext : juniper_stream.extension()) {
         //    //std::cout << iter.registered_ext().msg() << "\n";
