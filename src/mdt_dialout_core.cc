@@ -460,14 +460,14 @@ void Srv::JuniperStream::Start()
             for (const auto& _elem : __jup.path().elem()) {
                 //std::cout << "Path: " << _elem.name() << "\n";
                 path = _elem.name();
-                _counter++;
+                value = __jup.val().json_val();
+                std::cout << path << "--->" << value << "\n";
             }
             //std::cout << "Origin: " << __jup.path().origin() << "\n";
             //std::cout << "Target: " << __jup.path().target() << "\n";
 
             //std::cout << "Val: " << __jup.val().json_val() << "\n";
-            value = __jup.val().json_val();
-            std::cout << path << "--->" << value << "\n";
+            _counter++;
         }
 
         std::cout << "------- \n";
