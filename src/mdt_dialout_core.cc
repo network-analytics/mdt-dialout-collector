@@ -406,10 +406,54 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_header_ext(
                 new GnmiJuniperTelemetryHeaderExtension());
 
-
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
+
+        //SubscribeResponse
+        //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
+        //---> Notification update = 1;                                 Changed or sampled value for a path.
+        //     ---> (        ) bool atomic = 6;
+        //     ---> (        ) Path prefix = 2;
+        //          ---> (        ) string origin = 2;                  Label to disambiguate path.
+        //          ---> (        ) string target = 4;                  The name of the target
+        //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
+        //                          ---> string name = 1;               The name of the element in the path.
+        //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
+
+        //     ---> (repeated) Update update = 4;
+        //          ---> TypedValue val = 3;                            The explicitly typed update value.
+        //          ---> Path path = 1;                                 The path (key) for the update.
+        //          ---> (        ) string origin = 2;                  Label to disambiguate path.
+        //          ---> (        ) string target = 4;                  The name of the target
+        //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
+        //                          ---> string name = 1;               The name of the element in the path.
+        //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
+
+        //std::vector<gnmi::Update> jupdate;
+
+        //for (const auto& jup : juniper_stream.update()) {            
+        //    jupdate.push_back(jup);
+        //}
         
+        const auto& _jup = juniper_stream.update();
+    
+        int counter = 0;
+        std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
+        counter++;
+        if (_jup.has_prefix()) {
+            std::cout << "Origin: " << _jup.prefix().origin() << "\n";
+            std::cout << "Target: " << _jup.prefix().target() << "\n";
+            for (const auto& _path : _jup.prefix().elem()) {
+                std::cout << "Name: " << _path.name() << "\n";
+                std::cout << "Value: " << _path.key().at(_path.name()) << "\n";
+            }
+        }
+        
+        std::cout << "------- \n";
+        counter++;
+        //jupdate.clear();
+        //sleep(10);
+
         //for (const auto& r_ext : juniper_stream.extension()) {
         //    //std::cout << iter.registered_ext().msg() << "\n";
         //    if (r_ext.has_registered_ext() and
@@ -446,32 +490,6 @@ void Srv::JuniperStream::Start()
         //    } else {
         //        std::cout << "Parsing ERROR - update \n";
         //    }
-
-        std::vector<gnmi::Update> jupdate;
-
-        for (const auto& jup : juniper_stream.update().update()) {            
-            jupdate.push_back(jup);
-        }
-        
-        int counter = 0;
-        std::string path_;
-        std::string val_;
-        for (const auto& _jup : jupdate) {
-            std::cout << counter << "-->" << _jup.ByteSizeLong() << "\n";
-            counter++;
-            if (_jup.has_path()) {
-                for (const auto& _path : _jup.path().elem())
-                path_ = _path.name();
-            }
-            if (_jup.has_val()) {
-                val_ = _jup.val().json_val();
-            }
-            std::cout << path_  << ": " << val_ << "\n";
-        }
-        
-        std::cout << "------- \n";
-        jupdate.clear();
-        sleep(10);
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
