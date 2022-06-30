@@ -136,12 +136,12 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
     juniper_server_ = juniper_builder.BuildAndStart();
 
     std::thread t1(&Srv::JuniperFsmCtrl, this);
-    std::thread t2(&Srv::JuniperFsmCtrl, this);
-    std::thread t3(&Srv::JuniperFsmCtrl, this);
+    //std::thread t2(&Srv::JuniperFsmCtrl, this);
+    //std::thread t3(&Srv::JuniperFsmCtrl, this);
 
     t1.join();
-    t2.join();
-    t3.join();
+    //t2.join();
+    //t3.join();
 }
 
 void Srv::HuaweiBind(std::string huawei_srv_socket)
@@ -429,12 +429,6 @@ void Srv::JuniperStream::Start()
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
 
-        //std::vector<gnmi::Update> jupdate;
-
-        //for (const auto& jup : juniper_stream.update()) {            
-        //    jupdate.push_back(jup);
-        //}
-        
         //const auto& _jup = juniper_stream.update();
     
         int counter = 0;
@@ -447,14 +441,14 @@ void Srv::JuniperStream::Start()
                 //std::cout << "Name: " << _path.name() << "\n";
                 //std::cout << "Value: " << _path.key().at(_path.name()) << "\n";
                 for (const auto& map : _path.key()) {
-                    std::cout << "Name: " << map.first << "Value: " << map.second << "\n";
+                    std::cout << "Name: " << map.first << "\n";
+                    std::cout << "Value: " << map.second << "\n";
                 }
+                counter++;
             }
         }
         
         std::cout << "------- \n";
-        counter++;
-        //jupdate.clear();
         //sleep(10);
 
         //for (const auto& r_ext : juniper_stream.extension()) {
