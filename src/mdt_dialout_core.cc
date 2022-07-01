@@ -447,16 +447,16 @@ void Srv::JuniperStream::Start()
         std::string value;
         std::cout << "-------> " << jup.ByteSizeLong() << "\n";
         if (jup.has_prefix()) {
-            //std::cout << "DebugString: " << jup.prefix().Utf8DebugString() << "\n";
-            int path_idx = 0;
-            //int key_idx = 0;
-            while (path_idx < jup.prefix().elem_size()) {
-                std::cout << jup.prefix().elem().at(path_idx).name() << " ---> " << " key_size: " << jup.prefix().elem().at(path_idx).key_size() << " ";
-                if (jup.prefix().elem().at(path_idx).key_size() != 0) {
-                    std::cout << " key: " << jup.prefix().elem().at(path_idx).key().at(jup.prefix().elem().at(path_idx).name()) << " ---> ";
-                }
-                path_idx++;
-            }
+            std::cout << "DebugString: " << jup.prefix().Utf8DebugString() << "\n";
+            //int path_idx = 0;
+            ////int key_idx = 0;
+            //while (path_idx < jup.prefix().elem_size()) {
+            //    std::cout << jup.prefix().elem().at(path_idx).name() << " ---> " << " key_size: " << jup.prefix().elem().at(path_idx).key_size() << " ";
+            //    if (jup.prefix().elem().at(path_idx).key_size() != 0) {
+            //        std::cout << " key: " << jup.prefix().elem().at(path_idx).key().at(jup.prefix().elem().at(path_idx).name()) << " ---> ";
+            //    }
+            //    path_idx++;
+            //}
         }
 
         std::cout << "-------> \n";
