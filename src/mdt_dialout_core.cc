@@ -486,16 +486,16 @@ void Srv::JuniperStream::Start()
                                     std::cout << "[" << key << "=" << value << " and ";
                                     filter++;
                                     continue;
-                                } else if (filter == jup.prefix().elem().at(path_idx).key_size()) {
-                                    std::cout << "]";
-                                    filter++;
-                                    continue;
-                                } else {
-                                    std::cout << key << "=" << value << " and ";
+                                }
+                                if (filter == jup.prefix().elem().at(path_idx).key_size()) {
+                                    std::cout << key << "=" << value << "]";
                                     filter++;
                                     continue;
                                 }
-                            } 
+                                std::cout << key << "=" << value << " and ";
+                                filter++;
+                                continue;
+                            }
                         }
                     }
                     std::cout << "/";
