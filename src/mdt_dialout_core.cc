@@ -471,9 +471,11 @@ void Srv::JuniperStream::Start()
                                     filter++;
                                     continue;
                                 }
-                                std::cout << key << "=" << value << " and ";
-                                filter++;
-                                continue;
+                                if (filter > 0) {
+                                    std::cout << key << "=" << value << " and ";
+                                    filter++;
+                                    continue;
+                                }
                             }
                         }
                     }
