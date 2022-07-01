@@ -455,23 +455,23 @@ void Srv::JuniperStream::Start()
                     jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name();
                     path_idx++;
-                    break;
+                    continue;
                 }
                 if (path_idx == 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name()
                         << "/";
                     path_idx++;
-                    break;
+                    continue;
                 }
                 if (jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << jup.prefix().elem().at(path_idx).name();
                     path_idx++;
-                    break;
+                    continue;
                 }
-                
+
                 std::cout << jup.prefix().elem().at(path_idx).name() << "/";
                 path_idx++;
-                
+
                 if (jup.prefix().elem().at(path_idx).key_size() != 0) {
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
