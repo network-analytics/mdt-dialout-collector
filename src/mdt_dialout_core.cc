@@ -459,8 +459,9 @@ void Srv::JuniperStream::Start()
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             std::cout << "[" << key << "=" << value << "]";
                         } else {
-                            std::cout << "[" << key << "=" << value << "]";
+                            std::cout << "[" << key << "=" << value << " and ";
                         }
+                        std::cout << "]";
                     }
                     std::cout << "/";
                     path_idx++;
@@ -479,8 +480,9 @@ void Srv::JuniperStream::Start()
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             std::cout << "[" << key << "=" << value << "]";
                         } else {
-                            std::cout << "[" << key << "=" << value << "]";
+                            std::cout << "[" << key << "=" << value << " and ";
                         }
+                        std::cout << "]";
                     }
                     std::cout << "/";
                     path_idx++;
