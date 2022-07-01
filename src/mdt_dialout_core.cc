@@ -445,23 +445,28 @@ void Srv::JuniperStream::Start()
         const auto& jup = juniper_stream.update();
 
         std::string value;
-        std::cout << "-------> " << jup.ByteSizeLong() << "\n";
+        std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
         if (jup.has_prefix()) {
             //std::cout << "DebugString: " << jup.prefix().Utf8DebugString() << "\n";
             int path_idx = 0;
             while (path_idx < jup.prefix().elem_size()) {
                 //std::cout << jup.prefix().elem().at(path_idx).name() << " ---> " << " key_size: " << jup.prefix().elem().at(path_idx).key_size() << " ";
-                std::cout << jup.prefix().elem().at(path_idx).name() << "/" << jup.prefix().elem().at(path_idx).key_size() << " ";
+                if (path_idx == 0) {
+                    std::cout << "/" << jup.prefix().elem().at(path_idx).name() << "/";
+                } else {
+                    std::cout << jup.prefix().elem().at(path_idx).name() << "/";
+                }
                 if (jup.prefix().elem().at(path_idx).key_size() != 0) {
                     for (const auto& [key, value] : jup.prefix().elem().at(path_idx).key()) {
                         std::cout << "[" << key << " = " << value << "]";
                     }
                 }
+                std::cout << "\n";
                 path_idx++;
             }
         }
 
-        std::cout << "-------> \n";
+        std::cout << "-------> \n\n";
         //sleep(10);
 
 
