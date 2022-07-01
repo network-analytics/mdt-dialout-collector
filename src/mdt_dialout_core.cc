@@ -441,24 +441,30 @@ void Srv::JuniperStream::Start()
         //          ---> (repeated) PathElem elem = 3;                  Elements of the path.
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
-        /*
+
         const auto& jup = juniper_stream.update();
 
+        std::string value;
         std::cout << "-------> " << jup.ByteSizeLong() << "\n";
         if (jup.has_prefix()) {
-            //std::cout << "Origin: " << _jup.prefix().origin() << "\n";
-            //std::cout << "Target: " << _jup.prefix().target() << "\n";
-            std::cout << "DebugString: " << jup.prefix().Utf8DebugString() << "\n";
-            //for (const auto& elem : jup.prefix().elem()) {
-            //    for (const auto& map : elem.key()) {
-            //        std::cout << map.first << "--->" << map.second << "\n";
-            //    }
-            //}
+            //std::cout << "DebugString: " << jup.prefix().Utf8DebugString() << "\n";
+            int path_idx = 0;
+            //int key_idx = 0;
+            while (path_idx < jup.prefix().elem_size()) {
+                std::cout << jup.prefix().elem().at(path_idx).name() << " ---> ";
+                if (jup.prefix().elem().at(path_idx).key().empty() != 0) {
+                    for (const auto& m : jup.prefix().elem()) {
+                        std::cout << "key: " << m.key().at(jup.prefix().elem().at(path_idx).name()) << " ---> ";
+                        //key_idx++;
+                    }
+                }
+                path_idx++;
+            }
         }
 
         std::cout << "-------> \n";
         //sleep(10);
-        */
+
 
         //SubscribeResponse
         //---> bool sync_response = 3;                                  Indicate target has sent all values associated with the subscription at least once.
@@ -472,6 +478,7 @@ void Srv::JuniperStream::Start()
         //                          ---> string name = 1;               The name of the element in the path.
         //                          ---> map<string, string> key = 2;   Map of key (attribute) name to value.
 
+        /*
         const auto& _jup = juniper_stream.update();
 
         //std::string key;
@@ -482,24 +489,17 @@ void Srv::JuniperStream::Start()
             //std::cout << "elem_size(): " << __jup.path().elem_size() << "\n";
 
             int path_idx = 0;
-            //for (const auto& _elem : __jup.path().elem()) {
-                while (path_idx < __jup.path().elem_size()) {
-                    std::cout << __jup.path().elem().at(path_idx).name() << " ---> ";
-                    path_idx++;
-                }
-                //std::cout << "Path: " << _elem.name() << "\n";
-                value = __jup.val().json_val();
-                std::cout << value << "\n";
-            //}
-            //std::cout << "Origin: " << __jup.path().origin() << "\n";
-            //std::cout << "Target: " << __jup.path().target() << "\n";
-
-            //std::cout << "Val: " << __jup.val().json_val() << "\n";
-            //std::cout << key << "--->" << value << "\n";
+            while (path_idx < __jup.path().elem_size()) {
+                std::cout << __jup.path().elem().at(path_idx).name() << " ---> ";
+                path_idx++;
+            }
+            value = __jup.val().json_val();
+            std::cout << value << "\n";
         }
 
         std::cout << "-------> \n\n";
         //sleep(10);
+        */
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
