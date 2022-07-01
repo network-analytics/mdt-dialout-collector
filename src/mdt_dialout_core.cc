@@ -454,6 +454,15 @@ void Srv::JuniperStream::Start()
                 if (path_idx == 0 and
                     jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name();
+                    for (const auto& [key, value] :
+                        jup.prefix().elem().at(path_idx).key()) {
+                        if (jup.prefix().elem().at(path_idx).key_size() == 1) {
+                            std::cout << "[" << key << "=" << value << "]";
+                        } else {
+                            std::cout << "[" << key << "=" << value << "]";
+                        }
+                    }
+                    std::cout << "/";
                     path_idx++;
                     continue;
                 }
@@ -465,14 +474,6 @@ void Srv::JuniperStream::Start()
                 }
                 if (jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << jup.prefix().elem().at(path_idx).name();
-                    path_idx++;
-                    continue;
-                }
-
-                std::cout << jup.prefix().elem().at(path_idx).name() << "/";
-                path_idx++;
-
-                if (jup.prefix().elem().at(path_idx).key_size() != 0) {
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
@@ -481,7 +482,13 @@ void Srv::JuniperStream::Start()
                             std::cout << "[" << key << "=" << value << "]";
                         }
                     }
+                    std::cout << "/";
+                    path_idx++;
+                    continue;
                 }
+
+                std::cout << jup.prefix().elem().at(path_idx).name() << "/";
+                path_idx++;
             }
             //SubscribeResponse
             //---> bool sync_response = 3;
