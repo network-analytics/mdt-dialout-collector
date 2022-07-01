@@ -463,7 +463,7 @@ void Srv::JuniperStream::Start()
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             int filter = 0;
-                            while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
+                            //while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
                                 if (filter == 0) {
                                     std::cout << "[" << key << "=" << value << " and ";
                                     filter++;
@@ -479,7 +479,7 @@ void Srv::JuniperStream::Start()
                                     filter++;
                                     continue;
                                 }
-                            }
+                            //}
                         }
                     }
                     std::cout << "/";
@@ -503,7 +503,7 @@ void Srv::JuniperStream::Start()
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             int filter = 0;
-                            while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
+                            //while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
                                 if (filter == 0) {
                                     std::cout << "[" << key << "=" << value << " and ";
                                     filter++;
@@ -519,7 +519,7 @@ void Srv::JuniperStream::Start()
                                     filter++;
                                     continue;
                                 }
-                            }
+                            //}
                         }
                     }
                     std::cout << "/";
@@ -527,6 +527,7 @@ void Srv::JuniperStream::Start()
                     continue;
                 }
 
+                // no filtering                    
                 std::cout << jup.prefix().elem().at(path_idx).name() << "/";
                 path_idx++;
             }
