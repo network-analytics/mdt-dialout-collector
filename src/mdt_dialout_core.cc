@@ -454,6 +454,7 @@ void Srv::JuniperStream::Start()
                 if (path_idx == 0 and
                     jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name();
+                    int filter = 0;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
@@ -462,24 +463,21 @@ void Srv::JuniperStream::Start()
                             continue;
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
-                            int filter = 0;
-                            //while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
-                                if (filter == 0) {
-                                    std::cout << "[" << key << "=" << value << " and ";
-                                    filter++;
-                                    continue;
-                                }
-                                if (filter == jup.prefix().elem().at(path_idx).key_size()) {
-                                    std::cout << key << "=" << value << "]";
-                                    filter++;
-                                    continue;
-                                }
-                                if (filter > 0) {
-                                    std::cout << key << "=" << value << " and ";
-                                    filter++;
-                                    continue;
-                                }
-                            //}
+                            if (filter == 0) {
+                                std::cout << "[" << key << "=" << value << " and ";
+                                filter++;
+                                continue;
+                            }
+                            if (filter == jup.prefix().elem().at(path_idx).key_size()) {
+                                std::cout << key << "=" << value << "]";
+                                filter++;
+                                continue;
+                            }
+                            if (filter > 0) {
+                                std::cout << key << "=" << value << " and ";
+                                filter++;
+                                continue;
+                            }
                         }
                     }
                     std::cout << "/";
@@ -494,6 +492,7 @@ void Srv::JuniperStream::Start()
                 }
                 if (jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << jup.prefix().elem().at(path_idx).name();
+                    int filter = 0;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
@@ -502,24 +501,21 @@ void Srv::JuniperStream::Start()
                             continue;
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
-                            int filter = 0;
-                            //while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
-                                if (filter == 0) {
-                                    std::cout << "[" << key << "=" << value << " and ";
-                                    filter++;
-                                    continue;
-                                }
-                                if (filter == jup.prefix().elem().at(path_idx).key_size()) {
-                                    std::cout << key << "=" << value << "]";
-                                    filter++;
-                                    continue;
-                                }
-                                if (filter > 0) {
-                                    std::cout << key << "=" << value << " and ";
-                                    filter++;
-                                    continue;
-                                }
-                            //}
+                            if (filter == 0) {
+                                std::cout << "[" << key << "=" << value << " and ";
+                                filter++;
+                                continue;
+                            }
+                            if (filter == jup.prefix().elem().at(path_idx).key_size()) {
+                                std::cout << key << "=" << value << "]";
+                                filter++;
+                                continue;
+                            }
+                            if (filter > 0) {
+                                std::cout << key << "=" << value << " and ";
+                                filter++;
+                                continue;
+                            }
                         }
                     }
                     std::cout << "/";
