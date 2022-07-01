@@ -458,9 +458,12 @@ void Srv::JuniperStream::Start()
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             std::cout << "[" << key << "=" << value << "]";
-                        } else {
+                            path_idx++;
+                            continue;
+                        }
+                        if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             int filter = 0;
-                            if (filter <= jup.prefix().elem().at(path_idx).key_size()) {
+                            while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
                                 if (filter == 0) {
                                     std::cout << "[" << key << "=" << value << " and ";
                                     filter++;
@@ -495,7 +498,10 @@ void Srv::JuniperStream::Start()
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             std::cout << "[" << key << "=" << value << "]";
-                        } else {
+                            path_idx++;
+                            continue;
+                        }
+                        if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             int filter = 0;
                             while (filter <= jup.prefix().elem().at(path_idx).key_size()) {
                                 if (filter == 0) {
@@ -508,9 +514,11 @@ void Srv::JuniperStream::Start()
                                     filter++;
                                     continue;
                                 }
-                                std::cout << key << "=" << value << " and ";
-                                filter++;
-                                continue;
+                                if (filter > 0) {
+                                    std::cout << key << "=" << value << " and ";
+                                    filter++;
+                                    continue;
+                                }
                             }
                         }
                     }
