@@ -431,6 +431,7 @@ void Srv::JuniperStream::Start()
             }
         }
 
+        // From the first update() generate the sensor_path
         //SubscribeResponse
         //---> bool sync_response = 3;
         //---> Notification update = 1;
@@ -464,11 +465,13 @@ void Srv::JuniperStream::Start()
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             if (filter == 1) {
-                                std::cout << "[" << key << "=" << value << " and ";
+                                std::cout << "[" << key << "=" << value
+                                    << " and ";
                                 filter++;
                                 continue;
                             }
-                            if (filter == jup.prefix().elem().at(path_idx).key_size()) {
+                            if (filter ==
+                                jup.prefix().elem().at(path_idx).key_size()) {
                                 std::cout << key << "=" << value << "]";
                                 filter++;
                                 continue;
@@ -502,11 +505,13 @@ void Srv::JuniperStream::Start()
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             if (filter == 1) {
-                                std::cout << "[" << key << "=" << value << " and ";
+                                std::cout << "[" << key << "=" << value
+                                    << " and ";
                                 filter++;
                                 continue;
                             }
-                            if (filter == jup.prefix().elem().at(path_idx).key_size()) {
+                            if (filter ==
+                                jup.prefix().elem().at(path_idx).key_size()) {
                                 std::cout << key << "=" << value << "]";
                                 filter++;
                                 continue;
@@ -527,6 +532,9 @@ void Srv::JuniperStream::Start()
                 std::cout << jup.prefix().elem().at(path_idx).name() << "/";
                 path_idx++;
             }
+
+            // From the second update().update() extract all the values 
+            // associated with a specific sensor path
             //SubscribeResponse
             //---> bool sync_response = 3;
             //---> Notification update = 1;
