@@ -462,6 +462,7 @@ void Srv::JuniperStream::Start()
                 }
                 path_idx++;
             }
+            std::cout << "\n";
             for (const auto& _jup : jup.update()) {
                 //std::cout << "DebugString: " << _jup.path().Utf8DebugString() << "\n";
                 int path_idx = 0;
