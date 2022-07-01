@@ -485,12 +485,15 @@ void Srv::JuniperStream::Start()
                                 if (filter == 0) {
                                     std::cout << "[" << key << "=" << value << " and ";
                                     filter++;
+                                    continue;
                                 } else if (filter == jup.prefix().elem().at(path_idx).key_size()) {
                                     std::cout << "]";
                                     filter++;
+                                    continue;
                                 } else {
                                     std::cout << key << "=" << value << " and ";
                                     filter++;
+                                    continue;
                                 }
                             } 
                         }
