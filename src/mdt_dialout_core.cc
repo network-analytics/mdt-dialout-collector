@@ -463,7 +463,7 @@ void Srv::JuniperStream::Start()
                             continue;
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
-                            if (filter == 0) {
+                            if (filter == 1) {
                                 std::cout << "[" << key << "=" << value << " and ";
                                 filter++;
                                 continue;
@@ -501,7 +501,7 @@ void Srv::JuniperStream::Start()
                             continue;
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
-                            if (filter == 0) {
+                            if (filter == 1) {
                                 std::cout << "[" << key << "=" << value << " and ";
                                 filter++;
                                 continue;
@@ -523,7 +523,7 @@ void Srv::JuniperStream::Start()
                     continue;
                 }
 
-                // no filtering                    
+                // no filtering
                 std::cout << jup.prefix().elem().at(path_idx).name() << "/";
                 path_idx++;
             }
