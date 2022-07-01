@@ -452,7 +452,7 @@ void Srv::JuniperStream::Start()
             //int key_idx = 0;
             while (path_idx < jup.prefix().elem_size()) {
                 std::cout << jup.prefix().elem().at(path_idx).name() << " ---> ";
-                if (jup.prefix().elem().at(path_idx).key().empty() != 0) {
+                if (!jup.prefix().elem().at(path_idx).key().empty()) {
                     for (const auto& m : jup.prefix().elem()) {
                         std::cout << "key: " << m.key().at(jup.prefix().elem().at(path_idx).name()) << " ---> ";
                         //key_idx++;
