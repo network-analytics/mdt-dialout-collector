@@ -445,12 +445,11 @@ void Srv::JuniperStream::Start()
         const auto& jup = juniper_stream.update();
 
         std::string value;
-        std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
+        //std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
         if (jup.has_prefix()) {
             //std::cout << "DebugString: " << jup.prefix().Utf8DebugString() << "\n";
             int path_idx = 0;
             while (path_idx < jup.prefix().elem_size()) {
-                //std::cout << jup.prefix().elem().at(path_idx).name() << " ---> " << " key_size: " << jup.prefix().elem().at(path_idx).key_size() << " ";
                 if (path_idx == 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name() << "/";
                 } else {
@@ -461,13 +460,21 @@ void Srv::JuniperStream::Start()
                         std::cout << "[" << key << " = " << value << "]";
                     }
                 }
-                std::cout << "\n";
                 path_idx++;
+            }
+            for (const auto& _jup : jup.update()) {
+                //std::cout << "DebugString: " << _jup.path().Utf8DebugString() << "\n";
+                int path_idx = 0;
+                while (path_idx < _jup.path().elem_size()) {
+                    std::cout << _jup.path().elem().at(path_idx).name() << " ---> ";
+                    path_idx++;
+                }
+                value = _jup.val().json_val();
+                std::cout << value << "\n";
             }
         }
 
-        std::cout << "-------> \n\n";
-        //sleep(10);
+        //std::cout << "\n\n-------> ";
 
 
         //SubscribeResponse
