@@ -454,7 +454,7 @@ void Srv::JuniperStream::Start()
                 if (path_idx == 0 and
                     jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name();
-                    int filter = 0;
+                    int filter = 1;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
@@ -492,7 +492,7 @@ void Srv::JuniperStream::Start()
                 }
                 if (jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << jup.prefix().elem().at(path_idx).name();
-                    int filter = 0;
+                    int filter = 1;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
