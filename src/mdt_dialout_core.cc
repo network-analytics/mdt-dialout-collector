@@ -694,46 +694,58 @@ void Srv::JuniperStream::Start()
 
                 if (_jup.val().has_any_val()) {
                     value = _jup.val().any_val().value();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_ascii_val()) {
                     value = _jup.val().ascii_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_bool_val()) {
                     value = _jup.val().bool_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_bytes_val()) {
                     value = _jup.val().bytes_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_decimal_val()) {
                     value = _jup.val().decimal_val().Utf8DebugString();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_float_val()) {
                     value = _jup.val().float_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_int_val()) {
                     value = (Json::Int64) _jup.val().int_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_json_ietf_val()) {
                     value = _jup.val().json_ietf_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_json_val()) {
                     value = _jup.val().json_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_leaflist_val()) {
                     value = _jup.val().leaflist_val().Utf8DebugString();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_proto_bytes()) {
                     value = _jup.val().proto_bytes();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_string_val()) {
                     value = _jup.val().string_val();
+                    root[path_name] = value;
                     continue;
                 } else if (_jup.val().has_uint_val()) {
                     value = (Json::UInt64) _jup.val().uint_val();
+                    root[path_name] = value;
                     continue;
                 }
 
-                root[path_name] = value;
                 //std::cout << value << "\n";
             }
 
