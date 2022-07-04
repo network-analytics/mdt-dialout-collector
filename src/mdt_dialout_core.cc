@@ -662,7 +662,7 @@ void Srv::JuniperStream::Start()
             }
             root["sensor_path"] = sensor_path;
 
-            // From the second update().update() extract all the values 
+            // From the second update().update() extract all the values
             // associated with a specific sensor path
             //SubscribeResponse
             //---> bool sync_response = 3;
@@ -677,6 +677,7 @@ void Srv::JuniperStream::Start()
             //                          ---> map<string, string> key = 2;
             //std::cout << "\n";
             std::string path_name;
+            Json::Value jpath;
             for (const auto& _jup : jup.update()) {
                 //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
                 //    << "\n";
@@ -685,7 +686,8 @@ void Srv::JuniperStream::Start()
                     //std::cout << _jup.path().elem().at(path_idx).name()
                     //    << " ---> ";
                     path_name =_jup.path().elem().at(path_idx).name();
-                    //root.append(path_name);
+                    jpath = path_name;
+                    root.append(jpath);
                     path_idx++;
                 }
                 value = _jup.val().json_val();
