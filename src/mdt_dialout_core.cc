@@ -687,7 +687,8 @@ void Srv::JuniperStream::Start()
                     //std::cout << _jup.path().elem().at(path_idx).name()
                     //    << " ---> ";
                     path_name =_jup.path().elem().at(path_idx).name();
-                    root[path_idx] = path_name;
+                    path[path_idx] = path_name;
+                    root.append(path);
                     path_idx++;
                 }
 
