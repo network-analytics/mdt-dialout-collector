@@ -692,48 +692,9 @@ void Srv::JuniperStream::Start()
                     path_idx++;
                 }
 
-                if (_jup.val().has_any_val()) {
-                    std::cout << "value = _jup.val().any_val().value()\n";
-                    value = _jup.val().any_val().value();
-                } else if (_jup.val().has_ascii_val()) {
-                    std::cout << "value = _jup.val().ascii_val()\n";
-                    value = _jup.val().ascii_val();
-                } else if (_jup.val().has_bool_val()) {
-                    std::cout << "value = _jup.val().bool_val()\n";
-                    value = _jup.val().bool_val();
-                } else if (_jup.val().has_bytes_val()) {
-                    std::cout << "value = _jup.val().bytes_val()\n";
-                    value = _jup.val().bytes_val();
-                } else if (_jup.val().has_decimal_val()) {
-                    std::cout << "value = _jup.val().decimal_val().Utf8DebugString()\n";
-                    value = _jup.val().decimal_val().Utf8DebugString();
-                } else if (_jup.val().has_float_val()) {
-                    std::cout << "value = _jup.val().float_val()\n";
-                    value = _jup.val().float_val();
-                } else if (_jup.val().has_int_val()) {
-                    std::cout << "value = (Json::Int64) _jup.val().int_val()\n";
-                    value = (Json::Int64) _jup.val().int_val();
-                } else if (_jup.val().has_json_ietf_val()) {
-                    std::cout << "value = _jup.val().json_ietf_val()\n";
-                    value = _jup.val().json_ietf_val();
-                } else if (_jup.val().has_json_val()) {
-                    std::cout << "value = _jup.val().json_val()\n";
-                    value = _jup.val().json_val();
-                } else if (_jup.val().has_leaflist_val()) {
-                    std::cout << "value = _jup.val().leaflist_val().Utf8DebugString()\n";
-                    value = _jup.val().leaflist_val().Utf8DebugString();
-                } else if (_jup.val().has_proto_bytes()) {
-                    std::cout << "value = _jup.val().proto_bytes()\n";
-                    value = _jup.val().proto_bytes();
-                } else if (_jup.val().has_string_val()) {
-                    std::cout << "value = _jup.val().string_val()\n";
-                    value = _jup.val().string_val();
-                } else if (_jup.val().has_uint_val()) {
-                    std::cout << "value = (Json::UInt64) _jup.val().uint_val()\n";
-                    value = (Json::UInt64) _jup.val().uint_val();
-                }
-
-                root[path_name] = value;
+                // json_vale() only received
+                value = _jup.val().json_val();
+                root[path_name] = value.toStyledString();
                 //std::cout << value << "\n";
             }
 
