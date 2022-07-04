@@ -676,8 +676,7 @@ void Srv::JuniperStream::Start()
             //                          ---> string name = 1;
             //                          ---> map<string, string> key = 2;
             //std::cout << "\n";
-            std::string path_full;
-            std::string path_partial;
+            std::string path;
             Json::Value value;
             for (const auto& _jup : jup.update()) {
                 //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
@@ -686,16 +685,15 @@ void Srv::JuniperStream::Start()
                 while (path_idx < _jup.path().elem_size()) {
                     //std::cout << _jup.path().elem().at(path_idx).name()
                     //    << " ---> ";
-                    path_partial =_jup.path().elem().at(path_idx).name();
                     path_full.append("/");
-                    path_full.append(path_partial);
+                    path.append(_jup.path().elem().at(path_idx).name());
                     path_idx++;
                 }
 
-                // json_vale() only received
+                // only json_val() received
                 value = _jup.val().json_val();
-                root[path_full] = value.toStyledString();
                 //std::cout << value << "\n";
+                root[path] = value.toStyledString();
             }
 
             // Serialize the JSON value into a string
