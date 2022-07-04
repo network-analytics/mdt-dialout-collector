@@ -682,12 +682,12 @@ void Srv::JuniperStream::Start()
                 //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
                 //    << "\n";
                 int path_idx = 0;
+                path.clear();
                 while (path_idx < _jup.path().elem_size()) {
                     //std::cout << _jup.path().elem().at(path_idx).name()
                     //    << " ---> ";
                     path.append("/");
                     path.append(_jup.path().elem().at(path_idx).name());
-                    path.clear();
                     path_idx++;
                 }
 
