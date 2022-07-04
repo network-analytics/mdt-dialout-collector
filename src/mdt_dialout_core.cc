@@ -534,6 +534,7 @@ void Srv::JuniperStream::Start()
             //std::cout << "DebugString: " << jup.prefix().Utf8DebugString()
             //    << "\n";
             int path_idx = 0;
+            sensor_path.clear();
             while (path_idx < jup.prefix().elem_size()) {
                 if (path_idx == 0 and
                     jup.prefix().elem().at(path_idx).key_size() > 0) {
@@ -561,7 +562,7 @@ void Srv::JuniperStream::Start()
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
-                                sensor_path.append("and");
+                                sensor_path.append(" and ");
                                 filter++;
                                 continue;
                             }
@@ -580,7 +581,7 @@ void Srv::JuniperStream::Start()
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
-                                sensor_path.append("and");
+                                sensor_path.append(" and ");
                                 filter++;
                                 continue;
                             }
@@ -623,7 +624,7 @@ void Srv::JuniperStream::Start()
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
-                                sensor_path.append("and");
+                                sensor_path.append(" and ");
                                 filter++;
                                 continue;
                             }
@@ -642,7 +643,7 @@ void Srv::JuniperStream::Start()
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
-                                sensor_path.append("and");
+                                sensor_path.append(" and ");
                                 filter++;
                                 continue;
                             }
@@ -661,6 +662,7 @@ void Srv::JuniperStream::Start()
                 path_idx++;
             }
             root["sensor_path"] = sensor_path;
+            std::cout << "sensor_path: " << sensor_path << "\n";
 
             // From the second update().update() extract all the values
             // associated with a specific sensor path
