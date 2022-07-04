@@ -695,7 +695,7 @@ void Srv::JuniperStream::Start()
                 value = _jup.val().json_val();
                 //std::cout << value << "\n";
                 if (path.compare("/state/prefix-length") == 0) {
-                    std::cout << (Json::String) value << "\n";
+                    std::cout << value.asInt() << "\n";
                 }
                 root[path] = value.toStyledString();
             }
