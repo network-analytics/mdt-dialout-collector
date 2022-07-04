@@ -714,7 +714,7 @@ void Srv::JuniperStream::Start()
                 } else if (_jup.val().has_proto_bytes()) {
                     value = _jup.val().proto_bytes();
                 } else if (_jup.val().has_string_val()) {
-                    value = (Json::String) _jup.val().string_val();
+                    value = _jup.val().string_val();
                 } else if (_jup.val().has_uint_val()) {
                     value = (Json::UInt64) _jup.val().uint_val();
                 }
