@@ -544,7 +544,7 @@ void Srv::JuniperStream::Start()
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
-                            //std::cout << "[" << key << "=" << value << "]";
+                            std::cout << "[" << key << "=" << value << "]";
                             sensor_path.append("[");
                             sensor_path.append(key);
                             sensor_path.append("=");
