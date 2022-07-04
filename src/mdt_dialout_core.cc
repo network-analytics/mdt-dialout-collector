@@ -677,7 +677,7 @@ void Srv::JuniperStream::Start()
             //                          ---> map<string, string> key = 2;
             //std::cout << "\n";
             std::string path_name;
-            Json::Value path;
+            //Json::Value path;
             Json::Value value;
             for (const auto& _jup : jup.update()) {
                 //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
@@ -687,8 +687,8 @@ void Srv::JuniperStream::Start()
                     //std::cout << _jup.path().elem().at(path_idx).name()
                     //    << " ---> ";
                     path_name =_jup.path().elem().at(path_idx).name();
-                    path[path_idx] = path_name;
-                    root.append(path);
+                    //path[path_idx] = path_name;
+                    //root.append(path);
                     path_idx++;
                 }
 
