@@ -699,6 +699,7 @@ void Srv::JuniperStream::Start()
 
             // Serialize the JSON value into a string
             Json::StreamWriterBuilder builderW;
+            builderW["emitUTF8"] = false;
             builderW["indentation"] = "";
             const std::unique_ptr<Json::StreamWriter> writer(
                                                 builderW.newStreamWriter());
