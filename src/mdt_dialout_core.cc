@@ -536,6 +536,7 @@ void Srv::JuniperStream::Start()
             int path_idx = 0;
             sensor_path.clear();
             while (path_idx < jup.prefix().elem_size()) {
+                // first partial path with filters
                 if (path_idx == 0 and
                     jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name();
@@ -544,6 +545,7 @@ void Srv::JuniperStream::Start()
                     int filter = 1;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
+                        // only one filter 
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             std::cout << "[" << key << "=" << value << "]";
                             sensor_path.append("[");
@@ -554,7 +556,9 @@ void Srv::JuniperStream::Start()
                             path_idx++;
                             continue;
                         }
+                        // multiple filters
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
+                            // first filter
                             if (filter == 1) {
                                 std::cout << "[" << key << "=" << value
                                     << " and ";
@@ -566,6 +570,7 @@ void Srv::JuniperStream::Start()
                                 filter++;
                                 continue;
                             }
+                            // last filter
                             if (filter ==
                                 jup.prefix().elem().at(path_idx).key_size()) {
                                 std::cout << key << "=" << value << "]";
@@ -576,6 +581,7 @@ void Srv::JuniperStream::Start()
                                 filter++;
                                 continue;
                             }
+                            // in-between filters
                             if (filter > 0) {
                                 std::cout << key << "=" << value << " and ";
                                 sensor_path.append(key);
@@ -592,6 +598,7 @@ void Srv::JuniperStream::Start()
                     path_idx++;
                     continue;
                 }
+                // first partial path without filters
                 if (path_idx == 0) {
                     std::cout << "/" << jup.prefix().elem().at(path_idx).name()
                         << "/";
@@ -601,11 +608,14 @@ void Srv::JuniperStream::Start()
                     path_idx++;
                     continue;
                 }
+                // in-between paths with filters
                 if (jup.prefix().elem().at(path_idx).key_size() > 0) {
                     std::cout << jup.prefix().elem().at(path_idx).name();
+                    sensor_path.append(jup.prefix().elem().at(path_idx).name());
                     int filter = 1;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
+                            // only one filter 
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             std::cout << "[" << key << "=" << value << "]";
                             sensor_path.append("[");
@@ -616,7 +626,9 @@ void Srv::JuniperStream::Start()
                             path_idx++;
                             continue;
                         }
+                        // multiple filters
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
+                            // first filter
                             if (filter == 1) {
                                 std::cout << "[" << key << "=" << value
                                     << " and ";
@@ -628,6 +640,7 @@ void Srv::JuniperStream::Start()
                                 filter++;
                                 continue;
                             }
+                            // last filter
                             if (filter ==
                                 jup.prefix().elem().at(path_idx).key_size()) {
                                 std::cout << key << "=" << value << "]";
@@ -638,6 +651,7 @@ void Srv::JuniperStream::Start()
                                 filter++;
                                 continue;
                             }
+                            // in-between filters
                             if (filter > 0) {
                                 std::cout << key << "=" << value << " and ";
                                 sensor_path.append(key);
