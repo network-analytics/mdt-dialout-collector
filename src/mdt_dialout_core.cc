@@ -687,36 +687,49 @@ void Srv::JuniperStream::Start()
                     //std::cout << _jup.path().elem().at(path_idx).name()
                     //    << " ---> ";
                     path_name =_jup.path().elem().at(path_idx).name();
-                    path[path_idx] = path_name;
+                    root[path_idx] = path_name;
                     path_idx++;
                 }
 
                 if (_jup.val().has_any_val()) {
                     value = _jup.val().any_val().value();
-                } else if (_jup.val().has_bool_val()) {
-                    value = _jup.val().bool_val();
-                } else if (_jup.val().has_bytes_val()) {
-                    value = _jup.val().bytes_val();
-                } else if (_jup.val().has_decimal_val()) {
-                    value = _jup.val().decimal_val().Utf8DebugString();
-                } else if (_jup.val().has_float_val()) {
-                    value = _jup.val().float_val();
-                } else if (_jup.val().has_int_val()) {
-                    value = (Json::Int64) _jup.val().int_val();
-                } else if (_jup.val().has_json_ietf_val()) {
-                    value = _jup.val().json_ietf_val();
-                } else if (_jup.val().has_json_val()) {
-                    value = _jup.val().json_val();
-                } else if (_jup.val().has_leaflist_val()) {
-                    value = _jup.val().leaflist_val().Utf8DebugString();
-                } else if (_jup.val().has_proto_bytes()) {
-                    value = _jup.val().proto_bytes();
-                } else if (_jup.val().has_string_val()) {
-                    value = _jup.val().string_val();
-                } else if (_jup.val().has_uint_val()) {
-                    value = (Json::UInt64) _jup.val().uint_val();
+                    continue;
                 } else if (_jup.val().has_ascii_val()) {
                     value = _jup.val().ascii_val();
+                    continue;
+                } else if (_jup.val().has_bool_val()) {
+                    value = _jup.val().bool_val();
+                    continue;
+                } else if (_jup.val().has_bytes_val()) {
+                    value = _jup.val().bytes_val();
+                    continue;
+                } else if (_jup.val().has_decimal_val()) {
+                    value = _jup.val().decimal_val().Utf8DebugString();
+                    continue;
+                } else if (_jup.val().has_float_val()) {
+                    value = _jup.val().float_val();
+                    continue;
+                } else if (_jup.val().has_int_val()) {
+                    value = (Json::Int64) _jup.val().int_val();
+                    continue;
+                } else if (_jup.val().has_json_ietf_val()) {
+                    value = _jup.val().json_ietf_val();
+                    continue;
+                } else if (_jup.val().has_json_val()) {
+                    value = _jup.val().json_val();
+                    continue;
+                } else if (_jup.val().has_leaflist_val()) {
+                    value = _jup.val().leaflist_val().Utf8DebugString();
+                    continue;
+                } else if (_jup.val().has_proto_bytes()) {
+                    value = _jup.val().proto_bytes();
+                    continue;
+                } else if (_jup.val().has_string_val()) {
+                    value = _jup.val().string_val();
+                    continue;
+                } else if (_jup.val().has_uint_val()) {
+                    value = (Json::UInt64) _jup.val().uint_val();
+                    continue;
                 }
 
                 root[path_name] = value;
