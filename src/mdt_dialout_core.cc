@@ -693,8 +693,6 @@ void Srv::JuniperStream::Start()
 
                 if (_jup.val().has_any_val()) {
                     value = _jup.val().any_val().value();
-                } else if (_jup.val().has_ascii_val()) {
-                    value = _jup.val().ascii_val();
                 } else if (_jup.val().has_bool_val()) {
                     value = _jup.val().bool_val();
                 } else if (_jup.val().has_bytes_val()) {
@@ -717,6 +715,8 @@ void Srv::JuniperStream::Start()
                     value = _jup.val().string_val();
                 } else if (_jup.val().has_uint_val()) {
                     value = (Json::UInt64) _jup.val().uint_val();
+                } else if (_jup.val().has_ascii_val()) {
+                    value = _jup.val().ascii_val();
                 }
 
                 root[path_name] = value;
