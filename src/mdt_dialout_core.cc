@@ -687,6 +687,7 @@ void Srv::JuniperStream::Start()
                     //    << " ---> ";
                     path.append("/");
                     path.append(_jup.path().elem().at(path_idx).name());
+                    path.clear();
                     path_idx++;
                 }
 
