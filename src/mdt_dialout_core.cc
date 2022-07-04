@@ -537,7 +537,7 @@ void Srv::JuniperStream::Start()
             while (path_idx < jup.prefix().elem_size()) {
                 if (path_idx == 0 and
                     jup.prefix().elem().at(path_idx).key_size() > 0) {
-                    //std::cout << "/" << jup.prefix().elem().at(path_idx).name();
+                    std::cout << "/" << jup.prefix().elem().at(path_idx).name();
                     sensor_path.append("/");
                     sensor_path.append(jup.prefix().elem().at(path_idx).name());
                     int filter = 1;
@@ -555,8 +555,8 @@ void Srv::JuniperStream::Start()
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             if (filter == 1) {
-                                //std::cout << "[" << key << "=" << value
-                                //    << " and ";
+                                std::cout << "[" << key << "=" << value
+                                    << " and ";
                                 sensor_path.append("[");
                                 sensor_path.append(key);
                                 sensor_path.append("=");
@@ -567,7 +567,7 @@ void Srv::JuniperStream::Start()
                             }
                             if (filter ==
                                 jup.prefix().elem().at(path_idx).key_size()) {
-                                //std::cout << key << "=" << value << "]";
+                                std::cout << key << "=" << value << "]";
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
@@ -576,7 +576,7 @@ void Srv::JuniperStream::Start()
                                 continue;
                             }
                             if (filter > 0) {
-                                //std::cout << key << "=" << value << " and ";
+                                std::cout << key << "=" << value << " and ";
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
@@ -586,14 +586,14 @@ void Srv::JuniperStream::Start()
                             }
                         }
                     }
-                    //std::cout << "/";
+                    std::cout << "/";
                     sensor_path.append("/");
                     path_idx++;
                     continue;
                 }
                 if (path_idx == 0) {
-                    //std::cout << "/" << jup.prefix().elem().at(path_idx).name()
-                    //    << "/";
+                    std::cout << "/" << jup.prefix().elem().at(path_idx).name()
+                        << "/";
                     sensor_path.append("/");
                     sensor_path.append(jup.prefix().elem().at(path_idx).name());
                     sensor_path.append("/");
@@ -606,7 +606,7 @@ void Srv::JuniperStream::Start()
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
-                            //std::cout << "[" << key << "=" << value << "]";
+                            std::cout << "[" << key << "=" << value << "]";
                             sensor_path.append("[");
                             sensor_path.append(key);
                             sensor_path.append("=");
@@ -617,8 +617,8 @@ void Srv::JuniperStream::Start()
                         }
                         if (jup.prefix().elem().at(path_idx).key_size() > 1) {
                             if (filter == 1) {
-                                //std::cout << "[" << key << "=" << value
-                                //    << " and ";
+                                std::cout << "[" << key << "=" << value
+                                    << " and ";
                                 sensor_path.append("[");
                                 sensor_path.append(key);
                                 sensor_path.append("=");
@@ -629,7 +629,7 @@ void Srv::JuniperStream::Start()
                             }
                             if (filter ==
                                 jup.prefix().elem().at(path_idx).key_size()) {
-                                //std::cout << key << "=" << value << "]";
+                                std::cout << key << "=" << value << "]";
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
@@ -638,7 +638,7 @@ void Srv::JuniperStream::Start()
                                 continue;
                             }
                             if (filter > 0) {
-                                //std::cout << key << "=" << value << " and ";
+                                std::cout << key << "=" << value << " and ";
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
@@ -648,14 +648,14 @@ void Srv::JuniperStream::Start()
                             }
                         }
                     }
-                    //std::cout << "/";
+                    std::cout << "/";
                     sensor_path.append("/");
                     path_idx++;
                     continue;
                 }
 
                 // no filtering
-                //std::cout << jup.prefix().elem().at(path_idx).name() << "/";
+                std::cout << jup.prefix().elem().at(path_idx).name() << "/";
                 sensor_path.append(jup.prefix().elem().at(path_idx).name());
                 sensor_path.append("/");
                 path_idx++;
