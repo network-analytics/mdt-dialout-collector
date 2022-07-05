@@ -422,10 +422,10 @@ void Srv::JuniperStream::Start()
 
                 // Extension to JSON Obj
                 // string - extracting the system_id
-                if (!juniper_tlm_header_ext->system_id().empty()) {
-                    root["system_id"] =
-                        juniper_tlm_header_ext->system_id();
-                }
+//                if (!juniper_tlm_header_ext->system_id().empty()) {
+//                    root["system_id"] =
+//                        juniper_tlm_header_ext->system_id();
+//                }
                 /*
                 // unit32
                 if (!juniper_tlm_header_ext->component_id()) {
