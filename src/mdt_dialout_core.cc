@@ -156,9 +156,9 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
     huawei_cq_ = huawei_builder.AddCompletionQueue();
     huawei_server_ = huawei_builder.BuildAndStart();
 
-    std::jthread t1(&Srv::HuaweiFsmCtrl, this);
-    std::jthread t2(&Srv::HuaweiFsmCtrl, this);
-    std::jthread t3(&Srv::HuaweiFsmCtrl, this);
+    std::thread t1(&Srv::HuaweiFsmCtrl, this);
+    std::thread t2(&Srv::HuaweiFsmCtrl, this);
+    std::thread t3(&Srv::HuaweiFsmCtrl, this);
 
     t1.join();
     t2.join();
