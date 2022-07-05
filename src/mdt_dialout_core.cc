@@ -137,11 +137,11 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
 
     std::thread t1(&Srv::JuniperFsmCtrl, this);
     std::thread t2(&Srv::JuniperFsmCtrl, this);
-    std::thread t3(&Srv::JuniperFsmCtrl, this);
+    //std::thread t3(&Srv::JuniperFsmCtrl, this);
 
     t1.join();
     t2.join();
-    t3.join();
+    //t3.join();
 }
 
 void Srv::HuaweiBind(std::string huawei_srv_socket)
