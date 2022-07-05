@@ -411,107 +411,107 @@ void Srv::JuniperStream::Start()
         juniper_resp.Read(&juniper_stream, this);
         std::cout << "after reading the jstream from: " << peer << "\n";
 
-//        // Decoding the (repeated) extension field
-//        for (const auto& r_ext : juniper_stream.extension()) {
-//            //std::cout << iter.registered_ext().msg() << "\n";
-//            if (r_ext.has_registered_ext() and
-//                r_ext.registered_ext().id() ==
-//                    gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
-//                parsing_str = juniper_tlm_header_ext->ParseFromString(
-//                    r_ext.registered_ext().msg());
-//
-//                // Extension to JSON Obj
-//                // string - extracting the system_id
-//                if (!juniper_tlm_header_ext->system_id().empty()) {
-//                    root["system_id"] =
-//                        juniper_tlm_header_ext->system_id();
-//                }
-//                /*
-//                // unit32
-//                if (!juniper_tlm_header_ext->component_id()) {
-//                    root["component_id"] =
-//                        (Json::Int) juniper_tlm_header_ext->component_id();
-//                }
-//                // unit32
-//                if (!juniper_tlm_header_ext->sub_component_id()) {
-//                    root["sub_component_id"] =
-//                        (Json::Int) juniper_tlm_header_ext->sub_component_id();
-//                }
-//                // string
-//                if (!juniper_tlm_header_ext->sensor_name().empty()) {
-//                    root["sensor_name"] =
-//                        juniper_tlm_header_ext->sensor_name();
-//                }
-//                // string
-//                if (!juniper_tlm_header_ext->subscribed_path().empty()) {
-//                    root["subscribed_path"] =
-//                        juniper_tlm_header_ext-> subscribed_path();
-//                }
-//                // string
-//                if (!juniper_tlm_header_ext->streamed_path().empty()) {
-//                    root["streamed_path"] =
-//                        juniper_tlm_header_ext->streamed_path();
-//                }
-//                // string
-//                if (!juniper_tlm_header_ext->component().empty()) {
-//                    root["component"] =
-//                        juniper_tlm_header_ext->component();
-//                }
-//                // unit64
-//                if (!juniper_tlm_header_ext->sequence_number()) {
-//                    root["sequence_number"] =
-//                    (Json::UInt64) juniper_tlm_header_ext->sequence_number();
-//                }
-//                // int64
-//                if (!juniper_tlm_header_ext->payload_get_timestamp()) {
-//                    root["payload_get_timestamp"] =
-//                    (Json::Int64) juniper_tlm_header_ext->
-//                        payload_get_timestamp();
-//                }
-//                // int64
-//                if (!juniper_tlm_header_ext->stream_creation_timestamp()) {
-//                    root["stream_creation_timestamp"] =
-//                    (Json::Int64) juniper_tlm_header_ext->
-//                        stream_creation_timestamp();
-//                }
-//                // int64
-//                if (!juniper_tlm_header_ext->event_timestamp()) {
-//                    root["event_timestamp"] =
-//                        (Json::Int64) juniper_tlm_header_ext->event_timestamp();
-//                }
-//                // int64
-//                if (!juniper_tlm_header_ext->export_timestamp()) {
-//                    root["export_timestamp"] =
-//                    (Json::Int64) juniper_tlm_header_ext->export_timestamp();
-//                }
-//                // unit64
-//                if (!juniper_tlm_header_ext->sub_sequence_number()) {
-//                    root["sub_sequence_number"] =
-//                    (Json::UInt64) juniper_tlm_header_ext->
-//                        sub_sequence_number();
-//                }
-//                // bool
-//                //if (!juniper_tlm_header_ext->eom()) {
-//                //    root["eom"] = juniper_tlm_header_ext->eom();
-//                //}
-//                */
-//
-//                // Extension to String
-//                if (parsing_str) {
-//                    stream_data_in.clear();
-//                    google::protobuf::util::JsonPrintOptions opt;
-//                    opt.add_whitespace = true;
-//                    google::protobuf::util::MessageToJsonString(
-//                                                    *juniper_tlm_header_ext,
-//                                                    &stream_data_in,
-//                                                    opt);
-//                    //std::cout << stream_data_in << "\n";
-//                    root["extension"] = stream_data_in;
-//                } else {
-//                    std::cout << "ERROR - the extension parsing went wrong \n";
-//                }
-//            }
-//        }
+        // Decoding the (repeated) extension field
+        for (const auto& r_ext : juniper_stream.extension()) {
+            //std::cout << iter.registered_ext().msg() << "\n";
+            if (r_ext.has_registered_ext() and
+                r_ext.registered_ext().id() ==
+                    gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
+                parsing_str = juniper_tlm_header_ext->ParseFromString(
+                    r_ext.registered_ext().msg());
+
+                // Extension to JSON Obj
+                // string - extracting the system_id
+                if (!juniper_tlm_header_ext->system_id().empty()) {
+                    root["system_id"] =
+                        juniper_tlm_header_ext->system_id();
+                }
+                /*
+                // unit32
+                if (!juniper_tlm_header_ext->component_id()) {
+                    root["component_id"] =
+                        (Json::Int) juniper_tlm_header_ext->component_id();
+                }
+                // unit32
+                if (!juniper_tlm_header_ext->sub_component_id()) {
+                    root["sub_component_id"] =
+                        (Json::Int) juniper_tlm_header_ext->sub_component_id();
+                }
+                // string
+                if (!juniper_tlm_header_ext->sensor_name().empty()) {
+                    root["sensor_name"] =
+                        juniper_tlm_header_ext->sensor_name();
+                }
+                // string
+                if (!juniper_tlm_header_ext->subscribed_path().empty()) {
+                    root["subscribed_path"] =
+                        juniper_tlm_header_ext-> subscribed_path();
+                }
+                // string
+                if (!juniper_tlm_header_ext->streamed_path().empty()) {
+                    root["streamed_path"] =
+                        juniper_tlm_header_ext->streamed_path();
+                }
+                // string
+                if (!juniper_tlm_header_ext->component().empty()) {
+                    root["component"] =
+                        juniper_tlm_header_ext->component();
+                }
+                // unit64
+                if (!juniper_tlm_header_ext->sequence_number()) {
+                    root["sequence_number"] =
+                    (Json::UInt64) juniper_tlm_header_ext->sequence_number();
+                }
+                // int64
+                if (!juniper_tlm_header_ext->payload_get_timestamp()) {
+                    root["payload_get_timestamp"] =
+                    (Json::Int64) juniper_tlm_header_ext->
+                        payload_get_timestamp();
+                }
+                // int64
+                if (!juniper_tlm_header_ext->stream_creation_timestamp()) {
+                    root["stream_creation_timestamp"] =
+                    (Json::Int64) juniper_tlm_header_ext->
+                        stream_creation_timestamp();
+                }
+                // int64
+                if (!juniper_tlm_header_ext->event_timestamp()) {
+                    root["event_timestamp"] =
+                        (Json::Int64) juniper_tlm_header_ext->event_timestamp();
+                }
+                // int64
+                if (!juniper_tlm_header_ext->export_timestamp()) {
+                    root["export_timestamp"] =
+                    (Json::Int64) juniper_tlm_header_ext->export_timestamp();
+                }
+                // unit64
+                if (!juniper_tlm_header_ext->sub_sequence_number()) {
+                    root["sub_sequence_number"] =
+                    (Json::UInt64) juniper_tlm_header_ext->
+                        sub_sequence_number();
+                }
+                // bool
+                //if (!juniper_tlm_header_ext->eom()) {
+                //    root["eom"] = juniper_tlm_header_ext->eom();
+                //}
+                */
+
+                // Extension to String
+                if (parsing_str) {
+                    stream_data_in.clear();
+                    google::protobuf::util::JsonPrintOptions opt;
+                    opt.add_whitespace = true;
+                    google::protobuf::util::MessageToJsonString(
+                                                    *juniper_tlm_header_ext,
+                                                    &stream_data_in,
+                                                    opt);
+                    //std::cout << stream_data_in << "\n";
+                    root["extension"] = stream_data_in;
+                } else {
+                    std::cout << "ERROR - the extension parsing went wrong \n";
+                }
+            }
+        }
 //
 //        // From the first update() generate the sensor_path
 //        //SubscribeResponse
