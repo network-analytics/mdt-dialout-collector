@@ -517,8 +517,9 @@ void Srv::JuniperStream::Start()
         //SubscribeResponse
         //---> bool sync_response = 3;
         //---> Notification update = 1;
-        //     ---> (        ) bool atomic = 6;
-        //     ---> (        ) Path prefix = 2;
+        //     ---> (        ) bool  atomic = 6;
+        //     ---> (        ) int64 timestamp = 1
+        //     ---> (        ) Path  prefix = 2;
         //          ---> (        ) string origin = 2;
         //          ---> (        ) string target = 4;
         //          ---> (repeated) PathElem elem = 3;
@@ -528,6 +529,8 @@ void Srv::JuniperStream::Start()
         const auto& jup = juniper_stream.update();
 
         //std::string value;
+        // The Notification MUST include the timestamp field
+        std::uint64_t notification_timestamp = jup.timestamp();
         std::string sensor_path;
         //std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
         if (jup.has_prefix()) {
@@ -675,7 +678,9 @@ void Srv::JuniperStream::Start()
                 sensor_path.append("/");
                 path_idx++;
             }
+            
             root["sensor_path"] = sensor_path;
+            root["notification_timestamp"] = notification_timestamp;
             //std::cout << "sensor_path: " << sensor_path << "\n";
 
             // From the second update().update() extract all the values
