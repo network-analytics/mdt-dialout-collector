@@ -32,10 +32,12 @@ int main(void)
 
     if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
         void *juniper_ptr {nullptr};
-        std::thread juniper_t(&juniper_thread, juniper_ptr);
+        std::thread juniper_t_0(&juniper_thread, juniper_ptr);
+        std::thread juniper_t_1(&juniper_thread, juniper_ptr);
         std::cout << "mdt-dialout-collector listening on "
         << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
-        vendors.push_back(std::move(juniper_t));
+        vendors.push_back(std::move(juniper_t_0));
+        vendors.push_back(std::move(juniper_t_1));
     }
     
     if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
