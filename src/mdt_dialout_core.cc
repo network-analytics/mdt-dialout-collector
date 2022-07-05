@@ -423,7 +423,7 @@ void Srv::JuniperStream::Start()
                 // string
                 if (juniper_tlm_header_ext->system_id().empty() != 0) {
                     root["system_id"] =
-                        (Json::String) juniper_tlm_header_ext->system_id();
+                        juniper_tlm_header_ext->system_id();
                 }
                 /*
                 // unit32
