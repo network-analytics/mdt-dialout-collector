@@ -411,7 +411,7 @@ void Srv::JuniperStream::Start()
         juniper_resp.Read(&juniper_stream, this);
         std::cout << "after reading the jstream from: " << peer << "\n";
 
-        if (juniper_stream.IsInitialized()) {
+        if (juniper_stream.has_update()) {
             std::cout << "Init: " << juniper_stream.ShortDebugString() << "\n";                
         } else {
             std::cout << "Zero: " << juniper_stream.ShortDebugString() << "\n";                
