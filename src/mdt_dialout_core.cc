@@ -532,12 +532,12 @@ void Srv::JuniperStream::Start()
         //                          ---> string name = 1;
         //                          ---> map<string, string> key = 2;
 
-        const auto& jup = juniper_stream.update();
 
         //std::string value;
         std::string sensor_path;
         //std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
         if (jup.has_prefix()) {
+            const auto& jup = juniper_stream.update();
             // The Notification MUST include the timestamp field
             std::uint64_t notification_timestamp = jup.timestamp();
             //std::cout << "DebugString: " << jup.prefix().Utf8DebugString()
