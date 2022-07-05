@@ -731,11 +731,11 @@ void Srv::JuniperStream::Start()
             if (enable_label_encode_as_map.compare("true") == 0) {
                 if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
-                    data_delivery->async_kafka_producer(stream_data_out);
+                    //data_delivery->async_kafka_producer(stream_data_out);
                 }
             } else {
                 stream_data_out = json_str_out;
-                data_delivery->async_kafka_producer(stream_data_out);
+                //data_delivery->async_kafka_producer(stream_data_out);
             }
         }
     } else {
