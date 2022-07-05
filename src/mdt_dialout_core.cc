@@ -389,15 +389,11 @@ void Srv::JuniperStream::Start()
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
 
-        if (juniper_stream.sync_response()) {
-            std::cout << "sync: " << peer << "\n";
-        }
-
         if (data_manipulation->juniper_extension(juniper_stream,
             juniper_tlm_header_ext, root) == 0){
-                std::cout << "INFO - Juniper ext parsing succesful" << "\n";
+                //std::cout << "INFO - Juniper ext parsing succesful" << "\n";
         } else {
-                std::cout << "ERROR - Juniper ext parsing unsuccesful" << "\n";
+                //std::cout << "ERROR - Juniper ext parsing unsuccesful" << "\n";
         }
 
         // From the first update() generate the sensor_path
