@@ -536,7 +536,7 @@ void Srv::JuniperStream::Start()
         //std::string value;
         std::string sensor_path;
         //std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
-        if (jup.has_prefix()) {
+        if (juniper_stream.has_update()) {
             const auto& jup = juniper_stream.update();
             // The Notification MUST include the timestamp field
             std::uint64_t notification_timestamp = jup.timestamp();
