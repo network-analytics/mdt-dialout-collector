@@ -1001,7 +1001,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
 //
 //    return EXIT_SUCCESS;
 //}
-
+    
     for (const auto& ext : juniper_stream.extension()) {
         if (ext.has_registered_ext() and
             ext.registered_ext().id() ==
@@ -1009,9 +1009,10 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
             parsing_str = juniper_tlm_header_ext->ParseFromString(
                 ext.registered_ext().msg());
 
-            if (!parsing_str) {
+            if (parsing_str) {
                 if (!juniper_tlm_header_ext->system_id().empty()) {
                     root["system_id"] = juniper_tlm_header_ext->system_id();
+                    std::cout << juniper_tlm_header_ext->system_id() << "\n";
                 }
 
 //                stream_data_in.clear();
