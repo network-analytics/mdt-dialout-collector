@@ -981,53 +981,53 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
     bool parsing_str;
     std::string stream_data_in;
 
-    int ext_counter = 0;
-    int ext_size = juniper_stream.extension().size();
-
-    while (ext_counter <= ext_size) {
-        if (juniper_stream.extension().at(ext_counter).has_registered_ext() and juniper_stream.extension().at(ext_counter).registered_ext().id() == gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
-            parsing_str = juniper_tlm_header_ext->ParseFromString(juniper_stream.extension().at(ext_counter).registered_ext().msg());
-
-            if (parsing_str) {
-                if(!juniper_tlm_header_ext->system_id().empty()) {
-                    root["system_id"] = juniper_tlm_header_ext->system_id();
-                }
-            } else {
-                return EXIT_FAILURE;
-            }
-        }
-        ext_counter++;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-//    for (const auto& ext : juniper_stream.extension()) {
-//        if (ext.has_registered_ext() and
-//            ext.registered_ext().id() ==
-//                gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
-//            parsing_str = juniper_tlm_header_ext->ParseFromString(
-//                ext.registered_ext().msg().);
+//    int ext_counter = 0;
+//    int ext_size = juniper_stream.extension().size();
+//
+//    while (ext_counter <= ext_size) {
+//        if (juniper_stream.extension().at(ext_counter).has_registered_ext() and juniper_stream.extension().at(ext_counter).registered_ext().id() == gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
+//            parsing_str = juniper_tlm_header_ext->ParseFromString(juniper_stream.extension().at(ext_counter).registered_ext().msg());
 //
 //            if (parsing_str) {
-//                if (!juniper_tlm_header_ext->system_id().empty()) {
+//                if(!juniper_tlm_header_ext->system_id().empty()) {
 //                    root["system_id"] = juniper_tlm_header_ext->system_id();
 //                }
-//
-//                stream_data_in.clear();
-//                google::protobuf::util::JsonPrintOptions opt;
-//                opt.add_whitespace = true;
-//                google::protobuf::util::MessageToJsonString(
-//                                                *juniper_tlm_header_ext,
-//                                                &stream_data_in,
-//                                                opt);
-//                root["extension"] = stream_data_in;
 //            } else {
 //                return EXIT_FAILURE;
 //            }
 //        }
+//        ext_counter++;
 //    }
 //
 //    return EXIT_SUCCESS;
 //}
+
+    for (const auto ext : juniper_stream.extension()) {
+        if (ext.has_registered_ext() and
+            ext.registered_ext().id() ==
+                gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
+            parsing_str = juniper_tlm_header_ext->ParseFromString(
+                ext.registered_ext().msg());
+
+            if (parsing_str) {
+                if (!juniper_tlm_header_ext->system_id().empty()) {
+                    root["system_id"] = juniper_tlm_header_ext->system_id();
+                }
+
+                stream_data_in.clear();
+                google::protobuf::util::JsonPrintOptions opt;
+                opt.add_whitespace = true;
+                google::protobuf::util::MessageToJsonString(
+                                                *juniper_tlm_header_ext,
+                                                &stream_data_in,
+                                                opt);
+                root["extension"] = stream_data_in;
+            } else {
+                return EXIT_FAILURE;
+            }
+        }
+    }
+
+    return EXIT_SUCCESS;
+}
 
