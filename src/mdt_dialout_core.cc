@@ -497,19 +497,19 @@ void Srv::JuniperStream::Start()
                 */
 
                 // Extension to String
-                if (parsing_str) {
-                    stream_data_in.clear();
-                    google::protobuf::util::JsonPrintOptions opt;
-                    opt.add_whitespace = true;
-                    google::protobuf::util::MessageToJsonString(
-                                                    *juniper_tlm_header_ext,
-                                                    &stream_data_in,
-                                                    opt);
-                    //std::cout << stream_data_in << "\n";
-                    root["extension"] = stream_data_in;
-                } else {
-                    std::cout << "ERROR - the extension parsing went wrong \n";
-                }
+//                if (parsing_str) {
+//                    stream_data_in.clear();
+//                    google::protobuf::util::JsonPrintOptions opt;
+//                    opt.add_whitespace = true;
+//                    google::protobuf::util::MessageToJsonString(
+//                                                    *juniper_tlm_header_ext,
+//                                                    &stream_data_in,
+//                                                    opt);
+//                    //std::cout << stream_data_in << "\n";
+//                    root["extension"] = stream_data_in;
+//                } else {
+//                    std::cout << "ERROR - the extension parsing went wrong \n";
+//                }
             }
         }
 //
