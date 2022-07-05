@@ -421,7 +421,7 @@ void Srv::JuniperStream::Start()
 
                 // Extension to JSON Obj
                 // string
-                if (juniper_tlm_header_ext->system_id().empty() != 0) {
+                if (!juniper_tlm_header_ext->system_id().empty()) {
                     root["system_id"] =
                         juniper_tlm_header_ext->system_id();
                 }
