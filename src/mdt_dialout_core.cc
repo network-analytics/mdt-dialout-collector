@@ -411,6 +411,12 @@ void Srv::JuniperStream::Start()
         juniper_resp.Read(&juniper_stream, this);
         std::cout << "after reading the jstream from: " << peer << "\n";
 
+        if (juniper_stream.IsInitialized()) {
+            std::cout << "Init: " << juniper_stream.ShortDebugString() << "\n";                
+        } else {
+            std::cout << "Zero: " << juniper_stream.ShortDebugString() << "\n";                
+        }
+
         // Decoding the (repeated) extension field
 //        for (const auto& r_ext : juniper_stream.extension()) {
 //            //std::cout << iter.registered_ext().msg() << "\n";
