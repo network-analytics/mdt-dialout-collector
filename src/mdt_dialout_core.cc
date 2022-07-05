@@ -737,7 +737,7 @@ void Srv::JuniperStream::Start()
 //                stream_data_out = json_str_out;
 //                data_delivery->async_kafka_producer(stream_data_out);
 //            }
-//        }
+        }
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
