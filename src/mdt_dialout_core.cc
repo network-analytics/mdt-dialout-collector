@@ -996,7 +996,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
             if (parsing_str == true) {
                 if (!juniper_tlm_header_ext->system_id().empty()) {
                     root["system_id"] = juniper_tlm_header_ext->system_id();
-                    std::cout << juniper_tlm_header_ext->system_id() << "\n";
+                    //std::cout << juniper_tlm_header_ext->system_id() << "\n";
                 }
 
                 stream_data_in.clear();
@@ -1007,7 +1007,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
                                                 &stream_data_in,
                                                 opt);
                 root["extension"] = stream_data_in;
-                std::cout << stream_data_in << "\n";
+                //std::cout << stream_data_in << "\n";
             } else {
                 return EXIT_FAILURE;
             }
