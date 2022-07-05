@@ -409,7 +409,7 @@ void Srv::JuniperStream::Start()
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
 
-        if (juniper_stream.sync_response() == true) {
+        if (juniper_stream.sync_response()) {
             std::cout << "sync: " << peer << "\n";
         }
 
