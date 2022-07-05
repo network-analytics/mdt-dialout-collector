@@ -137,11 +137,11 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
 
     std::thread t1(&Srv::JuniperFsmCtrl, this);
     std::thread t2(&Srv::JuniperFsmCtrl, this);
-    //std::thread t3(&Srv::JuniperFsmCtrl, this);
+    std::thread t3(&Srv::JuniperFsmCtrl, this);
 
     t1.join();
     t2.join();
-    //t3.join();
+    t3.join();
 }
 
 void Srv::HuaweiBind(std::string huawei_srv_socket)
@@ -407,7 +407,9 @@ void Srv::JuniperStream::Start()
             juniper_tlm_header_ext(new GnmiJuniperTelemetryHeaderExtension());
 
         // the key-word "this" is used as a unique TAG
+        std::cout << "before reading the jstream from: " << peer << "\n";
         juniper_resp.Read(&juniper_stream, this);
+        std::cout << "after reading the jstream from: " << peer << "\n";
 
         // Decoding the (repeated) extension field
         for (const auto& r_ext : juniper_stream.extension()) {
