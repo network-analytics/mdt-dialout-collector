@@ -40,10 +40,14 @@ int main(void)
     //}
     
     if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
-        if (juniper_single_process() == 0) {
-            std::cout << "mdt-dialout-collector listening on "
-            << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
-        }
+        // --- Required for config parameters ---
+        std::string ipv4_socket_juniper =
+            main_cfg_handler->get_ipv4_socket_juniper();
+        // --- Required for config parameters ---
+    
+        std::string juniper_srv_socket {ipv4_socket_juniper};
+        Srv juniper_mdt_dialout_collector;
+        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
     }
 
     //if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
