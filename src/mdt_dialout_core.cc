@@ -1002,7 +1002,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
 //    return EXIT_SUCCESS;
 //}
 
-    for (const auto ext : juniper_stream.extension()) {
+    for (const auto& ext : juniper_stream.extension()) {
         if (ext.has_registered_ext() and
             ext.registered_ext().id() ==
                 gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
@@ -1014,14 +1014,14 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
                     root["system_id"] = juniper_tlm_header_ext->system_id();
                 }
 
-                stream_data_in.clear();
-                google::protobuf::util::JsonPrintOptions opt;
-                opt.add_whitespace = true;
-                google::protobuf::util::MessageToJsonString(
-                                                *juniper_tlm_header_ext,
-                                                &stream_data_in,
-                                                opt);
-                root["extension"] = stream_data_in;
+//                stream_data_in.clear();
+//                google::protobuf::util::JsonPrintOptions opt;
+//                opt.add_whitespace = true;
+//                google::protobuf::util::MessageToJsonString(
+//                                                *juniper_tlm_header_ext,
+//                                                &stream_data_in,
+//                                                opt);
+//                root["extension"] = stream_data_in;
             } else {
                 return EXIT_FAILURE;
             }
