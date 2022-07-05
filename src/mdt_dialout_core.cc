@@ -419,13 +419,13 @@ void Srv::JuniperStream::Start()
                 parsing_str = juniper_tlm_header_ext->ParseFromString(
                     r_ext.registered_ext().msg());
 
-                /*
                 // Extension to JSON Obj
                 // string
                 if (juniper_tlm_header_ext->system_id().empty() != 0) {
                     root["system_id"] =
                         (Json::String) juniper_tlm_header_ext->system_id();
                 }
+                /*
                 // unit32
                 if (juniper_tlm_header_ext->component_id() != 0) {
                     root["component_id"] =
