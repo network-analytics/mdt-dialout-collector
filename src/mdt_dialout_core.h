@@ -8,6 +8,7 @@
 #include "cisco_telemetry.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "juniper_gnmi.pb.h"
+#include "juniper_telemetry_header_extension.pb.h"
 #include "juniper_dialout.grpc.pb.h"
 #include "grpc/socket_mutator.h"
 
@@ -44,6 +45,10 @@ public:
             std::string& json_str_out);
     Json::Value cisco_gpbkv_field2json(
             const cisco_telemetry::TelemetryField& field);
+    int juniper_extension(gnmi::SubscribeResponse& juniper_stream,
+        const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>&
+            juniper_tlm_header_ext,
+        Json::Value& root);
 };
 
 class Srv final {

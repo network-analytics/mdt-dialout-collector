@@ -386,7 +386,6 @@ void Srv::JuniperStream::Start()
                                         this);
         juniper_stream_status = FLOW;
     } else if (juniper_stream_status == FLOW) {
-        bool parsing_str;
         // From the network
         std::string stream_data_in;
         // After data enrichment
@@ -397,118 +396,23 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<DataManipulation> data_manipulation(
                 new DataManipulation());
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
-        std::unique_ptr<TelemetryStream> juniper_tlm(
-                new TelemetryStream());
+        //std::unique_ptr<TelemetryStream> juniper_tlm(
+        //        new TelemetryStream());
         //GnmiJuniperTelemetryHeader
-        std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_header(
-                new GnmiJuniperTelemetryHeader());
+        //std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_header(
+        //        new GnmiJuniperTelemetryHeader());
         //GnmiJuniperTelemetryHeaderExtension
         std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
             juniper_tlm_header_ext(new GnmiJuniperTelemetryHeaderExtension());
 
         // the key-word "this" is used as a unique TAG
-        juniper_resp.Read(juniper_stream, this);
+        juniper_resp.Read(&juniper_stream, this);
 
-        // Decoding the (repeated) extension field
-        for (const auto& r_ext : juniper_stream.extension()) {
-            //std::cout << iter.registered_ext().msg() << "\n";
-            if (r_ext.has_registered_ext() and
-                r_ext.registered_ext().id() ==
-                    gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
-                parsing_str = juniper_tlm_header_ext->ParseFromString(
-                    r_ext.registered_ext().msg());
-
-              // Extension to JSON Obj
-              // string - extracting the system_id
-                if (!juniper_tlm_header_ext->system_id().empty()) {
-                    root["system_id"] =
-                        juniper_tlm_header_ext->system_id();
-                }
-                /*
-                // unit32
-                if (!juniper_tlm_header_ext->component_id()) {
-                    root["component_id"] =
-                        (Json::Int) juniper_tlm_header_ext->component_id();
-                }
-                // unit32
-                if (!juniper_tlm_header_ext->sub_component_id()) {
-                    root["sub_component_id"] =
-                        (Json::Int) juniper_tlm_header_ext->sub_component_id();
-                }
-                // string
-                if (!juniper_tlm_header_ext->sensor_name().empty()) {
-                    root["sensor_name"] =
-                        juniper_tlm_header_ext->sensor_name();
-                }
-                // string
-                if (!juniper_tlm_header_ext->subscribed_path().empty()) {
-                    root["subscribed_path"] =
-                        juniper_tlm_header_ext-> subscribed_path();
-                }
-                // string
-                if (!juniper_tlm_header_ext->streamed_path().empty()) {
-                    root["streamed_path"] =
-                        juniper_tlm_header_ext->streamed_path();
-                }
-                // string
-                if (!juniper_tlm_header_ext->component().empty()) {
-                    root["component"] =
-                        juniper_tlm_header_ext->component();
-                }
-                // unit64
-                if (!juniper_tlm_header_ext->sequence_number()) {
-                    root["sequence_number"] =
-                    (Json::UInt64) juniper_tlm_header_ext->sequence_number();
-                }
-                // int64
-                if (!juniper_tlm_header_ext->payload_get_timestamp()) {
-                    root["payload_get_timestamp"] =
-                    (Json::Int64) juniper_tlm_header_ext->
-                        payload_get_timestamp();
-                }
-                // int64
-                if (!juniper_tlm_header_ext->stream_creation_timestamp()) {
-                    root["stream_creation_timestamp"] =
-                    (Json::Int64) juniper_tlm_header_ext->
-                        stream_creation_timestamp();
-                }
-                // int64
-                if (!juniper_tlm_header_ext->event_timestamp()) {
-                    root["event_timestamp"] =
-                        (Json::Int64) juniper_tlm_header_ext->event_timestamp();
-                }
-                // int64
-                if (!juniper_tlm_header_ext->export_timestamp()) {
-                    root["export_timestamp"] =
-                    (Json::Int64) juniper_tlm_header_ext->export_timestamp();
-                }
-                // unit64
-                if (!juniper_tlm_header_ext->sub_sequence_number()) {
-                    root["sub_sequence_number"] =
-                    (Json::UInt64) juniper_tlm_header_ext->
-                        sub_sequence_number();
-                }
-                // bool
-                //if (!juniper_tlm_header_ext->eom()) {
-                //    root["eom"] = juniper_tlm_header_ext->eom();
-                //}
-                */
-
-                // Extension to String
-                if (parsing_str) {
-                    stream_data_in.clear();
-                    google::protobuf::util::JsonPrintOptions opt;
-                    opt.add_whitespace = true;
-                    google::protobuf::util::MessageToJsonString(
-                                                    *juniper_tlm_header_ext,
-                                                    &stream_data_in,
-                                                    opt);
-                    //std::cout << stream_data_in << "\n";
-                    root["extension"] = stream_data_in;
-                } else {
-                    std::cout << "ERROR - the extension parsing went wrong \n";
-                }
-            }
+        if (data_manipulation->juniper_extension(juniper_stream,
+            juniper_tlm_header_ext, root)){
+                std::cout << "INFO - Juniper ext parsing succesful" << "\n";
+        } else {
+                std::cout << "ERROR - Juniper ext parsing unsuccesful" << "\n";
         }
 
         // From the first update() generate the sensor_path
@@ -545,7 +449,7 @@ void Srv::JuniperStream::Start()
                     int filter = 1;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
-                        // only one filter 
+                        // only one filter
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             //std::cout << "[" << key << "=" << value << "]";
                             sensor_path.append("[");
@@ -615,7 +519,7 @@ void Srv::JuniperStream::Start()
                     int filter = 1;
                     for (const auto& [key, value] :
                         jup.prefix().elem().at(path_idx).key()) {
-                            // only one filter 
+                            // only one filter
                         if (jup.prefix().elem().at(path_idx).key_size() == 1) {
                             //std::cout << "[" << key << "=" << value << "]";
                             sensor_path.append("[");
@@ -675,7 +579,7 @@ void Srv::JuniperStream::Start()
                 sensor_path.append("/");
                 path_idx++;
             }
-            
+
             root["sensor_path"] = sensor_path;
             root["notification_timestamp"] = notification_timestamp;
             //std::cout << "sensor_path: " << sensor_path << "\n";
@@ -1064,6 +968,43 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
     } catch (const kafka::KafkaException& ex) {
         std::cerr << "Unexpected exception: " << ex.what() << std::endl;
         return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
+    const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>&
+        juniper_tlm_header_ext,
+    Json::Value& root)
+{
+    bool parsing_str;
+    std::string stream_data_in;
+
+    for (const auto& r_ext : juniper_stream.extension()) {
+        if (r_ext.has_registered_ext() and
+            r_ext.registered_ext().id() ==
+                gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
+            parsing_str = juniper_tlm_header_ext->ParseFromString(
+                r_ext.registered_ext().msg());
+
+            if (parsing_str) {
+                if (!juniper_tlm_header_ext->system_id().empty()) {
+                    root["system_id"] = juniper_tlm_header_ext->system_id();
+                }
+
+                stream_data_in.clear();
+                google::protobuf::util::JsonPrintOptions opt;
+                opt.add_whitespace = true;
+                google::protobuf::util::MessageToJsonString(
+                                                *juniper_tlm_header_ext,
+                                                &stream_data_in,
+                                                opt);
+                root["extension"] = stream_data_in;
+            } else {
+                return EXIT_FAILURE;
+            }
+        }
     }
 
     return EXIT_SUCCESS;
