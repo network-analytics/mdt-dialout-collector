@@ -526,157 +526,157 @@ void Srv::JuniperStream::Start()
         //                          ---> string name = 1;
         //                          ---> map<string, string> key = 2;
 
-
         //std::string value;
         std::string sensor_path;
         //std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
         if (juniper_stream.has_update()) {
             const auto& jup = juniper_stream.update();
-            // The Notification MUST include the timestamp field
-            std::uint64_t notification_timestamp = jup.timestamp();
-            //std::cout << "DebugString: " << jup.prefix().Utf8DebugString()
-            //    << "\n";
-            int path_idx = 0;
-            sensor_path.clear();
-            while (path_idx < jup.prefix().elem_size()) {
-                // first partial path with filters
-                if (path_idx == 0 and
-                    jup.prefix().elem().at(path_idx).key_size() > 0) {
-                    //std::cout << "/" << jup.prefix().elem().at(path_idx).name();
-                    sensor_path.append("/");
-                    sensor_path.append(jup.prefix().elem().at(path_idx).name());
-                    int filter = 1;
-                    for (const auto& [key, value] :
-                        jup.prefix().elem().at(path_idx).key()) {
-                        // only one filter 
-                        if (jup.prefix().elem().at(path_idx).key_size() == 1) {
-                            //std::cout << "[" << key << "=" << value << "]";
-                            sensor_path.append("[");
-                            sensor_path.append(key);
-                            sensor_path.append("=");
-                            sensor_path.append(value);
-                            sensor_path.append("]");
-                            path_idx++;
-                            continue;
-                        }
-                        // multiple filters
-                        if (jup.prefix().elem().at(path_idx).key_size() > 1) {
-                            // first filter
-                            if (filter == 1) {
-                                //std::cout << "[" << key << "=" << value
-                                //    << " and ";
-                                sensor_path.append("[");
-                                sensor_path.append(key);
-                                sensor_path.append("=");
-                                sensor_path.append(value);
-                                sensor_path.append(" and ");
-                                filter++;
-                                continue;
-                            }
-                            // last filter
-                            if (filter ==
-                                jup.prefix().elem().at(path_idx).key_size()) {
-                                //std::cout << key << "=" << value << "]";
-                                sensor_path.append(key);
-                                sensor_path.append("=");
-                                sensor_path.append(value);
-                                sensor_path.append("]");
-                                filter++;
-                                continue;
-                            }
-                            // in-between filters
-                            if (filter > 0) {
-                                //std::cout << key << "=" << value << " and ";
-                                sensor_path.append(key);
-                                sensor_path.append("=");
-                                sensor_path.append(value);
-                                sensor_path.append(" and ");
-                                filter++;
-                                continue;
-                            }
-                        }
-                    }
-                    //std::cout << "/";
-                    sensor_path.append("/");
-                    path_idx++;
-                    continue;
-                }
-                // first partial path without filters
-                if (path_idx == 0) {
-                    //std::cout << "/" << jup.prefix().elem().at(path_idx).name()
-                    //    << "/";
-                    sensor_path.append("/");
-                    sensor_path.append(jup.prefix().elem().at(path_idx).name());
-                    sensor_path.append("/");
-                    path_idx++;
-                    continue;
-                }
-                // in-between paths with filters
-                if (jup.prefix().elem().at(path_idx).key_size() > 0) {
-                    //std::cout << jup.prefix().elem().at(path_idx).name();
-                    sensor_path.append(jup.prefix().elem().at(path_idx).name());
-                    int filter = 1;
-                    for (const auto& [key, value] :
-                        jup.prefix().elem().at(path_idx).key()) {
+            if(jup.has_prefix()) { 
+                // The Notification MUST include the timestamp field
+                std::uint64_t notification_timestamp = jup.timestamp();
+                //std::cout << "DebugString: " << jup.prefix().Utf8DebugString()
+                //    << "\n";
+                int path_idx = 0;
+                sensor_path.clear();
+                while (path_idx < jup.prefix().elem_size()) {
+                    // first partial path with filters
+                    if (path_idx == 0 and
+                        jup.prefix().elem().at(path_idx).key_size() > 0) {
+                        //std::cout << "/" << jup.prefix().elem().at(path_idx).name();
+                        sensor_path.append("/");
+                        sensor_path.append(jup.prefix().elem().at(path_idx).name());
+                        int filter = 1;
+                        for (const auto& [key, value] :
+                            jup.prefix().elem().at(path_idx).key()) {
                             // only one filter 
-                        if (jup.prefix().elem().at(path_idx).key_size() == 1) {
-                            //std::cout << "[" << key << "=" << value << "]";
-                            sensor_path.append("[");
-                            sensor_path.append(key);
-                            sensor_path.append("=");
-                            sensor_path.append(value);
-                            sensor_path.append("]");
-                            path_idx++;
-                            continue;
-                        }
-                        // multiple filters
-                        if (jup.prefix().elem().at(path_idx).key_size() > 1) {
-                            // first filter
-                            if (filter == 1) {
-                                //std::cout << "[" << key << "=" << value
-                                //    << " and ";
+                            if (jup.prefix().elem().at(path_idx).key_size() == 1) {
+                                //std::cout << "[" << key << "=" << value << "]";
                                 sensor_path.append("[");
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
-                                sensor_path.append(" and ");
-                                filter++;
+                                sensor_path.append("]");
+                                path_idx++;
                                 continue;
                             }
-                            // last filter
-                            if (filter ==
-                                jup.prefix().elem().at(path_idx).key_size()) {
-                                //std::cout << key << "=" << value << "]";
+                            // multiple filters
+                            if (jup.prefix().elem().at(path_idx).key_size() > 1) {
+                                // first filter
+                                if (filter == 1) {
+                                    //std::cout << "[" << key << "=" << value
+                                    //    << " and ";
+                                    sensor_path.append("[");
+                                    sensor_path.append(key);
+                                    sensor_path.append("=");
+                                    sensor_path.append(value);
+                                    sensor_path.append(" and ");
+                                    filter++;
+                                    continue;
+                                }
+                                // last filter
+                                if (filter ==
+                                    jup.prefix().elem().at(path_idx).key_size()) {
+                                    //std::cout << key << "=" << value << "]";
+                                    sensor_path.append(key);
+                                    sensor_path.append("=");
+                                    sensor_path.append(value);
+                                    sensor_path.append("]");
+                                    filter++;
+                                    continue;
+                                }
+                                // in-between filters
+                                if (filter > 0) {
+                                    //std::cout << key << "=" << value << " and ";
+                                    sensor_path.append(key);
+                                    sensor_path.append("=");
+                                    sensor_path.append(value);
+                                    sensor_path.append(" and ");
+                                    filter++;
+                                    continue;
+                                }
+                            }
+                        }
+                        //std::cout << "/";
+                        sensor_path.append("/");
+                        path_idx++;
+                        continue;
+                    }
+                    // first partial path without filters
+                    if (path_idx == 0) {
+                        //std::cout << "/" << jup.prefix().elem().at(path_idx).name()
+                        //    << "/";
+                        sensor_path.append("/");
+                        sensor_path.append(jup.prefix().elem().at(path_idx).name());
+                        sensor_path.append("/");
+                        path_idx++;
+                        continue;
+                    }
+                    // in-between paths with filters
+                    if (jup.prefix().elem().at(path_idx).key_size() > 0) {
+                        //std::cout << jup.prefix().elem().at(path_idx).name();
+                        sensor_path.append(jup.prefix().elem().at(path_idx).name());
+                        int filter = 1;
+                        for (const auto& [key, value] :
+                            jup.prefix().elem().at(path_idx).key()) {
+                                // only one filter 
+                            if (jup.prefix().elem().at(path_idx).key_size() == 1) {
+                                //std::cout << "[" << key << "=" << value << "]";
+                                sensor_path.append("[");
                                 sensor_path.append(key);
                                 sensor_path.append("=");
                                 sensor_path.append(value);
                                 sensor_path.append("]");
-                                filter++;
+                                path_idx++;
                                 continue;
                             }
-                            // in-between filters
-                            if (filter > 0) {
-                                //std::cout << key << "=" << value << " and ";
-                                sensor_path.append(key);
-                                sensor_path.append("=");
-                                sensor_path.append(value);
-                                sensor_path.append(" and ");
-                                filter++;
-                                continue;
+                            // multiple filters
+                            if (jup.prefix().elem().at(path_idx).key_size() > 1) {
+                                // first filter
+                                if (filter == 1) {
+                                    //std::cout << "[" << key << "=" << value
+                                    //    << " and ";
+                                    sensor_path.append("[");
+                                    sensor_path.append(key);
+                                    sensor_path.append("=");
+                                    sensor_path.append(value);
+                                    sensor_path.append(" and ");
+                                    filter++;
+                                    continue;
+                                }
+                                // last filter
+                                if (filter ==
+                                    jup.prefix().elem().at(path_idx).key_size()) {
+                                    //std::cout << key << "=" << value << "]";
+                                    sensor_path.append(key);
+                                    sensor_path.append("=");
+                                    sensor_path.append(value);
+                                    sensor_path.append("]");
+                                    filter++;
+                                    continue;
+                                }
+                                // in-between filters
+                                if (filter > 0) {
+                                    //std::cout << key << "=" << value << " and ";
+                                    sensor_path.append(key);
+                                    sensor_path.append("=");
+                                    sensor_path.append(value);
+                                    sensor_path.append(" and ");
+                                    filter++;
+                                    continue;
+                                }
                             }
                         }
+                        //std::cout << "/";
+                        sensor_path.append("/");
+                        path_idx++;
+                        continue;
                     }
-                    //std::cout << "/";
+    
+                    // no filtering
+                    //std::cout << jup.prefix().elem().at(path_idx).name() << "/";
+                    sensor_path.append(jup.prefix().elem().at(path_idx).name());
                     sensor_path.append("/");
                     path_idx++;
-                    continue;
-                }
-
-                // no filtering
-                //std::cout << jup.prefix().elem().at(path_idx).name() << "/";
-                sensor_path.append(jup.prefix().elem().at(path_idx).name());
-                sensor_path.append("/");
-                path_idx++;
             }
             
             root["sensor_path"] = sensor_path;
@@ -737,6 +737,7 @@ void Srv::JuniperStream::Start()
 //                stream_data_out = json_str_out;
 //                data_delivery->async_kafka_producer(stream_data_out);
 //            }
+            }
         }
     } else {
         GPR_ASSERT(juniper_stream_status == END);
