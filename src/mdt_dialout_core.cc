@@ -409,7 +409,7 @@ void Srv::JuniperStream::Start()
         juniper_resp.Read(&juniper_stream, this);
 
         if (data_manipulation->juniper_extension(juniper_stream,
-            juniper_tlm_header_ext, root)){
+            juniper_tlm_header_ext, root) == 0){
                 std::cout << "INFO - Juniper ext parsing succesful" << "\n";
         } else {
                 std::cout << "ERROR - Juniper ext parsing unsuccesful" << "\n";
