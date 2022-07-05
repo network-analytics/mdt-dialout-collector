@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <thread>
 #include <typeinfo>
 #include <grpcpp/grpcpp.h>
 #include "grpc/socket_mutator.h"
@@ -114,13 +113,7 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
     cisco_cq_ = cisco_builder.AddCompletionQueue();
     cisco_server_ = cisco_builder.BuildAndStart();
 
-    std::thread t1(&Srv::CiscoFsmCtrl, this);
-    std::thread t2(&Srv::CiscoFsmCtrl, this);
-    std::thread t3(&Srv::CiscoFsmCtrl, this);
-
-    t1.join();
-    t2.join();
-    t3.join();
+    Srv::CiscoFsmCtrl();
 }
 
 void Srv::JuniperBind(std::string juniper_srv_socket)
@@ -136,13 +129,6 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
     juniper_server_ = juniper_builder.BuildAndStart();
 
     Srv::JuniperFsmCtrl();
-    //std::thread t1(&Srv::JuniperFsmCtrl, this);
-    //std::thread t2(&Srv::JuniperFsmCtrl, this);
-    //std::thread t3(&Srv::JuniperFsmCtrl, this);
-
-    //t1.join();
-    //t2.join();
-    //t3.join();
 }
 
 void Srv::HuaweiBind(std::string huawei_srv_socket)
@@ -157,13 +143,7 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
     huawei_cq_ = huawei_builder.AddCompletionQueue();
     huawei_server_ = huawei_builder.BuildAndStart();
 
-    std::thread t1(&Srv::HuaweiFsmCtrl, this);
-    std::thread t2(&Srv::HuaweiFsmCtrl, this);
-    std::thread t3(&Srv::HuaweiFsmCtrl, this);
-
-    t1.join();
-    t2.join();
-    t3.join();
+    Srv::HuaweiFsmCtrl();
 }
 
 void Srv::CiscoFsmCtrl()
