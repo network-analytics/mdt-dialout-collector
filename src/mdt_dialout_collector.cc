@@ -13,7 +13,7 @@ std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
 
 int main(void)
 {
-    std::vector<std::thread> vendors;
+    std::vector<std::jthread> vendors;
 
     if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
         (main_cfg_handler->get_ipv4_socket_huawei()).empty() and
@@ -24,7 +24,7 @@ int main(void)
 
     if (!(main_cfg_handler->get_ipv4_socket_cisco()).empty()) {
         void *cisco_ptr {nullptr};
-        std::thread cisco_t(&cisco_thread, cisco_ptr);
+        std::jthread cisco_t(&cisco_thread, cisco_ptr);
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_cisco() << "..." << std::endl;
         vendors.push_back(std::move(cisco_t));
@@ -32,7 +32,7 @@ int main(void)
 
     if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
         void *juniper_ptr {nullptr};
-        std::thread juniper_t(&juniper_thread, juniper_ptr);
+        std::jthread juniper_t(&juniper_thread, juniper_ptr);
         std::cout << "mdt-dialout-collector listening on "
         << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
         vendors.push_back(std::move(juniper_t));
@@ -40,14 +40,14 @@ int main(void)
 
     if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
         void *huawei_ptr {nullptr};
-        std::thread huawei_t(&huawei_thread, huawei_ptr);
+        std::jthread huawei_t(&huawei_thread, huawei_ptr);
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_huawei() << "..." << std::endl;
         vendors.push_back(std::move(huawei_t));
     }
 
     // Handling only required threads
-    for(std::thread& v : vendors) {
+    for(std::jthread& v : vendors) {
         if(v.joinable()) {
             v.join();
         }
