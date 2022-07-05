@@ -526,7 +526,7 @@ void Srv::JuniperStream::Start()
         //                          ---> string name = 1;
         //                          ---> map<string, string> key = 2;
 
-        const auto jup = juniper_stream.update();
+        const auto& jup = juniper_stream.update();
 
         //std::string value;
         // The Notification MUST include the timestamp field
@@ -697,47 +697,47 @@ void Srv::JuniperStream::Start()
             //                          ---> string name = 1;
             //                          ---> map<string, string> key = 2;
             //std::cout << "\n";
-            std::string path;
-            Json::Value value;
-            for (const auto& _jup : jup.update()) {
-                //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
-                //    << "\n";
-                int path_idx = 0;
-                path.clear();
-                while (path_idx < _jup.path().elem_size()) {
-                    //std::cout << _jup.path().elem().at(path_idx).name()
-                    //    << " ---> ";
-                    path.append("/");
-                    path.append(_jup.path().elem().at(path_idx).name());
-                    path_idx++;
-                }
-
-                // only json_val() received
-                value = _jup.val().json_val();
-                //std::cout << value << "\n";
-                root[path] = value.toStyledString();
-            }
-
-            // Serialize the JSON value into a string
-            Json::StreamWriterBuilder builderW;
-            builderW["emitUTF8"] = false;
-            builderW["indentation"] = "";
-            const std::unique_ptr<Json::StreamWriter> writer(
-                                                builderW.newStreamWriter());
-            std::string json_str_out = Json::writeString(builderW, root);
-
-            // Data enrichment with label (node_id/platform_id)
-            stream_data_in = json_str_out;
-            if (enable_label_encode_as_map.compare("true") == 0) {
-                if (data_manipulation->append_label_map(stream_data_in,
-                        stream_data_out) == 0) {
-                    data_delivery->async_kafka_producer(stream_data_out);
-                }
-            } else {
-                stream_data_out = json_str_out;
-                data_delivery->async_kafka_producer(stream_data_out);
-            }
-        }
+//            std::string path;
+//            Json::Value value;
+//            for (const auto& _jup : jup.update()) {
+//                //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
+//                //    << "\n";
+//                int path_idx = 0;
+//                path.clear();
+//                while (path_idx < _jup.path().elem_size()) {
+//                    //std::cout << _jup.path().elem().at(path_idx).name()
+//                    //    << " ---> ";
+//                    path.append("/");
+//                    path.append(_jup.path().elem().at(path_idx).name());
+//                    path_idx++;
+//                }
+//
+//                // only json_val() received
+//                value = _jup.val().json_val();
+//                //std::cout << value << "\n";
+//                root[path] = value.toStyledString();
+//            }
+//
+//            // Serialize the JSON value into a string
+//            Json::StreamWriterBuilder builderW;
+//            builderW["emitUTF8"] = false;
+//            builderW["indentation"] = "";
+//            const std::unique_ptr<Json::StreamWriter> writer(
+//                                                builderW.newStreamWriter());
+//            std::string json_str_out = Json::writeString(builderW, root);
+//
+//            // Data enrichment with label (node_id/platform_id)
+//            stream_data_in = json_str_out;
+//            if (enable_label_encode_as_map.compare("true") == 0) {
+//                if (data_manipulation->append_label_map(stream_data_in,
+//                        stream_data_out) == 0) {
+//                    data_delivery->async_kafka_producer(stream_data_out);
+//                }
+//            } else {
+//                stream_data_out = json_str_out;
+//                data_delivery->async_kafka_producer(stream_data_out);
+//            }
+//        }
     } else {
         GPR_ASSERT(juniper_stream_status == END);
         delete this;
