@@ -526,7 +526,7 @@ void Srv::JuniperStream::Start()
         //                          ---> string name = 1;
         //                          ---> map<string, string> key = 2;
 
-        const auto& jup = juniper_stream.update();
+        const auto jup = juniper_stream.update();
 
         //std::string value;
         // The Notification MUST include the timestamp field
