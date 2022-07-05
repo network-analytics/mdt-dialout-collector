@@ -1009,7 +1009,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
             parsing_str = juniper_tlm_header_ext->ParseFromString(
                 ext.registered_ext().msg());
 
-            if (parsing_str) {
+            if (parsing_str == true) {
                 if (!juniper_tlm_header_ext->system_id().empty()) {
                     root["system_id"] = juniper_tlm_header_ext->system_id();
                     std::cout << juniper_tlm_header_ext->system_id() << "\n";
