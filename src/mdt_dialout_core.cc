@@ -134,6 +134,7 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
                                 grpc::InsecureServerCredentials());
     juniper_cq_ = juniper_builder.AddCompletionQueue();
     juniper_server_ = juniper_builder.BuildAndStart();
+    Srv::JuniperFsmCtrl();
 
     //std::thread t1(&Srv::JuniperFsmCtrl, this);
     //std::thread t2(&Srv::JuniperFsmCtrl, this);
