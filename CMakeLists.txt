@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 # Set compiler options
-set(CMAKE_CXX_FLAGS "-Wall -pedantic -pthread")
+set(CMAKE_CXX_FLAGS "-Wall -pedantic -pthread -std=c++20")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
@@ -301,7 +301,7 @@ foreach(_target "mdt_dialout_collector")
         ${huawei_dialout_pb_grpc_cc}
         ${huawei_telemetry_pb_cc}
     )
-    target_compile_features(${_target} PRIVATE cxx_std_20)
+    target_compile_features(${_target} PRIVATE)
     target_link_libraries(
         ${_target}
         ${_REFLECTION}
