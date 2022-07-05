@@ -136,12 +136,12 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
     juniper_server_ = juniper_builder.BuildAndStart();
 
     std::thread t1(&Srv::JuniperFsmCtrl, this);
-    //std::thread t2(&Srv::JuniperFsmCtrl, this);
-    //std::thread t3(&Srv::JuniperFsmCtrl, this);
+    std::thread t2(&Srv::JuniperFsmCtrl, this);
+    std::thread t3(&Srv::JuniperFsmCtrl, this);
 
     t1.join();
-    //t2.join();
-    //t3.join();
+    t2.join();
+    t3.join();
 }
 
 void Srv::HuaweiBind(std::string huawei_srv_socket)
@@ -193,8 +193,7 @@ void Srv::JuniperFsmCtrl()
         //std::cout << "Juniper: " << juniper_counter << std::endl;
         GPR_ASSERT(juniper_cq_->Next(&juniper_tag, &juniper_ok));
         if (!juniper_ok) {
-            static_cast<JuniperStream *>(juniper_tag)->
-                Srv::JuniperStream::Stop();
+            static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Stop();
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start();
@@ -420,78 +419,77 @@ void Srv::JuniperStream::Start()
                     r_ext.registered_ext().msg());
 
                 // Extension to JSON Obj
-                // string
+                // string - extracting the system_id
                 if (!juniper_tlm_header_ext->system_id().empty()) {
                     root["system_id"] =
                         juniper_tlm_header_ext->system_id();
                 }
                 /*
                 // unit32
-                if (juniper_tlm_header_ext->component_id() != 0) {
+                if (!juniper_tlm_header_ext->component_id()) {
                     root["component_id"] =
                         (Json::Int) juniper_tlm_header_ext->component_id();
                 }
                 // unit32
-                if (juniper_tlm_header_ext->sub_component_id() != 0) {
+                if (!juniper_tlm_header_ext->sub_component_id()) {
                     root["sub_component_id"] =
                         (Json::Int) juniper_tlm_header_ext->sub_component_id();
                 }
                 // string
-                if (juniper_tlm_header_ext->sensor_name().empty() != 0) {
+                if (!juniper_tlm_header_ext->sensor_name().empty()) {
                     root["sensor_name"] =
-                        (Json::String) juniper_tlm_header_ext->sensor_name();
+                        juniper_tlm_header_ext->sensor_name();
                 }
                 // string
-                if (juniper_tlm_header_ext->subscribed_path().empty() != 0) {
+                if (!juniper_tlm_header_ext->subscribed_path().empty()) {
                     root["subscribed_path"] =
-                        (Json::String) juniper_tlm_header_ext->
-                            subscribed_path();
+                        juniper_tlm_header_ext-> subscribed_path();
                 }
                 // string
-                if (juniper_tlm_header_ext->streamed_path().empty() != 0) {
+                if (!juniper_tlm_header_ext->streamed_path().empty()) {
                     root["streamed_path"] =
-                    (Json::String) juniper_tlm_header_ext->streamed_path();
+                        juniper_tlm_header_ext->streamed_path();
                 }
                 // string
-                if (juniper_tlm_header_ext->component().empty() != 0) {
+                if (!juniper_tlm_header_ext->component().empty()) {
                     root["component"] =
-                    (Json::String) juniper_tlm_header_ext->component();
+                        juniper_tlm_header_ext->component();
                 }
                 // unit64
-                if (juniper_tlm_header_ext->sequence_number() != 0) {
+                if (!juniper_tlm_header_ext->sequence_number()) {
                     root["sequence_number"] =
                     (Json::UInt64) juniper_tlm_header_ext->sequence_number();
                 }
                 // int64
-                if (juniper_tlm_header_ext->payload_get_timestamp() != 0) {
+                if (!juniper_tlm_header_ext->payload_get_timestamp()) {
                     root["payload_get_timestamp"] =
                     (Json::Int64) juniper_tlm_header_ext->
                         payload_get_timestamp();
                 }
                 // int64
-                if (juniper_tlm_header_ext->stream_creation_timestamp() != 0) {
+                if (!juniper_tlm_header_ext->stream_creation_timestamp()) {
                     root["stream_creation_timestamp"] =
                     (Json::Int64) juniper_tlm_header_ext->
                         stream_creation_timestamp();
                 }
                 // int64
-                if (juniper_tlm_header_ext->event_timestamp() != 0) {
+                if (!juniper_tlm_header_ext->event_timestamp()) {
                     root["event_timestamp"] =
                         (Json::Int64) juniper_tlm_header_ext->event_timestamp();
                 }
                 // int64
-                if (juniper_tlm_header_ext->export_timestamp() != 0) {
+                if (!juniper_tlm_header_ext->export_timestamp()) {
                     root["export_timestamp"] =
                     (Json::Int64) juniper_tlm_header_ext->export_timestamp();
                 }
                 // unit64
-                if (juniper_tlm_header_ext->sub_sequence_number() != 0) {
+                if (!juniper_tlm_header_ext->sub_sequence_number()) {
                     root["sub_sequence_number"] =
                     (Json::UInt64) juniper_tlm_header_ext->
                         sub_sequence_number();
                 }
                 // bool
-                //if (juniper_tlm_header_ext->eom() != 0) {
+                //if (!juniper_tlm_header_ext->eom()) {
                 //    root["eom"] = juniper_tlm_header_ext->eom();
                 //}
                 */
