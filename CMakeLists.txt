@@ -277,6 +277,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery")
 
 # set the bin folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
@@ -288,6 +290,8 @@ foreach(_target "mdt_dialout_collector")
         "${CMAKE_CURRENT_SOURCE_DIR}/src/${_target}.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/mdt_dialout_core.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/data_delivery.cc"
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
         ${cisco_telemetry_pb_cc}
