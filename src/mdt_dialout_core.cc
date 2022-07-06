@@ -30,10 +30,6 @@
 #include <cstring>
 #include "cfg_handler.h"
 
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::Status;
-
 
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
@@ -961,7 +957,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
 {
     bool parsing_str;
     std::string stream_data_in;
-    
+
     for (const auto& ext : juniper_stream.extension()) {
         if (ext.has_registered_ext() and
             ext.registered_ext().id() ==

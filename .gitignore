@@ -50,3 +50,8 @@ src/proto/Juniper/*
 
 # BIN
 bin/mdt_dialout_collector
+
+# YouCompleteMe
+.cache/*
+compile_commands.json
+
