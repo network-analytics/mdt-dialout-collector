@@ -368,18 +368,13 @@ void Srv::JuniperStream::Start()
         std::string stream_data_in;
         // After data enrichment
         std::string stream_data_out;
+        std::string json_str_out;
         std::string peer = juniper_server_ctx.peer();
         Json::Value root;
 
         std::unique_ptr<DataManipulation> data_manipulation(
                 new DataManipulation());
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
-        //std::unique_ptr<TelemetryStream> juniper_tlm(
-        //        new TelemetryStream());
-        //GnmiJuniperTelemetryHeader
-        //std::unique_ptr<GnmiJuniperTelemetryHeader> juniper_tlm_header(
-        //        new GnmiJuniperTelemetryHeader());
-        //GnmiJuniperTelemetryHeaderExtension
         std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
             juniper_tlm_header_ext(new GnmiJuniperTelemetryHeaderExtension());
 
@@ -388,19 +383,14 @@ void Srv::JuniperStream::Start()
 
         if (data_manipulation->juniper_extension(juniper_stream,
             juniper_tlm_header_ext, root) == 0 and
-            data_manipulation->juniper_update(juniper_stream, root) == 0){
+            data_manipulation->juniper_update(juniper_stream, json_str_out,
+                root) == 0) {
+                // to be properly logged
                 std::cerr << "INFO - Juniper ext parsing succesful" << "\n";
         } else {
+                // to be properly logged
                 std::cerr << "ERROR - Juniper ext parsing unsuccesful" << "\n";
         }
-
-        // Serialize the JSON value into a string
-        Json::StreamWriterBuilder builderW;
-        builderW["emitUTF8"] = false;
-        builderW["indentation"] = "";
-        const std::unique_ptr<Json::StreamWriter> writer(
-                                            builderW.newStreamWriter());
-        std::string json_str_out = Json::writeString(builderW, root);
 
         // Data enrichment with label (node_id/platform_id)
         stream_data_in = json_str_out;
@@ -787,6 +777,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
 }
 
 int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
+    std::string json_str_out,
     Json::Value& root)
 {
     // From the first update() generate the sensor_path
@@ -993,6 +984,14 @@ int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
             root[path] = value.toStyledString();
         }
     }
+
+    // Serialize the JSON value into a string
+    Json::StreamWriterBuilder builderW;
+    builderW["emitUTF8"] = false;
+    builderW["indentation"] = "";
+    const std::unique_ptr<Json::StreamWriter> writer(
+                                        builderW.newStreamWriter());
+    json_str_out = Json::writeString(builderW, root);
 
     return EXIT_SUCCESS;
 }
