@@ -45,7 +45,7 @@ int main(void)
         vendors.push_back(std::move(juniper_t_1));
         vendors.push_back(std::move(juniper_t_2));
     }
-    
+
     if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
         void *huawei_ptr {nullptr};
         std::thread huawei_t_0(&huawei_thread, huawei_ptr);
