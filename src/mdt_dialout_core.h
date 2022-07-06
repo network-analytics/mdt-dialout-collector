@@ -49,6 +49,8 @@ public:
         const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>&
             juniper_tlm_header_ext,
         Json::Value& root);
+    int juniper_update(gnmi::SubscribeResponse& juniper_stream,
+        Json::Value& root);
 };
 
 class Srv final {
