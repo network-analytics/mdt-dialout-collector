@@ -777,7 +777,7 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
 }
 
 int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
-    std::string json_str_out,
+    std::string& json_str_out,
     Json::Value& root)
 {
     // From the first update() generate the sensor_path

@@ -50,7 +50,7 @@ public:
             juniper_tlm_header_ext,
         Json::Value& root);
     int juniper_update(gnmi::SubscribeResponse& juniper_stream,
-        std::string json_str_out,
+        std::string& json_str_out,
         Json::Value& root);
 };
 
