@@ -993,4 +993,7 @@ int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
             root[path] = value.toStyledString();
         }
     }
+
+    return EXIT_SUCCESS;
 }
+
