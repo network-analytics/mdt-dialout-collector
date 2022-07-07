@@ -6,8 +6,6 @@
 
 int DataDelivery::async_kafka_producer(const std::string& json_str)
 {
-    using namespace kafka::clients;
-
     // --- Required for config parameters ---
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
 
@@ -44,7 +42,7 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
             {"log_level", log_level},
         });
 
-        KafkaProducer producer(properties);
+        kafka::clients::KafkaProducer producer(properties);
 
         if (json_str.empty()) {
             // Implementing a better handling
@@ -52,13 +50,13 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
             return EXIT_FAILURE;
         }
 
-        auto msg = producer::ProducerRecord(topic,
+        auto msg = kafka::clients::producer::ProducerRecord(topic,
                     kafka::NullKey,
                     kafka::Value(json_str.c_str(), json_str.size()));
 
         producer.send(
             msg,
-            [](const producer::RecordMetadata& mdata,
+            [](const kafka::clients::producer::RecordMetadata& mdata,
                 const kafka::Error& err) {
             if (!err) {
                 std::cout << "Msg delivered: "
@@ -67,7 +65,7 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
                 std::cerr << "Msg delivery failed: "
                         << err.message() << std::endl;
             }
-        }, KafkaProducer::SendOption::ToCopyRecordValue);
+        }, kafka::clients::KafkaProducer::SendOption::ToCopyRecordValue);
     } catch (const kafka::KafkaException& ex) {
         std::cerr << "Unexpected exception: " << ex.what() << std::endl;
         return EXIT_FAILURE;

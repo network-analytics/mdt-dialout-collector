@@ -380,10 +380,10 @@ void Srv::JuniperStream::Start()
             data_manipulation->juniper_update(juniper_stream, json_str_out,
                 root) == 0) {
                 // to be properly logged
-                std::cerr << "INFO - Juniper ext parsing succesful" << "\n";
+                std::cout << "INFO - Juniper ext parsing succesful" << "\n";
         } else {
                 // to be properly logged
-                std::cerr << "ERROR - Juniper ext parsing unsuccesful" << "\n";
+                std::cout << "ERROR - Juniper ext parsing unsuccesful" << "\n";
         }
 
         // Data enrichment with label (node_id/platform_id)

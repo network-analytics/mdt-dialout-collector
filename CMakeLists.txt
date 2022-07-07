@@ -234,7 +234,7 @@ add_custom_command(
     "${juniper_telemetry_header_extension_pb_h}"
     COMMAND
     ${_PROTOBUF_PROTOC}
-    ARGS 
+    ARGS
     -I "${juniper_gnmi_ext_proto_path}"
     -I "${juniper_telemetry_proto_path}"
     -I "${juniper_telemetry_header_proto_path}"
