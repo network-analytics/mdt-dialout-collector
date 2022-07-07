@@ -7,7 +7,7 @@
 #include <grpc/support/log.h>
 #include <grpcpp/impl/server_builder_plugin.h>
 #include <json/json.h>
-#include "mdt_dialout_core.h"
+#include "core/mdt_dialout_core.h"
 #include "cisco_dialout.grpc.pb.h"
 #include "cisco_telemetry.pb.h"
 #include "juniper_dialout.grpc.pb.h"

@@ -276,6 +276,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/core")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery")
@@ -288,7 +289,7 @@ foreach(_target "mdt_dialout_collector")
     add_executable(
         ${_target}
         "${CMAKE_CURRENT_SOURCE_DIR}/src/${_target}.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mdt_dialout_core.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mdt_dialout_core.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/data_delivery.cc"
