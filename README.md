@@ -41,11 +41,12 @@ and the [Huawei's gRPC Dial-out .proto file](https://support.huawei.com/enterpri
 
 With the limits imposed by the Vendors implementations, both JSON and GPB-KV are supported.
 
-| Vendor | OS Version                     |   Encoding   |      .proto file                                                                                                                                  |
-|--------|--------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Cisco  | XR  (7.4.1@NSC-540)            | JSON, GPB-KV | [XR Telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)  |
-| Cisco  | XE  (17.06.01prd7@C8000V)      | GPB-KV       | [XE Telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)  |
-| Huawei | VRP (V800R021C10SPC300T@NE40E) | JSON         | [VRP Telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                   |
+| Vendor | OS Version                     |   Encoding   |      .proto file                                                                                                                                                              |
+|--------|--------------------------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Cisco  | XR  (7.4.1@NSC-540)            | JSON, GPB-KV | [XR Telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                              |
+| Cisco  | XE  (17.06.01prd7@C8000V)      | GPB-KV       | [XE Telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                              |
+| Juniper| Junos  (20.4R3-S2.6@mx10003)   | JSON-GNMI    | [Junos Telemetry .proto (Download section)](https://www.juniper.net/documentation/us/en/software/junos/interfaces-telemetry/topics/topic-map/telemetry-grpc-dialout-ta.html)  |
+| Huawei | VRP (V800R021C10SPC300T@NE40E) | JSON         | [VRP Telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                               |
 
 #### How to build
 
@@ -105,6 +106,8 @@ ipv4_socket_cisco = "0.0.0.0:10007";
 ## socket dedicated to the huawei's data-stream
 ipv4_socket_huawei = "0.0.0.0:10008";
 
+## socket dedicated to the juniper's data-stream
+ipv4_socket_juniper = "0.0.0.0:10009";
 
 ### mdt-dialout-collector - data-flow manipulation
 
@@ -137,15 +140,16 @@ log_level = "0";
 
 #### Licenses matrix
 
-|  Libraries / .proto files                                                                                                                                                 | License                   |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
-| [JsonCpp](https://github.com/open-source-parsers/jsoncpp)                                                                                                                 | MIT License               |
-| [librdkafka](https://github.com/edenhill/librdkafka)                                                                                                                      | BSD 2-Clause License      |
-| [Modern C++ Kafka API](https://github.com/morganstanley/modern-cpp-kafka)                                                                                                 | Apache License Version 2.0|
-| [libconfig](http://hyperrealm.github.io/libconfig/)                                                                                                                       | LGPL v2.1                 |
-| [gRPC](https://github.com/grpc/grpc)                                                                                                                                      | BSD 3-Clause License      |
-| [Cisco dial-out .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)| Apache License Version 2.0|
-| [Cisco telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                       | Apache License Version 2.0|
-| [Huawei dial-out .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                         | N/A                       |
-| [Huawei telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                        | N/A                       |
-| [mdt-dialout-collector](https://github.com/scuzzilla/mdt-dialout-collector)                                                                                               | MIT License               |
+|  Libraries / .proto files                                                                                                                                                   | License                   |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
+| [JsonCpp](https://github.com/open-source-parsers/jsoncpp)                                                                                                                   | MIT License               |
+| [librdkafka](https://github.com/edenhill/librdkafka)                                                                                                                        | BSD 2-Clause License      |
+| [Modern C++ Kafka API](https://github.com/morganstanley/modern-cpp-kafka)                                                                                                   | Apache License Version 2.0|
+| [libconfig](http://hyperrealm.github.io/libconfig/)                                                                                                                         | LGPL v2.1                 |
+| [gRPC](https://github.com/grpc/grpc)                                                                                                                                        | BSD 3-Clause License      |
+| [Cisco dial-out .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)  | Apache License Version 2.0|
+| [Cisco telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                         | Apache License Version 2.0|
+| [Junos Telemetry .proto (Download section)](https://www.juniper.net/documentation/us/en/software/junos/interfaces-telemetry/topics/topic-map/telemetry-grpc-dialout-ta.html)| Apache License Version 2.0|
+| [Huawei dial-out .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                           | N/A                       |
+| [Huawei telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                          | N/A                       |
+| [mdt-dialout-collector](https://github.com/scuzzilla/mdt-dialout-collector)                                                                                                 | MIT License               |
