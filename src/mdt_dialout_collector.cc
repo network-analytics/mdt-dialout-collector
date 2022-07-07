@@ -13,7 +13,7 @@ std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
 
 int main(void)
 {
-    //std::vector<std::thread> vendors;
+    std::vector<std::thread> vendors;
 
     if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
         (main_cfg_handler->get_ipv4_socket_huawei()).empty() and
@@ -30,15 +30,10 @@ int main(void)
         std::thread cisco_t_3(&cisco_thread, cisco_ptr);
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_cisco() << "..." << std::endl;
-        //vendors.push_back(std::move(cisco_t_0));
-        //vendors.push_back(std::move(cisco_t_1));
-        //vendors.push_back(std::move(cisco_t_2));
-        //vendors.push_back(std::move(cisco_t_3));
-
-        if (cisco_t_0.joinable()) cisco_t_0.join();
-        if (cisco_t_1.joinable()) cisco_t_1.join();
-        if (cisco_t_2.joinable()) cisco_t_2.join();
-        if (cisco_t_3.joinable()) cisco_t_3.join();
+        vendors.push_back(std::move(cisco_t_0));
+        vendors.push_back(std::move(cisco_t_1));
+        vendors.push_back(std::move(cisco_t_2));
+        vendors.push_back(std::move(cisco_t_3));
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
@@ -49,15 +44,10 @@ int main(void)
         std::thread juniper_t_3(&juniper_thread, juniper_ptr);
         std::cout << "mdt-dialout-collector listening on "
         << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
-        //vendors.push_back(std::move(juniper_t_0));
-        //vendors.push_back(std::move(juniper_t_1));
-        //vendors.push_back(std::move(juniper_t_2));
-        //vendors.push_back(std::move(juniper_t_3));
-
-        if (juniper_t_0.joinable()) juniper_t_0.join();
-        if (juniper_t_1.joinable()) juniper_t_1.join();
-        if (juniper_t_2.joinable()) juniper_t_2.join();
-        if (juniper_t_3.joinable()) juniper_t_3.join();
+        vendors.push_back(std::move(juniper_t_0));
+        vendors.push_back(std::move(juniper_t_1));
+        vendors.push_back(std::move(juniper_t_2));
+        vendors.push_back(std::move(juniper_t_3));
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
@@ -68,23 +58,18 @@ int main(void)
         std::thread huawei_t_3(&huawei_thread, huawei_ptr);
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_huawei() << "..." << std::endl;
-        //vendors.push_back(std::move(huawei_t_0));
-        //vendors.push_back(std::move(huawei_t_1));
-        //vendors.push_back(std::move(huawei_t_2));
-        //vendors.push_back(std::move(huawei_t_3));
-
-        if (huawei_t_0.joinable()) huawei_t_0.join();
-        if (huawei_t_1.joinable()) huawei_t_1.join();
-        if (huawei_t_2.joinable()) huawei_t_2.join();
-        if (huawei_t_3.joinable()) huawei_t_3.join();
+        vendors.push_back(std::move(huawei_t_0));
+        vendors.push_back(std::move(huawei_t_1));
+        vendors.push_back(std::move(huawei_t_2));
+        vendors.push_back(std::move(huawei_t_3));
     }
 
     // Handling only required threads
-    //for(std::thread& v : vendors) {
-    //    if(v.joinable()) {
-    //        v.join();
-    //    }
-    //}
+    for(std::thread& v : vendors) {
+        if(v.joinable()) {
+            v.join();
+        }
+    }
 
     return (EXIT_SUCCESS);
 }
