@@ -332,7 +332,8 @@ void Srv::CiscoStream::Start()
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }
-        cisco_stream_status = END;
+        // Memory leaks to be fixed
+        //cisco_stream_status = END;
     } else if (cisco_stream_status == END) {
         cisco_resp.Finish(grpc::Status::OK, this);
         cisco_stream_status = DELETE;
@@ -394,7 +395,8 @@ void Srv::JuniperStream::Start()
             stream_data_out = json_str_out;
             data_delivery->async_kafka_producer(stream_data_out);
         }
-        juniper_stream_status = END;
+        // Memory leaks to be fixed
+        //juniper_stream_status = END;
     } else if (juniper_stream_status == END) {
         juniper_resp.Finish(grpc::Status::OK, this);
         juniper_stream_status = DELETE;
@@ -501,7 +503,8 @@ void Srv::HuaweiStream::Start()
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }
-        huawei_stream_status = END;
+        // Memory leaks to be fixed
+        //huawei_stream_status = END;
     } else if (huawei_stream_status == END) {
         huawei_resp.Finish(grpc::Status::OK, this);
         huawei_stream_status = DELETE;
