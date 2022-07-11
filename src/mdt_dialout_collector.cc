@@ -14,6 +14,7 @@ std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
 int main(void)
 {
     std::vector<std::thread> vendors;
+    std::vector<std::thread> workers;
 
     if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
         (main_cfg_handler->get_ipv4_socket_huawei()).empty() and
@@ -22,18 +23,14 @@ int main(void)
             return(EXIT_FAILURE);
     }
 
+    int cisco_workers = std::stoi(main_cfg_handler->get_cisco_workers());
     if (!(main_cfg_handler->get_ipv4_socket_cisco()).empty()) {
         void *cisco_ptr {nullptr};
-        std::thread cisco_t_0(&cisco_thread, cisco_ptr);
-        std::thread cisco_t_1(&cisco_thread, cisco_ptr);
-        std::thread cisco_t_2(&cisco_thread, cisco_ptr);
-        std::thread cisco_t_3(&cisco_thread, cisco_ptr);
+        for (int w = 0; w < cisco_workers; ++w) {
+            workers.push_back(std::move(std::thread(&cisco_thread, cisco_ptr)));
+        }
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_cisco() << "..." << std::endl;
-        vendors.push_back(std::move(cisco_t_0));
-        vendors.push_back(std::move(cisco_t_1));
-        vendors.push_back(std::move(cisco_t_2));
-        vendors.push_back(std::move(cisco_t_3));
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {

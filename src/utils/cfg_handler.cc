@@ -101,6 +101,22 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     } else {
         params.insert({"ipv4_socket_huawei", ""});
     }
+    
+    bool cisco_workers = main_params->exists("cisco_workers");
+    if (cisco_workers) {
+        libconfig::Setting& cisco_workers =
+            main_params->lookup("cisco_workers");
+        std::string cisco_workers_s = cisco_workers;
+        if (!cisco_workers_s.empty()) {
+            params.insert({"cisco_workers", cisco_workers_s});
+        } else {
+            std::cout << "cisco_workers: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"cisco_workers", "1"});
+    }
 
     return EXIT_SUCCESS;
 }

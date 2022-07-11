@@ -34,11 +34,14 @@ public:
                       return ipv4_socket_juniper; };
     std::string get_ipv4_socket_huawei() {
                       return ipv4_socket_huawei; };
+    std::string get_cisco_workers() {
+                      return cisco_workers; };
 private:
     std::string iface;
     std::string ipv4_socket_cisco;
     std::string ipv4_socket_juniper;
     std::string ipv4_socket_huawei;
+    std::string cisco_workers;
 };
 
 // Data manipulation configuration parameters
