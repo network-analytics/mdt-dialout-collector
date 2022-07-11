@@ -13,7 +13,6 @@ std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
 
 int main(void)
 {
-    std::vector<std::thread> vendors;
     std::vector<std::thread> workers;
 
     if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
@@ -24,8 +23,8 @@ int main(void)
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_cisco()).empty()) {
-        int cisco_workers = std::stoi(main_cfg_handler->get_cisco_workers());
         void *cisco_ptr {nullptr};
+        int cisco_workers = std::stoi(main_cfg_handler->get_cisco_workers());
         for (int w = 0; w < cisco_workers; ++w) {
             workers.push_back(std::move(std::thread(&cisco_thread, cisco_ptr)));
         }
@@ -35,38 +34,24 @@ int main(void)
 
     if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
         void *juniper_ptr {nullptr};
-        std::thread juniper_t_0(&juniper_thread, juniper_ptr);
-        std::thread juniper_t_1(&juniper_thread, juniper_ptr);
-        std::thread juniper_t_2(&juniper_thread, juniper_ptr);
-        std::thread juniper_t_3(&juniper_thread, juniper_ptr);
+        int juniper_workers = std::stoi(main_cfg_handler->get_juniper_workers());
+        for (int w = 0; w < juniper_workers; ++w) {
+            workers.push_back(std::move(std::thread(&juniper_thread, juniper_ptr)));
+        }
         std::cout << "mdt-dialout-collector listening on "
         << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
-        vendors.push_back(std::move(juniper_t_0));
-        vendors.push_back(std::move(juniper_t_1));
-        vendors.push_back(std::move(juniper_t_2));
-        vendors.push_back(std::move(juniper_t_3));
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
         void *huawei_ptr {nullptr};
-        std::thread huawei_t_0(&huawei_thread, huawei_ptr);
-        std::thread huawei_t_1(&huawei_thread, huawei_ptr);
-        std::thread huawei_t_2(&huawei_thread, huawei_ptr);
-        std::thread huawei_t_3(&huawei_thread, huawei_ptr);
+        int huawei_workers = std::stoi(main_cfg_handler->get_huawei_workers());
+        for (int w = 0; w < huawei_workers; ++w) {
+            workers.push_back(std::move(std::thread(&huawei_thread, huawei_ptr)));
+        }
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_huawei() << "..." << std::endl;
-        vendors.push_back(std::move(huawei_t_0));
-        vendors.push_back(std::move(huawei_t_1));
-        vendors.push_back(std::move(huawei_t_2));
-        vendors.push_back(std::move(huawei_t_3));
     }
 
-    // Handling only required threads
-    //for(std::thread& v : vendors) {
-    //    if(v.joinable()) {
-    //        v.join();
-    //    }
-    //}
     for(std::thread& w : workers) {
         if(w.joinable()) {
             w.join();

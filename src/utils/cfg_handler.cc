@@ -19,6 +19,8 @@ MainCfgHandler::MainCfgHandler()
         this->ipv4_socket_juniper = parameters.at("ipv4_socket_juniper");
         this->ipv4_socket_huawei = parameters.at("ipv4_socket_huawei");
         this->cisco_workers = parameters.at("cisco_workers");
+        this->juniper_workers = parameters.at("juniper_workers");
+        this->huawei_workers = parameters.at("huawei_workers");
     } else {
         throw std::exception();
     }
@@ -117,6 +119,38 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
         }
     } else {
         params.insert({"cisco_workers", "1"});
+    }
+    
+    bool juniper_workers = main_params->exists("juniper_workers");
+    if (juniper_workers) {
+        libconfig::Setting& juniper_workers =
+            main_params->lookup("juniper_workers");
+        std::string juniper_workers_s = juniper_workers;
+        if (!juniper_workers_s.empty()) {
+            params.insert({"juniper_workers", juniper_workers_s});
+        } else {
+            std::cout << "juniper_workers: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"juniper_workers", "1"});
+    }
+    
+    bool huawei_workers = main_params->exists("huawei_workers");
+    if (huawei_workers) {
+        libconfig::Setting& huawei_workers =
+            main_params->lookup("huawei_workers");
+        std::string huawei_workers_s = huawei_workers;
+        if (!huawei_workers_s.empty()) {
+            params.insert({"huawei_workers", huawei_workers_s});
+        } else {
+            std::cout << "huawei_workers: valid value not empty"
+                                                                << std::endl;
+            return(EXIT_FAILURE);
+        }
+    } else {
+        params.insert({"huawei_workers", "1"});
     }
 
     return EXIT_SUCCESS;

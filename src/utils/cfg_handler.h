@@ -36,12 +36,18 @@ public:
                       return ipv4_socket_huawei; };
     std::string get_cisco_workers() {
                       return cisco_workers; };
+    std::string get_juniper_workers() {
+                      return juniper_workers; };
+    std::string get_huawei_workers() {
+                      return huawei_workers; };
 private:
     std::string iface;
     std::string ipv4_socket_cisco;
     std::string ipv4_socket_juniper;
     std::string ipv4_socket_huawei;
     std::string cisco_workers;
+    std::string juniper_workers;
+    std::string huawei_workers;
 };
 
 // Data manipulation configuration parameters
