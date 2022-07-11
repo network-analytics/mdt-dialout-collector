@@ -109,6 +109,11 @@ ipv4_socket_huawei = "0.0.0.0:10008";
 ## socket dedicated to the juniper's data-stream
 ipv4_socket_juniper = "0.0.0.0:10009";
 
+## workers (threads) per vendor - default = "1"
+cisco_workers = 1;
+juniper_workers = 1;
+huawei_workers = 1;
+
 ### mdt-dialout-collector - data-flow manipulation
 
 ## simplified JSON after GPB/GPB-KV decoding - default = "true"
