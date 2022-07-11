@@ -49,7 +49,7 @@ private:
     void CiscoFsmCtrl();
     void JuniperFsmCtrl();
     void HuaweiFsmCtrl();
-    enum StreamStatus { START, FLOW, END };
+    enum StreamStatus { START, FLOW, END, DELETE };
 
     class CiscoStream {
     public:
@@ -57,7 +57,6 @@ private:
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
         void Start();
-        void Stop();
 
     private:
         mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
@@ -75,7 +74,6 @@ private:
             Subscriber::AsyncService *juniper_service,
             grpc::ServerCompletionQueue *juniper_cq);
         void Start();
-        void Stop();
 
     private:
         Subscriber::AsyncService *juniper_service_;
@@ -93,7 +91,6 @@ private:
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *huawei_cq);
         void Start();
-        void Stop();
 
     private:
         huawei_dialout::gRPCDataservice::AsyncService *huawei_service_;

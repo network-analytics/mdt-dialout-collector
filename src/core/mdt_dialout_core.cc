@@ -145,10 +145,7 @@ void Srv::CiscoFsmCtrl()
     while (true) {
         //std::cout << "Cisco: " << cisco_counter << std::endl;
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
-        if (!cisco_ok) {
-            static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Stop();
-            continue;
-        }
+        GPR_ASSERT(cisco_ok);
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
         //cisco_counter++;
     }
@@ -163,11 +160,7 @@ void Srv::JuniperFsmCtrl()
     while (true) {
         //std::cout << "Juniper: " << juniper_counter << std::endl;
         GPR_ASSERT(juniper_cq_->Next(&juniper_tag, &juniper_ok));
-        if (!juniper_ok) {
-            static_cast<JuniperStream *>(juniper_tag)->
-                Srv::JuniperStream::Stop();
-            continue;
-        }
+        GPR_ASSERT(juniper_ok);
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start();
         //juniper_counter++;
     }
@@ -182,10 +175,7 @@ void Srv::HuaweiFsmCtrl()
     while (true) {
         //std::cout << "Huawei: " << huawei_counter << std::endl;
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
-        if (!huawei_ok) {
-            static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Stop();
-            continue;
-        }
+        GPR_ASSERT(huawei_ok);
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start();
         //huawei_counter++;
     }
@@ -259,6 +249,8 @@ void Srv::CiscoStream::Start()
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
         std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
                 new cisco_telemetry::Telemetry());
+
+        new Srv::CiscoStream(cisco_service_, cisco_cq_);
 
         // the key-word "this" is used as a unique TAG
         cisco_resp.Read(&cisco_stream, this);
@@ -340,8 +332,11 @@ void Srv::CiscoStream::Start()
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }
-    } else {
-        GPR_ASSERT(cisco_stream_status == END);
+        cisco_stream_status = END;
+    } else if (cisco_stream_status == END) {
+        cisco_resp.Finish(grpc::Status::OK, this);
+        cisco_stream_status = DELETE;
+    } else if (cisco_stream_status == DELETE) {
         delete this;
     }
 }
@@ -371,6 +366,8 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
         std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
             juniper_tlm_header_ext(new GnmiJuniperTelemetryHeaderExtension());
+        
+        new Srv::JuniperStream(juniper_service_, juniper_cq_);
 
         // the key-word "this" is used as a unique TAG
         juniper_resp.Read(&juniper_stream, this);
@@ -397,8 +394,11 @@ void Srv::JuniperStream::Start()
             stream_data_out = json_str_out;
             data_delivery->async_kafka_producer(stream_data_out);
         }
-    } else {
-        GPR_ASSERT(juniper_stream_status == END);
+        juniper_stream_status = END;
+    } else if (juniper_stream_status == END) {
+        juniper_resp.Finish(grpc::Status::OK, this);
+        juniper_stream_status = DELETE;
+    } else if (juniper_stream_status == DELETE) {
         delete this;
     }
 }
@@ -426,6 +426,8 @@ void Srv::HuaweiStream::Start()
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
         std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
+        
+        new Srv::HuaweiStream(huawei_service_, huawei_cq_);
 
         huawei_resp.Read(&huawei_stream, this);
         parsing_str = huawei_tlm->ParseFromString(huawei_stream.data());
@@ -499,27 +501,12 @@ void Srv::HuaweiStream::Start()
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }
-    } else {
-        GPR_ASSERT(huawei_stream_status == END);
+        huawei_stream_status = END;
+    } else if (huawei_stream_status == END) {
+        huawei_resp.Finish(grpc::Status::OK, this);
+        huawei_stream_status = DELETE;
+    } else if (huawei_stream_status == DELETE) {
         delete this;
     }
-}
-
-void Srv::CiscoStream::Stop()
-{
-    //std::cout << "Streaming Interrupted ..." << std::endl;
-    cisco_stream_status = END;
-}
-
-void Srv::JuniperStream::Stop()
-{
-    //std::cout << "Streaming Interrupted ..." << std::endl;
-    juniper_stream_status = END;
-}
-
-void Srv::HuaweiStream::Stop()
-{
-    //std::cout << "Streaming Interrupted ..." << std::endl;
-    huawei_stream_status = END;
 }
 
