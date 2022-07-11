@@ -18,6 +18,7 @@ MainCfgHandler::MainCfgHandler()
         this->ipv4_socket_cisco = parameters.at("ipv4_socket_cisco");
         this->ipv4_socket_juniper = parameters.at("ipv4_socket_juniper");
         this->ipv4_socket_huawei = parameters.at("ipv4_socket_huawei");
+        this->cisco_workers = parameters.at("cisco_workers");
     } else {
         throw std::exception();
     }

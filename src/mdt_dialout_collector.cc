@@ -23,8 +23,8 @@ int main(void)
             return(EXIT_FAILURE);
     }
 
-    int cisco_workers = std::stoi(main_cfg_handler->get_cisco_workers());
     if (!(main_cfg_handler->get_ipv4_socket_cisco()).empty()) {
+        int cisco_workers = std::stoi(main_cfg_handler->get_cisco_workers());
         void *cisco_ptr {nullptr};
         for (int w = 0; w < cisco_workers; ++w) {
             workers.push_back(std::move(std::thread(&cisco_thread, cisco_ptr)));
@@ -62,9 +62,14 @@ int main(void)
     }
 
     // Handling only required threads
-    for(std::thread& v : vendors) {
-        if(v.joinable()) {
-            v.join();
+    //for(std::thread& v : vendors) {
+    //    if(v.joinable()) {
+    //        v.join();
+    //    }
+    //}
+    for(std::thread& w : workers) {
+        if(w.joinable()) {
+            w.join();
         }
     }
 
