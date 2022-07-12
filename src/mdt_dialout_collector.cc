@@ -26,7 +26,7 @@ int main(void)
         void *cisco_ptr {nullptr};
         int cisco_workers = std::stoi(main_cfg_handler->get_cisco_workers());
         for (int w = 0; w < cisco_workers; ++w) {
-            workers.push_back(std::move(std::thread(&cisco_thread, cisco_ptr)));
+            workers.push_back(std::thread(&cisco_thread, cisco_ptr));
         }
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_cisco() << "..." << std::endl;
@@ -36,7 +36,7 @@ int main(void)
         void *juniper_ptr {nullptr};
         int juniper_workers = std::stoi(main_cfg_handler->get_juniper_workers());
         for (int w = 0; w < juniper_workers; ++w) {
-            workers.push_back(std::move(std::thread(&juniper_thread, juniper_ptr)));
+            workers.push_back(std::thread(&juniper_thread, juniper_ptr));
         }
         std::cout << "mdt-dialout-collector listening on "
         << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
@@ -46,7 +46,7 @@ int main(void)
         void *huawei_ptr {nullptr};
         int huawei_workers = std::stoi(main_cfg_handler->get_huawei_workers());
         for (int w = 0; w < huawei_workers; ++w) {
-            workers.push_back(std::move(std::thread(&huawei_thread, huawei_ptr)));
+            workers.push_back(std::thread(&huawei_thread, huawei_ptr));
         }
         std::cout << "mdt-dialout-collector listening on "
             << main_cfg_handler->get_ipv4_socket_huawei() << "..." << std::endl;

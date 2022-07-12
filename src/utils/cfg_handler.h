@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <libconfig.h++>
+#include <map>
 
 
 class CfgHandler {

@@ -104,7 +104,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     } else {
         params.insert({"ipv4_socket_huawei", ""});
     }
-    
+
     bool cisco_workers = main_params->exists("cisco_workers");
     if (cisco_workers) {
         libconfig::Setting& cisco_workers =
@@ -120,7 +120,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     } else {
         params.insert({"cisco_workers", "1"});
     }
-    
+
     bool juniper_workers = main_params->exists("juniper_workers");
     if (juniper_workers) {
         libconfig::Setting& juniper_workers =
@@ -136,7 +136,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     } else {
         params.insert({"juniper_workers", "1"});
     }
-    
+
     bool huawei_workers = main_params->exists("huawei_workers");
     if (huawei_workers) {
         libconfig::Setting& huawei_workers =

@@ -145,7 +145,11 @@ void Srv::CiscoFsmCtrl()
     while (true) {
         //std::cout << "Cisco: " << cisco_counter << std::endl;
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
-        GPR_ASSERT(cisco_ok);
+        //GPR_ASSERT(cisco_ok);
+        if (!cisco_ok) {
+            std::cout << "WARN - Cisco CQ failed\n";
+            continue;
+        }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
         //cisco_counter++;
     }
@@ -160,7 +164,11 @@ void Srv::JuniperFsmCtrl()
     while (true) {
         //std::cout << "Juniper: " << juniper_counter << std::endl;
         GPR_ASSERT(juniper_cq_->Next(&juniper_tag, &juniper_ok));
-        GPR_ASSERT(juniper_ok);
+        //GPR_ASSERT(juniper_ok);
+        if (!juniper_ok) {
+            std::cout << "WARN - Juniper CQ failed\n";
+            continue;
+        }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start();
         //juniper_counter++;
     }
@@ -175,7 +183,11 @@ void Srv::HuaweiFsmCtrl()
     while (true) {
         //std::cout << "Huawei: " << huawei_counter << std::endl;
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
-        GPR_ASSERT(huawei_ok);
+        //GPR_ASSERT(huawei_ok);
+        if (!huawei_ok) {
+            std::cout << "WARN - Huawei CQ failed\n";
+            continue;
+        }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start();
         //huawei_counter++;
     }
@@ -367,7 +379,7 @@ void Srv::JuniperStream::Start()
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
         std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
             juniper_tlm_header_ext(new GnmiJuniperTelemetryHeaderExtension());
-        
+
         new Srv::JuniperStream(juniper_service_, juniper_cq_);
 
         // the key-word "this" is used as a unique TAG
@@ -428,13 +440,15 @@ void Srv::HuaweiStream::Start()
         std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
         std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
                                             new huawei_telemetry::Telemetry());
-        
+
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
 
         huawei_resp.Read(&huawei_stream, this);
         parsing_str = huawei_tlm->ParseFromString(huawei_stream.data());
 
         stream_data_in = huawei_stream.data();
+
+        std::cout << stream_data_in << "\n";
 
         // Handling empty data
         if (stream_data_in.empty()) {
