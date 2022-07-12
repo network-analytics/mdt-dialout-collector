@@ -472,6 +472,8 @@ void Srv::HuaweiStream::Start()
                                                             *huawei_tlm,
                                                             &stream_data_in,
                                                             opt);
+                int rows = huawei_tlm->data_gpb().row_size();
+                std::cout << "rows: " << rows << "\n";
             }
 
             // Data enrichment with label (node_id/platform_id)
