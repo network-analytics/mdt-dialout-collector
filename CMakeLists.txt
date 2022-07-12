@@ -304,6 +304,7 @@ add_custom_command(
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/OpenConfig")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/core")

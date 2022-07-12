@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <iostream>
 #include <typeinfo>
 #include <grpcpp/grpcpp.h>
@@ -23,6 +24,7 @@
 #include "cfg_handler.h"
 #include "dataManipulation/data_manipulation.h"
 #include "dataDelivery/data_delivery.h"
+#include "openconfig_interfaces.pb.h"
 
 
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
@@ -257,10 +259,11 @@ void Srv::CiscoStream::Start()
         std::string peer = cisco_server_ctx.peer();
 
         std::unique_ptr<DataManipulation> data_manipulation(
-                new DataManipulation());
-        std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
+            new DataManipulation());
+        std::unique_ptr<DataDelivery> data_delivery(
+            new DataDelivery());
         std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
-                new cisco_telemetry::Telemetry());
+            new cisco_telemetry::Telemetry());
 
         new Srv::CiscoStream(cisco_service_, cisco_cq_);
 
@@ -375,10 +378,11 @@ void Srv::JuniperStream::Start()
         Json::Value root;
 
         std::unique_ptr<DataManipulation> data_manipulation(
-                new DataManipulation());
-        std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
-        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
-            juniper_tlm_header_ext(new GnmiJuniperTelemetryHeaderExtension());
+            new DataManipulation());
+        std::unique_ptr<DataDelivery> data_delivery(
+            new DataDelivery());
+        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_hdr_ext(
+            new GnmiJuniperTelemetryHeaderExtension());
 
         new Srv::JuniperStream(juniper_service_, juniper_cq_);
 
@@ -386,7 +390,7 @@ void Srv::JuniperStream::Start()
         juniper_resp.Read(&juniper_stream, this);
 
         if (data_manipulation->juniper_extension(juniper_stream,
-            juniper_tlm_header_ext, root) == 0 and
+            juniper_tlm_hdr_ext, root) == 0 and
             data_manipulation->juniper_update(juniper_stream, json_str_out,
                 root) == 0) {
                 // to be properly logged
@@ -436,10 +440,13 @@ void Srv::HuaweiStream::Start()
         std::string peer = huawei_server_ctx.peer();
 
         std::unique_ptr<DataManipulation> data_manipulation(
-                new DataManipulation());
-        std::unique_ptr<DataDelivery> data_delivery(new DataDelivery());
+            new DataManipulation());
+        std::unique_ptr<DataDelivery> data_delivery(
+            new DataDelivery());
         std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
-                                            new huawei_telemetry::Telemetry());
+            new huawei_telemetry::Telemetry());
+        std::unique_ptr<openconfig_interfaces::Interfaces> oc_if(
+            new openconfig_interfaces::Interfaces());
 
         new Srv::HuaweiStream(huawei_service_, huawei_cq_);
 
@@ -472,16 +479,31 @@ void Srv::HuaweiStream::Start()
                                                             *huawei_tlm,
                                                             &stream_data_in,
                                                             opt);
+                // --- OC-IF ---
                 int counter = 0;
                 int rows = huawei_tlm->data_gpb().row_size();
                 std::cout << "rows: " << rows << "\n";
 
+                bool parsing_content {false};
+                std::string content_s;
+
                 while (counter < rows) {
                     std::string content = huawei_tlm->
                         data_gpb().row().at(counter).content();
-                    std::cout << "content: " << content << "\n";
+                    parsing_content = oc_if->ParseFromString(content);
+                    if (parsing_content == true) {
+                        google::protobuf::util::JsonPrintOptions opt;
+                        opt.add_whitespace = true;
+                        google::protobuf::util::MessageToJsonString(
+                                                            *oc_if,
+                                                            &content_s,
+                                                            opt);
+                    }
+
+                    std::cout << "content: " << content_s << "\n";
                     counter++;
                 }
+                // --- OC-IF ---
             }
 
             // Data enrichment with label (node_id/platform_id)
