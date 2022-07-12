@@ -461,7 +461,7 @@ void Srv::HuaweiStream::Start()
 
         // Handling GPB
         else {
-            if (!(huawei_tlm->has_data_gpb() == true or parsing_str == true)) {
+            if (!(huawei_tlm->has_data_gpb()) == true or parsing_str == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
