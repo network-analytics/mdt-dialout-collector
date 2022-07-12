@@ -467,6 +467,7 @@ void Srv::HuaweiStream::Start()
                 std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
                                                                 << std::endl;
                 // ---
+                stream_data_in.clear();
                 google::protobuf::util::JsonPrintOptions opt;
                 opt.add_whitespace = true;
                 google::protobuf::util::MessageToJsonString(
