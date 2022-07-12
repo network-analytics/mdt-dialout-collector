@@ -280,7 +280,7 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
-        } else if (!(cisco_tlm->data_gpbkv().empty()) or parsing_str == true) {
+        } else if (cisco_tlm->has_data_gpb() == true or parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
@@ -459,7 +459,7 @@ void Srv::HuaweiStream::Start()
 
         // Handling GPB
         else {
-            if (!(huawei_tlm->has_data_gpb()) == true or parsing_str == true) {
+            if (huawei_tlm->has_data_gpb() == true or parsing_str == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling GPB: " << type_info
