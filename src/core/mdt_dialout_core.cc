@@ -448,8 +448,6 @@ void Srv::HuaweiStream::Start()
 
         stream_data_in = huawei_stream.data();
 
-        std::cout << stream_data_in << "\n";
-
         // Handling empty data
         if (stream_data_in.empty()) {
             // ---
@@ -464,7 +462,7 @@ void Srv::HuaweiStream::Start()
             if (!(huawei_tlm->has_data_gpb()) == true or parsing_str == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
-                std::cout << peer << " HUAWEI Handling GPB-KV: " << type_info
+                std::cout << peer << " HUAWEI Handling GPB: " << type_info
                                                                 << std::endl;
                 // ---
                 stream_data_in.clear();
