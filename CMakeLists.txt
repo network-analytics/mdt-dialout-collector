@@ -49,7 +49,7 @@ get_filename_component(huawei_dialout_proto_path "${huawei_dialout_proto}" PATH)
 get_filename_component(cisco_telemetry_proto "proto/Cisco/cisco_telemetry.proto" ABSOLUTE)
 get_filename_component(cisco_telemetry_proto_path "${cisco_telemetry_proto}" PATH)
 
-# Proto file to be able to decode gpb-kv messages - Telemetry / Telemetry Header / Telemetry Header Extensions - Juniper
+# Proto file to be able to decode gpb messages - Telemetry / Telemetry Header / Telemetry Header Extensions - Juniper
 get_filename_component(juniper_telemetry_proto "proto/Juniper/juniper_telemetry.proto" ABSOLUTE)
 get_filename_component(juniper_telemetry_proto_path "${juniper_telemetry_proto}" PATH)
 
@@ -59,9 +59,20 @@ get_filename_component(juniper_telemetry_header_proto_path "${juniper_telemetry_
 get_filename_component(juniper_telemetry_header_extension_proto "proto/Juniper/juniper_telemetry_header_extension.proto" ABSOLUTE)
 get_filename_component(juniper_telemetry_header_extension_proto_path "${juniper_telemetry_header_extension_proto}" PATH)
 
-# Proto file to be able to decode gpb-kv messages - Huawei
+# Proto file to be able to decode gpb messages - Huawei
 get_filename_component(huawei_telemetry_proto "proto/Huawei/huawei_telemetry.proto" ABSOLUTE)
 get_filename_component(huawei_telemetry_proto_path "${huawei_telemetry_proto}" PATH)
+
+# GPB "Subject" specific, Vendors & Standardization entities
+# Cisco
+
+# Juniper
+
+# Huawei
+
+# OpenConfig
+get_filename_component(openconfig_interfaces_proto "proto/OpenConfig/openconfig_interfaces.proto" ABSOLUTE)
+get_filename_component(openconfig_interfaces_proto_path "${openconfig_interfaces_proto}" PATH)
 
 # jsoncpp libs
 set(JSONCPP_INCLUDE_DIR /usr/include/jsoncpp)
@@ -186,7 +197,7 @@ add_custom_command(
     "${huawei_dialout_proto}"
 )
 
-# Protobuf generated support "GPB-KV" encoding - Cisco
+# Protobuf generated support "GPB-KV" decoding - Cisco
 set(cisco_telemetry_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco/cisco_telemetry.pb.cc")
 set(cisco_telemetry_pb_h
@@ -205,7 +216,7 @@ add_custom_command(
     "${cisco_telemetry_proto}"
 )
 
-# Protobuf generated support "GPB-KV" encoding - Juniper
+# Protobuf generated support "GPB" decoding - Juniper
 set(juniper_gnmi_ext_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper/juniper_gnmi_ext.pb.cc")
 set(juniper_gnmi_ext_pb_h
@@ -251,7 +262,7 @@ add_custom_command(
     "${juniper_telemetry_header_extension_proto}"
 )
 
-# Protobuf generated support "GPB-KV" encoding - Huawei
+# Protobuf generated support "GPB" decoding - Huawei
 set(huawei_telemetry_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei/huawei_telemetry.pb.cc")
 set(huawei_telemetry_pb_h
@@ -268,6 +279,25 @@ add_custom_command(
     "${huawei_telemetry_proto}"
     DEPENDS
     "${huawei_telemetry_proto}"
+)
+
+# Protobuf generated support "GPB" decoding - Openconfig
+set(openconfig_interfaces_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/OpenConfig/openconfig_interfaces.pb.cc")
+set(openconfig_interfaces_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/OpenConfig/openconfig_interfaces.pb.h")
+add_custom_command(
+    OUTPUT
+    "${openconfig_interfaces_pb_cc}"
+    "${openconfig_interfaces_pb_h}"
+    COMMAND
+    ${_PROTOBUF_PROTOC}
+    ARGS
+    -I "${openconfig_interfaces_proto_path}"
+    --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/OpenConfig"
+    "${openconfig_interfaces_proto}"
+    DEPENDS
+    "${openconfig_interfaces_proto}"
 )
 
 # Include local header files
@@ -306,6 +336,7 @@ foreach(_target "mdt_dialout_collector")
         ${huawei_dialout_pb_cc}
         ${huawei_dialout_pb_grpc_cc}
         ${huawei_telemetry_pb_cc}
+        ${openconfig_interfaces_pb_cc}
     )
     target_compile_features(${_target} PRIVATE)
     target_link_libraries(
