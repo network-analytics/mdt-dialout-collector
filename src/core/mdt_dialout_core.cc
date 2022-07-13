@@ -525,7 +525,7 @@ void Srv::HuaweiStream::Start()
                     //        << err
                     //        << std::endl;
                     //}
-                    root.append(content_s);
+                    root["decoded"].append(content_s);
 
                     // Serialize the JSON value into a string
                     Json::StreamWriterBuilder builderW;
