@@ -483,9 +483,9 @@ void Srv::HuaweiStream::Start()
                 // --- OC-IF ---
                 int counter = 0;
                 int rows = huawei_tlm->data_gpb().row_size();
-                huawei_tlm->sensor_path();
-                std::cout << "sensor_path: " << huawei_tlm-> sensor_path()
-                    << "rows: " << rows << "\n";
+                std::cout << "------- sensor_path: "
+                    << huawei_tlm->sensor_path()
+                    << " ------- rows: " << rows << "\n";
 
                 bool parsing_content {false};
                 std::string content_s;
