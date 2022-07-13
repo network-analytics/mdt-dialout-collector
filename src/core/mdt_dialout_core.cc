@@ -476,6 +476,7 @@ void Srv::HuaweiStream::Start()
                                                                 << std::endl;
 
                 // --- OC-IF ---
+                stream_data_in.clear();
                 int counter = 0;
                 int rows = huawei_tlm->data_gpb().row_size();
 
