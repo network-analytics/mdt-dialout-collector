@@ -283,9 +283,9 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
-        std::cout << cisco_tlm->data_gpbkv().empty() << "\n";
-        } else if (cisco_tlm->data_gpbkv().empty() == false and
-            parsing_str == true) {
+        std::cout << "GPB-KV empty?: " << cisco_tlm->data_gpbkv().empty() << "\n";
+        std::cout << "Parsing?: " << parsing_str << "\n";
+        } else if (cisco_tlm->data_gpbkv().empty() == false) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
