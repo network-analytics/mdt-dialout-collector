@@ -476,7 +476,7 @@ void Srv::HuaweiStream::Start()
                                                                 << std::endl;
 
                 if (data_manipulation->huawei_gpb_openconfig_interface(
-                    huawei_tlm, oc_if, json_str_out)) {
+                    huawei_tlm, oc_if, json_str_out) == 0) {
                         // to be properly logged
                         std::cout << peer
                             << " huawei oc-if parsing succesful\n";
