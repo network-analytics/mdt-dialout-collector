@@ -432,7 +432,7 @@ void Srv::HuaweiStream::Start()
                                     this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        bool parsing_str;
+        bool parsing_str {false};
         // From the network
         std::string stream_data_in;
         // Afetr data enrichment
@@ -466,7 +466,7 @@ void Srv::HuaweiStream::Start()
 
         // Handling GPB
         else {
-            if (!(huawei_tlm->has_data_gpb()) == true or parsing_str == true) {
+            if (huawei_tlm->has_data_gpb() == true and parsing_str == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling GPB: " << type_info
