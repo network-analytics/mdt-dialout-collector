@@ -5,6 +5,7 @@
 #include "juniper_telemetry_header_extension.pb.h"
 #include "dataManipulation/data_manipulation.h"
 #include <google/protobuf/util/json_util.h>
+#include "openconfig_interfaces.pb.h"
 
 
 // forge JSON & enrich with MAP (node_id/platform_id)
@@ -398,6 +399,61 @@ int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
     const std::unique_ptr<Json::StreamWriter> writer(
                                         builderW.newStreamWriter());
     json_str_out = Json::writeString(builderW, root);
+
+    return EXIT_SUCCESS;
+}
+
+int DataManipulation::huawei_gpb_openconfig_interface(
+    const std::unique_ptr<huawei_telemetry::Telemetry>& huawei_tlm,
+    const std::unique_ptr<openconfig_interfaces::Interfaces>& oc_if,
+    std::string& json_str_out)
+{
+    int data_rows = huawei_tlm->data_gpb().row_size();
+
+    bool parsing_content {false};
+    std::string content_s;
+    Json::Value root;
+
+    root["collection_id"] = huawei_tlm->collection_id();
+    root["collection_start_time"] = huawei_tlm->collection_start_time();
+    root["collection_end_time"] = huawei_tlm->collection_end_time();
+    root["current_period"] = huawei_tlm->current_period();
+    root["encoding"] = huawei_tlm->encoding();
+    root["except_desc"] = huawei_tlm->except_desc();
+    root["msg_timestamp"] = huawei_tlm->msg_timestamp();
+    root["node_id_str"] = huawei_tlm->node_id_str();
+    root["product_name"] = huawei_tlm->product_name();
+    root["proto_path"] = huawei_tlm->proto_path();
+    root["sensor_path"] = huawei_tlm->sensor_path();
+    root["software_version"] = huawei_tlm->software_version();
+    root["subscription_id_str"] = huawei_tlm->subscription_id_str();
+
+    for (int idx_0 = 0; idx_0 < data_rows; ++idx_0) {
+        content_s.clear();
+        std::string content = huawei_tlm->
+            data_gpb().row().at(idx_0).content();
+        parsing_content = oc_if->ParseFromString(content);
+        if (parsing_content == true) {
+            google::protobuf::util::JsonPrintOptions opt;
+            opt.add_whitespace = true;
+            google::protobuf::util::MessageToJsonString(
+                *oc_if,
+                &content_s,
+                opt);
+        } else {
+            return EXIT_FAILURE;
+        }
+
+        root["decoded"].append(content_s);
+
+        // Serialize the JSON value into a string
+        Json::StreamWriterBuilder builderW;
+        builderW["emitUTF8"] = false;
+        builderW["indentation"] = "";
+        const std::unique_ptr<Json::StreamWriter> writer(
+        builderW.newStreamWriter());
+        json_str_out = Json::writeString(builderW, root);
+    }
 
     return EXIT_SUCCESS;
 }

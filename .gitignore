@@ -45,8 +45,10 @@ src/proto/Cisco/*.cc
 src/proto/Cisco/*.h
 src/proto/Huawei/*.cc
 src/proto/Huawei/*.h
-src/proto/Juniper/*
-!src/proto/Juniper/README.md
+src/proto/Juniper/*.cc
+src/proto/Juniper/*.h
+src/proto/OpenConfig/*.cc
+src/proto/OpenConfig/*.h
 
 # BIN
 bin/mdt_dialout_collector
