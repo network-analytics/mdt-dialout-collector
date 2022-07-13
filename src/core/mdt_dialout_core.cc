@@ -485,9 +485,9 @@ void Srv::HuaweiStream::Start()
                 // --- OC-IF ---
                 int counter = 0;
                 int rows = huawei_tlm->data_gpb().row_size();
-                std::cout << "------- sensor_path: "
-                    << huawei_tlm->sensor_path()
-                    << " ------- rows: " << rows << "\n";
+                //std::cout << "------- sensor_path: "
+                //    << huawei_tlm->sensor_path()
+                //    << " ------- rows: " << rows << "\n";
 
                 bool parsing_content {false};
                 std::string content_s;
@@ -498,7 +498,7 @@ void Srv::HuaweiStream::Start()
 
                 while (counter < rows) {
                     content_s.clear();
-                    std::cout << "------- row: " << counter << " -------\n";
+                    //std::cout << "------- row: " << counter << " -------\n";
                     std::string content = huawei_tlm->
                         data_gpb().row().at(counter).content();
                     parsing_content = oc_if->ParseFromString(content);
@@ -545,12 +545,12 @@ void Srv::HuaweiStream::Start()
             if (enable_label_encode_as_map.compare("true") == 0) {
                 if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
-                    data_delivery->async_kafka_producer(stream_data_out);
+                    //data_delivery->async_kafka_producer(stream_data_out);
                     data_delivery->async_kafka_producer(json_str_out);
                 }
             } else {
                 stream_data_out = stream_data_in;
-                data_delivery->async_kafka_producer(stream_data_out);
+                //data_delivery->async_kafka_producer(stream_data_out);
                 data_delivery->async_kafka_producer(json_str_out);
             }
         }
