@@ -6,6 +6,8 @@
 #include "cisco_telemetry.pb.h"
 #include "juniper_gnmi.pb.h"
 #include "juniper_telemetry_header_extension.pb.h"
+#include "huawei_telemetry.pb.h"
+#include "openconfig_interfaces.pb.h"
 
 
 class DataManipulation {
@@ -25,6 +27,10 @@ public:
     int juniper_update(gnmi::SubscribeResponse& juniper_stream,
         std::string& json_str_out,
         Json::Value& root);
+    int huawei_gpb_openconfig_interface(
+            const std::unique_ptr<huawei_telemetry::Telemetry>& huawei_tlm,
+            const std::unique_ptr<openconfig_interfaces::Interfaces>& oc_if,
+            std::string& json_str_out);
 };
 
 #endif

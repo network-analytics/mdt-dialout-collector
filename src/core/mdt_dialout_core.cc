@@ -349,7 +349,7 @@ void Srv::CiscoStream::Start()
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }
-        // Memory leaks to be fixed
+        // Potential memory leak to be fixed
         //cisco_stream_status = END;
     } else if (cisco_stream_status == END) {
         cisco_resp.Finish(grpc::Status::OK, this);
@@ -413,7 +413,7 @@ void Srv::JuniperStream::Start()
             stream_data_out = json_str_out;
             data_delivery->async_kafka_producer(stream_data_out);
         }
-        // Memory leaks to be fixed
+        // potential memory leak to be fixed
         //juniper_stream_status = END;
     } else if (juniper_stream_status == END) {
         juniper_resp.Finish(grpc::Status::OK, this);
@@ -475,78 +475,28 @@ void Srv::HuaweiStream::Start()
                 std::cout << peer << " HUAWEI Handling GPB: " << type_info
                                                                 << std::endl;
 
-                // --- OC-IF ---
-                stream_data_in.clear();
-                int counter = 0;
-                int rows = huawei_tlm->data_gpb().row_size();
+                if (data_manipulation->huawei_gpb_openconfig_interface(
+                    huawei_tlm, oc_if, json_str_out)) {
+                        // to be properly logged
+                        std::cout << peer
+                            << " huawei oc-if parsing succesful\n";
+                } else {
+                        // to be properly logged
+                        std::cout << peer
+                            << " huawei oc-if parsing unsuccesful\n";
+                }
 
-                bool parsing_content {false};
-                std::string content_s;
-                Json::Value root;
-
-                root["collection_id"] = huawei_tlm->
-                    collection_id();
-                root["collection_start_time"] = huawei_tlm->
-                    collection_start_time();
-                root["collection_end_time"] = huawei_tlm->
-                    collection_end_time();
-                root["current_period"] = huawei_tlm->
-                    current_period();
-                root["except_desc"] = huawei_tlm->
-                    except_desc();
-                root["msg_timestamp"] = huawei_tlm->
-                    msg_timestamp();
-                root["node_id_str"] = huawei_tlm->
-                    node_id_str();
-                root["product_name"] = huawei_tlm->
-                    product_name();
-                root["proto_path"] = huawei_tlm->
-                    proto_path();
-                root["sensor_path"] = huawei_tlm->
-                    sensor_path();
-                root["software_version"] = huawei_tlm->
-                    software_version();
-                root["subscription_id_str"] = huawei_tlm->
-                    subscription_id_str();
-
-                while (counter < rows) {
-                    content_s.clear();
-                    std::string content = huawei_tlm->
-                        data_gpb().row().at(counter).content();
-                    parsing_content = oc_if->ParseFromString(content);
-                    if (parsing_content == true) {
-                        google::protobuf::util::JsonPrintOptions opt;
-                        opt.add_whitespace = true;
-                        google::protobuf::util::MessageToJsonString(
-                                                            *oc_if,
-                                                            &content_s,
-                                                            opt);
+                // Data enrichment with label (node_id/platform_id)
+                stream_data_in = json_str_out;
+                if (enable_label_encode_as_map.compare("true") == 0) {
+                    if (data_manipulation->append_label_map(stream_data_in,
+                            stream_data_out) == 0) {
+                        data_delivery->async_kafka_producer(stream_data_out);
                     }
-
-                    root["decoded"].append(content_s);
-
-                    // Serialize the JSON value into a string
-                    Json::StreamWriterBuilder builderW;
-                    builderW["emitUTF8"] = false;
-                    builderW["indentation"] = "";
-                    const std::unique_ptr<Json::StreamWriter> writer(
-                        builderW.newStreamWriter());
-                    json_str_out = Json::writeString(builderW, root);
-
-                    counter++;
+                } else {
+                    stream_data_out = json_str_out;
+                    data_delivery->async_kafka_producer(stream_data_out);
                 }
-                // --- OC-IF ---
-            }
-
-            // Data enrichment with label (node_id/platform_id)
-            if (enable_label_encode_as_map.compare("true") == 0) {
-                if (data_manipulation->append_label_map(stream_data_in,
-                        stream_data_out) == 0) {
-                    data_delivery->async_kafka_producer(json_str_out);
-                }
-            } else {
-                stream_data_out = stream_data_in;
-                data_delivery->async_kafka_producer(json_str_out);
             }
         }
 
@@ -580,7 +530,7 @@ void Srv::HuaweiStream::Start()
                 data_delivery->async_kafka_producer(stream_data_out);
             }
         }
-        // Memory leaks to be fixed
+        // potential memory leak to be fixed
         //huawei_stream_status = END;
     } else if (huawei_stream_status == END) {
         huawei_resp.Finish(grpc::Status::OK, this);
