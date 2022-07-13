@@ -39,7 +39,7 @@ The main aim of this project it to use the gRPC framework to implement a multi-v
 both the [Cisco's gRPC Dial-out .proto file](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)
 and the [Huawei's gRPC Dial-out .proto file](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files).
 
-With the limits imposed by the Vendors implementations, both JSON and GPB-KV are supported.
+With some restrictions, due to the technical limitations imposed by the Vendors' implementations, the supported encodings are JSON, GPB-KV and GPB-Comapct (Huawei openconfig-interfaces only).
 
 | Vendor | OS Version                     |   Encoding   |      .proto file                                                                                                                                                              |
 |--------|--------------------------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
