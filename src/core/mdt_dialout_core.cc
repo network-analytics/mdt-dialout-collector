@@ -286,7 +286,8 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
-        } else if (cisco_tlm->data_gpbkv().empty() == false) {
+        } else if (cisco_tlm->data_gpbkv().empty() == false and
+            parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
@@ -332,7 +333,7 @@ void Srv::CiscoStream::Start()
             // TBD
 
         // Handling JSON string
-        } else {
+        } else if (parsing_str == false) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling JSON string: " << type_info
