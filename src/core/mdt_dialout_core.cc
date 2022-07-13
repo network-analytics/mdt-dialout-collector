@@ -274,9 +274,6 @@ void Srv::CiscoStream::Start()
 
         stream_data_in = cisco_stream.data();
 
-        std::cout << "GPB-KV empty?: " << cisco_tlm->data_gpbkv().empty() << "\n";
-        std::cout << "Parsing?: " << parsing_str << "\n";
-
         // Handling empty data
         if (stream_data_in.empty()) {
             // ---
