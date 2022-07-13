@@ -36,7 +36,8 @@ The biggest benefit of Dial-in over Dial-out is that you're gonna have a single 
 ### MDT Dial-out collector
 
 The main aim of this project it to use the gRPC framework to implement a multi-vendor gRPC Dial-out server. Currently the application is implementing
-both the [Cisco's gRPC Dial-out .proto file](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)
+the [Cisco's gRPC Dial-out .proto file](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)
+, the [Juniper's gRPC Dial-out .proto file](https://www.juniper.net/documentation/us/en/software/junos/interfaces-telemetry/topics/topic-map/telemetry-grpc-dialout-ta.html)
 and the [Huawei's gRPC Dial-out .proto file](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files).
 
 With some restrictions, due to the technical limitations imposed by the Vendors' implementations, the supported encodings are JSON, GPB-KV and GPB-Comapct (Huawei openconfig-interfaces only).
