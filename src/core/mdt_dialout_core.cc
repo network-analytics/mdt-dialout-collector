@@ -288,7 +288,7 @@ void Srv::CiscoStream::Start()
         // Handling GPB-KV
         } else if (cisco_tlm->has_data_gpb() == true
             and parsing_str == true
-            and cisco_tlm->data_gpbkv().empty() == false) {
+            and cisco_tlm->data_gpbkv().empty() == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
@@ -324,7 +324,7 @@ void Srv::CiscoStream::Start()
             }
 
         // Handling GPB
-        } else if (cisco_tlm->data_gpbkv().empty() == true){
+        } else if (cisco_tlm->data_gpbkv().empty() == false){
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB: " << type_info
