@@ -491,6 +491,7 @@ void Srv::HuaweiStream::Start()
 
                 bool parsing_content {false};
                 std::string content_s;
+                Json::Value content_j;
                 Json::Value root;
 
                 root["sensor_path"] = huawei_tlm->sensor_path();
@@ -509,7 +510,22 @@ void Srv::HuaweiStream::Start()
                                                             &content_s,
                                                             opt);
                     }
-                    root.append(content_s);
+                    const auto json_str_length =
+                        static_cast<int>(content_s.length());
+                    JSONCPP_STRING err;
+                    Json::CharReaderBuilder builderR;
+                    const std::unique_ptr<Json::CharReader> reader
+                        (builderR.newCharReader());
+
+                    if (!reader->parse(content_s.c_str(), content_s.c_str() +
+                        json_str_length, &content_j, &err) and
+                        json_str_length != 0) {
+                        std::cout << "ERROR parsing the string,"
+                            " conversion to JSON Failed!"
+                            << err
+                            << std::endl;
+                    }
+                    root.append(content_j);
 
                     // Serialize the JSON value into a string
                     Json::StreamWriterBuilder builderW;
