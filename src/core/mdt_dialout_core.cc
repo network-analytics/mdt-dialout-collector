@@ -472,7 +472,7 @@ void Srv::HuaweiStream::Start()
             // Handling OpenConfig interfaces
             if (huawei_tlm->has_data_gpb() == true and
                     parsing_str == true and
-                    huawei_tlm->sensor_path().compare(
+                    huawei_tlm->proto_path().compare(
                         "openconfig_interfaces.Interfaces") == 0) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
