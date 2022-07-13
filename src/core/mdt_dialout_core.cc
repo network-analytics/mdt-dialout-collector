@@ -474,24 +474,13 @@ void Srv::HuaweiStream::Start()
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling GPB: " << type_info
                                                                 << std::endl;
-                // ---
-                stream_data_in.clear();
-                google::protobuf::util::JsonPrintOptions opt;
-                opt.add_whitespace = true;
-                google::protobuf::util::MessageToJsonString(
-                                                            *huawei_tlm,
-                                                            &stream_data_in,
-                                                            opt);
+
                 // --- OC-IF ---
                 int counter = 0;
                 int rows = huawei_tlm->data_gpb().row_size();
-                //std::cout << "------- sensor_path: "
-                //    << huawei_tlm->sensor_path()
-                //    << " ------- rows: " << rows << "\n";
 
                 bool parsing_content {false};
                 std::string content_s;
-                Json::Value content_j;
                 Json::Value root;
 
                 root["collection_id"] = huawei_tlm->
@@ -500,12 +489,27 @@ void Srv::HuaweiStream::Start()
                     collection_start_time();
                 root["collection_end_time"] = huawei_tlm->
                     collection_end_time();
-
-                root["sensor_path"] = huawei_tlm->sensor_path();
+                root["current_period"] = huawei_tlm->
+                    current_period();
+                root["except_desc"] = huawei_tlm->
+                    except_desc();
+                root["msg_timestamp"] = huawei_tlm->
+                    msg_timestamp();
+                root["node_id_str"] = huawei_tlm->
+                    node_id_str();
+                root["product_name"] = huawei_tlm->
+                    product_name();
+                root["proto_path"] = huawei_tlm->
+                    proto_path();
+                root["sensor_path"] = huawei_tlm->
+                    sensor_path();
+                root["software_version"] = huawei_tlm->
+                    software_version();
+                root["subscription_id_str"] = huawei_tlm->
+                    subscription_id_str();
 
                 while (counter < rows) {
                     content_s.clear();
-                    //std::cout << "------- row: " << counter << " -------\n";
                     std::string content = huawei_tlm->
                         data_gpb().row().at(counter).content();
                     parsing_content = oc_if->ParseFromString(content);
@@ -517,21 +521,7 @@ void Srv::HuaweiStream::Start()
                                                             &content_s,
                                                             opt);
                     }
-                    //const auto json_str_length =
-                    //    static_cast<int>(content_s.length());
-                    //JSONCPP_STRING err;
-                    //Json::CharReaderBuilder builderR;
-                    //const std::unique_ptr<Json::CharReader> reader
-                    //    (builderR.newCharReader());
 
-                    //if (!reader->parse(content_s.c_str(), content_s.c_str() +
-                    //    json_str_length, &content_j, &err) and
-                    //    json_str_length != 0) {
-                    //    std::cout << "ERROR parsing the string,"
-                    //        " conversion to JSON Failed!"
-                    //        << err
-                    //        << std::endl;
-                    //}
                     root["decoded"].append(content_s);
 
                     // Serialize the JSON value into a string
@@ -542,7 +532,6 @@ void Srv::HuaweiStream::Start()
                         builderW.newStreamWriter());
                     json_str_out = Json::writeString(builderW, root);
 
-                    //std::cout << content_s << "\n";
                     counter++;
                 }
                 // --- OC-IF ---
@@ -552,13 +541,11 @@ void Srv::HuaweiStream::Start()
             if (enable_label_encode_as_map.compare("true") == 0) {
                 if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
-                    data_delivery->async_kafka_producer(stream_data_out);
-                    //data_delivery->async_kafka_producer(json_str_out);
+                    data_delivery->async_kafka_producer(json_str_out);
                 }
             } else {
                 stream_data_out = stream_data_in;
-                data_delivery->async_kafka_producer(stream_data_out);
-                //data_delivery->async_kafka_producer(json_str_out);
+                data_delivery->async_kafka_producer(json_str_out);
             }
         }
 
