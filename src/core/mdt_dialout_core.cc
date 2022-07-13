@@ -1,3 +1,4 @@
+#include "json/value.h"
 #include <cstddef>
 #include <iostream>
 #include <typeinfo>
@@ -438,6 +439,7 @@ void Srv::HuaweiStream::Start()
         std::string stream_data_in;
         // Afetr data enrichment
         std::string stream_data_out;
+        std::string json_str_out;
         std::string peer = huawei_server_ctx.peer();
 
         std::unique_ptr<DataManipulation> data_manipulation(
@@ -489,6 +491,9 @@ void Srv::HuaweiStream::Start()
 
                 bool parsing_content {false};
                 std::string content_s;
+                Json::Value root;
+
+                root["sensor_path"] = huawei_tlm->sensor_path();
 
                 while (counter < rows) {
                     content_s.clear();
@@ -504,8 +509,17 @@ void Srv::HuaweiStream::Start()
                                                             &content_s,
                                                             opt);
                     }
+                    root.append(content_s);
 
-                    std::cout << content_s << "\n";
+                    // Serialize the JSON value into a string
+                    Json::StreamWriterBuilder builderW;
+                    builderW["emitUTF8"] = false;
+                    builderW["indentation"] = "";
+                    const std::unique_ptr<Json::StreamWriter> writer(
+                        builderW.newStreamWriter());
+                    json_str_out = Json::writeString(builderW, root);
+
+                    //std::cout << content_s << "\n";
                     counter++;
                 }
                 // --- OC-IF ---
@@ -516,10 +530,12 @@ void Srv::HuaweiStream::Start()
                 if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
                     data_delivery->async_kafka_producer(stream_data_out);
+                    data_delivery->async_kafka_producer(json_str_out);
                 }
             } else {
                 stream_data_out = stream_data_in;
                 data_delivery->async_kafka_producer(stream_data_out);
+                data_delivery->async_kafka_producer(json_str_out);
             }
         }
 
