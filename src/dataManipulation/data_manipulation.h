@@ -28,9 +28,9 @@ public:
         std::string& json_str_out,
         Json::Value& root);
     int huawei_gpb_openconfig_interface(
-            const std::unique_ptr<huawei_telemetry::Telemetry>& huawei_tlm,
-            const std::unique_ptr<openconfig_interfaces::Interfaces>& oc_if,
-            std::string& json_str_out);
+        const std::unique_ptr<huawei_telemetry::Telemetry>& huawei_tlm,
+        const std::unique_ptr<openconfig_interfaces::Interfaces>& oc_if,
+        std::string& json_str_out);
 };
 
 #endif

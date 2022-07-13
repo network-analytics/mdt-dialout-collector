@@ -418,6 +418,7 @@ int DataManipulation::huawei_gpb_openconfig_interface(
     root["collection_start_time"] = huawei_tlm->collection_start_time();
     root["collection_end_time"] = huawei_tlm->collection_end_time();
     root["current_period"] = huawei_tlm->current_period();
+    root["encoding"] = huawei_tlm->encoding();
     root["except_desc"] = huawei_tlm->except_desc();
     root["msg_timestamp"] = huawei_tlm->msg_timestamp();
     root["node_id_str"] = huawei_tlm->node_id_str();
@@ -427,7 +428,7 @@ int DataManipulation::huawei_gpb_openconfig_interface(
     root["software_version"] = huawei_tlm->software_version();
     root["subscription_id_str"] = huawei_tlm->subscription_id_str();
 
-    for (int idx_0; idx_0 < data_rows; ++idx_0) {
+    for (int idx_0 = 0; idx_0 < data_rows; ++idx_0) {
         content_s.clear();
         std::string content = huawei_tlm->
             data_gpb().row().at(idx_0).content();
