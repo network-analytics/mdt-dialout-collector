@@ -491,6 +491,7 @@ void Srv::HuaweiStream::Start()
                 std::string content_s;
 
                 while (counter < rows) {
+                    content_s.clear();
                     std::cout << "------- row: " << counter << " -------\n";
                     std::string content = huawei_tlm->
                         data_gpb().row().at(counter).content();
