@@ -494,7 +494,7 @@ void Srv::HuaweiStream::Start()
                 Json::Value content_j;
                 Json::Value root;
 
-                root["sensor_path"] = huawei_tlm->sensor_path();
+                //root["sensor_path"] = huawei_tlm->sensor_path();
 
                 while (counter < rows) {
                     content_s.clear();
@@ -510,22 +510,22 @@ void Srv::HuaweiStream::Start()
                                                             &content_s,
                                                             opt);
                     }
-                    const auto json_str_length =
-                        static_cast<int>(content_s.length());
-                    JSONCPP_STRING err;
-                    Json::CharReaderBuilder builderR;
-                    const std::unique_ptr<Json::CharReader> reader
-                        (builderR.newCharReader());
+                    //const auto json_str_length =
+                    //    static_cast<int>(content_s.length());
+                    //JSONCPP_STRING err;
+                    //Json::CharReaderBuilder builderR;
+                    //const std::unique_ptr<Json::CharReader> reader
+                    //    (builderR.newCharReader());
 
-                    if (!reader->parse(content_s.c_str(), content_s.c_str() +
-                        json_str_length, &content_j, &err) and
-                        json_str_length != 0) {
-                        std::cout << "ERROR parsing the string,"
-                            " conversion to JSON Failed!"
-                            << err
-                            << std::endl;
-                    }
-                    root.append(content_j);
+                    //if (!reader->parse(content_s.c_str(), content_s.c_str() +
+                    //    json_str_length, &content_j, &err) and
+                    //    json_str_length != 0) {
+                    //    std::cout << "ERROR parsing the string,"
+                    //        " conversion to JSON Failed!"
+                    //        << err
+                    //        << std::endl;
+                    //}
+                    root.append(content_s);
 
                     // Serialize the JSON value into a string
                     Json::StreamWriterBuilder builderW;
