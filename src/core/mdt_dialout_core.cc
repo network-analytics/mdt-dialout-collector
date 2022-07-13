@@ -494,6 +494,13 @@ void Srv::HuaweiStream::Start()
                 Json::Value content_j;
                 Json::Value root;
 
+                root["collection_id"] = huawei_tlm->
+                    collection_id();
+                root["collection_start_time"] = huawei_tlm->
+                    collection_start_time();
+                root["collection_end_time"] = huawei_tlm->
+                    collection_end_time();
+
                 root["sensor_path"] = huawei_tlm->sensor_path();
 
                 while (counter < rows) {
@@ -545,13 +552,13 @@ void Srv::HuaweiStream::Start()
             if (enable_label_encode_as_map.compare("true") == 0) {
                 if (data_manipulation->append_label_map(stream_data_in,
                         stream_data_out) == 0) {
-                    //data_delivery->async_kafka_producer(stream_data_out);
-                    data_delivery->async_kafka_producer(json_str_out);
+                    data_delivery->async_kafka_producer(stream_data_out);
+                    //data_delivery->async_kafka_producer(json_str_out);
                 }
             } else {
                 stream_data_out = stream_data_in;
-                //data_delivery->async_kafka_producer(stream_data_out);
-                data_delivery->async_kafka_producer(json_str_out);
+                data_delivery->async_kafka_producer(stream_data_out);
+                //data_delivery->async_kafka_producer(json_str_out);
             }
         }
 
