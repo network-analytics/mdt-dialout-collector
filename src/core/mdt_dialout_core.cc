@@ -481,14 +481,15 @@ void Srv::HuaweiStream::Start()
                                                             &stream_data_in,
                                                             opt);
                 // --- OC-IF ---
-                int counter = 0;
+                int counter = 1;
                 int rows = huawei_tlm->data_gpb().row_size();
                 std::cout << "rows: " << rows << "\n";
 
                 bool parsing_content {false};
                 std::string content_s;
 
-                while (counter < rows) {
+                while (counter <= rows) {
+                    std::cout << "------- row: " << counter << " -------\n";
                     std::string content = huawei_tlm->
                         data_gpb().row().at(counter).content();
                     parsing_content = oc_if->ParseFromString(content);
@@ -501,7 +502,7 @@ void Srv::HuaweiStream::Start()
                                                             opt);
                     }
 
-                    std::cout << "content: " << content_s << "\n";
+                    std::cout << content_s << "\n";
                     counter++;
                 }
                 // --- OC-IF ---
