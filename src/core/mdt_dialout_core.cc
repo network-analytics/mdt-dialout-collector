@@ -494,7 +494,7 @@ void Srv::HuaweiStream::Start()
                 Json::Value content_j;
                 Json::Value root;
 
-                //root["sensor_path"] = huawei_tlm->sensor_path();
+                root["sensor_path"] = huawei_tlm->sensor_path();
 
                 while (counter < rows) {
                     content_s.clear();
