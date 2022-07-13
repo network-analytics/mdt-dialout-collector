@@ -47,6 +47,7 @@ With the limits imposed by the Vendors implementations, both JSON and GPB-KV are
 | Cisco  | XE  (17.06.01prd7@C8000V)      | GPB-KV       | [XE Telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                              |
 | Juniper| Junos  (20.4R3-S2.6@mx10003)   | JSON-GNMI    | [Junos Telemetry .proto (Download section)](https://www.juniper.net/documentation/us/en/software/junos/interfaces-telemetry/topics/topic-map/telemetry-grpc-dialout-ta.html)  |
 | Huawei | VRP (V800R021C10SPC300T@NE40E) | JSON         | [VRP Telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                               |
+| Huawei | VRP (V800R021C10SPC300T@NE40E) | GPB-Compact  | [OpenConfig Interfaces .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                       |
 
 #### How to build
 
