@@ -283,6 +283,7 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
+        std::cout << cisco_tlm->data_gpbkv().empty() << "\n";
         } else if (cisco_tlm->data_gpbkv().empty() == false and
             parsing_str == true) {
             // ---
