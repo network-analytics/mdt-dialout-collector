@@ -251,7 +251,7 @@ void Srv::CiscoStream::Start()
                                         this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
-        bool parsing_str;
+        bool parsing_str {false};
         // From the network
         std::string stream_data_in;
         // After data enrichment
@@ -283,7 +283,8 @@ void Srv::CiscoStream::Start()
             // ---
 
         // Handling GPB-KV
-        } else if (!(cisco_tlm->data_gpbkv().empty()) or parsing_str == true) {
+        } else if (cisco_tlm->data_gpbkv().empty() == false and
+            parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB-KV: " << type_info
@@ -319,7 +320,7 @@ void Srv::CiscoStream::Start()
             }
 
         // Handling GPB
-        } else if (cisco_tlm->has_data_gpb() == true or parsing_str == true) {
+        } else if (cisco_tlm->has_data_gpb() == true and parsing_str == true) {
             // ---
             auto type_info = typeid(stream_data_in).name();
             std::cout << peer << " CISCO Handling GPB: " << type_info
