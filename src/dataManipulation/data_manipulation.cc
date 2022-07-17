@@ -10,7 +10,7 @@
 
 // forge JSON & enrich with MAP (node_id/platform_id)
 int DataManipulation::append_label_map(const std::string& json_str,
-                                    std::string& json_str_out)
+    std::string& json_str_out)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;
@@ -20,16 +20,16 @@ int DataManipulation::append_label_map(const std::string& json_str,
     builderW["indentation"] = "";
     const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
     const std::unique_ptr<Json::StreamWriter> writer(
-                                                builderW.newStreamWriter());
+        builderW.newStreamWriter());
     Json::Value label_map;
     label_map["node_id"] = "node_id";
     label_map["platform_id"] = "platform_id";
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
-                      &root, &err) and json_str_length != 0) {
+        &root, &err) and json_str_length != 0) {
         std::cout << "ERROR parsing the string, conversion to JSON Failed!"
-                                                                << err
-                                                                << std::endl;
+            << err
+            << std::endl;
         //std::cout << "Failing message: " << json_str << std::endl;
         return EXIT_FAILURE;
     }
@@ -79,14 +79,14 @@ int DataManipulation::cisco_gpbkv2json(
     Json::StreamWriterBuilder builderW;
     builderW["indentation"] = "";
     const std::unique_ptr<Json::StreamWriter> writer(
-                                                builderW.newStreamWriter());
+        builderW.newStreamWriter());
     json_str_out = Json::writeString(builderW, root);
 
     return EXIT_SUCCESS;
 }
 
 Json::Value DataManipulation::cisco_gpbkv_field2json(
-                                const cisco_telemetry::TelemetryField& field)
+    const cisco_telemetry::TelemetryField& field)
 {
     Json::Value root;
     // gpbkv allows for nested kv fields, we recursively decode each one of them.
@@ -146,7 +146,7 @@ Json::Value DataManipulation::cisco_gpbkv_field2json(
 
 int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
     const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>&
-        juniper_tlm_header_ext,
+    juniper_tlm_header_ext,
     Json::Value& root)
 {
     bool parsing_str;
@@ -169,9 +169,9 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
                 google::protobuf::util::JsonPrintOptions opt;
                 opt.add_whitespace = true;
                 google::protobuf::util::MessageToJsonString(
-                                                *juniper_tlm_header_ext,
-                                                &stream_data_in,
-                                                opt);
+                    *juniper_tlm_header_ext,
+                    &stream_data_in,
+                    opt);
                 root["extension"] = stream_data_in;
                 //std::cout << stream_data_in << "\n";
             } else {
@@ -397,7 +397,7 @@ int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
     builderW["emitUTF8"] = false;
     builderW["indentation"] = "";
     const std::unique_ptr<Json::StreamWriter> writer(
-                                        builderW.newStreamWriter());
+        builderW.newStreamWriter());
     json_str_out = Json::writeString(builderW, root);
 
     return EXIT_SUCCESS;

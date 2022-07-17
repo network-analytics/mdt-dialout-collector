@@ -10,23 +10,23 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
 
     kafka::Topic topic =
-                        kafka_cfg_handler->get_kafka_topic();
+        kafka_cfg_handler->get_kafka_topic();
     std::string bootstrap_servers =
-                        kafka_cfg_handler->get_kafka_bootstrap_servers();
+        kafka_cfg_handler->get_kafka_bootstrap_servers();
     std::string enable_idempotence =
-                        kafka_cfg_handler->get_kafka_enable_idempotence();
+        kafka_cfg_handler->get_kafka_enable_idempotence();
     std::string client_id =
-                        kafka_cfg_handler->get_kafka_client_id();
+        kafka_cfg_handler->get_kafka_client_id();
     std::string security_protocol =
-                        kafka_cfg_handler->get_kafka_security_protocol();
+        kafka_cfg_handler->get_kafka_security_protocol();
     std::string ssl_key_location =
-                        kafka_cfg_handler->get_kafka_ssl_key_location();
+        kafka_cfg_handler->get_kafka_ssl_key_location();
     std::string ssl_certificate_location =
-                        kafka_cfg_handler->get_kafka_ssl_certificate_location();
+        kafka_cfg_handler->get_kafka_ssl_certificate_location();
     std::string ssl_ca_location =
-                        kafka_cfg_handler->get_kafka_ssl_ca_location();
+        kafka_cfg_handler->get_kafka_ssl_ca_location();
     std::string log_level =
-                        kafka_cfg_handler->get_kafka_log_level();
+        kafka_cfg_handler->get_kafka_log_level();
     // --- Required for config parameters ---
 
     try {
@@ -51,8 +51,8 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
         }
 
         auto msg = kafka::clients::producer::ProducerRecord(topic,
-                    kafka::NullKey,
-                    kafka::Value(json_str.c_str(), json_str.size()));
+            kafka::NullKey,
+            kafka::Value(json_str.c_str(), json_str.size()));
 
         producer.send(
             msg,
@@ -60,10 +60,10 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
                 const kafka::Error& err) {
             if (!err) {
                 std::cout << "Msg delivered: "
-                        << mdata.toString() << std::endl;
+                    << mdata.toString() << std::endl;
             } else {
                 std::cerr << "Msg delivery failed: "
-                        << err.message() << std::endl;
+                    << err.message() << std::endl;
             }
         }, kafka::clients::KafkaProducer::SendOption::ToCopyRecordValue);
     } catch (const kafka::KafkaException& ex) {

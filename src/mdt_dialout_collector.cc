@@ -18,7 +18,7 @@ int main(void)
     if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
         (main_cfg_handler->get_ipv4_socket_huawei()).empty() and
         (main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
-            std::cout << "no ipv4 sockets were configured" << std::endl;
+            std::cout << "no ipv4 sockets were configured\n";
             return(EXIT_FAILURE);
     }
 
@@ -29,17 +29,18 @@ int main(void)
             workers.push_back(std::thread(&cisco_thread, cisco_ptr));
         }
         std::cout << "mdt-dialout-collector listening on "
-            << main_cfg_handler->get_ipv4_socket_cisco() << "..." << std::endl;
+            << main_cfg_handler->get_ipv4_socket_cisco() << "...\n";
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
         void *juniper_ptr {nullptr};
-        int juniper_workers = std::stoi(main_cfg_handler->get_juniper_workers());
+        int juniper_workers = std::stoi(main_cfg_handler->
+            get_juniper_workers());
         for (int w = 0; w < juniper_workers; ++w) {
             workers.push_back(std::thread(&juniper_thread, juniper_ptr));
         }
         std::cout << "mdt-dialout-collector listening on "
-        << main_cfg_handler->get_ipv4_socket_juniper() << "..." << std::endl;
+        << main_cfg_handler->get_ipv4_socket_juniper() << "...\n";
     }
 
     if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
@@ -49,7 +50,7 @@ int main(void)
             workers.push_back(std::thread(&huawei_thread, huawei_ptr));
         }
         std::cout << "mdt-dialout-collector listening on "
-            << main_cfg_handler->get_ipv4_socket_huawei() << "..." << std::endl;
+            << main_cfg_handler->get_ipv4_socket_huawei() << "...\n";
     }
 
     for(std::thread& w : workers) {

@@ -64,7 +64,7 @@ private:
         grpc::ServerContext cisco_server_ctx;
         mdt_dialout::MdtDialoutArgs cisco_stream;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
-                                    mdt_dialout::MdtDialoutArgs> cisco_resp;
+            mdt_dialout::MdtDialoutArgs> cisco_resp;
         StreamStatus cisco_stream_status;
     };
 
@@ -81,7 +81,7 @@ private:
         grpc::ServerContext juniper_server_ctx;
         gnmi::SubscribeResponse juniper_stream;
         grpc::ServerAsyncReaderWriter<gnmi::SubscribeRequest,
-                                    gnmi::SubscribeResponse> juniper_resp;
+            gnmi::SubscribeResponse> juniper_resp;
         StreamStatus juniper_stream_status;
     };
 
@@ -98,7 +98,7 @@ private:
         grpc::ServerContext huawei_server_ctx;
         huawei_dialout::serviceArgs huawei_stream;
         grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
-                                    huawei_dialout::serviceArgs> huawei_resp;
+            huawei_dialout::serviceArgs> huawei_resp;
         StreamStatus huawei_stream_status;
     };
 };
