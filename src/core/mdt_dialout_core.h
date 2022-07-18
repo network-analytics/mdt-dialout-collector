@@ -31,7 +31,17 @@ private:
 
 class Srv final {
 public:
-    ~Srv();
+    ~Srv()
+    {
+        std::cout << "~Srv()\n";
+        cisco_server_->grpc::ServerInterface::Shutdown();
+        juniper_server_->grpc::ServerInterface::Shutdown();
+        huawei_server_->grpc::ServerInterface::Shutdown();
+        cisco_cq_->grpc::ServerCompletionQueue::Shutdown();
+        juniper_cq_->grpc::ServerCompletionQueue::Shutdown();
+        huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
+    }
+    //~Srv();
     void CiscoBind(std::string cisco_srv_socket);
     void JuniperBind(std::string juniper_srv_socket);
     void HuaweiBind(std::string huawei_srv_socket);
@@ -49,10 +59,11 @@ private:
     void CiscoFsmCtrl();
     void JuniperFsmCtrl();
     void HuaweiFsmCtrl();
-    enum StreamStatus { START, FLOW, END, DELETE };
+    enum StreamStatus { START, FLOW, END };
 
     class CiscoStream {
     public:
+        ~CiscoStream() { std::cout << "~CiscoStream()\n"; };
         CiscoStream(
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
@@ -65,11 +76,13 @@ private:
         mdt_dialout::MdtDialoutArgs cisco_stream;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
             mdt_dialout::MdtDialoutArgs> cisco_resp;
+        int cisco_init_counts;
         StreamStatus cisco_stream_status;
     };
 
     class JuniperStream {
     public:
+        ~JuniperStream() {std::cout << "~JuniperStream()\n"; };
         JuniperStream(
             Subscriber::AsyncService *juniper_service,
             grpc::ServerCompletionQueue *juniper_cq);
@@ -82,11 +95,13 @@ private:
         gnmi::SubscribeResponse juniper_stream;
         grpc::ServerAsyncReaderWriter<gnmi::SubscribeRequest,
             gnmi::SubscribeResponse> juniper_resp;
+        int juniper_init_counts;
         StreamStatus juniper_stream_status;
     };
 
     class HuaweiStream {
     public:
+        ~HuaweiStream() {std::cout << "~HuaweiStream()\n"; };
         HuaweiStream(
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *huawei_cq);
@@ -99,6 +114,7 @@ private:
         huawei_dialout::serviceArgs huawei_stream;
         grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
             huawei_dialout::serviceArgs> huawei_resp;
+        int huawei_init_counts;
         StreamStatus huawei_stream_status;
     };
 };
