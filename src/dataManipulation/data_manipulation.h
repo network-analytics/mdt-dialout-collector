@@ -13,21 +13,21 @@
 class DataManipulation {
 public:
     // Handling data manipulation functions
-    int append_label_map(const std::string& json_str,
+    bool append_label_map(const std::string& json_str,
         std::string& json_str_out);
-    int cisco_gpbkv2json(
+    bool cisco_gpbkv2json(
         const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
         std::string& json_str_out);
     Json::Value cisco_gpbkv_field2json(
         const cisco_telemetry::TelemetryField& field);
-    int juniper_extension(gnmi::SubscribeResponse& juniper_stream,
+    bool juniper_extension(gnmi::SubscribeResponse& juniper_stream,
         const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>&
         juniper_tlm_header_ext,
         Json::Value& root);
-    int juniper_update(gnmi::SubscribeResponse& juniper_stream,
+    bool juniper_update(gnmi::SubscribeResponse& juniper_stream,
         std::string& json_str_out,
         Json::Value& root);
-    int huawei_gpb_openconfig_interface(
+    bool huawei_gpb_openconfig_interface(
         const std::unique_ptr<huawei_telemetry::Telemetry>& huawei_tlm,
         const std::unique_ptr<openconfig_interfaces::Interfaces>& oc_if,
         std::string& json_str_out);

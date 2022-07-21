@@ -9,7 +9,7 @@
 
 
 // forge JSON & enrich with MAP (node_id/platform_id)
-int DataManipulation::append_label_map(const std::string& json_str,
+bool DataManipulation::append_label_map(const std::string& json_str,
     std::string& json_str_out)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
@@ -31,16 +31,16 @@ int DataManipulation::append_label_map(const std::string& json_str,
             << err
             << std::endl;
         //std::cout << "Failing message: " << json_str << std::endl;
-        return EXIT_FAILURE;
+        return false;
     }
 
     root["label"] = label_map;
     json_str_out = Json::writeString(builderW, root);
 
-    return EXIT_SUCCESS;
+    return true;
 }
 
-int DataManipulation::cisco_gpbkv2json(
+bool DataManipulation::cisco_gpbkv2json(
     const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
     std::string& json_str_out)
 {
@@ -82,7 +82,7 @@ int DataManipulation::cisco_gpbkv2json(
         builderW.newStreamWriter());
     json_str_out = Json::writeString(builderW, root);
 
-    return EXIT_SUCCESS;
+    return true;
 }
 
 Json::Value DataManipulation::cisco_gpbkv_field2json(
@@ -144,7 +144,7 @@ Json::Value DataManipulation::cisco_gpbkv_field2json(
     return value;
 }
 
-int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
+bool DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
     const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>&
     juniper_tlm_header_ext,
     Json::Value& root)
@@ -175,15 +175,15 @@ int DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
                 root["extension"] = stream_data_in;
                 //std::cout << stream_data_in << "\n";
             } else {
-                return EXIT_FAILURE;
+                return false;
             }
         }
     }
 
-    return EXIT_SUCCESS;
+    return true;
 }
 
-int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
+bool DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
     std::string& json_str_out,
     Json::Value& root)
 {
@@ -400,10 +400,10 @@ int DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
         builderW.newStreamWriter());
     json_str_out = Json::writeString(builderW, root);
 
-    return EXIT_SUCCESS;
+    return true;
 }
 
-int DataManipulation::huawei_gpb_openconfig_interface(
+bool DataManipulation::huawei_gpb_openconfig_interface(
     const std::unique_ptr<huawei_telemetry::Telemetry>& huawei_tlm,
     const std::unique_ptr<openconfig_interfaces::Interfaces>& oc_if,
     std::string& json_str_out)
@@ -441,7 +441,7 @@ int DataManipulation::huawei_gpb_openconfig_interface(
                 &content_s,
                 opt);
         } else {
-            return EXIT_FAILURE;
+            return false;
         }
 
         root["decoded"].append(content_s);
@@ -455,6 +455,6 @@ int DataManipulation::huawei_gpb_openconfig_interface(
         json_str_out = Json::writeString(builderW, root);
     }
 
-    return EXIT_SUCCESS;
+    return true;
 }
 

@@ -7,7 +7,7 @@
 class DataDelivery {
 public:
     // Handling data delivery to KAFKA
-    int async_kafka_producer(const std::string& json_str);
+    bool async_kafka_producer(const std::string& json_str);
 };
 
 #endif

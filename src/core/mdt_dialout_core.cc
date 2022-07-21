@@ -39,12 +39,12 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     // --- Required for config parameters ---
 
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
-        //std::cout << "Issues with getting the iface type ..." << std::endl;
+        //std::cout << "Issues with getting the iface type ..." << "\n";
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
-        //std::cout << "Issues with iface binding for ..." << std::endl;
+        //std::cout << "Issues with iface binding for ..." << "\n";
     }
 
     return true;
@@ -88,9 +88,11 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
 {
     grpc::ServerBuilder cisco_builder;
     cisco_builder.RegisterService(&cisco_service_);
+    // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         csbo(new ServerBuilderOptionImpl());
     cisco_builder.SetOption(std::move(csbo));
+    // --- Required for socket manipulation ---
     cisco_builder.AddListeningPort(cisco_srv_socket,
         grpc::InsecureServerCredentials());
     cisco_cq_ = cisco_builder.AddCompletionQueue();
@@ -103,9 +105,11 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
 {
     grpc::ServerBuilder juniper_builder;
     juniper_builder.RegisterService(&juniper_service_);
+    // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         jsbo(new ServerBuilderOptionImpl());
     juniper_builder.SetOption(std::move(jsbo));
+    // --- Required for socket manipulation ---
     juniper_builder.AddListeningPort(juniper_srv_socket,
         grpc::InsecureServerCredentials());
     juniper_cq_ = juniper_builder.AddCompletionQueue();
@@ -118,9 +122,11 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 {
     grpc::ServerBuilder huawei_builder;
     huawei_builder.RegisterService(&huawei_service_);
+    // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         hsbo(new ServerBuilderOptionImpl());
     huawei_builder.SetOption(std::move(hsbo));
+    // --- Required for socket manipulation ---
     huawei_builder.AddListeningPort(huawei_srv_socket,
         grpc::InsecureServerCredentials());
     huawei_cq_ = huawei_builder.AddCompletionQueue();
@@ -136,10 +142,10 @@ void Srv::CiscoFsmCtrl()
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
     while (true) {
-        //std::cout << "Cisco: " << cisco_counter << std::endl;
+        //std::cout << "Cisco: " << cisco_counter << "\n";
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
         //GPR_ASSERT(cisco_ok);
-        if (!cisco_ok) {
+        if (cisco_ok == false) {
             std::cout << "WARN - Cisco CQ failed\n";
             continue;
         }
@@ -155,10 +161,10 @@ void Srv::JuniperFsmCtrl()
     void *juniper_tag {nullptr};
     bool juniper_ok {false};
     while (true) {
-        //std::cout << "Juniper: " << juniper_counter << std::endl;
+        //std::cout << "Juniper: " << juniper_counter << "\n";
         GPR_ASSERT(juniper_cq_->Next(&juniper_tag, &juniper_ok));
         //GPR_ASSERT(juniper_ok);
-        if (!juniper_ok) {
+        if (juniper_ok == false) {
             std::cout << "WARN - Juniper CQ failed\n";
             continue;
         }
@@ -174,10 +180,10 @@ void Srv::HuaweiFsmCtrl()
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
     while (true) {
-        //std::cout << "Huawei: " << huawei_counter << std::endl;
+        //std::cout << "Huawei: " << huawei_counter << "\n";
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
         //GPR_ASSERT(huawei_ok);
-        if (!huawei_ok) {
+        if (huawei_ok == false) {
             std::cout << "WARN - Huawei CQ failed\n";
             continue;
         }
@@ -280,83 +286,87 @@ void Srv::CiscoStream::Start()
             stream_data_in = cisco_stream.data();
 
             // Handling empty data
-            if (stream_data_in.empty()) {
-               // ---
-               auto type_info = typeid(stream_data_in).name();
-               std::cout << peer << " CISCO Handling empty data: "
-                   << type_info
-                   << std::endl;
+            if (stream_data_in.empty() == true) {
+                // ---
+                auto type_info = typeid(stream_data_in).name();
+                std::cout << peer << " CISCO Handling empty data: "
+                    << type_info << "\n";
                // ---
 
             // Handling GPB-KV
             } else if (cisco_tlm->data_gpbkv().empty() == false and
-               parsing_str == true) {
-               // ---
-               auto type_info = typeid(stream_data_in).name();
-               std::cout << peer << " CISCO Handling GPB-KV: " << type_info
-                   << std::endl;
-               // ---
+                parsing_str == true) {
+                // ---
+                auto type_info = typeid(stream_data_in).name();
+                std::cout << peer << " CISCO Handling GPB-KV: " << type_info
+                    << "\n";
+                // ---
 
-               if (enable_cisco_gpbkv2json.compare("true") == 0) {
-                   data_manipulation->cisco_gpbkv2json(
-                       cisco_tlm, stream_data_in);
-               } else if (enable_cisco_message_to_json_string.compare("true")
-                   == 0) {
-                   // MessageToJson is working directly on the PROTO-Obj
-                   stream_data_in.clear();
-                   google::protobuf::util::JsonPrintOptions opt;
-                   opt.add_whitespace = true;
-                   google::protobuf::util::MessageToJsonString(
-                       *cisco_tlm,
-                       &stream_data_in,
-                       opt);
-                   // Data enrichment with label (node_id/platform_id)
-                   if (enable_label_encode_as_map.compare("true") == 0) {
-                       if (data_manipulation->append_label_map(stream_data_in,
-                           stream_data_out) == 0) {
-                           data_delivery->async_kafka_producer(
-                               stream_data_out);
-                       }
-                   } else {
-                       stream_data_out = stream_data_in;
-                       data_delivery->async_kafka_producer(stream_data_out);
-                   }
-               } else {
-                   // Use Case: both data manipulation funcs set to false:
-                   // TBD: at the meoment simply send binary format to stdout
-                   std::cout << stream_data_in << std::endl;
-               }
+                // std::string:compare returns 0 when the compared strings are
+                // matching
+                if (enable_cisco_gpbkv2json.compare("true") == 0) {
+                    if (data_manipulation->cisco_gpbkv2json(cisco_tlm,
+                        stream_data_in) == true) {
+                        std::cout << "Cisco data-normalization successful\n";
+                    } else {
+                        std::cout << "Cisco data-normalization unsuccessful\n";
+                    }
+                } else if (enable_cisco_message_to_json_string.compare("true")
+                    == 0) {
+                    // MessageToJson is working directly on the PROTO-Obj
+                    stream_data_in.clear();
+                    google::protobuf::util::JsonPrintOptions opt;
+                    opt.add_whitespace = true;
+                    google::protobuf::util::MessageToJsonString(
+                        *cisco_tlm,
+                        &stream_data_in,
+                        opt);
+                    // Data enrichment with label (node_id/platform_id)
+                    if (enable_label_encode_as_map.compare("true") == 0) {
+                        if (data_manipulation->append_label_map(stream_data_in,
+                            stream_data_out) == true) {
+                            data_delivery->async_kafka_producer(
+                                stream_data_out);
+                        }
+                    } else {
+                        stream_data_out = stream_data_in;
+                        data_delivery->async_kafka_producer(stream_data_out);
+                    }
+                } else {
+                    // Use Case: both data manipulation funcs set to false:
+                    // TBD: at the meoment simply send binary format to stdout
+                    std::cout << stream_data_in << "\n";
+                }
 
             // Handling GPB
             } else if (cisco_tlm->has_data_gpb() == true and
-               parsing_str == true) {
-               // ---
-               auto type_info = typeid(stream_data_in).name();
-               std::cout << peer << " CISCO Handling GPB: " << type_info
-                   << std::endl;
-               // ---
+                parsing_str == true) {
+                // ---
+                auto type_info = typeid(stream_data_in).name();
+                std::cout << peer << " CISCO Handling GPB: " << type_info
+                    << "\n";
+                // ---
 
-               // TBD
+                // TBD
 
             // Handling JSON string
             } else if (parsing_str == false) {
-               // ---
-               auto type_info = typeid(stream_data_in).name();
-               std::cout << peer << " CISCO Handling JSON string: "
-                   << type_info
-                   << std::endl;
-               // ---
+                // ---
+                auto type_info = typeid(stream_data_in).name();
+                std::cout << peer << " CISCO Handling JSON string: "
+                    << type_info << "\n";
+                // ---
 
                // Data enrichment with label (node_id/platform_id)
-               if (enable_label_encode_as_map.compare("true") == 0) {
-                   if (data_manipulation->append_label_map(stream_data_in,
-                       stream_data_out) == 0) {
-                       data_delivery->async_kafka_producer(stream_data_out);
-                   }
-               } else {
-                   stream_data_out = stream_data_in;
-                   data_delivery->async_kafka_producer(stream_data_out);
-               }
+                if (enable_label_encode_as_map.compare("true") == 0) {
+                    if (data_manipulation->append_label_map(stream_data_in,
+                        stream_data_out) == true) {
+                        data_delivery->async_kafka_producer(stream_data_out);
+                    }
+                } else {
+                    stream_data_out = stream_data_in;
+                    data_delivery->async_kafka_producer(stream_data_out);
+                }
             }
         }
     } else {
@@ -410,23 +420,25 @@ void Srv::JuniperStream::Start()
             juniper_resp.Read(&juniper_stream, this);
 
             if (data_manipulation->juniper_extension(juniper_stream,
-                juniper_tlm_hdr_ext, root) == 0 and
+                juniper_tlm_hdr_ext, root) == true and
                 data_manipulation->juniper_update(juniper_stream, json_str_out,
-                    root) == 0) {
+                    root) == true) {
                     // to be properly logged
                     std::cout << peer
-                        << " Juniper ext parsing succesful" << "\n";
+                        << " Juniper ext parsing successful" << "\n";
             } else {
                     // to be properly logged
                     std::cout << peer
-                        << " Juniper ext parsing unsuccesful" << "\n";
+                        << " Juniper ext parsing unsuccessful" << "\n";
             }
 
             // Data enrichment with label (node_id/platform_id)
             stream_data_in = json_str_out;
+            // std::string:compare returns 0 when the compared strings are
+            // matching
             if (enable_label_encode_as_map.compare("true") == 0) {
                 if (data_manipulation->append_label_map(stream_data_in,
-                    stream_data_out) == 0) {
+                    stream_data_out) == true) {
                     data_delivery->async_kafka_producer(stream_data_out);
                 }
             } else {
@@ -487,12 +499,11 @@ void Srv::HuaweiStream::Start()
             stream_data_in = huawei_stream.data();
 
             // Handling empty data
-            if (stream_data_in.empty()) {
+            if (stream_data_in.empty() == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling empty data: "
-                    << type_info
-                    << std::endl;
+                    << type_info << "\n";
                 // ---
             }
 
@@ -501,15 +512,17 @@ void Srv::HuaweiStream::Start()
                 // Handling OpenConfig interfaces
                 if (huawei_tlm->has_data_gpb() == true and
                     parsing_str == true and
+                    // std::string:compare returns 0 when the compared strings
+                    // are matching
                     huawei_tlm->proto_path().compare(
                         "openconfig_interfaces.Interfaces") == 0) {
                     // ---
                     auto type_info = typeid(stream_data_in).name();
                     std::cout << peer << " HUAWEI Handling GPB: " << type_info
-                        << std::endl;
+                        << "\n";
 
                     if (data_manipulation->huawei_gpb_openconfig_interface(
-                        huawei_tlm, oc_if, json_str_out) == 0) {
+                        huawei_tlm, oc_if, json_str_out) == true) {
                             // to be properly logged
                             std::cout << peer
                                 << " huawei oc-if parsing succesful\n";
@@ -523,7 +536,7 @@ void Srv::HuaweiStream::Start()
                     stream_data_in = json_str_out;
                     if (enable_label_encode_as_map.compare("true") == 0) {
                         if (data_manipulation->append_label_map(stream_data_in,
-                            stream_data_out) == 0) {
+                            stream_data_out) == true) {
                             data_delivery->
                                 async_kafka_producer(stream_data_out);
                         }
@@ -537,12 +550,11 @@ void Srv::HuaweiStream::Start()
             stream_data_in = huawei_stream.data_json();
 
             // Handling empty data_json
-            if (stream_data_in.empty()) {
+            if (stream_data_in.empty() == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling empty data_json: "
-                    << type_info
-                    << std::endl;
+                    << type_info << "\n";
                 // ---
             }
             // Handling JSON string
@@ -550,14 +562,13 @@ void Srv::HuaweiStream::Start()
                 // ---
                 auto type_info = typeid(stream_data_in).name();
                 std::cout << peer << " HUAWEI Handling JSON string: "
-                    << type_info
-                    << std::endl;
+                    << type_info << "\n";
                 // ---
 
                 // Data enrichment with label (node_id/platform_id)
                 if (enable_label_encode_as_map.compare("true") == 0) {
                     if (data_manipulation->append_label_map(stream_data_in,
-                        stream_data_out) == 0) {
+                        stream_data_out) == true) {
                         data_delivery->async_kafka_producer(stream_data_out);
                     }
                 } else {

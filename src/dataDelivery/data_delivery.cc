@@ -4,7 +4,7 @@
 #include "dataDelivery/data_delivery.h"
 
 
-int DataDelivery::async_kafka_producer(const std::string& json_str)
+bool DataDelivery::async_kafka_producer(const std::string& json_str)
 {
     // --- Required for config parameters ---
     std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
@@ -46,8 +46,8 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
 
         if (json_str.empty()) {
             // Implementing a better handling
-            std::cout << "KAFKA - Empty JSON received " << std::endl;
-            return EXIT_FAILURE;
+            std::cout << "KAFKA - Empty JSON received\n";
+            return false;
         }
 
         auto msg = kafka::clients::producer::ProducerRecord(topic,
@@ -59,18 +59,16 @@ int DataDelivery::async_kafka_producer(const std::string& json_str)
             [](const kafka::clients::producer::RecordMetadata& mdata,
                 const kafka::Error& err) {
             if (!err) {
-                std::cout << "Msg delivered: "
-                    << mdata.toString() << std::endl;
+                std::cout << "Msg delivered: " << mdata.toString() << "\n";
             } else {
-                std::cerr << "Msg delivery failed: "
-                    << err.message() << std::endl;
+                std::cerr << "Msg delivery failed: " << err.message() << "\n";
             }
         }, kafka::clients::KafkaProducer::SendOption::ToCopyRecordValue);
     } catch (const kafka::KafkaException& ex) {
-        std::cerr << "Unexpected exception: " << ex.what() << std::endl;
-        return EXIT_FAILURE;
+        std::cerr << "Unexpected exception: " << ex.what() << "\n";
+        return false;
     }
 
-    return EXIT_SUCCESS;
+    return true;
 }
 

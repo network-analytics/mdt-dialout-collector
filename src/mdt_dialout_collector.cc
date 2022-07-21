@@ -15,14 +15,14 @@ int main(void)
 {
     std::vector<std::thread> workers;
 
-    if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() and
-        (main_cfg_handler->get_ipv4_socket_huawei()).empty() and
-        (main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
+    if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() == true and
+        (main_cfg_handler->get_ipv4_socket_huawei()).empty() == true and
+        (main_cfg_handler->get_ipv4_socket_juniper()).empty() == true) {
             std::cout << "no ipv4 sockets were configured\n";
-            return(EXIT_FAILURE);
+            return EXIT_FAILURE;
     }
 
-    if (!(main_cfg_handler->get_ipv4_socket_cisco()).empty()) {
+    if ((main_cfg_handler->get_ipv4_socket_cisco()).empty() == false) {
         void *cisco_ptr {nullptr};
         int cisco_workers = std::stoi(main_cfg_handler->get_cisco_workers());
         for (int w = 0; w < cisco_workers; ++w) {
@@ -32,7 +32,7 @@ int main(void)
             << main_cfg_handler->get_ipv4_socket_cisco() << "...\n";
     }
 
-    if (!(main_cfg_handler->get_ipv4_socket_juniper()).empty()) {
+    if ((main_cfg_handler->get_ipv4_socket_juniper()).empty() == false) {
         void *juniper_ptr {nullptr};
         int juniper_workers = std::stoi(main_cfg_handler->
             get_juniper_workers());
@@ -43,7 +43,7 @@ int main(void)
         << main_cfg_handler->get_ipv4_socket_juniper() << "...\n";
     }
 
-    if (!(main_cfg_handler->get_ipv4_socket_huawei()).empty()) {
+    if ((main_cfg_handler->get_ipv4_socket_huawei()).empty() == false) {
         void *huawei_ptr {nullptr};
         int huawei_workers = std::stoi(main_cfg_handler->get_huawei_workers());
         for (int w = 0; w < huawei_workers; ++w) {
@@ -59,7 +59,7 @@ int main(void)
         }
     }
 
-    return (EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 
 void *cisco_thread(void *cisco_ptr)
@@ -72,7 +72,7 @@ void *cisco_thread(void *cisco_ptr)
     Srv cisco_mdt_dialout_collector;
     cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
 
-    return (EXIT_SUCCESS);
+    return 0;
 }
 
 void *juniper_thread(void *juniper_ptr)
@@ -86,7 +86,7 @@ void *juniper_thread(void *juniper_ptr)
     Srv juniper_mdt_dialout_collector;
     juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
 
-    return (EXIT_SUCCESS);
+    return 0;
 }
 
 void *huawei_thread(void *huawei_ptr)
@@ -99,6 +99,6 @@ void *huawei_thread(void *huawei_ptr)
     Srv huawei_mdt_dialout_collector;
     huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
 
-    return (EXIT_SUCCESS);
+    return 0;
 }
 
