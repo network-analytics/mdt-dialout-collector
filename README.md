@@ -124,7 +124,8 @@ enable_cisco_gpbkv2json = "false";
 ## standard JSON after GPB/GPB-KV deconding - default = "false"
 enable_cisco_message_to_json_string = "true";
 
-## data-flow enrichment with node_id/platform_id (WIP) - default = "false"
+## data-flow enrichment with node_id/platform_id - default = "false"
+## for additional details refer to "csv/README.md"
 enable_label_encode_as_map = "true";
 
 
@@ -153,6 +154,7 @@ log_level = "0";
 | [librdkafka](https://github.com/edenhill/librdkafka)                                                                                                                        | BSD 2-Clause License      |
 | [Modern C++ Kafka API](https://github.com/morganstanley/modern-cpp-kafka)                                                                                                   | Apache License Version 2.0|
 | [libconfig](http://hyperrealm.github.io/libconfig/)                                                                                                                         | LGPL v2.1                 |
+| [rapidcsv](https://github.com/d99kris/rapidcsv)                                                                                                                             | BSD-3-Clause license      |
 | [gRPC](https://github.com/grpc/grpc)                                                                                                                                        | BSD 3-Clause License      |
 | [Cisco dial-out .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)  | Apache License Version 2.0|
 | [Cisco telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                         | Apache License Version 2.0|

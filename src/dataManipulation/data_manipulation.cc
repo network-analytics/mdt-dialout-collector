@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unordered_map>
 #include <json/json.h>
 #include "cisco_telemetry.pb.h"
 #include "juniper_gnmi.pb.h"
@@ -9,7 +10,10 @@
 
 
 // forge JSON & enrich with MAP (node_id/platform_id)
-bool DataManipulation::append_label_map(const std::string& json_str,
+bool DataManipulation::append_label_map(
+    std::unordered_map<std::string,std::vector<std::string>>& enrich_map,
+    const std::string& peer_ip,
+    const std::string& json_str,
     std::string& json_str_out)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
@@ -22,8 +26,20 @@ bool DataManipulation::append_label_map(const std::string& json_str,
     const std::unique_ptr<Json::StreamWriter> writer(
         builderW.newStreamWriter());
     Json::Value label_map;
-    label_map["node_id"] = "node_id";
-    label_map["platform_id"] = "platform_id";
+    // select exclusively the IP addr from peer
+    unsigned start_delim = (peer_ip.find_first_of(":") + 1);
+    unsigned stop_delim = peer_ip.find_last_of(":");
+    std::string _peer_ip = peer_ip.substr(
+        start_delim, (stop_delim - start_delim));
+    const auto search = enrich_map.find(_peer_ip);
+    if (search != enrich_map.end()) {
+        label_map["node_id"] = search->second.at(0);
+        label_map["platform_id"] = search->second.at(1);
+    } else{
+        label_map["node_id"] = "unknown";
+        label_map["platform_id"] = "unknown";
+        std::cout << peer_ip << " not found: enrichment failed.\n";
+    }
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
         &root, &err) and json_str_length != 0) {

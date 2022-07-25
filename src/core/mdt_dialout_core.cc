@@ -28,6 +28,9 @@
 #include "openconfig_interfaces.pb.h"
 
 
+// Global visibility to be able to signal the refresh --> CSV from main
+std::unordered_map<std::string,std::vector<std::string>> enrich_map;
+
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
     int type;
@@ -149,7 +152,8 @@ void Srv::CiscoFsmCtrl()
             std::cout << "WARN - Cisco CQ failed\n";
             continue;
         }
-        static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start();
+        static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
+            enrich_map);
         //cisco_counter++;
     }
 }
@@ -168,7 +172,8 @@ void Srv::JuniperFsmCtrl()
             std::cout << "WARN - Juniper CQ failed\n";
             continue;
         }
-        static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start();
+        static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
+            enrich_map);
         //juniper_counter++;
     }
 }
@@ -187,7 +192,8 @@ void Srv::HuaweiFsmCtrl()
             std::cout << "WARN - Huawei CQ failed\n";
             continue;
         }
-        static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start();
+        static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(
+            enrich_map);
         //huawei_counter++;
     }
 }
@@ -201,7 +207,7 @@ Srv::CiscoStream::CiscoStream(
         cisco_init_counts {0},
         cisco_stream_status {START}
 {
-    Srv::CiscoStream::Start();
+    Srv::CiscoStream::Start(enrich_map);
 }
 
 Srv::JuniperStream::JuniperStream(
@@ -213,7 +219,7 @@ Srv::JuniperStream::JuniperStream(
         juniper_init_counts {0},
         juniper_stream_status {START}
 {
-    Srv::JuniperStream::Start();
+    Srv::JuniperStream::Start(enrich_map);
 }
 
 Srv::HuaweiStream::HuaweiStream(
@@ -225,7 +231,7 @@ Srv::HuaweiStream::HuaweiStream(
         huawei_init_counts {0},
         huawei_stream_status {START}
 {
-    Srv::HuaweiStream::Start();
+    Srv::HuaweiStream::Start(enrich_map);
 }
 
 // --- Required for config parameters ---
@@ -239,7 +245,8 @@ std::string enable_label_encode_as_map =
     data_manipulation_cfg_handler->get_enable_label_encode_as_map();
 // --- Required for config parameters ---
 
-void Srv::CiscoStream::Start()
+void Srv::CiscoStream::Start(
+    std::unordered_map<std::string,std::vector<std::string>>& enrich_map)
 {
     // Initial stream_status set to START
     if (cisco_stream_status == START) {
@@ -251,12 +258,18 @@ void Srv::CiscoStream::Start()
             this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
+        // Debug
+        //for (auto& e : enrich_map) {
+        //    std::cout << e.first << " ---> "
+        //    << "[" << e.second.at(0) << ","
+        //    << e.second.at(1) << "]\n";
+        //}
         bool parsing_str {false};
         // From the network
         std::string stream_data_in;
         // After data enrichment
         std::string stream_data_out;
-        std::string peer = cisco_server_ctx.peer();
+        const std::string peer = cisco_server_ctx.peer();
 
         std::unique_ptr<DataManipulation> data_manipulation(
             new DataManipulation());
@@ -323,7 +336,10 @@ void Srv::CiscoStream::Start()
                         opt);
                     // Data enrichment with label (node_id/platform_id)
                     if (enable_label_encode_as_map.compare("true") == 0) {
-                        if (data_manipulation->append_label_map(stream_data_in,
+                        if (data_manipulation->append_label_map(
+                            enrich_map,
+                            peer,
+                            stream_data_in,
                             stream_data_out) == true) {
                             data_delivery->async_kafka_producer(
                                 stream_data_out);
@@ -359,7 +375,10 @@ void Srv::CiscoStream::Start()
 
                // Data enrichment with label (node_id/platform_id)
                 if (enable_label_encode_as_map.compare("true") == 0) {
-                    if (data_manipulation->append_label_map(stream_data_in,
+                    if (data_manipulation->append_label_map(
+                        enrich_map,
+                        peer,
+                        stream_data_in,
                         stream_data_out) == true) {
                         data_delivery->async_kafka_producer(stream_data_out);
                     }
@@ -376,7 +395,8 @@ void Srv::CiscoStream::Start()
     }
 }
 
-void Srv::JuniperStream::Start()
+void Srv::JuniperStream::Start(
+    std::unordered_map<std::string,std::vector<std::string>>& enrich_map)
 {
     // Initial stream_status set to START
     if (juniper_stream_status == START) {
@@ -393,7 +413,7 @@ void Srv::JuniperStream::Start()
         // After data enrichment
         std::string stream_data_out;
         std::string json_str_out;
-        std::string peer = juniper_server_ctx.peer();
+        const std::string peer = juniper_server_ctx.peer();
         Json::Value root;
 
         std::unique_ptr<DataManipulation> data_manipulation(
@@ -437,7 +457,10 @@ void Srv::JuniperStream::Start()
             // std::string:compare returns 0 when the compared strings are
             // matching
             if (enable_label_encode_as_map.compare("true") == 0) {
-                if (data_manipulation->append_label_map(stream_data_in,
+                if (data_manipulation->append_label_map(
+                    enrich_map,
+                    peer,
+                    stream_data_in,
                     stream_data_out) == true) {
                     data_delivery->async_kafka_producer(stream_data_out);
                 }
@@ -453,7 +476,8 @@ void Srv::JuniperStream::Start()
     }
 }
 
-void Srv::HuaweiStream::Start()
+void Srv::HuaweiStream::Start(
+    std::unordered_map<std::string,std::vector<std::string>>& enrich_map)
 {
     if (huawei_stream_status == START) {
         huawei_service_->RequestdataPublish(
@@ -470,7 +494,7 @@ void Srv::HuaweiStream::Start()
         // Afetr data enrichment
         std::string stream_data_out;
         std::string json_str_out;
-        std::string peer = huawei_server_ctx.peer();
+        const std::string peer = huawei_server_ctx.peer();
 
         std::unique_ptr<DataManipulation> data_manipulation(
             new DataManipulation());
@@ -535,7 +559,10 @@ void Srv::HuaweiStream::Start()
                     // Data enrichment with label (node_id/platform_id)
                     stream_data_in = json_str_out;
                     if (enable_label_encode_as_map.compare("true") == 0) {
-                        if (data_manipulation->append_label_map(stream_data_in,
+                        if (data_manipulation->append_label_map(
+                            enrich_map,
+                            peer,
+                            stream_data_in,
                             stream_data_out) == true) {
                             data_delivery->
                                 async_kafka_producer(stream_data_out);
@@ -567,7 +594,10 @@ void Srv::HuaweiStream::Start()
 
                 // Data enrichment with label (node_id/platform_id)
                 if (enable_label_encode_as_map.compare("true") == 0) {
-                    if (data_manipulation->append_label_map(stream_data_in,
+                    if (data_manipulation->append_label_map(
+                        enrich_map,
+                        peer,
+                        stream_data_in,
                         stream_data_out) == true) {
                         data_delivery->async_kafka_producer(stream_data_out);
                     }

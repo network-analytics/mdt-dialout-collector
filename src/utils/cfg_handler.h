@@ -27,19 +27,19 @@ public:
         std::map<std::string, std::string>& params);
 
     // Getters
-    std::string get_iface() {
+    std::string get_iface() const {
         return iface; };
-    std::string get_ipv4_socket_cisco() {
+    std::string get_ipv4_socket_cisco() const {
         return ipv4_socket_cisco; };
-    std::string get_ipv4_socket_juniper() {
+    std::string get_ipv4_socket_juniper() const {
         return ipv4_socket_juniper; };
-    std::string get_ipv4_socket_huawei() {
+    std::string get_ipv4_socket_huawei() const {
         return ipv4_socket_huawei; };
-    std::string get_cisco_workers() {
+    std::string get_cisco_workers() const {
         return cisco_workers; };
-    std::string get_juniper_workers() {
+    std::string get_juniper_workers() const {
         return juniper_workers; };
-    std::string get_huawei_workers() {
+    std::string get_huawei_workers() const {
         return huawei_workers; };
 private:
     std::string iface;
@@ -62,11 +62,11 @@ public:
         std::map<std::string, std::string>& params);
 
     // Getters
-    std::string get_enable_cisco_message_to_json_string() {
+    std::string get_enable_cisco_message_to_json_string() const {
         return enable_cisco_message_to_json_string; };
-    std::string get_enable_cisco_gpbkv2json() {
+    std::string get_enable_cisco_gpbkv2json() const {
         return enable_cisco_gpbkv2json; };
-    std::string get_enable_label_encode_as_map() {
+    std::string get_enable_label_encode_as_map() const {
         return enable_label_encode_as_map; };
 private:
     std::string enable_cisco_message_to_json_string;
@@ -85,23 +85,23 @@ public:
         std::map<std::string, std::string>& params);
 
     // Getters
-    std::string get_kafka_topic() {
+    std::string get_kafka_topic() const {
         return topic; };
-    std::string get_kafka_bootstrap_servers() {
+    std::string get_kafka_bootstrap_servers() const {
         return bootstrap_servers; };
-    std::string get_kafka_enable_idempotence() {
+    std::string get_kafka_enable_idempotence() const {
         return enable_idempotence; };
-    std::string get_kafka_client_id() {
+    std::string get_kafka_client_id() const {
         return client_id; };
-    std::string get_kafka_security_protocol() {
+    std::string get_kafka_security_protocol() const {
         return security_protocol; };
-    std::string get_kafka_ssl_key_location() {
+    std::string get_kafka_ssl_key_location() const {
         return ssl_key_location; };
-    std::string get_kafka_ssl_certificate_location() {
+    std::string get_kafka_ssl_certificate_location() const {
         return ssl_certificate_location; };
-    std::string get_kafka_ssl_ca_location() {
+    std::string get_kafka_ssl_ca_location() const {
         return ssl_ca_location; };
-    std::string get_kafka_log_level() {
+    std::string get_kafka_log_level() const {
         return log_level; };
 private:
     std::string topic;

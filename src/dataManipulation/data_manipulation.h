@@ -13,7 +13,10 @@
 class DataManipulation {
 public:
     // Handling data manipulation functions
-    bool append_label_map(const std::string& json_str,
+    bool append_label_map(
+        std::unordered_map<std::string,std::vector<std::string>>& enrich_map,
+        const std::string& peer_ip,
+        const std::string& json_str,
         std::string& json_str_out);
     bool cisco_gpbkv2json(
         const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,

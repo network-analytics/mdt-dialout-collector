@@ -2,6 +2,8 @@
 #define _SRV_H_
 
 #include <iostream>
+#include <unordered_map>
+#include <vector>
 #include <grpcpp/grpcpp.h>
 #include <json/json.h>
 #include "cisco_dialout.grpc.pb.h"
@@ -12,6 +14,9 @@
 #include "juniper_dialout.grpc.pb.h"
 #include "grpc/socket_mutator.h"
 
+
+// Global visibility to be able to signal the refresh --> CSV from main
+extern std::unordered_map<std::string,std::vector<std::string>> enrich_map;
 
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
 public:
@@ -67,7 +72,9 @@ private:
         CiscoStream(
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
-        void Start();
+        void Start(
+        std::unordered_map<std::string,std::vector<std::string>>& enrich_map
+        );
 
     private:
         mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
@@ -86,7 +93,9 @@ private:
         JuniperStream(
             Subscriber::AsyncService *juniper_service,
             grpc::ServerCompletionQueue *juniper_cq);
-        void Start();
+        void Start(
+        std::unordered_map<std::string,std::vector<std::string>>& enrich_map
+        );
 
     private:
         Subscriber::AsyncService *juniper_service_;
@@ -105,7 +114,9 @@ private:
         HuaweiStream(
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *huawei_cq);
-        void Start();
+        void Start(
+        std::unordered_map<std::string,std::vector<std::string>>& enrich_map
+        );
 
     private:
         huawei_dialout::gRPCDataservice::AsyncService *huawei_service_;

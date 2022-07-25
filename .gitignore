@@ -57,3 +57,6 @@ bin/mdt_dialout_collector
 .cache/*
 compile_commands.json
 
+# CSV
+csv/*.csv
+
