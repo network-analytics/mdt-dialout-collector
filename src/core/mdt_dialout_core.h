@@ -72,7 +72,7 @@ private:
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
         void Start(
-        std::unordered_map<std::string,std::vector<std::string>> &label_map
+            std::unordered_map<std::string,std::vector<std::string>> &label_map
         );
 
     private:
@@ -93,7 +93,7 @@ private:
             Subscriber::AsyncService *juniper_service,
             grpc::ServerCompletionQueue *juniper_cq);
         void Start(
-        std::unordered_map<std::string,std::vector<std::string>> &label_map
+            std::unordered_map<std::string,std::vector<std::string>> &label_map
         );
 
     private:
@@ -114,7 +114,7 @@ private:
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *huawei_cq);
         void Start(
-        std::unordered_map<std::string,std::vector<std::string>> &label_map
+            std::unordered_map<std::string,std::vector<std::string>> &label_map
         );
 
     private:

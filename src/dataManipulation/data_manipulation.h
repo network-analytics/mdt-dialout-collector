@@ -16,7 +16,6 @@
 
 class DataManipulation {
 public:
-    // Handling data manipulation functions
     bool AppendLabelMap(
         std::unordered_map<std::string,std::vector<std::string>> &label_map,
         const std::string &peer_ip,
