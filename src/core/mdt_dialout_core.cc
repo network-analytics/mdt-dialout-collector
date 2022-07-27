@@ -1,35 +1,9 @@
-#include "json/value.h"
-#include <cstddef>
-#include <iostream>
-#include <typeinfo>
-#include <grpcpp/grpcpp.h>
-#include "grpc/socket_mutator.h"
-#include <grpcpp/support/channel_arguments.h>
-#include <grpc/support/alloc.h>
-#include <grpc/support/log.h>
-#include <grpcpp/impl/server_builder_plugin.h>
-#include <json/json.h>
+// mdt-dialout-collector Library headers
 #include "core/mdt_dialout_core.h"
-#include "cisco_dialout.grpc.pb.h"
-#include "cisco_telemetry.pb.h"
-#include "juniper_dialout.grpc.pb.h"
-#include "juniper_telemetry.pb.h"
-#include "juniper_gnmi.pb.h"
-#include "juniper_gnmi_ext.pb.h"
-#include "juniper_telemetry_header.pb.h"
-#include "juniper_telemetry_header_extension.pb.h"
-#include "huawei_dialout.grpc.pb.h"
-#include "huawei_telemetry.pb.h"
-#include <google/protobuf/util/json_util.h>
-#include <sys/socket.h>
-#include "cfg_handler.h"
-#include "dataManipulation/data_manipulation.h"
-#include "dataDelivery/data_delivery.h"
-#include "openconfig_interfaces.pb.h"
 
 
 // Global visibility to be able to signal the refresh --> CSV from main
-std::unordered_map<std::string,std::vector<std::string>> enrich_map;
+std::unordered_map<std::string,std::vector<std::string>> label_map;
 
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
@@ -153,7 +127,7 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            enrich_map);
+            label_map);
         //cisco_counter++;
     }
 }
@@ -173,7 +147,7 @@ void Srv::JuniperFsmCtrl()
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
-            enrich_map);
+            label_map);
         //juniper_counter++;
     }
 }
@@ -193,7 +167,7 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(
-            enrich_map);
+            label_map);
         //huawei_counter++;
     }
 }
@@ -207,7 +181,7 @@ Srv::CiscoStream::CiscoStream(
         cisco_init_counts {0},
         cisco_stream_status {START}
 {
-    Srv::CiscoStream::Start(enrich_map);
+    Srv::CiscoStream::Start(label_map);
 }
 
 Srv::JuniperStream::JuniperStream(
@@ -219,7 +193,7 @@ Srv::JuniperStream::JuniperStream(
         juniper_init_counts {0},
         juniper_stream_status {START}
 {
-    Srv::JuniperStream::Start(enrich_map);
+    Srv::JuniperStream::Start(label_map);
 }
 
 Srv::HuaweiStream::HuaweiStream(
@@ -231,7 +205,7 @@ Srv::HuaweiStream::HuaweiStream(
         huawei_init_counts {0},
         huawei_stream_status {START}
 {
-    Srv::HuaweiStream::Start(enrich_map);
+    Srv::HuaweiStream::Start(label_map);
 }
 
 // --- Required for config parameters ---
@@ -246,7 +220,7 @@ std::string enable_label_encode_as_map =
 // --- Required for config parameters ---
 
 void Srv::CiscoStream::Start(
-    std::unordered_map<std::string,std::vector<std::string>>& enrich_map)
+    std::unordered_map<std::string,std::vector<std::string>> &label_map)
 {
     // Initial stream_status set to START
     if (cisco_stream_status == START) {
@@ -259,7 +233,7 @@ void Srv::CiscoStream::Start(
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
         // Debug
-        //for (auto& e : enrich_map) {
+        //for (auto &e : label_map) {
         //    std::cout << e.first << " ---> "
         //    << "[" << e.second.at(0) << ","
         //    << e.second.at(1) << "]\n";
@@ -307,7 +281,7 @@ void Srv::CiscoStream::Start(
                // ---
 
             // Handling GPB-KV
-            } else if (cisco_tlm->data_gpbkv().empty() == false and
+            } else if (cisco_tlm->data_gpbkv().empty() == false &&
                 parsing_str == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
@@ -318,7 +292,7 @@ void Srv::CiscoStream::Start(
                 // std::string:compare returns 0 when the compared strings are
                 // matching
                 if (enable_cisco_gpbkv2json.compare("true") == 0) {
-                    if (data_manipulation->cisco_gpbkv2json(cisco_tlm,
+                    if (data_manipulation->CiscoGpbkv2Json(cisco_tlm,
                         stream_data_in) == true) {
                         std::cout << "Cisco data-normalization successful\n";
                     } else {
@@ -336,17 +310,17 @@ void Srv::CiscoStream::Start(
                         opt);
                     // Data enrichment with label (node_id/platform_id)
                     if (enable_label_encode_as_map.compare("true") == 0) {
-                        if (data_manipulation->append_label_map(
-                            enrich_map,
+                        if (data_manipulation->AppendLabelMap(
+                            label_map,
                             peer,
                             stream_data_in,
                             stream_data_out) == true) {
-                            data_delivery->async_kafka_producer(
+                            data_delivery->AsyncKafkaProducer(
                                 stream_data_out);
                         }
                     } else {
                         stream_data_out = stream_data_in;
-                        data_delivery->async_kafka_producer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(stream_data_out);
                     }
                 } else {
                     // Use Case: both data manipulation funcs set to false:
@@ -355,7 +329,7 @@ void Srv::CiscoStream::Start(
                 }
 
             // Handling GPB
-            } else if (cisco_tlm->has_data_gpb() == true and
+            } else if (cisco_tlm->has_data_gpb() == true &&
                 parsing_str == true) {
                 // ---
                 auto type_info = typeid(stream_data_in).name();
@@ -375,16 +349,16 @@ void Srv::CiscoStream::Start(
 
                // Data enrichment with label (node_id/platform_id)
                 if (enable_label_encode_as_map.compare("true") == 0) {
-                    if (data_manipulation->append_label_map(
-                        enrich_map,
+                    if (data_manipulation->AppendLabelMap(
+                        label_map,
                         peer,
                         stream_data_in,
                         stream_data_out) == true) {
-                        data_delivery->async_kafka_producer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(stream_data_out);
                     }
                 } else {
                     stream_data_out = stream_data_in;
-                    data_delivery->async_kafka_producer(stream_data_out);
+                    data_delivery->AsyncKafkaProducer(stream_data_out);
                 }
             }
         }
@@ -396,7 +370,7 @@ void Srv::CiscoStream::Start(
 }
 
 void Srv::JuniperStream::Start(
-    std::unordered_map<std::string,std::vector<std::string>>& enrich_map)
+    std::unordered_map<std::string,std::vector<std::string>> &label_map)
 {
     // Initial stream_status set to START
     if (juniper_stream_status == START) {
@@ -439,9 +413,9 @@ void Srv::JuniperStream::Start(
             // the key-word "this" is used as a unique TAG
             juniper_resp.Read(&juniper_stream, this);
 
-            if (data_manipulation->juniper_extension(juniper_stream,
-                juniper_tlm_hdr_ext, root) == true and
-                data_manipulation->juniper_update(juniper_stream, json_str_out,
+            if (data_manipulation->JuniperExtension(juniper_stream,
+                juniper_tlm_hdr_ext, root) == true &&
+                data_manipulation->JuniperUpdate(juniper_stream, json_str_out,
                     root) == true) {
                     // to be properly logged
                     std::cout << peer
@@ -457,16 +431,16 @@ void Srv::JuniperStream::Start(
             // std::string:compare returns 0 when the compared strings are
             // matching
             if (enable_label_encode_as_map.compare("true") == 0) {
-                if (data_manipulation->append_label_map(
-                    enrich_map,
+                if (data_manipulation->AppendLabelMap(
+                    label_map,
                     peer,
                     stream_data_in,
                     stream_data_out) == true) {
-                    data_delivery->async_kafka_producer(stream_data_out);
+                    data_delivery->AsyncKafkaProducer(stream_data_out);
                 }
             } else {
                 stream_data_out = json_str_out;
-                data_delivery->async_kafka_producer(stream_data_out);
+                data_delivery->AsyncKafkaProducer(stream_data_out);
             }
         }
     } else {
@@ -477,7 +451,7 @@ void Srv::JuniperStream::Start(
 }
 
 void Srv::HuaweiStream::Start(
-    std::unordered_map<std::string,std::vector<std::string>>& enrich_map)
+    std::unordered_map<std::string,std::vector<std::string>> &label_map)
 {
     if (huawei_stream_status == START) {
         huawei_service_->RequestdataPublish(
@@ -534,8 +508,8 @@ void Srv::HuaweiStream::Start(
             // Handling GPB
             else {
                 // Handling OpenConfig interfaces
-                if (huawei_tlm->has_data_gpb() == true and
-                    parsing_str == true and
+                if (huawei_tlm->has_data_gpb() == true &&
+                    parsing_str == true &&
                     // std::string:compare returns 0 when the compared strings
                     // are matching
                     huawei_tlm->proto_path().compare(
@@ -545,7 +519,7 @@ void Srv::HuaweiStream::Start(
                     std::cout << peer << " HUAWEI Handling GPB: " << type_info
                         << "\n";
 
-                    if (data_manipulation->huawei_gpb_openconfig_interface(
+                    if (data_manipulation->HuaweiGpbOpenconfigInterface(
                         huawei_tlm, oc_if, json_str_out) == true) {
                             // to be properly logged
                             std::cout << peer
@@ -559,17 +533,17 @@ void Srv::HuaweiStream::Start(
                     // Data enrichment with label (node_id/platform_id)
                     stream_data_in = json_str_out;
                     if (enable_label_encode_as_map.compare("true") == 0) {
-                        if (data_manipulation->append_label_map(
-                            enrich_map,
+                        if (data_manipulation->AppendLabelMap(
+                            label_map,
                             peer,
                             stream_data_in,
                             stream_data_out) == true) {
                             data_delivery->
-                                async_kafka_producer(stream_data_out);
+                                AsyncKafkaProducer(stream_data_out);
                         }
                     } else {
                         stream_data_out = json_str_out;
-                        data_delivery->async_kafka_producer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(stream_data_out);
                     }
                 }
             }
@@ -594,16 +568,16 @@ void Srv::HuaweiStream::Start(
 
                 // Data enrichment with label (node_id/platform_id)
                 if (enable_label_encode_as_map.compare("true") == 0) {
-                    if (data_manipulation->append_label_map(
-                        enrich_map,
+                    if (data_manipulation->AppendLabelMap(
+                        label_map,
                         peer,
                         stream_data_in,
                         stream_data_out) == true) {
-                        data_delivery->async_kafka_producer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(stream_data_out);
                     }
                 } else {
                     stream_data_out = stream_data_in;
-                    data_delivery->async_kafka_producer(stream_data_out);
+                    data_delivery->AsyncKafkaProducer(stream_data_out);
                 }
             }
         }

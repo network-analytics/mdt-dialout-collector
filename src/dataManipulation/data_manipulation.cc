@@ -1,20 +1,13 @@
-#include <iostream>
-#include <unordered_map>
-#include <json/json.h>
-#include "cisco_telemetry.pb.h"
-#include "juniper_gnmi.pb.h"
-#include "juniper_telemetry_header_extension.pb.h"
+// mdt-dialout-collector Library headers
 #include "dataManipulation/data_manipulation.h"
-#include <google/protobuf/util/json_util.h>
-#include "openconfig_interfaces.pb.h"
 
 
 // forge JSON & enrich with MAP (node_id/platform_id)
-bool DataManipulation::append_label_map(
-    std::unordered_map<std::string,std::vector<std::string>>& enrich_map,
-    const std::string& peer_ip,
-    const std::string& json_str,
-    std::string& json_str_out)
+bool DataManipulation::AppendLabelMap(
+    std::unordered_map<std::string,std::vector<std::string>> &label_map,
+    const std::string &peer_ip,
+    const std::string &json_str,
+    std::string &json_str_out)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
     JSONCPP_STRING err;
@@ -25,24 +18,24 @@ bool DataManipulation::append_label_map(
     const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
     const std::unique_ptr<Json::StreamWriter> writer(
         builderW.newStreamWriter());
-    Json::Value label_map;
+    Json::Value jlabel_map;
     // select exclusively the IP addr from peer
     unsigned start_delim = (peer_ip.find_first_of(":") + 1);
     unsigned stop_delim = peer_ip.find_last_of(":");
     std::string _peer_ip = peer_ip.substr(
         start_delim, (stop_delim - start_delim));
-    const auto search = enrich_map.find(_peer_ip);
-    if (search != enrich_map.end()) {
-        label_map["node_id"] = search->second.at(0);
-        label_map["platform_id"] = search->second.at(1);
+    const auto search = label_map.find(_peer_ip);
+    if (search != label_map.end()) {
+        jlabel_map["node_id"] = search->second.at(0);
+        jlabel_map["platform_id"] = search->second.at(1);
     } else{
-        label_map["node_id"] = "unknown";
-        label_map["platform_id"] = "unknown";
+        jlabel_map["node_id"] = "unknown";
+        jlabel_map["platform_id"] = "unknown";
         std::cout << peer_ip << " not found: enrichment failed.\n";
     }
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
-        &root, &err) and json_str_length != 0) {
+        &root, &err) && json_str_length != 0) {
         std::cout << "ERROR parsing the string, conversion to JSON Failed!"
             << err
             << std::endl;
@@ -50,15 +43,15 @@ bool DataManipulation::append_label_map(
         return false;
     }
 
-    root["label"] = label_map;
+    root["label"] = jlabel_map;
     json_str_out = Json::writeString(builderW, root);
 
     return true;
 }
 
-bool DataManipulation::cisco_gpbkv2json(
-    const std::unique_ptr<cisco_telemetry::Telemetry>& cisco_tlm,
-    std::string& json_str_out)
+bool DataManipulation::CiscoGpbkv2Json(
+    const std::unique_ptr<cisco_telemetry::Telemetry> &cisco_tlm,
+    std::string &json_str_out)
 {
      Json::Value root;
     // First read the metadata defined in cisco_telemtry.proto
@@ -79,8 +72,8 @@ bool DataManipulation::cisco_gpbkv2json(
 
     // Iterate through the key/values in data_gpbkv
     Json::Value gpbkv;
-    for (auto const& field: cisco_tlm->data_gpbkv()) {
-        Json::Value value = DataManipulation::cisco_gpbkv_field2json(field);
+    for (auto const &field: cisco_tlm->data_gpbkv()) {
+        Json::Value value = DataManipulation::CiscoGpbkvField2Json(field);
         if (field.name().empty()) {
             gpbkv.append(value);
         } else {
@@ -101,15 +94,15 @@ bool DataManipulation::cisco_gpbkv2json(
     return true;
 }
 
-Json::Value DataManipulation::cisco_gpbkv_field2json(
-    const cisco_telemetry::TelemetryField& field)
+Json::Value DataManipulation::CiscoGpbkvField2Json(
+    const cisco_telemetry::TelemetryField &field)
 {
     Json::Value root;
     // gpbkv allows for nested kv fields, we recursively decode each one of them.
     Json::Value sub_fields;
     for (const cisco_telemetry::TelemetryField& sub_field: field.fields()) {
         Json::Value sub_field_value =
-            DataManipulation::cisco_gpbkv_field2json(sub_field);
+            DataManipulation::CiscoGpbkvField2Json(sub_field);
         Json::Value sub_field_json;
         if (sub_field.name().size() == 0) {
             sub_fields.append(sub_field_value);
@@ -160,16 +153,17 @@ Json::Value DataManipulation::cisco_gpbkv_field2json(
     return value;
 }
 
-bool DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream,
-    const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>&
-    juniper_tlm_header_ext,
-    Json::Value& root)
+bool DataManipulation::JuniperExtension(
+    gnmi::SubscribeResponse &juniper_stream,
+    const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
+    &juniper_tlm_header_ext,
+    Json::Value &root)
 {
     bool parsing_str;
     std::string stream_data_in;
 
-    for (const auto& ext : juniper_stream.extension()) {
-        if (ext.has_registered_ext() and
+    for (const auto &ext : juniper_stream.extension()) {
+        if (ext.has_registered_ext() &&
             ext.registered_ext().id() ==
                 gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
             parsing_str = juniper_tlm_header_ext->ParseFromString(
@@ -199,9 +193,9 @@ bool DataManipulation::juniper_extension(gnmi::SubscribeResponse& juniper_stream
     return true;
 }
 
-bool DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
-    std::string& json_str_out,
-    Json::Value& root)
+bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
+    std::string &json_str_out,
+    Json::Value &root)
 {
     // From the first update() generate the sensor_path
     //SubscribeResponse
@@ -220,7 +214,7 @@ bool DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
     std::string sensor_path;
     //std::cout << "-------> " << jup.ByteSizeLong() << "\n\n";
     if (juniper_stream.has_update()) {
-        const auto& jup = juniper_stream.update();
+        const auto &jup = juniper_stream.update();
         // The Notification MUST include the timestamp field
         std::uint64_t notification_timestamp = jup.timestamp();
         //std::cout << "DebugString: " << jup.prefix().Utf8DebugString()
@@ -229,13 +223,13 @@ bool DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
         sensor_path.clear();
         while (path_idx < jup.prefix().elem_size()) {
             // first partial path with filters
-            if (path_idx == 0 and
+            if (path_idx == 0 &&
                 jup.prefix().elem().at(path_idx).key_size() > 0) {
                 //std::cout << "/" << jup.prefix().elem().at(path_idx).name();
                 sensor_path.append("/");
                 sensor_path.append(jup.prefix().elem().at(path_idx).name());
                 int filter = 1;
-                for (const auto& [key, value] :
+                for (const auto &[key, value] :
                     jup.prefix().elem().at(path_idx).key()) {
                     // only one filter
                     if (jup.prefix().elem().at(path_idx).key_size() == 1) {
@@ -305,7 +299,7 @@ bool DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
                 //std::cout << jup.prefix().elem().at(path_idx).name();
                 sensor_path.append(jup.prefix().elem().at(path_idx).name());
                 int filter = 1;
-                for (const auto& [key, value] :
+                for (const auto &[key, value] :
                     jup.prefix().elem().at(path_idx).key()) {
                         // only one filter
                     if (jup.prefix().elem().at(path_idx).key_size() == 1) {
@@ -388,7 +382,7 @@ bool DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
         //std::cout << "\n";
         std::string path;
         Json::Value value;
-        for (const auto& _jup : jup.update()) {
+        for (const auto &_jup : jup.update()) {
             //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
             //    << "\n";
             int path_idx = 0;
@@ -419,10 +413,10 @@ bool DataManipulation::juniper_update(gnmi::SubscribeResponse& juniper_stream,
     return true;
 }
 
-bool DataManipulation::huawei_gpb_openconfig_interface(
-    const std::unique_ptr<huawei_telemetry::Telemetry>& huawei_tlm,
-    const std::unique_ptr<openconfig_interfaces::Interfaces>& oc_if,
-    std::string& json_str_out)
+bool DataManipulation::HuaweiGpbOpenconfigInterface(
+    const std::unique_ptr<huawei_telemetry::Telemetry> &huawei_tlm,
+    const std::unique_ptr<openconfig_interfaces::Interfaces> &oc_if,
+    std::string &json_str_out)
 {
     int data_rows = huawei_tlm->data_gpb().row_size();
 

@@ -1,29 +1,29 @@
 #ifndef _SRV_H_
 #define _SRV_H_
 
-#include <iostream>
-#include <unordered_map>
-#include <vector>
+// C++ Standard Library headers
+#include <typeinfo>
+// External Library headers & System headers
+#include <sys/socket.h>
 #include <grpcpp/grpcpp.h>
-#include <json/json.h>
-#include "cisco_dialout.grpc.pb.h"
-#include "cisco_telemetry.pb.h"
-#include "huawei_dialout.grpc.pb.h"
-#include "juniper_gnmi.pb.h"
-#include "juniper_telemetry_header_extension.pb.h"
-#include "juniper_dialout.grpc.pb.h"
 #include "grpc/socket_mutator.h"
+#include <grpc/support/alloc.h>
+// mdt-dialout-collector Library headers
+#include "cisco_dialout.grpc.pb.h"
+#include "huawei_dialout.grpc.pb.h"
+#include "juniper_dialout.grpc.pb.h"
+#include "dataManipulation/data_manipulation.h"
+#include "dataDelivery/data_delivery.h"
 
 
 // Global visibility to be able to signal the refresh --> CSV from main
-extern std::unordered_map<std::string,std::vector<std::string>> enrich_map;
+extern std::unordered_map<std::string,std::vector<std::string>> label_map;
 
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
 public:
     virtual void UpdateArguments(grpc::ChannelArguments *args);
     virtual void UpdatePlugins(
         std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
-private:
 };
 
 class CustomSocketMutator: public grpc_socket_mutator {
@@ -31,7 +31,6 @@ public:
     CustomSocketMutator();
     ~CustomSocketMutator() {}
     bool bindtodevice_socket_mutator(int fd);
-private:
 };
 
 class Srv final {
@@ -73,7 +72,7 @@ private:
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
         void Start(
-        std::unordered_map<std::string,std::vector<std::string>>& enrich_map
+        std::unordered_map<std::string,std::vector<std::string>> &label_map
         );
 
     private:
@@ -94,7 +93,7 @@ private:
             Subscriber::AsyncService *juniper_service,
             grpc::ServerCompletionQueue *juniper_cq);
         void Start(
-        std::unordered_map<std::string,std::vector<std::string>>& enrich_map
+        std::unordered_map<std::string,std::vector<std::string>> &label_map
         );
 
     private:
@@ -115,7 +114,7 @@ private:
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *huawei_cq);
         void Start(
-        std::unordered_map<std::string,std::vector<std::string>>& enrich_map
+        std::unordered_map<std::string,std::vector<std::string>> &label_map
         );
 
     private:

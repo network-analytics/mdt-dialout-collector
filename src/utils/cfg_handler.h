@@ -1,15 +1,15 @@
 #ifndef _CFG_HANDLER_H_
 #define _CFG_HANDLER_H_
 
+// C++ Standard Library headers
 #include <iostream>
-#include <libconfig.h++>
+#include <iomanip>
 #include <map>
+// External Library headers
+#include <libconfig.h++>
 
 
 class CfgHandler {
-public:
-    //TBC
-
 protected:
     const std::string mdt_dialout_collector_conf =
         "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
@@ -23,8 +23,8 @@ public:
     MainCfgHandler();
 
     // Setters - directly from the configuration file
-    int lookup_main_parameters(std::string cfg_path,
-        std::map<std::string, std::string>& params);
+    int lookup_main_parameters(const std::string &cfg_path,
+        std::map<std::string, std::string> &params);
 
     // Getters
     std::string get_iface() const {
@@ -58,8 +58,8 @@ public:
     DataManipulationCfgHandler();
 
     // Setters - directly from the configuration file
-    int lookup_main_parameters(std::string cfg_path,
-        std::map<std::string, std::string>& params);
+    int lookup_main_parameters(const std::string &cfg_path,
+        std::map<std::string, std::string> &params);
 
     // Getters
     std::string get_enable_cisco_message_to_json_string() const {
@@ -81,8 +81,8 @@ public:
     KafkaCfgHandler();
 
     // Setters - directly from the configuration file
-    int lookup_kafka_parameters(std::string cfg_path,
-        std::map<std::string, std::string>& params);
+    int lookup_kafka_parameters(const std::string &cfg_path,
+        std::map<std::string, std::string> &params);
 
     // Getters
     std::string get_kafka_topic() const {

@@ -1,12 +1,4 @@
-#include <iostream>
-#include <iomanip>
-#include <cstdlib>
-#include <cstring>
-#include <filesystem>
-#include <memory>
-#include <map>
-#include <string>
-#include <libconfig.h++>
+// mdt-dialout-collector Library headers
 #include "cfg_handler.h"
 
 
@@ -26,8 +18,8 @@ MainCfgHandler::MainCfgHandler()
     }
 }
 
-int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
-    std::map<std::string, std::string>& params)
+int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
+    std::map<std::string, std::string> &params)
 {
     std::unique_ptr<libconfig::Config> main_params(new libconfig::Config());
 
@@ -44,7 +36,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
     // Main parameters evaluation
     bool iface = main_params->exists("iface");
     if (iface == true) {
-        libconfig::Setting& iface = main_params->lookup("iface");
+        libconfig::Setting &iface = main_params->lookup("iface");
         std::string iface_s = iface;
         if (iface_s.empty() == false) {
             params.insert({"iface", iface_s});
@@ -59,7 +51,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
 
     bool ipv4_socket_cisco = main_params->exists("ipv4_socket_cisco");
     if (ipv4_socket_cisco == true) {
-        libconfig::Setting& ipv4_socket_cisco =
+        libconfig::Setting &ipv4_socket_cisco =
             main_params->lookup("ipv4_socket_cisco");
         std::string ipv4_socket_cisco_s = ipv4_socket_cisco;
         if (ipv4_socket_cisco_s.empty() == false) {
@@ -74,7 +66,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
 
     bool ipv4_socket_juniper = main_params->exists("ipv4_socket_juniper");
     if (ipv4_socket_juniper == true) {
-        libconfig::Setting& ipv4_socket_juniper =
+        libconfig::Setting &ipv4_socket_juniper =
             main_params->lookup("ipv4_socket_juniper");
         std::string ipv4_socket_juniper_s = ipv4_socket_juniper;
         if (ipv4_socket_juniper_s.empty() == false) {
@@ -89,7 +81,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
 
     bool ipv4_socket_huawei = main_params->exists("ipv4_socket_huawei");
     if (ipv4_socket_huawei == true) {
-        libconfig::Setting& ipv4_socket_huawei =
+        libconfig::Setting &ipv4_socket_huawei =
             main_params->lookup("ipv4_socket_huawei");
         std::string ipv4_socket_huawei_s = ipv4_socket_huawei;
         if (ipv4_socket_huawei_s.empty() == false) {
@@ -104,7 +96,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
 
     bool cisco_workers = main_params->exists("cisco_workers");
     if (cisco_workers == true) {
-        libconfig::Setting& cisco_workers =
+        libconfig::Setting &cisco_workers =
             main_params->lookup("cisco_workers");
         std::string cisco_workers_s = cisco_workers;
         if (cisco_workers_s.empty() == false) {
@@ -119,7 +111,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
 
     bool juniper_workers = main_params->exists("juniper_workers");
     if (juniper_workers == true) {
-        libconfig::Setting& juniper_workers =
+        libconfig::Setting &juniper_workers =
             main_params->lookup("juniper_workers");
         std::string juniper_workers_s = juniper_workers;
         if (juniper_workers_s.empty() == false) {
@@ -134,7 +126,7 @@ int MainCfgHandler::lookup_main_parameters(std::string cfg_path,
 
     bool huawei_workers = main_params->exists("huawei_workers");
     if (huawei_workers == true) {
-        libconfig::Setting& huawei_workers =
+        libconfig::Setting &huawei_workers =
             main_params->lookup("huawei_workers");
         std::string huawei_workers_s = huawei_workers;
         if (huawei_workers_s.empty() == false) {
@@ -165,8 +157,9 @@ DataManipulationCfgHandler::DataManipulationCfgHandler()
     }
 }
 
-int DataManipulationCfgHandler::lookup_main_parameters(std::string cfg_path,
-    std::map<std::string, std::string>& params)
+int DataManipulationCfgHandler::lookup_main_parameters(
+    const std::string &cfg_path,
+    std::map<std::string, std::string> &params)
 {
     std::unique_ptr<libconfig::Config>
         data_manipulation_params(new libconfig::Config());
@@ -185,7 +178,7 @@ int DataManipulationCfgHandler::lookup_main_parameters(std::string cfg_path,
     bool enable_cisco_message_to_json_string =
         data_manipulation_params->exists("enable_cisco_message_to_json_string");
     if (enable_cisco_message_to_json_string == true) {
-        libconfig::Setting& enable_cisco_message_to_json_string =
+        libconfig::Setting &enable_cisco_message_to_json_string =
             data_manipulation_params->lookup(
             "enable_cisco_message_to_json_string");
         std::string enable_cisco_message_to_json_string_s =
@@ -205,7 +198,7 @@ int DataManipulationCfgHandler::lookup_main_parameters(std::string cfg_path,
     bool enable_cisco_gpbkv2json =
         data_manipulation_params->exists("enable_cisco_gpbkv2json");
     if (enable_cisco_gpbkv2json == true) {
-        libconfig::Setting& enable_cisco_gpbkv2json =
+        libconfig::Setting &enable_cisco_gpbkv2json =
             data_manipulation_params->lookup("enable_cisco_gpbkv2json");
         std::string enable_cisco_gpbkv2json_s =
             enable_cisco_gpbkv2json;
@@ -223,7 +216,7 @@ int DataManipulationCfgHandler::lookup_main_parameters(std::string cfg_path,
     bool enable_label_encode_as_map =
         data_manipulation_params->exists("enable_label_encode_as_map");
     if (enable_label_encode_as_map == true) {
-        libconfig::Setting& enable_label_encode_as_map =
+        libconfig::Setting &enable_label_encode_as_map =
             data_manipulation_params->lookup("enable_label_encode_as_map");
         std::string enable_label_encode_as_map_s =
             enable_label_encode_as_map;
@@ -260,8 +253,8 @@ KafkaCfgHandler::KafkaCfgHandler()
     }
 }
 
-int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
-    std::map<std::string, std::string>& params)
+int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
+    std::map<std::string, std::string> &params)
 {
     std::unique_ptr<libconfig::Config> kafka_params(new libconfig::Config());
 
@@ -278,7 +271,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
     // Kafka arameters evaluation
     bool topic = kafka_params->exists("topic");
     if (topic == true) {
-        libconfig::Setting& topic = kafka_params->lookup("topic");
+        libconfig::Setting &topic = kafka_params->lookup("topic");
         std::string topic_s = topic.c_str();
         if (topic_s.empty() == false) {
             params.insert({"topic", topic_s});
@@ -293,7 +286,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
 
     bool bootstrap_servers = kafka_params->exists("bootstrap_servers");
     if (bootstrap_servers == true) {
-        libconfig::Setting& bootstrap_servers =
+        libconfig::Setting &bootstrap_servers =
             kafka_params->lookup("bootstrap_servers");
         std::string bootstrap_servers_s = bootstrap_servers.c_str();
         if (bootstrap_servers_s.empty() == false) {
@@ -309,10 +302,10 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
 
     bool enable_idempotence = kafka_params->exists("enable_idempotence");
     if (enable_idempotence == true) {
-        libconfig::Setting& enable_idempotence =
+        libconfig::Setting &enable_idempotence =
             kafka_params->lookup("enable_idempotence");
         std::string enable_idempotence_s = enable_idempotence.c_str();
-        if (enable_idempotence_s.empty() == false and
+        if (enable_idempotence_s.empty() == false &&
             (enable_idempotence_s.compare("true") == 0 or
             enable_idempotence_s.compare("false") == 0)) {
             params.insert({"enable_idempotence", enable_idempotence_s});
@@ -326,7 +319,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
 
     bool client_id = kafka_params->exists("client_id");
     if (client_id == true) {
-        libconfig::Setting& client_id = kafka_params->lookup("client_id");
+        libconfig::Setting &client_id = kafka_params->lookup("client_id");
         std::string client_id_s = client_id.c_str();
         if (client_id_s.empty() == false) {
             params.insert({"client_id", client_id_s});
@@ -340,7 +333,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
 
     bool log_level = kafka_params->exists("log_level");
     if (log_level == true) {
-        libconfig::Setting& log_level = kafka_params->lookup("log_level");
+        libconfig::Setting &log_level = kafka_params->lookup("log_level");
         std::string log_level_s = log_level.c_str();
         if (log_level_s.empty() == false) {
             params.insert({"log_level", log_level_s});
@@ -354,10 +347,10 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
 
     bool security_protocol = kafka_params->exists("security_protocol");
     if (security_protocol == true) {
-        libconfig::Setting& security_protocol =
+        libconfig::Setting &security_protocol =
             kafka_params->lookup("security_protocol");
         std::string security_protocol_s = security_protocol.c_str();
-        if (security_protocol_s.empty() == false and
+        if (security_protocol_s.empty() == false &&
             (security_protocol_s.compare("ssl") == 0 or
             security_protocol_s.compare("plaintext") == 0)) {
             params.insert({"security_protocol", security_protocol_s});
@@ -376,22 +369,22 @@ int KafkaCfgHandler::lookup_kafka_parameters(std::string cfg_path,
             kafka_params->exists("ssl_certificate_location");
         bool ssl_ca_location = kafka_params->exists("ssl_ca_location");
 
-        if (ssl_key_location == true and
-            ssl_certificate_location == true and
+        if (ssl_key_location == true &&
+            ssl_certificate_location == true &&
             ssl_ca_location == true) {
-            libconfig::Setting& ssl_key_location =
+            libconfig::Setting &ssl_key_location =
                 kafka_params->lookup("ssl_key_location");
-            libconfig::Setting& ssl_certificate_location =
+            libconfig::Setting &ssl_certificate_location =
                 kafka_params->lookup("ssl_certificate_location");
-            libconfig::Setting& ssl_ca_location =
+            libconfig::Setting &ssl_ca_location =
                 kafka_params->lookup("ssl_ca_location");
 
             std::string ssl_key_location_s = ssl_key_location.c_str();
             std::string ssl_certificate_location_s =
                 ssl_certificate_location.c_str();
             std::string ssl_ca_location_s = ssl_ca_location.c_str();
-            if (ssl_key_location_s.empty() == false and
-                ssl_certificate_location_s.empty() == false and
+            if (ssl_key_location_s.empty() == false &&
+                ssl_certificate_location_s.empty() == false &&
                 ssl_ca_location_s.empty() == false) {
                 params.insert({"ssl_key_location", ssl_key_location_s});
                 params.insert({"ssl_certificate_location",
