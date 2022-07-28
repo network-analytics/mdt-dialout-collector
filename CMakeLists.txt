@@ -1,5 +1,5 @@
 # Minimum CMake required
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 
 # Set compiler options
 set(CMAKE_CXX_FLAGS "-Wall -pedantic -pthread -std=c++17")
