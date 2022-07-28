@@ -51,8 +51,8 @@ int main(void)
     std::vector<std::thread> workers;
 
     if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
-        main_cfg_parameters.at("ipv4_socket_huawei").empty() == true &&
-        main_cfg_parameters.at("ipv4_socket_juniper").empty() == true) {
+        main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
+        main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
             std::cout << "no ipv4 sockets were configured\n";
             return EXIT_FAILURE;
     }
@@ -82,7 +82,7 @@ int main(void)
     if (main_cfg_parameters.at("ipv4_socket_huawei").empty() == false) {
         void *huawei_ptr {nullptr};
         int huawei_workers =
-            std::stoi(main_cfg_parameters.at("get_huawei_workers"));
+            std::stoi(main_cfg_parameters.at("huawei_workers"));
         for (int w = 0; w < huawei_workers; ++w) {
             workers.push_back(std::thread(&HuaweiThread, huawei_ptr));
         }
