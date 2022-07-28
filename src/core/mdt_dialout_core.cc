@@ -1,5 +1,5 @@
 // Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
-// Distributed under the MIT License (http://opensource.org/licenses/MIT
+// Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 // mdt-dialout-collector Library headers
@@ -7,17 +7,14 @@
 
 
 // Global visibility to be able to signal the refresh --> CSV from main
-std::unordered_map<std::string,std::vector<std::string>> label_map;
+std::unordered_map<std::string, std::vector<std::string>> label_map;
 
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
     int type;
     socklen_t len = sizeof(type);
 
-    // --- Required for config parameters ---
-    std::unique_ptr<MainCfgHandler> main_cfg_handler(new MainCfgHandler());
-    std::string iface = main_cfg_handler->get_iface();
-    // --- Required for config parameters ---
+    std::string iface = main_cfg_parameters.at("iface");
 
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
         //std::cout << "Issues with getting the iface type ..." << "\n";
@@ -212,16 +209,20 @@ Srv::HuaweiStream::HuaweiStream(
     Srv::HuaweiStream::Start(label_map);
 }
 
-// --- Required for config parameters ---
-std::unique_ptr<DataManipulationCfgHandler>
-    data_manipulation_cfg_handler(new DataManipulationCfgHandler());
-std::string enable_cisco_gpbkv2json =
-    data_manipulation_cfg_handler->get_enable_cisco_gpbkv2json();
-std::string enable_cisco_message_to_json_string =
-    data_manipulation_cfg_handler->get_enable_cisco_message_to_json_string();
-std::string enable_label_encode_as_map =
-    data_manipulation_cfg_handler->get_enable_label_encode_as_map();
-// --- Required for config parameters ---
+// --- DataManipulation, Datadelivery & Decoding
+std::unique_ptr<DataManipulation> data_manipulation(
+    new DataManipulation());
+std::unique_ptr<DataDelivery> data_delivery(
+    new DataDelivery());
+std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
+    new cisco_telemetry::Telemetry());
+std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_hdr_ext(
+    new GnmiJuniperTelemetryHeaderExtension());
+std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
+    new huawei_telemetry::Telemetry());
+std::unique_ptr<openconfig_interfaces::Interfaces> oc_if(
+    new openconfig_interfaces::Interfaces());
+// --- DataManipulation, Datadelivery & Decoding
 
 void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map)
@@ -236,25 +237,19 @@ void Srv::CiscoStream::Start(
             this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
-        // Debug
+        //  --- DEBUG ---
         //for (auto &e : label_map) {
         //    std::cout << e.first << " ---> "
         //    << "[" << e.second.at(0) << ","
         //    << e.second.at(1) << "]\n";
         //}
+        //  --- DEBUG ---
         bool parsing_str {false};
         // From the network
         std::string stream_data_in;
         // After data enrichment
         std::string stream_data_out;
         const std::string peer = cisco_server_ctx.peer();
-
-        std::unique_ptr<DataManipulation> data_manipulation(
-            new DataManipulation());
-        std::unique_ptr<DataDelivery> data_delivery(
-            new DataDelivery());
-        std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
-            new cisco_telemetry::Telemetry());
 
         // A new CiscoStream is spawned every time a new client connects
         if (cisco_init_counts == 0) {
@@ -295,15 +290,17 @@ void Srv::CiscoStream::Start(
 
                 // std::string:compare returns 0 when the compared strings are
                 // matching
-                if (enable_cisco_gpbkv2json.compare("true") == 0) {
+                if (data_manipulation_cfg_parameters.at(
+                    "enable_cisco_gpbkv2json").compare("true") == 0) {
                     if (data_manipulation->CiscoGpbkv2Json(cisco_tlm,
                         stream_data_in) == true) {
                         std::cout << "Cisco data-normalization successful\n";
                     } else {
                         std::cout << "Cisco data-normalization unsuccessful\n";
                     }
-                } else if (enable_cisco_message_to_json_string.compare("true")
-                    == 0) {
+                } else if (data_manipulation_cfg_parameters.at(
+                    "enable_cisco_message_to_json_string").compare(
+                    "true") == 0) {
                     // MessageToJson is working directly on the PROTO-Obj
                     stream_data_in.clear();
                     google::protobuf::util::JsonPrintOptions opt;
@@ -313,7 +310,8 @@ void Srv::CiscoStream::Start(
                         &stream_data_in,
                         opt);
                     // Data enrichment with label (node_id/platform_id)
-                    if (enable_label_encode_as_map.compare("true") == 0) {
+                    if (data_manipulation_cfg_parameters.at(
+                        "enable_label_encode_as_map").compare("true") == 0) {
                         if (data_manipulation->AppendLabelMap(
                             label_map,
                             peer,
@@ -352,7 +350,8 @@ void Srv::CiscoStream::Start(
                 // ---
 
                // Data enrichment with label (node_id/platform_id)
-                if (enable_label_encode_as_map.compare("true") == 0) {
+                if (data_manipulation_cfg_parameters.at(
+                    "enable_label_encode_as_map").compare("true") == 0) {
                     if (data_manipulation->AppendLabelMap(
                         label_map,
                         peer,
@@ -394,14 +393,6 @@ void Srv::JuniperStream::Start(
         const std::string peer = juniper_server_ctx.peer();
         Json::Value root;
 
-        std::unique_ptr<DataManipulation> data_manipulation(
-            new DataManipulation());
-        std::unique_ptr<DataDelivery> data_delivery(
-            new DataDelivery());
-        std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
-            juniper_tlm_hdr_ext(
-            new GnmiJuniperTelemetryHeaderExtension());
-
         // A new JuniperStream is spawned every time a new client connects
         if (juniper_init_counts == 0) {
             std::cout << "new Srv::JuniperStream()\n";
@@ -434,7 +425,8 @@ void Srv::JuniperStream::Start(
             stream_data_in = json_str_out;
             // std::string:compare returns 0 when the compared strings are
             // matching
-            if (enable_label_encode_as_map.compare("true") == 0) {
+            if (data_manipulation_cfg_parameters.at(
+                "enable_label_encode_as_map").compare("true") == 0) {
                 if (data_manipulation->AppendLabelMap(
                     label_map,
                     peer,
@@ -473,15 +465,6 @@ void Srv::HuaweiStream::Start(
         std::string stream_data_out;
         std::string json_str_out;
         const std::string peer = huawei_server_ctx.peer();
-
-        std::unique_ptr<DataManipulation> data_manipulation(
-            new DataManipulation());
-        std::unique_ptr<DataDelivery> data_delivery(
-            new DataDelivery());
-        std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
-            new huawei_telemetry::Telemetry());
-        std::unique_ptr<openconfig_interfaces::Interfaces> oc_if(
-            new openconfig_interfaces::Interfaces());
 
         // A new HuaweiStream is spawned every time a new client connects
         if (huawei_init_counts == 0) {
@@ -536,7 +519,8 @@ void Srv::HuaweiStream::Start(
 
                     // Data enrichment with label (node_id/platform_id)
                     stream_data_in = json_str_out;
-                    if (enable_label_encode_as_map.compare("true") == 0) {
+                    if (data_manipulation_cfg_parameters.at(
+                        "enable_label_encode_as_map").compare("true") == 0) {
                         if (data_manipulation->AppendLabelMap(
                             label_map,
                             peer,
@@ -571,7 +555,8 @@ void Srv::HuaweiStream::Start(
                 // ---
 
                 // Data enrichment with label (node_id/platform_id)
-                if (enable_label_encode_as_map.compare("true") == 0) {
+                if (data_manipulation_cfg_parameters.at(
+                    "enable_label_encode_as_map").compare("true") == 0) {
                     if (data_manipulation->AppendLabelMap(
                         label_map,
                         peer,

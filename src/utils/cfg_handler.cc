@@ -1,15 +1,31 @@
 // Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
-// Distributed under the MIT License (http://opensource.org/licenses/MIT
+// Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 // mdt-dialout-collector Library headers
 #include "cfg_handler.h"
 
 
+// Centralizing config parameters
+std::unique_ptr<MainCfgHandler>
+    main_cfg_handler(new MainCfgHandler());
+std::unique_ptr<DataManipulationCfgHandler>
+    data_manipulation_cfg_handler(new DataManipulationCfgHandler());
+std::unique_ptr<KafkaCfgHandler>
+    data_delivery_cfg_handler(new KafkaCfgHandler());
+
+std::map<std::string, std::string> main_cfg_parameters =
+    main_cfg_handler->get_parameters();
+std::map<std::string, std::string> data_manipulation_cfg_parameters =
+    data_manipulation_cfg_handler->get_parameters();
+std::map<std::string, std::string> data_delivery_cfg_parameters =
+    data_delivery_cfg_handler->get_parameters();
+
 MainCfgHandler::MainCfgHandler()
 {
     if (!lookup_main_parameters(this->mdt_dialout_collector_conf,
         this->parameters)) {
+        this->core_pid_folder = parameters.at("core_pid_folder");
         this->iface = parameters.at("iface");
         this->ipv4_socket_cisco = parameters.at("ipv4_socket_cisco");
         this->ipv4_socket_juniper = parameters.at("ipv4_socket_juniper");
@@ -25,6 +41,7 @@ MainCfgHandler::MainCfgHandler()
 int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
     std::map<std::string, std::string> &params)
 {
+    params.clear();
     std::unique_ptr<libconfig::Config> main_params(new libconfig::Config());
 
     try {
@@ -38,6 +55,29 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
     }
 
     // Main parameters evaluation
+    bool core_pid_folder =
+        main_params->exists("core_pid_folder");
+    if (core_pid_folder == true) {
+        libconfig::Setting &core_pid_folder =
+            main_params->lookup("core_pid_folder");
+        std::string core_pid_folder_s = core_pid_folder;
+        if (core_pid_folder_s.empty() == false &&
+            std::filesystem::exists(core_pid_folder_s) == true) {
+            params.insert({"core_pid_folder", core_pid_folder_s});
+        } else {
+            std::cout << "core_pid_folder: invalid folder\n";
+            std::exit(EXIT_FAILURE);
+        }
+    } else {
+        const std::string default_core_pid_folder = "/var/run/";
+        if (std::filesystem::exists(default_core_pid_folder) == true) {
+            params.insert({"core_pid_folder", default_core_pid_folder});
+        } else {
+            std::cout << "core_pid_folder: invalid folder\n";
+            std::exit(EXIT_FAILURE);
+        }
+    }
+
     bool iface = main_params->exists("iface");
     if (iface == true) {
         libconfig::Setting &iface = main_params->lookup("iface");
@@ -148,7 +188,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
 
 DataManipulationCfgHandler::DataManipulationCfgHandler()
 {
-    if (!lookup_main_parameters(this->mdt_dialout_collector_conf,
+    if (!lookup_data_manipulation_parameters(this->mdt_dialout_collector_conf,
         this->parameters)) {
         this->enable_cisco_message_to_json_string =
             parameters.at("enable_cisco_message_to_json_string");
@@ -156,15 +196,18 @@ DataManipulationCfgHandler::DataManipulationCfgHandler()
             parameters.at("enable_cisco_gpbkv2json");
         this->enable_label_encode_as_map =
             parameters.at("enable_label_encode_as_map");
+        this->label_map_csv_path =
+            parameters.at("label_map_csv_path");
     } else {
         throw std::exception();
     }
 }
 
-int DataManipulationCfgHandler::lookup_main_parameters(
+int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
     const std::string &cfg_path,
     std::map<std::string, std::string> &params)
 {
+    params.clear();
     std::unique_ptr<libconfig::Config>
         data_manipulation_params(new libconfig::Config());
 
@@ -235,6 +278,32 @@ int DataManipulationCfgHandler::lookup_main_parameters(
         params.insert({"enable_label_encode_as_map", "false"});
     }
 
+    bool label_map_csv_path =
+        data_manipulation_params->exists("label_map_csv_path");
+    if (label_map_csv_path == true) {
+        libconfig::Setting &label_map_csv_path =
+            data_manipulation_params->lookup("label_map_csv_path");
+        std::string label_map_csv_path_s =
+            label_map_csv_path;
+        if (label_map_csv_path_s.empty() == false &&
+            std::filesystem::exists(label_map_csv_path_s) == true) {
+            params.insert({"label_map_csv_path",
+            label_map_csv_path_s});
+        } else {
+            std::cout << "label_map_csv_path: invalid path\n";
+            std::exit(EXIT_FAILURE);
+        }
+    } else {
+        const std::string default_label_map_csv_path =
+            "/opt/mdt_dialout_collector/csv/label_map.csv";
+        if (std::filesystem::exists(default_label_map_csv_path) == true) {
+            params.insert({"label_map_csv_path", default_label_map_csv_path});
+        } else {
+            std::cout << "label_map_csv_path: invalid path\n";
+            std::exit(EXIT_FAILURE);
+        }
+    }
+
     return EXIT_SUCCESS;
 }
 
@@ -260,6 +329,7 @@ KafkaCfgHandler::KafkaCfgHandler()
 int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
     std::map<std::string, std::string> &params)
 {
+    params.clear();
     std::unique_ptr<libconfig::Config> kafka_params(new libconfig::Config());
 
     try {

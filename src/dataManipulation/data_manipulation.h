@@ -1,5 +1,5 @@
 // Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
-// Distributed under the MIT License (http://opensource.org/licenses/MIT
+// Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 #ifndef _DATA_MANIPULATION_H_

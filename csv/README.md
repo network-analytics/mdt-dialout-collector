@@ -23,6 +23,6 @@ with field2 & field3 according to this data format:
 When new rows are added to the CSV, you can refresh the daemon seamlessly:
 
 ```SHELL
-$ sudo kill -USR1 `cat /var/run/mdt_dout_collector.pid`
+$ sudo kill -USR1 `cat /var/run/mdt_dialout_collector.pid`
 ```
 

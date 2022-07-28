@@ -1,5 +1,5 @@
 // Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
-// Distributed under the MIT License (http://opensource.org/licenses/MIT
+// Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 // mdt-dialout-collector Library headers
@@ -8,46 +8,31 @@
 
 bool DataDelivery::AsyncKafkaProducer(const std::string &json_str)
 {
-    // --- Required for config parameters ---
-    std::unique_ptr<KafkaCfgHandler> kafka_cfg_handler(new KafkaCfgHandler());
-
-    kafka::Topic topic =
-        kafka_cfg_handler->get_kafka_topic();
-    std::string bootstrap_servers =
-        kafka_cfg_handler->get_kafka_bootstrap_servers();
-    std::string enable_idempotence =
-        kafka_cfg_handler->get_kafka_enable_idempotence();
-    std::string client_id =
-        kafka_cfg_handler->get_kafka_client_id();
-    std::string security_protocol =
-        kafka_cfg_handler->get_kafka_security_protocol();
-    std::string ssl_key_location =
-        kafka_cfg_handler->get_kafka_ssl_key_location();
-    std::string ssl_certificate_location =
-        kafka_cfg_handler->get_kafka_ssl_certificate_location();
-    std::string ssl_ca_location =
-        kafka_cfg_handler->get_kafka_ssl_ca_location();
-    std::string log_level =
-        kafka_cfg_handler->get_kafka_log_level();
-    // --- Required for config parameters ---
+    kafka::Topic topic = data_delivery_cfg_parameters.at("topic");
 
     try {
-        // Additional kafka producer's config options here
         kafka::Properties properties ({
-            {"bootstrap.servers",  bootstrap_servers},
-            {"enable.idempotence", enable_idempotence},
-            {"client.id", client_id},
-            {"security.protocol", security_protocol},
-            {"ssl.key.location", ssl_key_location},
-            {"ssl.certificate.location", ssl_certificate_location},
-            {"ssl.ca.location", ssl_ca_location},
-            {"log_level", log_level},
+            {"bootstrap.servers",
+                data_delivery_cfg_parameters.at("bootstrap_servers")},
+            {"enable.idempotence",
+                data_delivery_cfg_parameters.at("enable_idempotence")},
+            {"client.id",
+                data_delivery_cfg_parameters.at("client_id")},
+            {"security.protocol",
+                data_delivery_cfg_parameters.at("security_protocol")},
+            {"ssl.key.location",
+                data_delivery_cfg_parameters.at("ssl_key_location")},
+            {"ssl.certificate.location",
+                data_delivery_cfg_parameters.at("ssl_certificate_location")},
+            {"ssl.ca.location",
+                data_delivery_cfg_parameters.at("ssl_ca_location")},
+            {"log_level",
+                data_delivery_cfg_parameters.at("log_level")},
         });
 
         kafka::clients::KafkaProducer producer(properties);
 
         if (json_str.empty()) {
-            // Implementing a better handling
             std::cout << "KAFKA - Empty JSON received\n";
             return false;
         }
