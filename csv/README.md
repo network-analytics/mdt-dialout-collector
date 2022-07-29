@@ -8,7 +8,7 @@
 4,4,4,4,daisy-router-04,JunOS
 ```
 
-if not already existing crate a file "csv/enrichment.csv" resembling the above format.
+if not already existing, crate a file "csv/label_map.csv" resembling the above format.
 The client IP address (field1) is matched & the data-stream is enriched
 with field2 & field3 according to this data format:
 
