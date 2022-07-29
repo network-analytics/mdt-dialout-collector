@@ -20,6 +20,7 @@
 
 class DataManipulation {
 public:
+    DataManipulation() { std::cout << "DataManipulation()\n"; };
     bool AppendLabelMap(
         std::unordered_map<std::string,std::vector<std::string>> &label_map,
         const std::string &peer_ip,

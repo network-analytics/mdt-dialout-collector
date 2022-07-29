@@ -25,6 +25,7 @@ extern std::unordered_map<std::string,std::vector<std::string>> label_map;
 
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
 public:
+    ServerBuilderOptionImpl() { std::cout << "ServerBuilderOptionImpl()\n"; };
     virtual void UpdateArguments(grpc::ChannelArguments *args);
     virtual void UpdatePlugins(
         std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
@@ -49,7 +50,7 @@ public:
         juniper_cq_->grpc::ServerCompletionQueue::Shutdown();
         huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
     }
-    //~Srv();
+    Srv() { std::cout << "Srv()\n"; };
     void CiscoBind(std::string cisco_srv_socket);
     void JuniperBind(std::string juniper_srv_socket);
     void HuaweiBind(std::string huawei_srv_socket);

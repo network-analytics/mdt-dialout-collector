@@ -4,6 +4,7 @@
 
 // mdt-dialout-collector Library headers
 #include "cfg_handler.h"
+#include <libconfig.h++>
 
 
 // Centralizing config parameters
@@ -21,10 +22,29 @@ std::map<std::string, std::string> data_manipulation_cfg_parameters =
 std::map<std::string, std::string> data_delivery_cfg_parameters =
     data_delivery_cfg_handler->get_parameters();
 
+bool CfgHandler::set_parameters(std::unique_ptr<libconfig::Config> &params,
+    const std::string &cfg_path)
+{
+    try {
+        params->readFile(cfg_path.c_str());
+    } catch (const libconfig::FileIOException &fioex) {
+        std::cout << "libconfig: " << fioex.what() << "\n";
+        return false;
+    } catch(const libconfig::ParseException &pex) {
+        std::cout << "libconfig: " << pex.what() << "\n";
+        return false;
+    }
+
+    return true;
+}
+
 MainCfgHandler::MainCfgHandler()
 {
-    if (!lookup_main_parameters(this->mdt_dialout_collector_conf,
-        this->parameters)) {
+    std::cout << "MainCfgHandler()\n";
+    if (lookup_main_parameters(
+        this->mdt_dialout_collector_conf,
+        this->parameters) == true) {
+
         this->core_pid_folder = parameters.at("core_pid_folder");
         this->iface = parameters.at("iface");
         this->ipv4_socket_cisco = parameters.at("ipv4_socket_cisco");
@@ -34,24 +54,18 @@ MainCfgHandler::MainCfgHandler()
         this->juniper_workers = parameters.at("juniper_workers");
         this->huawei_workers = parameters.at("huawei_workers");
     } else {
-        throw std::exception();
+        std::exit(EXIT_FAILURE);
     }
 }
 
-int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
+bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
     std::map<std::string, std::string> &params)
 {
     params.clear();
     std::unique_ptr<libconfig::Config> main_params(new libconfig::Config());
 
-    try {
-        main_params->readFile(cfg_path.c_str());
-    } catch (const libconfig::FileIOException &fioex) {
-        std::cout << "libconfig::FileIOException\n";
-        return EXIT_FAILURE;
-    } catch(const libconfig::ParseException &pex) {
-        std::cout << "libconfig::ParseException\n";
-        return EXIT_FAILURE;
+    if (set_parameters(main_params, cfg_path) == false) {
+        return false;
     }
 
     // Main parameters evaluation
@@ -66,7 +80,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"core_pid_folder", core_pid_folder_s});
         } else {
             std::cout << "core_pid_folder: invalid folder\n";
-            std::exit(EXIT_FAILURE);
+            return false;
         }
     } else {
         const std::string default_core_pid_folder = "/var/run/";
@@ -74,7 +88,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"core_pid_folder", default_core_pid_folder});
         } else {
             std::cout << "core_pid_folder: invalid folder\n";
-            std::exit(EXIT_FAILURE);
+            return false;
         }
     }
 
@@ -86,11 +100,11 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"iface", iface_s});
         } else {
             std::cout << "empty iface not allowed\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         std::cout << "mdt-dialout-collector: iface mandatory\n";
-        throw libconfig::SettingNotFoundException("iface");
+        return false;
     }
 
     bool ipv4_socket_cisco = main_params->exists("ipv4_socket_cisco");
@@ -102,7 +116,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"ipv4_socket_cisco", ipv4_socket_cisco_s});
         } else {
             std::cout << "ipv4_socket_cisco: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"ipv4_socket_cisco", ""});
@@ -117,7 +131,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"ipv4_socket_juniper", ipv4_socket_juniper_s});
         } else {
             std::cout << "ipv4_socket_juniper: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"ipv4_socket_juniper", ""});
@@ -132,7 +146,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"ipv4_socket_huawei", ipv4_socket_huawei_s});
         } else {
             std::cout << "ipv4_socket_huawei: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"ipv4_socket_huawei", ""});
@@ -147,7 +161,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"cisco_workers", cisco_workers_s});
         } else {
             std::cout << "cisco_workers: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"cisco_workers", "1"});
@@ -162,7 +176,7 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"juniper_workers", juniper_workers_s});
         } else {
             std::cout << "juniper_workers: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"juniper_workers", "1"});
@@ -177,19 +191,22 @@ int MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             params.insert({"huawei_workers", huawei_workers_s});
         } else {
             std::cout << "huawei_workers: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"huawei_workers", "1"});
     }
 
-    return EXIT_SUCCESS;
+    return true;
 }
 
 DataManipulationCfgHandler::DataManipulationCfgHandler()
 {
-    if (!lookup_data_manipulation_parameters(this->mdt_dialout_collector_conf,
-        this->parameters)) {
+    std::cout << "DataManipulationCfgHandler()\n";
+    if (lookup_data_manipulation_parameters(
+        this->mdt_dialout_collector_conf,
+        this->parameters) == true) {
+
         this->enable_cisco_message_to_json_string =
             parameters.at("enable_cisco_message_to_json_string");
         this->enable_cisco_gpbkv2json =
@@ -199,11 +216,11 @@ DataManipulationCfgHandler::DataManipulationCfgHandler()
         this->label_map_csv_path =
             parameters.at("label_map_csv_path");
     } else {
-        throw std::exception();
+        std::exit(EXIT_FAILURE);
     }
 }
 
-int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
+bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
     const std::string &cfg_path,
     std::map<std::string, std::string> &params)
 {
@@ -211,14 +228,8 @@ int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
     std::unique_ptr<libconfig::Config>
         data_manipulation_params(new libconfig::Config());
 
-    try {
-        data_manipulation_params->readFile(cfg_path.c_str());
-    } catch (const libconfig::FileIOException &fioex) {
-        std::cout << "libconfig::FileIOException\n";
-        return EXIT_FAILURE;
-    } catch(const libconfig::ParseException &pex) {
-        std::cout << "libconfig::ParseException\n";
-        return EXIT_FAILURE;
+    if (set_parameters(data_manipulation_params, cfg_path) == false) {
+        return false;
     }
 
     // Data manipulation parameters evaluation
@@ -236,10 +247,10 @@ int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
         } else {
             std::cout <<
                 "enable_cisco_message_to_json_string: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
-        params.insert({"enable_message_to_json_string", "false"});
+        params.insert({"enable_cisco_message_to_json_string", "false"});
     }
 
     bool enable_cisco_gpbkv2json =
@@ -254,7 +265,7 @@ int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
             enable_cisco_gpbkv2json_s});
         } else {
             std::cout << "enable_cisco_gpbkv2json: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"enable_cisco_gpbkv2json", "true"});
@@ -272,7 +283,7 @@ int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
             enable_label_encode_as_map_s});
         } else {
             std::cout << "enable_label_encode_as_map: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"enable_label_encode_as_map", "false"});
@@ -291,7 +302,7 @@ int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
             label_map_csv_path_s});
         } else {
             std::cout << "label_map_csv_path: invalid path\n";
-            std::exit(EXIT_FAILURE);
+            return false;
         }
     } else {
         const std::string default_label_map_csv_path =
@@ -300,17 +311,20 @@ int DataManipulationCfgHandler::lookup_data_manipulation_parameters(
             params.insert({"label_map_csv_path", default_label_map_csv_path});
         } else {
             std::cout << "label_map_csv_path: invalid path\n";
-            std::exit(EXIT_FAILURE);
+            return false;
         }
     }
 
-    return EXIT_SUCCESS;
+    return true;
 }
 
 KafkaCfgHandler::KafkaCfgHandler()
 {
-    if (!lookup_kafka_parameters(this->mdt_dialout_collector_conf,
-        this->parameters)) {
+    std::cout << "KafkaCfgHandler()\n";
+    if (lookup_kafka_parameters(
+        this->mdt_dialout_collector_conf,
+        this->parameters) == true) {
+
         this->topic = parameters.at("topic");
         this->bootstrap_servers = parameters.at("bootstrap_servers");
         this->enable_idempotence = parameters.at("enable_idempotence");
@@ -322,24 +336,18 @@ KafkaCfgHandler::KafkaCfgHandler()
         this->ssl_ca_location = parameters.at("ssl_ca_location");
         this->log_level = parameters.at("log_level");
     } else {
-        throw std::exception();
+        std::exit(EXIT_FAILURE);
     }
 }
 
-int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
+bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
     std::map<std::string, std::string> &params)
 {
     params.clear();
     std::unique_ptr<libconfig::Config> kafka_params(new libconfig::Config());
 
-    try {
-        kafka_params->readFile(cfg_path.c_str());
-    } catch (const libconfig::FileIOException &fioex) {
-        std::cout << "libconfig::FileIOException\n";
-        return EXIT_FAILURE;
-    } catch(const libconfig::ParseException &pex) {
-        std::cout << "libconfig::ParseException\n";
-        return EXIT_FAILURE;
+    if (set_parameters(kafka_params, cfg_path) == false) {
+        return false;
     }
 
     // Kafka arameters evaluation
@@ -351,11 +359,11 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             params.insert({"topic", topic_s});
         } else {
             std::cout << "empty topic not allowed\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         std::cout << "kafka-producer: topic mandatory\n";
-        throw libconfig::SettingNotFoundException("topic");
+        return false;
     }
 
     bool bootstrap_servers = kafka_params->exists("bootstrap_servers");
@@ -367,11 +375,11 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             params.insert({"bootstrap_servers", bootstrap_servers_s});
         } else {
             std::cout << "empty bootstrap_servers not allowed\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         std::cout << "kafka-producer: bootstrap_servers mandatory\n";
-        throw libconfig::SettingNotFoundException("bootstrap_servers");
+        return false;
     }
 
     bool enable_idempotence = kafka_params->exists("enable_idempotence");
@@ -385,7 +393,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             params.insert({"enable_idempotence", enable_idempotence_s});
         } else {
             std::cout << "enable_idempotence: valid value <true | false>\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"enable_idempotence", "true"});
@@ -399,7 +407,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             params.insert({"client_id", client_id_s});
         } else {
             std::cout << "client_id: valid value not empty\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"client_id", "mdt-dialout-collector"});
@@ -413,7 +421,7 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             params.insert({"log_level", log_level_s});
         } else {
             std::cout << "log_level: valid value 0..7\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         params.insert({"log_level", "6"});
@@ -430,11 +438,11 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             params.insert({"security_protocol", security_protocol_s});
         } else {
             std::cout << "security_protocol: valid values <ssl | plaintext>\n";
-            return EXIT_FAILURE;
+            return false;
         }
     } else {
         std::cout << "kafka-producer: security_protocol mandatory\n";
-        throw libconfig::SettingNotFoundException("security_protocol");
+        return false;
     }
 
     if (params.at("security_protocol").compare("ssl") == 0) {
@@ -466,13 +474,12 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
                 params.insert({"ssl_ca_location", ssl_ca_location_s});
             } else {
                 std::cout << "security_protocol: valid values not empty\n";
-                return EXIT_FAILURE;
+                return false;
             }
         } else {
             std::cout <<
                 "kafka-producer: security_protocol options mandatory\n";
-            throw libconfig::SettingNotFoundException(
-                                                "security_protocol options");
+            return false;
         }
     } else {
         params.insert({"ssl_key_location", "NULL"});
@@ -480,6 +487,6 @@ int KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         params.insert({"ssl_ca_location", "NULL"});
     }
 
-    return EXIT_SUCCESS;
+    return true;
 }
 

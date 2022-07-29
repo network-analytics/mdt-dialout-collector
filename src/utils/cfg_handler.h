@@ -21,6 +21,9 @@ extern std::map<std::string, std::string> data_delivery_cfg_parameters;
 
 class CfgHandler {
 public:
+    CfgHandler() { std::cout << "CfgHandler()\n"; };
+    bool set_parameters(std::unique_ptr<libconfig::Config> &params,
+        const std::string &cfg_path);
     // Single getter to handle them all
     const std::map<std::string, std::string> &get_parameters() const {
         return parameters; };
@@ -37,7 +40,7 @@ public:
     MainCfgHandler();
 
     // Setters - directly from the configuration file
-    int lookup_main_parameters(const std::string &cfg_path,
+    bool lookup_main_parameters(const std::string &cfg_path,
         std::map<std::string, std::string> &params);
 
     // Getters
@@ -75,7 +78,7 @@ public:
     DataManipulationCfgHandler();
 
     // Setters - directly from the configuration file
-    int lookup_data_manipulation_parameters(const std::string &cfg_path,
+    bool lookup_data_manipulation_parameters(const std::string &cfg_path,
         std::map<std::string, std::string> &params);
 
     // Getters
@@ -101,7 +104,7 @@ public:
     KafkaCfgHandler();
 
     // Setters - directly from the configuration file
-    int lookup_kafka_parameters(const std::string &cfg_path,
+    bool lookup_kafka_parameters(const std::string &cfg_path,
         std::map<std::string, std::string> &params);
 
     // Getters

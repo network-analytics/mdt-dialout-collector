@@ -59,6 +59,7 @@ void ServerBuilderOptionImpl::UpdateArguments(
 }
 
 CustomSocketMutator::CustomSocketMutator() {
+    std::cout << "CustomSocketMutator()\n";
     grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
 }
 
@@ -182,6 +183,7 @@ Srv::CiscoStream::CiscoStream(
         cisco_init_counts {0},
         cisco_stream_status {START}
 {
+    std::cout << "CiscoStream()\n";
     Srv::CiscoStream::Start(label_map);
 }
 
@@ -194,6 +196,7 @@ Srv::JuniperStream::JuniperStream(
         juniper_init_counts {0},
         juniper_stream_status {START}
 {
+    std::cout << "JuniperStream()\n";
     Srv::JuniperStream::Start(label_map);
 }
 
@@ -206,6 +209,7 @@ Srv::HuaweiStream::HuaweiStream(
         huawei_init_counts {0},
         huawei_stream_status {START}
 {
+    std::cout << "HuaweiStream()\n";
     Srv::HuaweiStream::Start(label_map);
 }
 
