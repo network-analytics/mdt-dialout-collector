@@ -28,9 +28,11 @@ bool CfgHandler::set_parameters(std::unique_ptr<libconfig::Config> &params,
     try {
         params->readFile(cfg_path.c_str());
     } catch (const libconfig::FileIOException &fioex) {
+        // check if the cfg exists
         std::cout << "libconfig: " << fioex.what() << "\n";
         return false;
     } catch(const libconfig::ParseException &pex) {
+        // check it cfg is parsable
         std::cout << "libconfig: " << pex.what() << "\n";
         return false;
     }

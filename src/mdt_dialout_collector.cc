@@ -43,7 +43,7 @@ int main(void)
     if (DumpCorePid(core_pid, core_pid_path) == false) {
         std::cout << "Can't dump PID " << core_pid << " to " << core_pid_path
             << "\n";
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     LoadLabelMap(label_map,
