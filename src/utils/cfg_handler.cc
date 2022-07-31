@@ -4,7 +4,6 @@
 
 // mdt-dialout-collector Library headers
 #include "cfg_handler.h"
-#include <libconfig.h++>
 
 
 // Centralizing config parameters
