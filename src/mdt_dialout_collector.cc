@@ -172,8 +172,9 @@ bool DumpCorePid(int &core_pid, const std::string &core_pid_path)
     } else {
         outf << core_pid;
         outf.close();
-        return true;
     }
+    
+    return true;
 }
 
 void SignalHandler(int sig_num)
