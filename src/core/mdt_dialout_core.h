@@ -18,6 +18,7 @@
 #include "juniper_dialout.grpc.pb.h"
 #include "dataManipulation/data_manipulation.h"
 #include "dataDelivery/data_delivery.h"
+#include "juniper_gnmi.pb.h"
 
 
 // Global visibility to be able to signal the refresh --> CSV from main
@@ -68,7 +69,7 @@ private:
     void CiscoFsmCtrl();
     void JuniperFsmCtrl();
     void HuaweiFsmCtrl();
-    enum StreamStatus { START, FLOW, END };
+    enum StreamStatus { START, FLOW, PROCESSING, END };
 
     class CiscoStream {
     public:
@@ -87,7 +88,8 @@ private:
         mdt_dialout::MdtDialoutArgs cisco_stream;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
             mdt_dialout::MdtDialoutArgs> cisco_resp;
-        int cisco_init_counts;
+        int cisco_replies_sent;
+        const int kCiscoMaxReplies;
         StreamStatus cisco_stream_status;
     };
 
@@ -108,7 +110,8 @@ private:
         gnmi::SubscribeResponse juniper_stream;
         grpc::ServerAsyncReaderWriter<gnmi::SubscribeRequest,
             gnmi::SubscribeResponse> juniper_resp;
-        int juniper_init_counts;
+        int juniper_replies_sent;
+        const int kJuniperMaxReplies;
         StreamStatus juniper_stream_status;
     };
 
@@ -129,7 +132,8 @@ private:
         huawei_dialout::serviceArgs huawei_stream;
         grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
             huawei_dialout::serviceArgs> huawei_resp;
-        int huawei_init_counts;
+        int huawei_replies_sent;
+        const int kHuaweiMaxReplies;
         StreamStatus huawei_stream_status;
     };
 };

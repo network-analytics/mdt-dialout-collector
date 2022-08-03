@@ -58,6 +58,12 @@ int main(void)
     }
 
     if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == false) {
+        if (std::stoi(main_cfg_parameters.at("replies_cisco")) < 0 ||
+            std::stoi(main_cfg_parameters.at("replies_cisco")) > 100) {
+            std::cout << "Cisco - the allowed amount of replies per session "
+                << "is defined between 0 and 100. (0 = Unlimited)\n";
+            return EXIT_FAILURE;
+        }
         void *cisco_ptr {nullptr};
         int cisco_workers =
             std::stoi(main_cfg_parameters.at("cisco_workers"));
@@ -69,6 +75,12 @@ int main(void)
     }
 
     if (main_cfg_parameters.at("ipv4_socket_juniper").empty() == false) {
+        if (std::stoi(main_cfg_parameters.at("replies_juniper")) < 0 ||
+            std::stoi(main_cfg_parameters.at("replies_juniper")) > 100) {
+            std::cout << "Juniper - the allowed amount of replies per session "
+                << "is defined between 0 and 100. (0 = Unlimited)\n";
+            return EXIT_FAILURE;
+        }
         void *juniper_ptr {nullptr};
         int juniper_workers =
             std::stoi(main_cfg_parameters.at("juniper_workers"));
@@ -80,6 +92,12 @@ int main(void)
     }
 
     if (main_cfg_parameters.at("ipv4_socket_huawei").empty() == false) {
+        if (std::stoi(main_cfg_parameters.at("replies_huawei")) < 0 ||
+            std::stoi(main_cfg_parameters.at("replies_huawei")) > 100) {
+            std::cout << "Huawei - the allowed amount of replies per session "
+                << "is defined between 0 and 100. (0 = Unlimited)\n";
+            return EXIT_FAILURE;
+        }
         void *huawei_ptr {nullptr};
         int huawei_workers =
             std::stoi(main_cfg_parameters.at("huawei_workers"));
@@ -173,7 +191,7 @@ bool DumpCorePid(int &core_pid, const std::string &core_pid_path)
         outf << core_pid;
         outf.close();
     }
-    
+
     return true;
 }
 

@@ -4,6 +4,7 @@
 
 // mdt-dialout-collector Library headers
 #include "core/mdt_dialout_core.h"
+#include <grpcpp/support/status.h>
 
 
 // Global visibility to be able to signal the refresh --> CSV from main
@@ -180,7 +181,9 @@ Srv::CiscoStream::CiscoStream(
         cisco_service_ {cisco_service},
         cisco_cq_ {cisco_cq},
         cisco_resp {&cisco_server_ctx},
-        cisco_init_counts {0},
+        cisco_replies_sent {0},
+        kCiscoMaxReplies
+            {std::stoi(main_cfg_parameters.at("replies_cisco"))},
         cisco_stream_status {START}
 {
     std::cout << "CiscoStream()\n";
@@ -193,7 +196,9 @@ Srv::JuniperStream::JuniperStream(
         juniper_service_ {juniper_service},
         juniper_cq_ {juniper_cq},
         juniper_resp {&juniper_server_ctx},
-        juniper_init_counts {0},
+        juniper_replies_sent {0},
+        kJuniperMaxReplies
+            {std::stoi(main_cfg_parameters.at("replies_juniper"))},
         juniper_stream_status {START}
 {
     std::cout << "JuniperStream()\n";
@@ -206,7 +211,9 @@ Srv::HuaweiStream::HuaweiStream(
         huawei_service_ {huawei_service},
         huawei_cq_ {huawei_cq},
         huawei_resp {&huawei_server_ctx},
-        huawei_init_counts {0},
+        huawei_replies_sent {0},
+        kHuaweiMaxReplies
+            {std::stoi(main_cfg_parameters.at("replies_huawei"))},
         huawei_stream_status {START}
 {
     std::cout << "HuaweiStream()\n";
@@ -241,32 +248,30 @@ void Srv::CiscoStream::Start(
             this);
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
-        //  --- DEBUG ---
-        //for (auto &e : label_map) {
-        //    std::cout << e.first << " ---> "
-        //    << "[" << e.second.at(0) << ","
-        //    << e.second.at(1) << "]\n";
-        //}
-        //  --- DEBUG ---
-        bool parsing_str {false};
-        // From the network
-        std::string stream_data_in;
-        // After data enrichment
-        std::string stream_data_out;
-        const std::string peer = cisco_server_ctx.peer();
-
-        // A new CiscoStream is spawned every time a new client connects
-        if (cisco_init_counts == 0) {
-            std::cout << "new Srv::CiscoStream()\n";
-            new Srv::CiscoStream(cisco_service_, cisco_cq_);
-        }
-
-        // CiscoStream is released every N CQ events (tunable)
-        if (cisco_init_counts++ >= 10) {
+        std::cout << "new Srv::CiscoStream()\n";
+        new Srv::CiscoStream(cisco_service_, cisco_cq_);
+        cisco_resp.Read(&cisco_stream, this);
+        cisco_stream_status = PROCESSING;
+        cisco_replies_sent++;
+    } else if (cisco_stream_status == PROCESSING) {
+        if (cisco_replies_sent == kCiscoMaxReplies) {
             std::cout << "cisco_stream_status = END\n";
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
         } else {
+            //  --- DEBUG ---
+            //for (auto &e : label_map) {
+            //    std::cout << e.first << " ---> "
+            //    << "[" << e.second.at(0) << ","
+            //    << e.second.at(1) << "]\n";
+            //}
+            //  --- DEBUG ---
+            bool parsing_str {false};
+            // From the network
+            std::string stream_data_in;
+            // After data enrichment
+            std::string stream_data_out;
+            const std::string peer = cisco_server_ctx.peer();
             // the key-word "this" is used as a unique TAG
             cisco_resp.Read(&cisco_stream, this);
             // returns true for GPB-KV & GPB, false for JSON
@@ -368,6 +373,8 @@ void Srv::CiscoStream::Start(
                     data_delivery->AsyncKafkaProducer(stream_data_out);
                 }
             }
+            cisco_stream_status = PROCESSING;
+            cisco_replies_sent++;
         }
     } else {
         std::cout << "GPR_ASSERT(cisco_stream_status == END)\n";
@@ -389,26 +396,25 @@ void Srv::JuniperStream::Start(
             this);
         juniper_stream_status = FLOW;
     } else if (juniper_stream_status == FLOW) {
-        // From the network
-        std::string stream_data_in;
-        // After data enrichment
-        std::string stream_data_out;
-        std::string json_str_out;
-        const std::string peer = juniper_server_ctx.peer();
-        Json::Value root;
-
-        // A new JuniperStream is spawned every time a new client connects
-        if (juniper_init_counts == 0) {
-            std::cout << "new Srv::JuniperStream()\n";
-            new Srv::JuniperStream(juniper_service_, juniper_cq_);
-        }
-
-        // JuniperStream is released every N CQ events (tunable)
-        if (juniper_init_counts++ >= 10) {
+        std::cout << "new Srv::JuniperStream()\n";
+        new Srv::JuniperStream(juniper_service_, juniper_cq_);
+        juniper_resp.Read(&juniper_stream, this);
+        juniper_stream_status = PROCESSING;
+        juniper_replies_sent++;
+    } else if (juniper_stream_status == PROCESSING) {
+        if (juniper_replies_sent == kJuniperMaxReplies) {
             std::cout << "juniper_stream_status = END\n";
             juniper_stream_status = END;
             juniper_resp.Finish(grpc::Status::OK, this);
         } else {
+            // From the network
+            std::string stream_data_in;
+            // After data enrichment
+            std::string stream_data_out;
+            std::string json_str_out;
+            const std::string peer = juniper_server_ctx.peer();
+            Json::Value root;
+
             // the key-word "this" is used as a unique TAG
             juniper_resp.Read(&juniper_stream, this);
 
@@ -442,6 +448,9 @@ void Srv::JuniperStream::Start(
                 stream_data_out = json_str_out;
                 data_delivery->AsyncKafkaProducer(stream_data_out);
             }
+
+            juniper_stream_status = PROCESSING;
+            juniper_replies_sent++;
         }
     } else {
         std::cout << "GPR_ASSERT(juniper_stream_status == END)\n";
@@ -462,26 +471,25 @@ void Srv::HuaweiStream::Start(
             this);
         huawei_stream_status = FLOW;
     } else if (huawei_stream_status == FLOW) {
-        bool parsing_str {false};
-        // From the network
-        std::string stream_data_in;
-        // Afetr data enrichment
-        std::string stream_data_out;
-        std::string json_str_out;
-        const std::string peer = huawei_server_ctx.peer();
-
-        // A new HuaweiStream is spawned every time a new client connects
-        if (huawei_init_counts == 0) {
-            std::cout << "new Srv::HuaweiStream()\n";
-            new Srv::HuaweiStream(huawei_service_, huawei_cq_);
-        }
-
-        // HuaweiStream is released every N CQ events (tunable)
-        if (huawei_init_counts++ >= 10) {
+        std::cout << "new Srv::HuaweiStream()\n";
+        new Srv::HuaweiStream(huawei_service_, huawei_cq_);
+        huawei_resp.Read(&huawei_stream, this);
+        huawei_stream_status = PROCESSING;
+        huawei_replies_sent++;
+    } else if (huawei_stream_status == PROCESSING) {
+        if (huawei_replies_sent == kHuaweiMaxReplies) {
             std::cout << "huawei_stream_status = END\n";
             huawei_stream_status = END;
             huawei_resp.Finish(grpc::Status::OK, this);
         } else {
+            bool parsing_str {false};
+            // From the network
+            std::string stream_data_in;
+            // Afetr data enrichment
+            std::string stream_data_out;
+            std::string json_str_out;
+            const std::string peer = huawei_server_ctx.peer();
+
             huawei_resp.Read(&huawei_stream, this);
             parsing_str = huawei_tlm->ParseFromString(huawei_stream.data());
 
@@ -573,6 +581,9 @@ void Srv::HuaweiStream::Start(
                     data_delivery->AsyncKafkaProducer(stream_data_out);
                 }
             }
+
+            huawei_stream_status = PROCESSING;
+            huawei_replies_sent++;
         }
     } else {
         std::cout << "GPR_ASSERT(huawei_stream_status == END)\n";

@@ -54,6 +54,12 @@ public:
     //    return ipv4_socket_juniper; };
     //const std::string &get_ipv4_socket_huawei() const {
     //    return ipv4_socket_huawei; };
+    //const std::string &get_replies_cisco() const {
+    //    return replies_cisco; };
+    //const std::string &get_replies_juniper() const {
+    //    return replies_juniper; };
+    //const std::string &get_replies_huawei() const {
+    //    return replies_huawei; };
     //const std::string &get_cisco_workers() const {
     //    return cisco_workers; };
     //const std::string &get_juniper_workers() const {
@@ -61,14 +67,17 @@ public:
     //const std::string &get_huawei_workers() const {
     //    return huawei_workers; };
 private:
-    std::string core_pid_folder;
-    std::string iface;
-    std::string ipv4_socket_cisco;
-    std::string ipv4_socket_juniper;
-    std::string ipv4_socket_huawei;
-    std::string cisco_workers;
-    std::string juniper_workers;
-    std::string huawei_workers;
+    const std::string core_pid_folder;
+    const std::string iface;
+    const std::string ipv4_socket_cisco;
+    const std::string ipv4_socket_juniper;
+    const std::string ipv4_socket_huawei;
+    const std::string replies_cisco;
+    const std::string replies_juniper;
+    const std::string replies_huawei;
+    const std::string cisco_workers;
+    const std::string juniper_workers;
+    const std::string huawei_workers;
 };
 
 // Data manipulation configuration parameters
@@ -91,10 +100,10 @@ public:
     //const std::string &get_label_map_csv_path() const {
     //    return label_map_csv_path; };
 private:
-    std::string enable_cisco_message_to_json_string;
-    std::string enable_cisco_gpbkv2json;
-    std::string enable_label_encode_as_map;
-    std::string label_map_csv_path;
+    const std::string enable_cisco_message_to_json_string;
+    const std::string enable_cisco_gpbkv2json;
+    const std::string enable_label_encode_as_map;
+    const std::string label_map_csv_path;
 };
 
 // Kafka configuration parameters
@@ -127,15 +136,15 @@ public:
     //const std::string &get_kafka_log_level() const {
     //    return log_level; };
 private:
-    std::string topic;
-    std::string bootstrap_servers;
-    std::string enable_idempotence;
-    std::string client_id;
-    std::string security_protocol;
-    std::string ssl_key_location;
-    std::string ssl_certificate_location;
-    std::string ssl_ca_location;
-    std::string log_level;
+    const std::string topic;
+    const std::string bootstrap_servers;
+    const std::string enable_idempotence;
+    const std::string client_id;
+    const std::string security_protocol;
+    const std::string ssl_key_location;
+    const std::string ssl_certificate_location;
+    const std::string ssl_ca_location;
+    const std::string log_level;
 };
 
 #endif

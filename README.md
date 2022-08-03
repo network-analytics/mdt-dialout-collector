@@ -111,10 +111,17 @@ ipv4_socket_huawei = "0.0.0.0:10008";
 ## socket dedicated to the juniper's data-stream
 ipv4_socket_juniper = "0.0.0.0:10009";
 
+## network replies: fine control on the amount of messages received within a single
+session - valid range: "0" < replies < "100" - default "0" = unlimited
+replies_cisco = "0";
+replies_juniper = "100";
+replies_huawei = "1000";
+
 ## workers (threads) per vendor - default = "1"
-cisco_workers = 1;
-juniper_workers = 1;
-huawei_workers = 1;
+cisco_workers = "1";
+juniper_workers = "1";
+huawei_workers = "1";
+
 
 ### mdt-dialout-collector - data-flow manipulation
 
