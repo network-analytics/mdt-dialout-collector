@@ -129,7 +129,7 @@ juniper_workers = "1";
 huawei_workers = "1";
 
 
-### mdt-dialout-collector - data-flow manipulation
+#### mdt-dialout-collector - data-flow manipulation
 
 ## simplified JSON after GPB/GPB-KV decoding - default = "true"
 enable_cisco_gpbkv2json = "false";
