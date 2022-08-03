@@ -112,7 +112,7 @@ ipv4_socket_huawei = "0.0.0.0:10008";
 ipv4_socket_juniper = "0.0.0.0:10009";
 
 ## network replies: fine control on the amount of messages received within a single
-session - valid range: "0" < replies < "100" - default "0" = unlimited
+## session - valid range: "0" < replies < "100" - default "0" = unlimited
 replies_cisco = "0";
 replies_juniper = "100";
 replies_huawei = "1000";
