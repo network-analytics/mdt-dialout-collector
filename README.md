@@ -170,6 +170,7 @@ log_level = "0";
 | [Modern C++ Kafka API](https://github.com/morganstanley/modern-cpp-kafka)                                                                                                   | Apache License Version 2.0|
 | [libconfig](http://hyperrealm.github.io/libconfig/)                                                                                                                         | LGPL v2.1                 |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)                                                                                                                             | BSD-3-Clause license      |
+| [spdlog](https://github.com/gabime/spdlog)                                                                                                                                  | MIT License               |
 | [gRPC](https://github.com/grpc/grpc)                                                                                                                                        | BSD 3-Clause License      |
 | [Cisco dial-out .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)  | Apache License Version 2.0|
 | [Cisco telemetry .proto](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/telemetry.proto)                         | Apache License Version 2.0|
@@ -177,3 +178,4 @@ log_level = "0";
 | [Huawei dial-out .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                           | N/A                       |
 | [Huawei telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                          | N/A                       |
 | [mdt-dialout-collector](https://github.com/scuzzilla/mdt-dialout-collector)                                                                                                 | MIT License               |
+
