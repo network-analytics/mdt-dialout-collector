@@ -4,7 +4,6 @@
 
 // mdt-dialout-collector Library headers
 #include "core/mdt_dialout_core.h"
-#include <grpcpp/support/status.h>
 
 
 // Global visibility to be able to signal the refresh --> CSV from main

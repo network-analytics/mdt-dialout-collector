@@ -3,13 +3,16 @@
 
 
 // C++ Standard Library headers
+#include <memory>
 #include <thread>
 #include <csignal>
 #include <fstream>
 // External Library headers
 #include "csv/rapidcsv.h"
 // mdt-dialout-collector Library headers
+#include "juniper_gnmi.pb.h"
 #include "mdt_dialout_core.h"
+#include "logs_handler.h"
 
 
 void *CiscoThread(void *);
@@ -41,8 +44,8 @@ int main(void)
     const std::string core_pid_file = "mdt_dialout_collector.pid";
     const std::string core_pid_path = core_pid_folder + core_pid_file;
     if (DumpCorePid(core_pid, core_pid_path) == false) {
-        std::cout << "Can't dump PID " << core_pid << " to " << core_pid_path
-            << "\n";
+        multi_logger->error(
+            "Unable to dump PID {} to {}", core_pid, core_pid_path);
         return EXIT_FAILURE;
     }
 
@@ -197,7 +200,8 @@ bool DumpCorePid(int &core_pid, const std::string &core_pid_path)
 
 void SignalHandler(int sig_num)
 {
-    std::cout << "Siganl " << sig_num << " received, refreshing label_map\n";
+    multi_logger->info(
+        "Siganl {} received, re-freshing label_map information", sig_num);
     LoadLabelMap(label_map,
         data_manipulation_cfg_parameters.at("label_map_csv_path"));
 }

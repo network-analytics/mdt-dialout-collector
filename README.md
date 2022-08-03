@@ -58,8 +58,8 @@ you're running a Debian derived Linux distribution you can also refer to the [Al
 
 - Libraries like jsoncpp & librdkafka are also required.
 ```SHELL
-Debian$ sudo apt install libjsoncpp-dev librdkafka-dev libconfig++-dev
-Redhat$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel
+Debian$ sudo apt install libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev
+Redhat$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel spdlog-devel
 ```
 
 #### git Clone, Compile and Run
@@ -87,6 +87,12 @@ $ export PATH="$MY_INSTALL_DIR/bin:$PATH"
 On CentOS you might need to modify the pkg-config path to allow cmake to find all required libraries.
 ```SHELL
 $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
+```
+
+On CentOS the "spdlog" library should use the external 'fmt' library.
+```TEXT
+uncomment #define SPDLOG_FMT_EXTERNAL from /usr/include/spdlog/tweakme.h before
+running the make command
 ```
 
 #### Configuration parameters

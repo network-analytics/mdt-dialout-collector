@@ -101,6 +101,13 @@ pkg_check_modules(LIBCONFIG_CPP libconfig++>=1.5)
 link_libraries(${LIBCONFIG_CPP_LIBRARIES})
 message(STATUS "Using libconfig++ ${LIBCONFIG_CPP_VERSION}")
 
+# spdlog
+set(SPDLOG_INCLUDE_DIR /usr/include)
+include_directories("${SPDLOG_INCLUDE_DIR}")
+pkg_check_modules(SPDLOG spdlog>=1.5.0)
+link_libraries(${SPDLOG_LIBRARIES})
+message(STATUS "Using spdlog ${SPDLOG_VERSION}")
+
 # Protobuf generated "gRPC dial-out" - Cisco
 set(cisco_dialout_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco/cisco_dialout.pb.cc")
@@ -322,6 +329,7 @@ foreach(_target "mdt_dialout_collector")
         "${CMAKE_CURRENT_SOURCE_DIR}/src/${_target}.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mdt_dialout_core.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/data_delivery.cc"
         ${cisco_dialout_pb_cc}
