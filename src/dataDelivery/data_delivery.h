@@ -9,12 +9,14 @@
 #include "kafka/KafkaProducer.h"
 // mdt-dialout-collector Library headers
 #include "cfg_handler.h"
+#include "logs_handler.h"
 
 
 class DataDelivery {
 public:
     // Handling data delivery to KAFKA
-    DataDelivery() { std::cout << "DataDelivery()\n"; };
+    DataDelivery() { multi_logger->debug("constructor: DataDelivery()"); };
+    ~DataDelivery() { multi_logger->debug("destructor: ~DataDelivery()"); };
     bool AsyncKafkaProducer(const std::string &json_str);
 };
 

@@ -22,11 +22,16 @@ extern std::shared_ptr<spdlog::logger> multi_logger;
 class LogsHandler {
 public:
     LogsHandler();
-    bool set_spdlog_sinks(std::vector<spdlog::sink_ptr> &spdlog_sinks,
-        std::shared_ptr<spdlog::logger> &multi_logger);
+    ~LogsHandler() {
+        multi_logger->debug("destructor: ~LogsHandler()"); };
+    bool set_spdlog_sinks(
+        std::vector<spdlog::sink_ptr> &spdlog_sinks,
+        std::shared_ptr<spdlog::logger> &multi_logger,
+        std::string &spdlog_level);
 protected:
     std::vector<spdlog::sink_ptr> spdlog_sinks;
     std::shared_ptr<spdlog::logger> multi_logger;
+    std::string spdlog_level;
 };
 
 #endif

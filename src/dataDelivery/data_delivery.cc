@@ -33,7 +33,8 @@ bool DataDelivery::AsyncKafkaProducer(const std::string &json_str)
         kafka::clients::KafkaProducer producer(properties);
 
         if (json_str.empty()) {
-            std::cout << "KAFKA - Empty JSON received\n";
+            multi_logger->error("[AsyncKafkaProducer] data-delivery issue: "
+                "empty JSON received");
             return false;
         }
 
@@ -46,13 +47,16 @@ bool DataDelivery::AsyncKafkaProducer(const std::string &json_str)
             [](const kafka::clients::producer::RecordMetadata &mdata,
                 const kafka::Error &err) {
             if (!err) {
-                std::cout << "Msg delivered: " << mdata.toString() << "\n";
+                multi_logger->info("[AsyncKafkaProducer] data-delivery: "
+                    "message successfully delivered");
             } else {
-                std::cerr << "Msg delivery failed: " << err.message() << "\n";
+                multi_logger->error("[AsyncKafkaProducer] data-delivery "
+                    "issue: message delivery failure, {}", err.message());
             }
         }, kafka::clients::KafkaProducer::SendOption::ToCopyRecordValue);
-    } catch (const kafka::KafkaException &ex) {
-        std::cerr << "Unexpected exception: " << ex.what() << "\n";
+    } catch (const kafka::KafkaException &kex) {
+        multi_logger->error("[AsyncKafkaProducer] data-delivery issue: "
+            "{}", kex.what());
         return false;
     }
 

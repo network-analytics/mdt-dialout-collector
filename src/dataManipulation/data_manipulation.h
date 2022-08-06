@@ -16,11 +16,15 @@
 #include "huawei_telemetry.pb.h"
 #include "openconfig_interfaces.pb.h"
 #include <google/protobuf/util/json_util.h>
+#include "logs_handler.h"
 
 
 class DataManipulation {
 public:
-    DataManipulation() { std::cout << "DataManipulation()\n"; };
+    DataManipulation() {
+        multi_logger->debug("constructor: DataManipulation()"); };
+    ~DataManipulation() {
+        multi_logger->debug("destructor: ~DataManipulation()"); };
     bool AppendLabelMap(
         std::unordered_map<std::string,std::vector<std::string>> &label_map,
         const std::string &peer_ip,

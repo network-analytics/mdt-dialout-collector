@@ -29,26 +29,29 @@ bool DataManipulation::AppendLabelMap(
     std::string _peer_ip = peer_ip.substr(
         start_delim, (stop_delim - start_delim));
     const auto search = label_map.find(_peer_ip);
-    if (search != label_map.end()) {
-        jlabel_map["node_id"] = search->second.at(0);
-        jlabel_map["platform_id"] = search->second.at(1);
-    } else{
-        jlabel_map["node_id"] = "unknown";
-        jlabel_map["platform_id"] = "unknown";
-        std::cout << peer_ip << " not found: enrichment failed.\n";
-    }
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
         &root, &err) && json_str_length != 0) {
-        std::cout << "ERROR parsing the string, conversion to JSON Failed!"
-            << err
-            << std::endl;
+        multi_logger->error("[AppendLabelMap] data-manipulation issue: "
+            "conversion to JSON failure, {}", err);
         //std::cout << "Failing message: " << json_str << std::endl;
         return false;
-    }
+    } else {
+        if (search != label_map.end()) {
+            jlabel_map["node_id"] = search->second.at(0);
+            jlabel_map["platform_id"] = search->second.at(1);
+            multi_logger->info("[AppendLabelMap] data-manipulation: "
+                "{} data enrichment successful", _peer_ip);
+        } else{
+            jlabel_map["node_id"] = "unknown";
+            jlabel_map["platform_id"] = "unknown";
+            multi_logger->warn("[AppendLabelMap] data-manipulation issue: "
+                "{} not found, data enrichment failure", _peer_ip);
+        }
 
-    root["label"] = jlabel_map;
-    json_str_out = Json::writeString(builderW, root);
+        root["label"] = jlabel_map;
+        json_str_out = Json::writeString(builderW, root);
+    }
 
     return true;
 }

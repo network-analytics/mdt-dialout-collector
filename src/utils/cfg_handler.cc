@@ -7,6 +7,8 @@
 
 
 // Centralizing config parameters
+std::unique_ptr<LogsCfgHandler>
+    logs_cfg_handler(new LogsCfgHandler());
 std::unique_ptr<MainCfgHandler>
     main_cfg_handler(new MainCfgHandler());
 std::unique_ptr<DataManipulationCfgHandler>
@@ -14,12 +16,113 @@ std::unique_ptr<DataManipulationCfgHandler>
 std::unique_ptr<KafkaCfgHandler>
     data_delivery_cfg_handler(new KafkaCfgHandler());
 
+std::map<std::string, std::string> logs_cfg_parameters =
+    logs_cfg_handler->get_logs_parameters();
 std::map<std::string, std::string> main_cfg_parameters =
-    main_cfg_handler->get_parameters();
+    main_cfg_handler->get_main_parameters();
 std::map<std::string, std::string> data_manipulation_cfg_parameters =
-    data_manipulation_cfg_handler->get_parameters();
+    data_manipulation_cfg_handler->get_data_manipulation_parameters();
 std::map<std::string, std::string> data_delivery_cfg_parameters =
-    data_delivery_cfg_handler->get_parameters();
+    data_delivery_cfg_handler->get_kafka_parameters();
+
+bool LogsCfgHandler::set_boot_spdlog_sinks(
+    std::shared_ptr<spdlog::logger> &multi_logger_boot)
+{
+    std::vector<spdlog::sink_ptr> spdlog_sinks;
+    std::string spdlog_level = "debug";
+
+    // Syslog
+    const std::string ident = "mdt-dialout-collector";
+    try {
+        auto spdlog_syslog =
+            std::make_shared<spdlog::sinks::syslog_sink_mt>(
+                ident, 0, LOG_USER, true);
+        spdlog_sinks.push_back(spdlog_syslog);
+    } catch (const spdlog::spdlog_ex &sex) {
+        std::cout << "spdlog, syslog: " << sex.what() << "\n";
+        return false;
+    }
+
+    // ConsoleLog
+    try {
+        auto spdlog_console =
+            std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        spdlog_sinks.push_back(spdlog_console);
+    } catch (const spdlog::spdlog_ex &sex) {
+        std::cout << "spdlog, console: " << sex.what() << "\n";
+        return false;
+    }
+
+    multi_logger_boot = std::make_shared<spdlog::logger>
+        ("multi-logger-boot", begin(spdlog_sinks), end(spdlog_sinks));
+    multi_logger_boot->set_level(spdlog::level::from_str(spdlog_level));
+    spdlog::register_logger(multi_logger_boot);
+
+    return true;
+}
+
+bool CfgHandler::set_cfg_spdlog_sinks(
+    std::shared_ptr<spdlog::logger> &multi_logger)
+{
+    std::map<std::string, std::string> logs_cfg_parameters =
+        logs_cfg_handler->get_logs_parameters();
+    std::vector<spdlog::sink_ptr> spdlog_sinks;
+    std::string spdlog_level = logs_cfg_parameters.at("spdlog_level");
+
+    // Syslog
+    if (logs_cfg_parameters.at("syslog").compare("true") == 0) {
+        const std::string ident = "mdt-dialout-collector";
+        try {
+            auto spdlog_syslog =
+                std::make_shared<spdlog::sinks::syslog_sink_mt>(
+                    ident, 0, LOG_USER, true);
+            spdlog_sinks.push_back(spdlog_syslog);
+        } catch (const spdlog::spdlog_ex &sex) {
+            std::cout << "spdlog, syslog: " << sex.what() << "\n";
+            return false;
+        }
+    }
+
+    // ConsoleLog
+    if (logs_cfg_parameters.at("console_log").compare("true") == 0){
+        try {
+            auto spdlog_console =
+                std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            spdlog_sinks.push_back(spdlog_console);
+        } catch (const spdlog::spdlog_ex &sex) {
+            std::cout << "spdlog, console: " << sex.what() << "\n";
+            return false;
+        }
+    }
+
+    multi_logger_cfg = std::make_shared<spdlog::logger>
+        ("multi-logger-cfg", begin(spdlog_sinks), end(spdlog_sinks));
+    multi_logger_cfg->set_level(spdlog::level::from_str(spdlog_level));
+    spdlog::drop_all();
+    spdlog::register_logger(multi_logger_cfg);
+
+    return true;
+}
+
+bool LogsCfgHandler::set_parameters(std::unique_ptr<libconfig::Config> &params,
+    const std::string &cfg_path)
+{
+    try {
+        params->readFile(cfg_path.c_str());
+    } catch (const libconfig::FileIOException &fioex) {
+        // check if the cfg exists
+        spdlog::get("multi-logger-boot")->
+            error("configuration file issues: {}", fioex.what());
+        return false;
+    } catch (const libconfig::ParseException &pex) {
+        // check it cfg is parsable
+        spdlog::get("multi-logger-boot")->
+            error("configuration file issues: {}", pex.what());
+        return false;
+    }
+
+    return true;
+}
 
 bool CfgHandler::set_parameters(std::unique_ptr<libconfig::Config> &params,
     const std::string &cfg_path)
@@ -28,12 +131,140 @@ bool CfgHandler::set_parameters(std::unique_ptr<libconfig::Config> &params,
         params->readFile(cfg_path.c_str());
     } catch (const libconfig::FileIOException &fioex) {
         // check if the cfg exists
-        std::cout << "libconfig: " << fioex.what() << "\n";
+        spdlog::get("multi-logger-cfg")->
+            error("configuration file issues: {}", fioex.what());
         return false;
     } catch (const libconfig::ParseException &pex) {
         // check it cfg is parsable
-        std::cout << "libconfig: " << pex.what() << "\n";
+        spdlog::get("multi-logger-cfg")->
+            error("configuration file issues: {}", pex.what());
         return false;
+    }
+
+    return true;
+}
+
+LogsCfgHandler::LogsCfgHandler()
+{
+    if (set_boot_spdlog_sinks(
+            this->multi_logger_boot) == false) {
+        std::cout << "Unable to LogsCfgHandler::set_pre_spdlog_sinks(...)\n";
+        std::exit(EXIT_FAILURE);
+    } else {
+        spdlog::get("multi-logger-boot")->
+            info("constructor: LogsCfgHandler()");
+        std::unique_ptr<libconfig::Config>
+            logs_params(new libconfig::Config());
+        if (lookup_logs_parameters(
+            this->mdt_dialout_collector_conf,
+            this->logs_parameters) == true) {
+
+            //this->syslog = parameters.at("syslog");
+            //this->console_log = parameters.at("console_log");
+            //this->spdlog_level = parameters.at("log_level");
+        } else {
+            std::exit(EXIT_FAILURE);
+        }
+    }
+}
+
+CfgHandler::CfgHandler()
+{
+    if (set_cfg_spdlog_sinks(
+            this->multi_logger_cfg) == false) {
+        std::cout << "Unable to CfgHandler::set_spdlog_sinks(...)\n";
+        std::exit(EXIT_FAILURE);
+    } else {
+        spdlog::get("multi-logger-cfg")->debug("constructor: CfgHandler()");
+    }
+}
+
+bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
+    std::map<std::string, std::string> &params)
+{
+    params.clear();
+    std::unique_ptr<libconfig::Config> logs_params(new libconfig::Config());
+
+    if (LogsCfgHandler::set_parameters(logs_params, cfg_path) == false) {
+        return false;
+    }
+
+    // Logs parameters evaluation
+    bool syslog = logs_params->exists("syslog");
+    if (syslog == true) {
+        libconfig::Setting &syslog =
+            logs_params->lookup("syslog");
+        try {
+            std::string syslog_s = syslog;
+            if (syslog_s.empty() == false) {
+                params.insert({"syslog", syslog_s});
+            } else {
+                spdlog::get("multi-logger-boot")->
+                    error("[syslog] configuration "
+                    "issue: [ {} ] is invalid", syslog_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger-boot")->
+                error("[syslog] configuration issue: {}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"syslog", "false"});
+    }
+
+    bool console_log = logs_params->exists("console_log");
+    if (console_log == true) {
+        libconfig::Setting &console_log =
+            logs_params->lookup("console_log");
+        try {
+            std::string console_log_s = console_log;
+            if (console_log_s.empty() == false) {
+                params.insert({"console_log", console_log_s});
+            } else {
+                spdlog::get("multi-logger-boot")->
+                    error("[console_log] configuration "
+                    "issue: [ {} ] is invalid", console_log_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger-boot")->
+                error("[console_log] configuration issue: "
+                "{}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"console_log", "true"});
+    }
+
+    bool spdlog_level = logs_params->exists("spdlog_level");
+    if (spdlog_level == true) {
+        libconfig::Setting &spdlog_level =
+            logs_params->lookup("spdlog_level");
+        try {
+            std::string spdlog_level_s = spdlog_level;
+            if (spdlog_level_s.empty()          == false &&
+               (spdlog_level_s.compare("debug") == 0 ||
+                spdlog_level_s.compare("info")  == 0 ||
+                spdlog_level_s.compare("warn")  == 0 ||
+                spdlog_level_s.compare("error") == 0 ||
+                spdlog_level_s.compare("off")   == 0)) {
+                params.insert({"spdlog_level", spdlog_level_s});
+            } else {
+                spdlog::get("multi-logger-boot")->
+                    error("[spdlog_level] configuration "
+                    "issue: [ {} ] is an invalid severity level",
+                    spdlog_level_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger-boot")->
+                error("[spdlog_level] configuration issue: "
+                "{}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"spdlog_level", "info"});
     }
 
     return true;
@@ -41,11 +272,11 @@ bool CfgHandler::set_parameters(std::unique_ptr<libconfig::Config> &params,
 
 MainCfgHandler::MainCfgHandler()
 {
-    std::cout << "MainCfgHandler()\n";
+    spdlog::get("multi-logger-cfg")->debug("constructor: MainCfgHandler()");
     std::unique_ptr<libconfig::Config> main_params(new libconfig::Config());
     if (lookup_main_parameters(
         this->mdt_dialout_collector_conf,
-        this->parameters) == true) {
+        this->main_parameters) == true) {
 
         //this->core_pid_folder = parameters.at("core_pid_folder");
         //this->iface = parameters.at("iface");
@@ -69,11 +300,12 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
     params.clear();
     std::unique_ptr<libconfig::Config> main_params(new libconfig::Config());
 
-    if (set_parameters(main_params, cfg_path) == false) {
+    if (CfgHandler::set_parameters(main_params, cfg_path) == false) {
         return false;
     }
 
     // Main parameters evaluation
+    // core_pid_folder: hidden option
     bool core_pid_folder =
         main_params->exists("core_pid_folder");
     if (core_pid_folder == true) {
@@ -85,11 +317,15 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
                 std::filesystem::exists(core_pid_folder_s) == true) {
                 params.insert({"core_pid_folder", core_pid_folder_s});
             } else {
-                std::cout << "core_pid_folder: invalid folder\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[core_pid_folder] configuration issue: "
+                    "[ {} ] is an invalid folder", core_pid_folder_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[core_pid_folder] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
@@ -97,7 +333,9 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         if (std::filesystem::exists(default_core_pid_folder) == true) {
             params.insert({"core_pid_folder", default_core_pid_folder});
         } else {
-            std::cout << "core_pid_folder: invalid folder\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[core_pid_folder] configuration issue: "
+                "{} is an invalid folder", default_core_pid_folder);
             return false;
         }
     }
@@ -110,15 +348,20 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (iface_s.empty() == false) {
                 params.insert({"iface", iface_s});
             } else {
-                std::cout << "empty iface not allowed\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[iface] configuration issue: "
+                    "[ {} ] is an invalid inteface", iface_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[iface] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
-        std::cout << "mdt-dialout-collector: iface mandatory\n";
+        spdlog::get("multi-logger-cfg")->error("[iface] configuration issue: "
+            "a valid inteface is mandatory");
         return false;
     }
 
@@ -131,11 +374,15 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (ipv4_socket_cisco_s.empty() == false) {
                 params.insert({"ipv4_socket_cisco", ipv4_socket_cisco_s});
             } else {
-                std::cout << "ipv4_socket_cisco: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[ipv4_socket_cisco] configuration issue: "
+                    "[ {} ] is an invalid socket", ipv4_socket_cisco_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[ipv4_socket_cisco] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
@@ -151,11 +398,16 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (ipv4_socket_juniper_s.empty() == false) {
                 params.insert({"ipv4_socket_juniper", ipv4_socket_juniper_s});
             } else {
-                std::cout << "ipv4_socket_juniper: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[ipv4_socket_juniper] configuration "
+                    "issue: [ {} ] is an invalid socket",
+                    ipv4_socket_juniper_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[ipv4_socket_juniper] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
@@ -171,11 +423,16 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (ipv4_socket_huawei_s.empty() == false) {
                 params.insert({"ipv4_socket_huawei", ipv4_socket_huawei_s});
             } else {
-                std::cout << "ipv4_socket_huawei: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[ipv4_socket_huawei] configuration "
+                    "issue: [ {} ] is an invalid socket",
+                    ipv4_socket_huawei_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[ipv4_socket_huawei] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
@@ -191,15 +448,20 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (replies_cisco_s.empty() == false) {
                 params.insert({"replies_cisco", replies_cisco_s});
             } else {
-                std::cout << "replies_cisco: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[replies_cisco] configuration "
+                    "issue: [ {} ] is an invalid # of replies",
+                    replies_cisco_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[replies_cisco] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
-        params.insert({"replies_cisco", "0"});
+        params.insert({"replies_cisco", "100"});
     }
 
     bool replies_juniper = main_params->exists("replies_juniper");
@@ -211,15 +473,20 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (replies_juniper_s.empty() == false) {
                 params.insert({"replies_juniper", replies_juniper_s});
             } else {
-                std::cout << "replies_juniper: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[replies_juniper] configuration "
+                    "issue: [ {} ] is an invalid # of replies",
+                    replies_juniper_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[replies_juniper] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
-        params.insert({"replies_juniper", "0"});
+        params.insert({"replies_juniper", "100"});
     }
 
     bool replies_huawei = main_params->exists("replies_huawei");
@@ -231,15 +498,20 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (replies_huawei_s.empty() == false) {
                 params.insert({"replies_huawei", replies_huawei_s});
             } else {
-                std::cout << "replies_huawei: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[replies_huawei] configuration "
+                    "issue: [ {} ] is an invalid # of replies",
+                    replies_huawei_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[replies_huawei] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
-        params.insert({"replies_huawei", "0"});
+        params.insert({"replies_huawei", "100"});
     }
 
     bool cisco_workers = main_params->exists("cisco_workers");
@@ -251,11 +523,16 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (cisco_workers_s.empty() == false) {
                 params.insert({"cisco_workers", cisco_workers_s});
             } else {
-                std::cout << "cisco_workers: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[cisco_workers] configuration "
+                    "issue: [ {} ] is an invalid # of replies",
+                    cisco_workers_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[cisco_workers] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
@@ -271,11 +548,16 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (juniper_workers_s.empty() == false) {
                 params.insert({"juniper_workers", juniper_workers_s});
             } else {
-                std::cout << "juniper_workers: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[juniper_workers] configuration "
+                    "issue: [ {} ] is an invalid # of replies",
+                    juniper_workers_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[juniper_workers] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
@@ -291,11 +573,16 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             if (huawei_workers_s.empty() == false) {
                 params.insert({"huawei_workers", huawei_workers_s});
             } else {
-                std::cout << "huawei_workers: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[huawei_workers] configuration "
+                    "issue: [ {} ] is an invalid # of replies",
+                    huawei_workers_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[huawei_workers] configuration issue: "
+                "{}", ste.what());
             return false;
         }
     } else {
@@ -307,10 +594,11 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
 
 DataManipulationCfgHandler::DataManipulationCfgHandler()
 {
-    std::cout << "DataManipulationCfgHandler()\n";
+    spdlog::get("multi-logger-cfg")->
+        debug("constructor: DataManipulationCfgHandler()");
     if (lookup_data_manipulation_parameters(
         this->mdt_dialout_collector_conf,
-        this->parameters) == true) {
+        this->data_manipulation_parameters) == true) {
 
         //this->enable_cisco_message_to_json_string =
         //    parameters.at("enable_cisco_message_to_json_string");
@@ -333,8 +621,9 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
     std::unique_ptr<libconfig::Config>
         data_manipulation_params(new libconfig::Config());
 
-    if (set_parameters(data_manipulation_params, cfg_path) == false) {
-        return false;
+    if (CfgHandler::set_parameters(data_manipulation_params, cfg_path)
+        == false) {
+            return false;
     }
 
     // Data manipulation parameters evaluation
@@ -351,13 +640,16 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
                 params.insert({"enable_cisco_message_to_json_string",
                 enable_cisco_message_to_json_string_s});
             } else {
-                std::cout <<
-                    "enable_cisco_message_to_json_string: "
-                    "valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[enable_cisco_message_to_json_string] "
+                    "configuration issue: [ {} ] is invalid",
+                    enable_cisco_message_to_json_string_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[enable_cisco_message_to_json_string] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
@@ -376,70 +668,90 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
                 params.insert({"enable_cisco_gpbkv2json",
                 enable_cisco_gpbkv2json_s});
             } else {
-                std::cout <<
-                    "enable_cisco_gpbkv2json: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[enable_cisco_gpbkv2json] "
+                    "configuration issue: [ {} ] is invalid",
+                    enable_cisco_gpbkv2json_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[enable_cisco_gpbkv2json] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
         params.insert({"enable_cisco_gpbkv2json", "true"});
     }
 
+    std::string enable_label_encode_as_map_s;
     bool enable_label_encode_as_map =
         data_manipulation_params->exists("enable_label_encode_as_map");
     if (enable_label_encode_as_map == true) {
         libconfig::Setting &enable_label_encode_as_map =
             data_manipulation_params->lookup("enable_label_encode_as_map");
         try {
-            std::string enable_label_encode_as_map_s =
-                enable_label_encode_as_map;
+            enable_label_encode_as_map_s =
+                enable_label_encode_as_map.c_str();
             if (enable_label_encode_as_map_s.empty() == false) {
                 params.insert({"enable_label_encode_as_map",
                 enable_label_encode_as_map_s});
+                if (enable_label_encode_as_map_s.compare("true") == 0) {
+                }
             } else {
-                std::cout <<
-                    "enable_label_encode_as_map: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[enable_label_encode_as_map] "
+                    "configuration issue: [ {} ] is invalid",
+                    enable_label_encode_as_map_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[enable_label_encode_as_map] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
         params.insert({"enable_label_encode_as_map", "false"});
     }
 
-    bool label_map_csv_path =
-        data_manipulation_params->exists("label_map_csv_path");
-    if (label_map_csv_path == true) {
-        libconfig::Setting &label_map_csv_path =
-            data_manipulation_params->lookup("label_map_csv_path");
-        try {
-            std::string label_map_csv_path_s =
-                label_map_csv_path;
-            if (label_map_csv_path_s.empty() == false &&
-                std::filesystem::exists(label_map_csv_path_s) == true) {
-                params.insert({"label_map_csv_path",
-                label_map_csv_path_s});
-            } else {
-                std::cout << "label_map_csv_path: invalid path\n";
+    if (enable_label_encode_as_map_s.compare("true") == 0) {
+        bool label_map_csv_path =
+            data_manipulation_params->exists("label_map_csv_path");
+        if (label_map_csv_path == true) {
+            libconfig::Setting &label_map_csv_path =
+                data_manipulation_params->lookup("label_map_csv_path");
+            try {
+                std::string label_map_csv_path_s =
+                    label_map_csv_path;
+                if (label_map_csv_path_s.empty() == false &&
+                    std::filesystem::exists(label_map_csv_path_s) == true) {
+                    params.insert({"label_map_csv_path",
+                    label_map_csv_path_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[label_map_csv_path] "
+                        "configuration issue: [ {} ] is invalid",
+                        label_map_csv_path_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger-cfg")->error("[label_map_csv_path] "
+                    "configuration issue: {}", ste.what());
                 return false;
             }
-        } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
-            return false;
-        }
-    } else {
-        const std::string default_label_map_csv_path =
-            "/opt/mdt_dialout_collector/csv/label_map.csv";
-        if (std::filesystem::exists(default_label_map_csv_path) == true) {
-            params.insert({"label_map_csv_path", default_label_map_csv_path});
         } else {
-            std::cout << "label_map_csv_path: invalid path\n";
-            return false;
+            const std::string default_label_map_csv_path =
+                "/opt/mdt_dialout_collector/csv/label_map.csv";
+            if (std::filesystem::exists(default_label_map_csv_path) == true) {
+                params.insert({"label_map_csv_path",
+                    default_label_map_csv_path});
+            } else {
+                spdlog::get("multi-logger-cfg")->
+                    error("[label_map_csv_path] configuration issue: {} "
+                    "is invalid", default_label_map_csv_path);
+                return false;
+            }
         }
     }
 
@@ -448,10 +760,10 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
 
 KafkaCfgHandler::KafkaCfgHandler()
 {
-    std::cout << "KafkaCfgHandler()\n";
+    spdlog::get("multi-logger-cfg")->debug("constructor: KafkaCfgHandler()");
     if (lookup_kafka_parameters(
         this->mdt_dialout_collector_conf,
-        this->parameters) == true) {
+        this->kafka_parameters) == true) {
 
         //this->topic = parameters.at("topic");
         //this->bootstrap_servers = parameters.at("bootstrap_servers");
@@ -474,7 +786,7 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
     params.clear();
     std::unique_ptr<libconfig::Config> kafka_params(new libconfig::Config());
 
-    if (set_parameters(kafka_params, cfg_path) == false) {
+    if (CfgHandler::set_parameters(kafka_params, cfg_path) == false) {
         return false;
     }
 
@@ -487,15 +799,19 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             if (topic_s.empty() == false) {
                 params.insert({"topic", topic_s});
             } else {
-                std::cout << "empty topic not allowed\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[topic] configuration issue: [ {} ] "
+                    "is invalid", topic_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->error("[topic] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
-        std::cout << "kafka-producer: topic mandatory\n";
+        spdlog::get("multi-logger-cfg")->error("[topic] configuration issue: "
+            "a valid topic is mandatory");
         return false;
     }
 
@@ -508,15 +824,20 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             if (bootstrap_servers_s.empty() == false) {
                 params.insert({"bootstrap_servers", bootstrap_servers_s});
             } else {
-                std::cout << "empty bootstrap_servers not allowed\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[bootstrap_servers] configuration issue: "
+                    "[ {} ] is invalid", bootstrap_servers_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->error("[bootstrap_servers] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
-        std::cout << "kafka-producer: bootstrap_servers mandatory\n";
+        spdlog::get("multi-logger-cfg")->
+            error("[bootstrap_servers] configuration issue: "
+            "a valid bootstrap_servers is mandatory");
         return false;
     }
 
@@ -527,16 +848,18 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         try {
             std::string enable_idempotence_s = enable_idempotence.c_str();
             if (enable_idempotence_s.empty() == false &&
-                (enable_idempotence_s.compare("true") == 0 or
+                (enable_idempotence_s.compare("true") == 0 ||
                 enable_idempotence_s.compare("false") == 0)) {
                 params.insert({"enable_idempotence", enable_idempotence_s});
             } else {
-                std::cout <<
-                    "enable_idempotence: valid value <true | false>\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[enable_idempotence] configuration issue: "
+                    "[ {} ] is invalid (true or false)", enable_idempotence_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->error("[enable_idempotence] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
@@ -551,11 +874,14 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             if (client_id_s.empty() == false) {
                 params.insert({"client_id", client_id_s});
             } else {
-                std::cout << "client_id: valid value not empty\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[client_id] configuration issue: "
+                    "[ {} ] is invalid", client_id_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->error("[client_id] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
@@ -570,11 +896,14 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             if (log_level_s.empty() == false) {
                 params.insert({"log_level", log_level_s});
             } else {
-                std::cout << "log_level: valid value 0..7\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[log_level] configuration issue: "
+                    "[ {} ] is invalid (0...7)", log_level_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->error("[log_level] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
@@ -588,19 +917,24 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         try {
             std::string security_protocol_s = security_protocol.c_str();
             if (security_protocol_s.empty() == false &&
-                (security_protocol_s.compare("ssl") == 0 or
+                (security_protocol_s.compare("ssl") == 0 ||
                 security_protocol_s.compare("plaintext") == 0)) {
                 params.insert({"security_protocol", security_protocol_s});
             } else {
-                std::cout << "security_protocol: valid values <ssl | plaintext>\n";
+                spdlog::get("multi-logger-cfg")->
+                    error("[security_protocol] configuration issue: "
+                    "[ {} ] is invalid (ssl or plaintext)", security_protocol_s);
                 return false;
             }
         } catch (const libconfig::SettingTypeException &ste) {
-            std::cout << "libconfig: " << ste.what() << "\n";
+            spdlog::get("multi-logger-cfg")->error("[security_protocol] "
+                "configuration issue: {}", ste.what());
             return false;
         }
     } else {
-        std::cout << "kafka-producer: security_protocol mandatory\n";
+        spdlog::get("multi-logger-cfg")->
+            error("[security_protocol] configuration issue: "
+            "a valid security_protocol is mandatory");
         return false;
     }
 
@@ -632,16 +966,20 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
                         ssl_certificate_location_s});
                     params.insert({"ssl_ca_location", ssl_ca_location_s});
                 } else {
-                    std::cout << "security_protocol: valid values not empty\n";
+                    spdlog::get("multi-logger-cfg")->
+                        error("[security_protocol] "
+                        "configuration issue: is invalid");
                     return false;
                 }
             } catch (const libconfig::SettingTypeException &ste) {
-                std::cout << "libconfig: " << ste.what() << "\n";
+                spdlog::get("multi-logger-cfg")->error("[security_protocol] "
+                    "configuration issue: {}", ste.what());
                 return false;
             }
         } else {
-            std::cout <<
-                "kafka-producer: security_protocol options mandatory\n";
+            spdlog::get("multi-logger-cfg")->
+                error("[security_protocol] configuration issue: "
+                "a valid security_protocol is mandatory");
             return false;
         }
     } else {

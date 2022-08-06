@@ -4,6 +4,8 @@
 
 // mdt-dialout-collector Library headers
 #include "logs_handler.h"
+#include "cfg_handler.h"
+#include <spdlog/spdlog.h>
 
 
 // Centralizing logging parameters
@@ -15,20 +17,26 @@ std::shared_ptr<spdlog::logger> multi_logger =
 
 LogsHandler::LogsHandler()
 {
-    std::cout << "LogsHandler()\n";
     if (set_spdlog_sinks(
             this->spdlog_sinks,
-            this->multi_logger) == false) {
+            this->multi_logger,
+            this->spdlog_level) == false) {
         std::cout << "Unable to LogsHandler::set_spdlog_sinks(...)\n";
         std::exit(EXIT_FAILURE);
+    } else {
+        multi_logger->debug("constructor: LogsHandler()");
     }
 }
 
-bool LogsHandler::set_spdlog_sinks(std::vector<spdlog::sink_ptr> &spdlog_sinks,
-    std::shared_ptr<spdlog::logger> &multi_logger)
+bool LogsHandler::set_spdlog_sinks(
+    std::vector<spdlog::sink_ptr> &spdlog_sinks,
+    std::shared_ptr<spdlog::logger> &multi_logger,
+    std::string &spdlog_level)
 {
+    spdlog_level = logs_cfg_parameters.at("spdlog_level");
+
     // Syslog
-    if (true) {
+    if (logs_cfg_parameters.at("syslog").compare("true") == 0) {
         const std::string ident = "mdt-dialout-collector";
         try {
             auto spdlog_syslog =
@@ -42,7 +50,7 @@ bool LogsHandler::set_spdlog_sinks(std::vector<spdlog::sink_ptr> &spdlog_sinks,
     }
 
     // ConsoleLog
-    if (true) {
+    if (logs_cfg_parameters.at("console_log").compare("true") == 0){
         try {
             auto spdlog_console =
                 std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -55,6 +63,7 @@ bool LogsHandler::set_spdlog_sinks(std::vector<spdlog::sink_ptr> &spdlog_sinks,
 
     multi_logger = std::make_shared<spdlog::logger>
         ("multi-logger", begin(spdlog_sinks), end(spdlog_sinks));
+    multi_logger->set_level(spdlog::level::from_str(spdlog_level));
     spdlog::register_logger(multi_logger);
 
     return true;

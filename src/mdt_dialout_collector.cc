@@ -45,70 +45,102 @@ int main(void)
     const std::string core_pid_path = core_pid_folder + core_pid_file;
     if (DumpCorePid(core_pid, core_pid_path) == false) {
         multi_logger->error(
-            "Unable to dump PID {} to {}", core_pid, core_pid_path);
+            "unable to dump PID {} to {}", core_pid, core_pid_path);
         return EXIT_FAILURE;
     }
 
-    LoadLabelMap(label_map,
+    if (data_manipulation_cfg_parameters.at(
+            "enable_label_encode_as_map").compare("true") == 0) {
+        LoadLabelMap(label_map,
             data_manipulation_cfg_parameters.at("label_map_csv_path"));
+    }
     std::vector<std::thread> workers;
 
     if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
         main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
         main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
-            std::cout << "no ipv4 sockets were configured\n";
+            multi_logger->error("[ipv4_socket_*] configuration issue: "
+                "unable to find at least one valid IPv4 socket where to bind "
+                "the daemon");
             return EXIT_FAILURE;
     }
 
+    // Cisco
     if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == false) {
-        if (std::stoi(main_cfg_parameters.at("replies_cisco")) < 0 ||
-            std::stoi(main_cfg_parameters.at("replies_cisco")) > 100) {
-            std::cout << "Cisco - the allowed amount of replies per session "
-                << "is defined between 0 and 100. (0 = Unlimited)\n";
+        int replies_cisco =
+            std::stoi(main_cfg_parameters.at("replies_cisco"));
+        if (replies_cisco < 10 || replies_cisco > 1000) {
+            multi_logger->error("[replies_cisco] configuaration issue: the "
+                "allowed amount of replies per session is defined between 10 "
+                "and 1000. (default = 100)");
             return EXIT_FAILURE;
         }
         void *cisco_ptr {nullptr};
         int cisco_workers =
             std::stoi(main_cfg_parameters.at("cisco_workers"));
+        if (cisco_workers < 0 || cisco_workers > 5) {
+            multi_logger->error("[cisco_workers] configuaration issue: the "
+                "allowed amount of workers is defined between 0 "
+                "and 5. (default = 1)");
+            return EXIT_FAILURE;
+        }
         for (int w = 0; w < cisco_workers; ++w) {
             workers.push_back(std::thread(&CiscoThread, cisco_ptr));
         }
-        std::cout << "mdt-dialout-collector listening on "
-            << main_cfg_parameters.at("ipv4_socket_cisco") << "...\n";
+        multi_logger->info("mdt-dialout-collector listening on {} ",
+            main_cfg_parameters.at("ipv4_socket_cisco"));
     }
 
+    // Juniper
     if (main_cfg_parameters.at("ipv4_socket_juniper").empty() == false) {
-        if (std::stoi(main_cfg_parameters.at("replies_juniper")) < 0 ||
-            std::stoi(main_cfg_parameters.at("replies_juniper")) > 100) {
-            std::cout << "Juniper - the allowed amount of replies per session "
-                << "is defined between 0 and 100. (0 = Unlimited)\n";
+        int replies_juniper =
+            std::stoi(main_cfg_parameters.at("replies_juniper"));
+        if (replies_juniper < 10 || replies_juniper > 1000) {
+            multi_logger->error("[replies_juniper] configuaration issue: the "
+                "allowed amount of replies per session is defined between 10 "
+                "and 1000. (default = 100)");
             return EXIT_FAILURE;
         }
         void *juniper_ptr {nullptr};
         int juniper_workers =
             std::stoi(main_cfg_parameters.at("juniper_workers"));
+        if (juniper_workers < 0 || juniper_workers > 5) {
+            multi_logger->error("[juniper_workers] configuaration issue: the "
+                "allowed amount of workers is defined between 0 "
+                "and 5. (default = 1)");
+            return EXIT_FAILURE;
+        }
         for (int w = 0; w < juniper_workers; ++w) {
             workers.push_back(std::thread(&JuniperThread, juniper_ptr));
         }
-        std::cout << "mdt-dialout-collector listening on "
-        << main_cfg_parameters.at("ipv4_socket_juniper") << "...\n";
+        multi_logger->info("mdt-dialout-collector listening on {} ",
+            main_cfg_parameters.at("ipv4_socket_juniper"));
     }
 
+    // Huawei
     if (main_cfg_parameters.at("ipv4_socket_huawei").empty() == false) {
-        if (std::stoi(main_cfg_parameters.at("replies_huawei")) < 0 ||
-            std::stoi(main_cfg_parameters.at("replies_huawei")) > 100) {
-            std::cout << "Huawei - the allowed amount of replies per session "
-                << "is defined between 0 and 100. (0 = Unlimited)\n";
+        int replies_huawei =
+            std::stoi(main_cfg_parameters.at("replies_huawei"));
+        if (replies_huawei < 10 || replies_huawei > 1000) {
+            multi_logger->error("[replies_huawei] configuaration issue: the "
+                "allowed amount of replies per session is defined between 10 "
+                "and 1000. (default = 100)");
             return EXIT_FAILURE;
         }
         void *huawei_ptr {nullptr};
         int huawei_workers =
             std::stoi(main_cfg_parameters.at("huawei_workers"));
+        if (huawei_workers < 0 || huawei_workers > 5) {
+            multi_logger->error("[huawei_workers] configuaration issue: the "
+                "allowed amount of workers is defined between 0 "
+                "and 5. (default = 1)");
+            return EXIT_FAILURE;
+        }
         for (int w = 0; w < huawei_workers; ++w) {
             workers.push_back(std::thread(&HuaweiThread, huawei_ptr));
         }
-        std::cout << "mdt-dialout-collector listening on "
-            << main_cfg_parameters.at("ipv4_socket_huawei") << "...\n";
+        multi_logger->info("mdt-dialout-collector listening on {} ",
+            main_cfg_parameters.at("ipv4_socket_huawei"));
     }
 
     signal(SIGUSR1, SignalHandler);
@@ -201,7 +233,7 @@ bool DumpCorePid(int &core_pid, const std::string &core_pid_path)
 void SignalHandler(int sig_num)
 {
     multi_logger->info(
-        "Siganl {} received, re-freshing label_map information", sig_num);
+        "siganl {} received, re-freshing label_map information", sig_num);
     LoadLabelMap(label_map,
         data_manipulation_cfg_parameters.at("label_map_csv_path"));
 }
