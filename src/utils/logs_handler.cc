@@ -5,7 +5,6 @@
 // mdt-dialout-collector Library headers
 #include "logs_handler.h"
 #include "cfg_handler.h"
-#include <spdlog/spdlog.h>
 
 
 // Centralizing logging parameters
