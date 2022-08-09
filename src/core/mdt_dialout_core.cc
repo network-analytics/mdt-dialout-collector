@@ -133,7 +133,8 @@ void Srv::CiscoFsmCtrl()
         GPR_ASSERT(cisco_cq_->Next(&cisco_tag, &cisco_ok));
         //GPR_ASSERT(cisco_ok);
         if (cisco_ok == false) {
-            multi_logger->error("[CiscoFsmCtrl] core issue: CQ failure");
+            multi_logger->warn("[CiscoFsmCtrl][grpc::CompletionQueue] "
+                "unsuccessful event");
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
@@ -161,7 +162,8 @@ void Srv::JuniperFsmCtrl()
         GPR_ASSERT(juniper_cq_->Next(&juniper_tag, &juniper_ok));
         //GPR_ASSERT(juniper_ok);
         if (juniper_ok == false) {
-            multi_logger->error("[JuniperFsmCtrl] core issue: CQ failure");
+            multi_logger->warn("[JuniperFsmCtrl][grpc::CompletionQueue] "
+                "unsuccessful event");
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
@@ -191,7 +193,8 @@ void Srv::HuaweiFsmCtrl()
         GPR_ASSERT(huawei_cq_->Next(&huawei_tag, &huawei_ok));
         //GPR_ASSERT(huawei_ok);
         if (huawei_ok == false) {
-            multi_logger->error("[HuaweiFsmCtrl] core issue: CQ failure");
+            multi_logger->warn("[HuaweiFsmCtrl][grpc::CompletionQueue] "
+                "unsuccessful event");
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(

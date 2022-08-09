@@ -627,6 +627,7 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
     }
 
     // Data manipulation parameters evaluation
+    std::string enable_cisco_message_to_json_string_s;
     bool enable_cisco_message_to_json_string =
         data_manipulation_params->exists("enable_cisco_message_to_json_string");
     if (enable_cisco_message_to_json_string == true) {
@@ -634,8 +635,8 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
             data_manipulation_params->lookup(
             "enable_cisco_message_to_json_string");
         try {
-            std::string enable_cisco_message_to_json_string_s =
-                enable_cisco_message_to_json_string;
+            enable_cisco_message_to_json_string_s =
+                enable_cisco_message_to_json_string.c_str();
             if (enable_cisco_message_to_json_string_s.empty() == false) {
                 params.insert({"enable_cisco_message_to_json_string",
                 enable_cisco_message_to_json_string_s});
@@ -656,14 +657,15 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
         params.insert({"enable_cisco_message_to_json_string", "false"});
     }
 
+    std::string enable_cisco_gpbkv2json_s;
     bool enable_cisco_gpbkv2json =
         data_manipulation_params->exists("enable_cisco_gpbkv2json");
     if (enable_cisco_gpbkv2json == true) {
         libconfig::Setting &enable_cisco_gpbkv2json =
             data_manipulation_params->lookup("enable_cisco_gpbkv2json");
         try {
-            std::string enable_cisco_gpbkv2json_s =
-                enable_cisco_gpbkv2json;
+            enable_cisco_gpbkv2json_s =
+                enable_cisco_gpbkv2json.c_str();
             if (enable_cisco_gpbkv2json_s.empty() == false) {
                 params.insert({"enable_cisco_gpbkv2json",
                 enable_cisco_gpbkv2json_s});
@@ -682,6 +684,17 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
         }
     } else {
         params.insert({"enable_cisco_gpbkv2json", "true"});
+    }
+
+    // the two funcs above are in XOR
+    if ((enable_cisco_message_to_json_string_s.compare(
+        enable_cisco_gpbkv2json_s) == 0) &&
+        (params.at("enable_cisco_message_to_json_string").compare(params.at(
+            "enable_cisco_gpbkv2json"))) == 0) {
+        spdlog::get("multi-logger-cfg")->
+            error("[enable_cisco_gpbkv2json] XOR "
+            "[enable_cisco_message_to_json_string]");
+        return false;
     }
 
     std::string enable_label_encode_as_map_s;
