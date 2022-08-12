@@ -60,7 +60,7 @@ bool DataDelivery::AsyncKafkaProducer(
 
         auto msg = kafka::clients::producer::ProducerRecord(
             topic,
-            kafka::Key{peer.c_str()},
+            kafka::Key(peer.c_str()),
             kafka::Value(json_str.c_str(), json_str.size()));
 
         producer->send(
