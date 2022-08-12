@@ -4,9 +4,6 @@
 
 // mdt-dialout-collector Library headers
 #include "dataDelivery/data_delivery.h"
-#include "kafka/KafkaProducer.h"
-#include "kafka/Properties.h"
-#include "kafka/Types.h"
 
 
 DataDelivery::DataDelivery()
