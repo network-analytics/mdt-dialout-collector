@@ -148,10 +148,17 @@ enable_cisco_gpbkv2json = "false";
 enable_cisco_message_to_json_string = "true";
 
 ## data-flow enrichment with node_id/platform_id - default = "false"
-## for additional details refer to "csv/README.md"
-enable_label_encode_as_map = "true";
+## for additional details refer to "csv/README.md" or "ptm/README.md"
+
+## CSV format - default = "false"
+enable_label_encode_as_map = "false";
 ## label_map_csv_path - default = "/opt/mdt_dialout_collector/csv/label_map.csv"
 label_map_csv_path = "/define/here/your/custom_path.csv"
+
+## PTM format (pmacct's pretag) - default = "false"
+enable_label_encode_as_map_ptm = "true";
+## label_map_ptm_path - default = "/opt/mdt_dialout_collector/ptm/label_map.ptm"
+label_map_ptm_path = "/define/here/your/custom_path.ptm"
 
 
 #### mdt-dialout-collector - kafka-producer

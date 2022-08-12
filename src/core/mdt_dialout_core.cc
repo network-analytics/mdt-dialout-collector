@@ -120,11 +120,15 @@ void Srv::CiscoFsmCtrl()
         new DataManipulation());
     std::unique_ptr<DataDelivery> data_delivery(
         new DataDelivery());
+    std::unique_ptr<kafka::clients::KafkaProducer> producer(
+        new kafka::clients::KafkaProducer(data_delivery->get_properties()));
     std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
         new cisco_telemetry::Telemetry());
 
-    std::unique_ptr<Srv::CiscoStream> cisco_stream(
+    std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
+    cisco_sstream->Start(label_map, data_manipulation, data_delivery, producer,
+        cisco_tlm);
     //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
@@ -138,7 +142,7 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            label_map, data_manipulation, data_delivery, cisco_tlm);
+            label_map, data_manipulation, data_delivery, producer, cisco_tlm);
         //cisco_counter++;
     }
 }
@@ -149,11 +153,15 @@ void Srv::JuniperFsmCtrl()
         new DataManipulation());
     std::unique_ptr<DataDelivery> data_delivery(
         new DataDelivery());
+    std::unique_ptr<kafka::clients::KafkaProducer> producer(
+        new kafka::clients::KafkaProducer(data_delivery->get_properties()));
     std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_hdr_ext(
         new GnmiJuniperTelemetryHeaderExtension());
 
-    std::unique_ptr<Srv::JuniperStream> juniper_stream(
+    std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
+    juniper_sstream->Start(label_map, data_manipulation, data_delivery,
+        producer, juniper_tlm_hdr_ext);
     //int juniper_counter {0};
     void *juniper_tag {nullptr};
     bool juniper_ok {false};
@@ -167,7 +175,8 @@ void Srv::JuniperFsmCtrl()
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
-            label_map, data_manipulation, data_delivery, juniper_tlm_hdr_ext);
+            label_map, data_manipulation, data_delivery, producer,
+            juniper_tlm_hdr_ext);
         //juniper_counter++;
     }
 }
@@ -178,13 +187,17 @@ void Srv::HuaweiFsmCtrl()
         new DataManipulation());
     std::unique_ptr<DataDelivery> data_delivery(
         new DataDelivery());
+    std::unique_ptr<kafka::clients::KafkaProducer> producer(
+        new kafka::clients::KafkaProducer(data_delivery->get_properties()));
     std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
         new huawei_telemetry::Telemetry());
     std::unique_ptr<openconfig_interfaces::Interfaces> oc_if(
         new openconfig_interfaces::Interfaces());
 
-    std::unique_ptr<Srv::HuaweiStream> huawei_stream(
+    std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
         new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get()));
+    huawei_sstream->Start(label_map, data_manipulation, data_delivery,
+        producer, huawei_tlm, oc_if);
     //int huawei_counter {0};
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
@@ -198,7 +211,8 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(
-            label_map, data_manipulation, data_delivery, huawei_tlm, oc_if);
+            label_map, data_manipulation, data_delivery, producer,
+            huawei_tlm, oc_if);
         //huawei_counter++;
     }
 }
@@ -215,14 +229,6 @@ Srv::CiscoStream::CiscoStream(
         cisco_stream_status {START}
 {
     multi_logger->debug("constructor: CiscoStream()");
-    std::unique_ptr<DataManipulation> data_manipulation(
-        new DataManipulation());
-    std::unique_ptr<DataDelivery> data_delivery(
-        new DataDelivery());
-    std::unique_ptr<cisco_telemetry::Telemetry> cisco_tlm(
-        new cisco_telemetry::Telemetry());
-    Srv::CiscoStream::Start(label_map, data_manipulation,
-        data_delivery, cisco_tlm);
 }
 
 Srv::JuniperStream::JuniperStream(
@@ -236,15 +242,7 @@ Srv::JuniperStream::JuniperStream(
             {std::stoi(main_cfg_parameters.at("replies_juniper"))},
         juniper_stream_status {START}
 {
-    std::unique_ptr<DataManipulation> data_manipulation(
-        new DataManipulation());
-    std::unique_ptr<DataDelivery> data_delivery(
-        new DataDelivery());
-    std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> juniper_tlm_hdr_ext(
-        new GnmiJuniperTelemetryHeaderExtension());
     multi_logger->debug("constructor: JuniperStream()");
-    Srv::JuniperStream::Start(label_map, data_manipulation,
-        data_delivery, juniper_tlm_hdr_ext);
 }
 
 Srv::HuaweiStream::HuaweiStream(
@@ -259,22 +257,13 @@ Srv::HuaweiStream::HuaweiStream(
         huawei_stream_status {START}
 {
     multi_logger->debug("constructor: HuaweiStream()");
-    std::unique_ptr<DataManipulation> data_manipulation(
-        new DataManipulation());
-    std::unique_ptr<DataDelivery> data_delivery(
-        new DataDelivery());
-    std::unique_ptr<huawei_telemetry::Telemetry> huawei_tlm(
-        new huawei_telemetry::Telemetry());
-    std::unique_ptr<openconfig_interfaces::Interfaces> oc_if(
-        new openconfig_interfaces::Interfaces());
-    Srv::HuaweiStream::Start(label_map, data_manipulation,
-        data_delivery, huawei_tlm, oc_if);
 }
 
 void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     std::unique_ptr<DataManipulation> &data_manipulation,
     std::unique_ptr<DataDelivery> &data_delivery,
+    std::unique_ptr<kafka::clients::KafkaProducer> &producer,
     std::unique_ptr<cisco_telemetry::Telemetry> &cisco_tlm)
 {
     // Initial stream_status set to START @constructor
@@ -289,7 +278,10 @@ void Srv::CiscoStream::Start(
     } else if (cisco_stream_status == FLOW) {
         multi_logger->debug("[CiscoStream::Start()] "
             "new Srv::CiscoStream()");
-        new Srv::CiscoStream(cisco_service_, cisco_cq_);
+        Srv::CiscoStream *cisco_sstream =
+            new Srv::CiscoStream(cisco_service_, cisco_cq_);
+        cisco_sstream->Start(label_map, data_manipulation, data_delivery,
+            producer, cisco_tlm);
         cisco_resp.Read(&cisco_stream, this);
         cisco_stream_status = PROCESSING;
         cisco_replies_sent++;
@@ -347,6 +339,8 @@ void Srv::CiscoStream::Start(
                         // Data enrichment with label (node_id/platform_id)
                         if (data_manipulation_cfg_parameters.at(
                             "enable_label_encode_as_map").compare("true")
+                                == 0 || data_manipulation_cfg_parameters.at(
+                            "enable_label_encode_as_map_ptm").compare("true")
                                 == 0) {
                             if (data_manipulation->AppendLabelMap(
                                 label_map,
@@ -354,11 +348,15 @@ void Srv::CiscoStream::Start(
                                 stream_data_in,
                                 stream_data_out) == true) {
                                 data_delivery->AsyncKafkaProducer(
+                                    producer,
+                                    peer,
                                     stream_data_out);
                             }
                         } else {
                             stream_data_out = stream_data_in;
                             data_delivery->AsyncKafkaProducer(
+                                producer,
+                                peer,
                                 stream_data_out);
                         }
                     } else {
@@ -379,18 +377,26 @@ void Srv::CiscoStream::Start(
                         opt);
                     // Data enrichment with label (node_id/platform_id)
                     if (data_manipulation_cfg_parameters.at(
-                        "enable_label_encode_as_map").compare("true") == 0) {
+                        "enable_label_encode_as_map").compare("true") == 0 ||
+                        data_manipulation_cfg_parameters.at(
+                        "enable_label_encode_as_map_ptm").compare("true")
+                            == 0) {
                         if (data_manipulation->AppendLabelMap(
                             label_map,
                             peer,
                             stream_data_in,
                             stream_data_out) == true) {
                             data_delivery->AsyncKafkaProducer(
+                                producer,
+                                peer,
                                 stream_data_out);
                         }
                     } else {
                         stream_data_out = stream_data_in;
-                        data_delivery->AsyncKafkaProducer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer,
+                            stream_data_out);
                     }
                 } else {
                     // Use Case: both data manipulation funcs set to false:
@@ -407,17 +413,25 @@ void Srv::CiscoStream::Start(
                     "data", peer);
                 // Data enrichment with label (node_id/platform_id)
                 if (data_manipulation_cfg_parameters.at(
-                    "enable_label_encode_as_map").compare("true") == 0) {
+                    "enable_label_encode_as_map").compare("true") == 0 ||
+                    data_manipulation_cfg_parameters.at(
+                    "enable_label_encode_as_map_ptm").compare("true") == 0) {
                     if (data_manipulation->AppendLabelMap(
                         label_map,
                         peer,
                         stream_data_in,
                         stream_data_out) == true) {
-                        data_delivery->AsyncKafkaProducer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer,
+                            stream_data_out);
                     }
                 } else {
                     stream_data_out = stream_data_in;
-                    data_delivery->AsyncKafkaProducer(stream_data_out);
+                    data_delivery->AsyncKafkaProducer(
+                        producer,
+                        peer,
+                        stream_data_out);
                 }
             // Handling JSON string
             } else if (parsing_str == false) {
@@ -425,17 +439,25 @@ void Srv::CiscoStream::Start(
                     "data", peer);
                 // Data enrichment with label (node_id/platform_id)
                 if (data_manipulation_cfg_parameters.at(
-                    "enable_label_encode_as_map").compare("true") == 0) {
+                    "enable_label_encode_as_map").compare("true") == 0 ||
+                    data_manipulation_cfg_parameters.at(
+                    "enable_label_encode_as_map_ptm").compare("true") == 0) {
                     if (data_manipulation->AppendLabelMap(
                         label_map,
                         peer,
                         stream_data_in,
                         stream_data_out) == true) {
-                        data_delivery->AsyncKafkaProducer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer,
+                            stream_data_out);
                     }
                 } else {
                     stream_data_out = stream_data_in;
-                    data_delivery->AsyncKafkaProducer(stream_data_out);
+                    data_delivery->AsyncKafkaProducer(
+                        producer,
+                        peer,
+                        stream_data_out);
                 }
             }
             cisco_stream_status = PROCESSING;
@@ -453,6 +475,7 @@ void Srv::JuniperStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     std::unique_ptr<DataManipulation> &data_manipulation,
     std::unique_ptr<DataDelivery> &data_delivery,
+    std::unique_ptr<kafka::clients::KafkaProducer> &producer,
     std::unique_ptr<GnmiJuniperTelemetryHeaderExtension> &juniper_tlm_hdr_ext)
 {
     // Initial stream_status set to START @constructor
@@ -467,7 +490,10 @@ void Srv::JuniperStream::Start(
     } else if (juniper_stream_status == FLOW) {
         multi_logger->debug("[JuniperStream::Start()] "
             "new Srv::JuniperStream()");
-        new Srv::JuniperStream(juniper_service_, juniper_cq_);
+        Srv::JuniperStream *juniper_sstream =
+            new Srv::JuniperStream(juniper_service_, juniper_cq_);
+        juniper_sstream->Start(label_map, data_manipulation, data_delivery,
+            producer, juniper_tlm_hdr_ext);
         juniper_resp.Read(&juniper_stream, this);
         juniper_stream_status = PROCESSING;
         juniper_replies_sent++;
@@ -509,17 +535,25 @@ void Srv::JuniperStream::Start(
             stream_data_in = json_str_out;
 
             if (data_manipulation_cfg_parameters.at(
-                "enable_label_encode_as_map").compare("true") == 0) {
+                "enable_label_encode_as_map").compare("true") == 0 ||
+                data_manipulation_cfg_parameters.at(
+                "enable_label_encode_as_map_ptm").compare("true") == 0) {
                 if (data_manipulation->AppendLabelMap(
                     label_map,
                     peer,
                     stream_data_in,
                     stream_data_out) == true) {
-                    data_delivery->AsyncKafkaProducer(stream_data_out);
+                    data_delivery->AsyncKafkaProducer(
+                        producer,
+                        peer,
+                        stream_data_out);
                 }
             } else {
                 stream_data_out = json_str_out;
-                data_delivery->AsyncKafkaProducer(stream_data_out);
+                data_delivery->AsyncKafkaProducer(
+                    producer,
+                    peer,
+                    stream_data_out);
             }
 
             juniper_stream_status = PROCESSING;
@@ -537,6 +571,7 @@ void Srv::HuaweiStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     std::unique_ptr<DataManipulation> &data_manipulation,
     std::unique_ptr<DataDelivery> &data_delivery,
+    std::unique_ptr<kafka::clients::KafkaProducer> &producer,
     std::unique_ptr<huawei_telemetry::Telemetry> &huawei_tlm,
     std::unique_ptr<openconfig_interfaces::Interfaces> &oc_if)
 {
@@ -552,7 +587,10 @@ void Srv::HuaweiStream::Start(
     } else if (huawei_stream_status == FLOW) {
         multi_logger->debug("[HuaweiStream::Start()] "
             "new Srv::HuaweiStream()");
-        new Srv::HuaweiStream(huawei_service_, huawei_cq_);
+        Srv::HuaweiStream *huawei_sstream =
+            new Srv::HuaweiStream(huawei_service_, huawei_cq_);
+        huawei_sstream->Start(label_map, data_manipulation, data_delivery,
+            producer, huawei_tlm, oc_if);
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
         huawei_replies_sent++;
@@ -611,18 +649,27 @@ void Srv::HuaweiStream::Start(
                     // Data enrichment with label (node_id/platform_id)
                     stream_data_in = json_str_out;
                     if (data_manipulation_cfg_parameters.at(
-                        "enable_label_encode_as_map").compare("true") == 0) {
+                        "enable_label_encode_as_map").compare("true") == 0 ||
+                        data_manipulation_cfg_parameters.at(
+                        "enable_label_encode_as_map_ptm").compare("true")
+                            == 0) {
                         if (data_manipulation->AppendLabelMap(
                             label_map,
                             peer,
                             stream_data_in,
                             stream_data_out) == true) {
                             data_delivery->
-                                AsyncKafkaProducer(stream_data_out);
+                                AsyncKafkaProducer(
+                                    producer,
+                                    peer,
+                                    stream_data_out);
                         }
                     } else {
                         stream_data_out = json_str_out;
-                        data_delivery->AsyncKafkaProducer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer,
+                            stream_data_out);
                     }
                 }
             }
@@ -642,17 +689,25 @@ void Srv::HuaweiStream::Start(
 
                 // Data enrichment with label (node_id/platform_id)
                 if (data_manipulation_cfg_parameters.at(
-                    "enable_label_encode_as_map").compare("true") == 0) {
+                    "enable_label_encode_as_map").compare("true") == 0 ||
+                    data_manipulation_cfg_parameters.at(
+                    "enable_label_encode_as_map_ptm").compare("true") == 0) {
                     if (data_manipulation->AppendLabelMap(
                         label_map,
                         peer,
                         stream_data_in,
                         stream_data_out) == true) {
-                        data_delivery->AsyncKafkaProducer(stream_data_out);
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer,
+                            stream_data_out);
                     }
                 } else {
                     stream_data_out = stream_data_in;
-                    data_delivery->AsyncKafkaProducer(stream_data_out);
+                    data_delivery->AsyncKafkaProducer(
+                        producer,
+                        peer,
+                        stream_data_out);
                 }
             }
 

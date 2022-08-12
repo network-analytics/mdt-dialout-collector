@@ -157,11 +157,17 @@ public:
     //    return enable_label_encode_as_map; };
     //const std::string &get_label_map_csv_path() const {
     //    return label_map_csv_path; };
+    //const std::string &get_enable_label_encode_as_map_ptm() const {
+    //    return enable_label_encode_as_map_ptm; };
+    //const std::string &get_label_map_ptm_path() const {
+    //    return label_map_ptm_path; };
 private:
     const std::string enable_cisco_message_to_json_string;
     const std::string enable_cisco_gpbkv2json;
     const std::string enable_label_encode_as_map;
     const std::string label_map_csv_path;
+    const std::string enable_label_encode_as_map_ptm;
+    const std::string label_map_ptm_path;
 };
 
 // Kafka configuration parameters

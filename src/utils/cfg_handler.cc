@@ -365,12 +365,13 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         return false;
     }
 
+    std::string ipv4_socket_cisco_s;
     bool ipv4_socket_cisco = main_params->exists("ipv4_socket_cisco");
     if (ipv4_socket_cisco == true) {
         libconfig::Setting &ipv4_socket_cisco =
             main_params->lookup("ipv4_socket_cisco");
         try {
-            std::string ipv4_socket_cisco_s = ipv4_socket_cisco;
+            ipv4_socket_cisco_s = ipv4_socket_cisco.c_str();
             if (ipv4_socket_cisco_s.empty() == false) {
                 params.insert({"ipv4_socket_cisco", ipv4_socket_cisco_s});
             } else {
@@ -389,12 +390,13 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         params.insert({"ipv4_socket_cisco", ""});
     }
 
+    std::string ipv4_socket_juniper_s;
     bool ipv4_socket_juniper = main_params->exists("ipv4_socket_juniper");
     if (ipv4_socket_juniper == true) {
         libconfig::Setting &ipv4_socket_juniper =
             main_params->lookup("ipv4_socket_juniper");
         try {
-            std::string ipv4_socket_juniper_s = ipv4_socket_juniper;
+            ipv4_socket_juniper_s = ipv4_socket_juniper.c_str();
             if (ipv4_socket_juniper_s.empty() == false) {
                 params.insert({"ipv4_socket_juniper", ipv4_socket_juniper_s});
             } else {
@@ -414,12 +416,13 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         params.insert({"ipv4_socket_juniper", ""});
     }
 
+    std::string ipv4_socket_huawei_s;
     bool ipv4_socket_huawei = main_params->exists("ipv4_socket_huawei");
     if (ipv4_socket_huawei == true) {
         libconfig::Setting &ipv4_socket_huawei =
             main_params->lookup("ipv4_socket_huawei");
         try {
-            std::string ipv4_socket_huawei_s = ipv4_socket_huawei;
+            ipv4_socket_huawei_s = ipv4_socket_huawei.c_str();
             if (ipv4_socket_huawei_s.empty() == false) {
                 params.insert({"ipv4_socket_huawei", ipv4_socket_huawei_s});
             } else {
@@ -439,154 +442,166 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         params.insert({"ipv4_socket_huawei", ""});
     }
 
-    bool replies_cisco = main_params->exists("replies_cisco");
-    if (replies_cisco == true) {
-        libconfig::Setting &replies_cisco =
-            main_params->lookup("replies_cisco");
-        try {
-            std::string replies_cisco_s = replies_cisco;
-            if (replies_cisco_s.empty() == false) {
-                params.insert({"replies_cisco", replies_cisco_s});
-            } else {
+    if (ipv4_socket_cisco_s.empty() == false) {
+        bool replies_cisco = main_params->exists("replies_cisco");
+        if (replies_cisco == true) {
+            libconfig::Setting &replies_cisco =
+                main_params->lookup("replies_cisco");
+            try {
+                std::string replies_cisco_s = replies_cisco;
+                if (replies_cisco_s.empty() == false) {
+                    params.insert({"replies_cisco", replies_cisco_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[replies_cisco] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        replies_cisco_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
                 spdlog::get("multi-logger-cfg")->
-                    error("[replies_cisco] configuration "
-                    "issue: [ {} ] is an invalid # of replies",
-                    replies_cisco_s);
+                    error("[replies_cisco] configuration issue: "
+                    "{}", ste.what());
                 return false;
             }
-        } catch (const libconfig::SettingTypeException &ste) {
-            spdlog::get("multi-logger-cfg")->
-                error("[replies_cisco] configuration issue: "
-                "{}", ste.what());
-            return false;
+        } else {
+            params.insert({"replies_cisco", "0"});
         }
-    } else {
-        params.insert({"replies_cisco", "100"});
     }
 
-    bool replies_juniper = main_params->exists("replies_juniper");
-    if (replies_juniper == true) {
-        libconfig::Setting &replies_juniper =
-            main_params->lookup("replies_juniper");
-        try {
-            std::string replies_juniper_s = replies_juniper;
-            if (replies_juniper_s.empty() == false) {
-                params.insert({"replies_juniper", replies_juniper_s});
-            } else {
+    if (ipv4_socket_juniper_s.empty() == false) {
+        bool replies_juniper = main_params->exists("replies_juniper");
+        if (replies_juniper == true) {
+            libconfig::Setting &replies_juniper =
+                main_params->lookup("replies_juniper");
+            try {
+                std::string replies_juniper_s = replies_juniper;
+                if (replies_juniper_s.empty() == false) {
+                    params.insert({"replies_juniper", replies_juniper_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[replies_juniper] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        replies_juniper_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
                 spdlog::get("multi-logger-cfg")->
-                    error("[replies_juniper] configuration "
-                    "issue: [ {} ] is an invalid # of replies",
-                    replies_juniper_s);
+                    error("[replies_juniper] configuration issue: "
+                    "{}", ste.what());
                 return false;
             }
-        } catch (const libconfig::SettingTypeException &ste) {
-            spdlog::get("multi-logger-cfg")->
-                error("[replies_juniper] configuration issue: "
-                "{}", ste.what());
-            return false;
+        } else {
+            params.insert({"replies_juniper", "0"});
         }
-    } else {
-        params.insert({"replies_juniper", "100"});
     }
 
-    bool replies_huawei = main_params->exists("replies_huawei");
-    if (replies_huawei == true) {
-        libconfig::Setting &replies_huawei =
-            main_params->lookup("replies_huawei");
-        try {
-            std::string replies_huawei_s = replies_huawei;
-            if (replies_huawei_s.empty() == false) {
-                params.insert({"replies_huawei", replies_huawei_s});
-            } else {
+    if (ipv4_socket_huawei_s.empty() == false) {
+        bool replies_huawei = main_params->exists("replies_huawei");
+        if (replies_huawei == true) {
+            libconfig::Setting &replies_huawei =
+                main_params->lookup("replies_huawei");
+            try {
+                std::string replies_huawei_s = replies_huawei;
+                if (replies_huawei_s.empty() == false) {
+                    params.insert({"replies_huawei", replies_huawei_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[replies_huawei] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        replies_huawei_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
                 spdlog::get("multi-logger-cfg")->
-                    error("[replies_huawei] configuration "
-                    "issue: [ {} ] is an invalid # of replies",
-                    replies_huawei_s);
+                    error("[replies_huawei] configuration issue: "
+                    "{}", ste.what());
                 return false;
             }
-        } catch (const libconfig::SettingTypeException &ste) {
-            spdlog::get("multi-logger-cfg")->
-                error("[replies_huawei] configuration issue: "
-                "{}", ste.what());
-            return false;
+        } else {
+            params.insert({"replies_huawei", "0"});
         }
-    } else {
-        params.insert({"replies_huawei", "100"});
     }
 
-    bool cisco_workers = main_params->exists("cisco_workers");
-    if (cisco_workers == true) {
-        libconfig::Setting &cisco_workers =
-            main_params->lookup("cisco_workers");
-        try {
-            std::string cisco_workers_s = cisco_workers;
-            if (cisco_workers_s.empty() == false) {
-                params.insert({"cisco_workers", cisco_workers_s});
-            } else {
+    if (ipv4_socket_cisco_s.empty() == false) {
+        bool cisco_workers = main_params->exists("cisco_workers");
+        if (cisco_workers == true) {
+            libconfig::Setting &cisco_workers =
+                main_params->lookup("cisco_workers");
+            try {
+                std::string cisco_workers_s = cisco_workers;
+                if (cisco_workers_s.empty() == false) {
+                    params.insert({"cisco_workers", cisco_workers_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[cisco_workers] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        cisco_workers_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
                 spdlog::get("multi-logger-cfg")->
-                    error("[cisco_workers] configuration "
-                    "issue: [ {} ] is an invalid # of replies",
-                    cisco_workers_s);
+                    error("[cisco_workers] configuration issue: "
+                    "{}", ste.what());
                 return false;
             }
-        } catch (const libconfig::SettingTypeException &ste) {
-            spdlog::get("multi-logger-cfg")->
-                error("[cisco_workers] configuration issue: "
-                "{}", ste.what());
-            return false;
+        } else {
+            params.insert({"cisco_workers", "1"});
         }
-    } else {
-        params.insert({"cisco_workers", "1"});
     }
 
-    bool juniper_workers = main_params->exists("juniper_workers");
-    if (juniper_workers == true) {
-        libconfig::Setting &juniper_workers =
-            main_params->lookup("juniper_workers");
-        try {
-            std::string juniper_workers_s = juniper_workers;
-            if (juniper_workers_s.empty() == false) {
-                params.insert({"juniper_workers", juniper_workers_s});
-            } else {
+    if (ipv4_socket_juniper_s.empty() == false) {
+        bool juniper_workers = main_params->exists("juniper_workers");
+        if (juniper_workers == true) {
+            libconfig::Setting &juniper_workers =
+                main_params->lookup("juniper_workers");
+            try {
+                std::string juniper_workers_s = juniper_workers;
+                if (juniper_workers_s.empty() == false) {
+                    params.insert({"juniper_workers", juniper_workers_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[juniper_workers] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        juniper_workers_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
                 spdlog::get("multi-logger-cfg")->
-                    error("[juniper_workers] configuration "
-                    "issue: [ {} ] is an invalid # of replies",
-                    juniper_workers_s);
+                    error("[juniper_workers] configuration issue: "
+                    "{}", ste.what());
                 return false;
             }
-        } catch (const libconfig::SettingTypeException &ste) {
-            spdlog::get("multi-logger-cfg")->
-                error("[juniper_workers] configuration issue: "
-                "{}", ste.what());
-            return false;
+        } else {
+            params.insert({"juniper_workers", "1"});
         }
-    } else {
-        params.insert({"juniper_workers", "1"});
     }
 
-    bool huawei_workers = main_params->exists("huawei_workers");
-    if (huawei_workers == true) {
-        libconfig::Setting &huawei_workers =
-            main_params->lookup("huawei_workers");
-        try {
-            std::string huawei_workers_s = huawei_workers;
-            if (huawei_workers_s.empty() == false) {
-                params.insert({"huawei_workers", huawei_workers_s});
-            } else {
+    if (ipv4_socket_huawei_s.empty() == false) {
+        bool huawei_workers = main_params->exists("huawei_workers");
+        if (huawei_workers == true) {
+            libconfig::Setting &huawei_workers =
+                main_params->lookup("huawei_workers");
+            try {
+                std::string huawei_workers_s = huawei_workers;
+                if (huawei_workers_s.empty() == false) {
+                    params.insert({"huawei_workers", huawei_workers_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[huawei_workers] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        huawei_workers_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
                 spdlog::get("multi-logger-cfg")->
-                    error("[huawei_workers] configuration "
-                    "issue: [ {} ] is an invalid # of replies",
-                    huawei_workers_s);
+                    error("[huawei_workers] configuration issue: "
+                    "{}", ste.what());
                 return false;
             }
-        } catch (const libconfig::SettingTypeException &ste) {
-            spdlog::get("multi-logger-cfg")->
-                error("[huawei_workers] configuration issue: "
-                "{}", ste.what());
-            return false;
+        } else {
+            params.insert({"huawei_workers", "1"});
         }
-    } else {
-        params.insert({"huawei_workers", "1"});
     }
 
     return true;
@@ -608,6 +623,10 @@ DataManipulationCfgHandler::DataManipulationCfgHandler()
         //    parameters.at("enable_label_encode_as_map");
         //this->label_map_csv_path =
         //    parameters.at("label_map_csv_path");
+        //this->enable_label_encode_as_map_ptm =
+        //    parameters.at("enable_label_encode_as_map_ptm");
+        //this->label_map_ptm_path =
+        //    parameters.at("label_map_ptm_path");
     } else {
         std::exit(EXIT_FAILURE);
     }
@@ -709,8 +728,6 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
             if (enable_label_encode_as_map_s.empty() == false) {
                 params.insert({"enable_label_encode_as_map",
                 enable_label_encode_as_map_s});
-                if (enable_label_encode_as_map_s.compare("true") == 0) {
-                }
             } else {
                 spdlog::get("multi-logger-cfg")->
                     error("[enable_label_encode_as_map] "
@@ -765,6 +782,89 @@ bool DataManipulationCfgHandler::lookup_data_manipulation_parameters(
                     "is invalid", default_label_map_csv_path);
                 return false;
             }
+        }
+    }
+
+    std::string enable_label_encode_as_map_ptm_s;
+    bool enable_label_encode_as_map_ptm =
+        data_manipulation_params->exists("enable_label_encode_as_map_ptm");
+    if (enable_label_encode_as_map_ptm == true) {
+        libconfig::Setting &enable_label_encode_as_map_ptm =
+            data_manipulation_params->lookup("enable_label_encode_as_map_ptm");
+        try {
+            enable_label_encode_as_map_ptm_s =
+                enable_label_encode_as_map_ptm.c_str();
+            if (enable_label_encode_as_map_ptm_s.empty() == false) {
+                params.insert({"enable_label_encode_as_map_ptm",
+                enable_label_encode_as_map_ptm_s});
+            } else {
+                spdlog::get("multi-logger-cfg")->
+                    error("[enable_label_encode_as_map_ptm] "
+                    "configuration issue: [ {} ] is invalid",
+                    enable_label_encode_as_map_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger-cfg")->
+                error("[enable_label_encode_as_map_ptm] "
+                "configuration issue: {}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"enable_label_encode_as_map_ptm", "false"});
+    }
+
+    if (enable_label_encode_as_map_ptm_s.compare("true") == 0) {
+        bool label_map_ptm_path =
+            data_manipulation_params->exists("label_map_ptm_path");
+        if (label_map_ptm_path == true) {
+            libconfig::Setting &label_map_ptm_path =
+                data_manipulation_params->lookup("label_map_ptm_path");
+            try {
+                std::string label_map_ptm_path_s =
+                    label_map_ptm_path;
+                if (label_map_ptm_path_s.empty() == false &&
+                    std::filesystem::exists(label_map_ptm_path_s) == true) {
+                    params.insert({"label_map_ptm_path",
+                    label_map_ptm_path_s});
+                } else {
+                    spdlog::get("multi-logger-cfg")->
+                        error("[label_map_ptm_path] "
+                        "configuration issue: [ {} ] is invalid",
+                        label_map_ptm_path_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger-cfg")->error("[label_map_ptm_path] "
+                    "configuration issue: {}", ste.what());
+                return false;
+            }
+        } else {
+            const std::string default_label_map_ptm_path =
+                "/opt/mdt_dialout_collector/ptm/label_map.ptm";
+            if (std::filesystem::exists(default_label_map_ptm_path) == true) {
+                params.insert({"label_map_ptm_path",
+                    default_label_map_ptm_path});
+            } else {
+                spdlog::get("multi-logger-cfg")->
+                    error("[label_map_ptm_path] configuration issue: {} "
+                    "is invalid", default_label_map_ptm_path);
+                return false;
+            }
+        }
+    }
+
+    // the two funcs above are in XOR
+    if (enable_label_encode_as_map_s.compare("true") == 0 &&
+        enable_label_encode_as_map_ptm_s.compare("true") == 0) {
+        if ((enable_label_encode_as_map_s.compare(
+            enable_label_encode_as_map_ptm_s) == 0) &&
+            (params.at("enable_label_encode_as_map").compare(params.at(
+                "enable_label_encode_as_map_ptm"))) == 0) {
+            spdlog::get("multi-logger-cfg")->
+                error("[enable_label_encode_as_map] XOR "
+                "[enable_label_encode_as_map_ptm]");
+            return false;
         }
     }
 

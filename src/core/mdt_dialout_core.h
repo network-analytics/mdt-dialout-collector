@@ -21,7 +21,7 @@
 #include "juniper_gnmi.pb.h"
 
 
-// Global visibility to be able to signal the refresh --> CSV from main
+// Global visibility to be able to signal the refresh --> CSV/PTM from main
 extern std::unordered_map<std::string,std::vector<std::string>> label_map;
 
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
@@ -88,10 +88,11 @@ private:
                 &data_manipulation,
             std::unique_ptr<DataDelivery>
                 &data_delivery,
+            std::unique_ptr<kafka::clients::KafkaProducer>
+                &producer,
             std::unique_ptr<cisco_telemetry::Telemetry>
                 &cisco_tlm
         );
-
     private:
         mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
         grpc::ServerCompletionQueue *cisco_cq_;
@@ -118,10 +119,11 @@ private:
                 &data_manipulation,
             std::unique_ptr<DataDelivery>
                 &data_delivery,
+            std::unique_ptr<kafka::clients::KafkaProducer>
+                &producer,
             std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
                 &juniper_tlm_hdr_ext
         );
-
     private:
         Subscriber::AsyncService *juniper_service_;
         grpc::ServerCompletionQueue *juniper_cq_;
@@ -148,12 +150,13 @@ private:
                 &data_manipulation,
             std::unique_ptr<DataDelivery>
                 &data_delivery,
+            std::unique_ptr<kafka::clients::KafkaProducer>
+                &producer,
             std::unique_ptr<huawei_telemetry::Telemetry>
                 &huawei_tlm,
             std::unique_ptr<openconfig_interfaces::Interfaces>
                 &oc_if
         );
-
     private:
         huawei_dialout::gRPCDataservice::AsyncService *huawei_service_;
         grpc::ServerCompletionQueue *huawei_cq_;
