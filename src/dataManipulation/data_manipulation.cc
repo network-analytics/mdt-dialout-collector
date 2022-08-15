@@ -6,6 +6,55 @@
 #include "dataManipulation/data_manipulation.h"
 
 
+// Envelop & collector meta-data
+bool DataManipulation::MetaData(std::string &json_str,
+    const std::string &peer_ip,
+    const std::string &peer_port,
+    std::string &json_str_out)
+{
+    std::time_t timestamp = std::time(nullptr);
+    const auto json_str_length = static_cast<int>(json_str.length());
+    //Json::String error;
+    JSONCPP_STRING error;
+    Json::Value root;
+    Json::CharReaderBuilder builder_r;
+    Json::StreamWriterBuilder builder_w;
+    builder_w["emitUTF8"] = true;
+    builder_w["indentation"] = "";
+
+    const std::unique_ptr<Json::CharReader> reader(builder_r.newCharReader());
+    const std::unique_ptr<Json::StreamWriter> writer(
+        builder_w.newStreamWriter());
+
+
+    if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
+        &root, &error) && json_str_length != 0) {
+        multi_logger->error("[MetaData] data-manipulation issue: "
+            "conversion to JSON failure, {}", error);
+        return false;
+    } else {
+        root.clear();
+        set_sequence_number();
+        // --- delete backslashes from the JSON-Str
+        json_str.erase(std::remove(json_str.begin(),
+            json_str.end(), '\\'), json_str.end());
+        // --- delete backslashes from the JSON-Str
+        root["event_type"] = "gRPC";
+        root["seq"] = static_cast<uint64_t>(get_sequence_number());
+        root["timestamp"] = timestamp;
+        root["writer_id"] = "mdt-dialout-collector";
+        root["telemetry_node"] = peer_ip;
+        root["telemetry_port"] = peer_port;
+        root["telemetry_data"] = json_str;
+        multi_logger->info("[MetaData] data-manipulation: "
+            "{} meta-data added successfully", peer_ip);
+    }
+
+    json_str_out = Json::writeString(builder_w, root);
+
+    return true;
+}
+
 // forge JSON & enrich with MAP (node_id/platform_id)
 bool DataManipulation::AppendLabelMap(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
@@ -14,48 +63,47 @@ bool DataManipulation::AppendLabelMap(
     std::string &json_str_out)
 {
     const auto json_str_length = static_cast<int>(json_str.length());
-    JSONCPP_STRING err;
+    //Json::String error;
+    JSONCPP_STRING error;
     Json::Value root;
-    Json::CharReaderBuilder builderR;
-    Json::StreamWriterBuilder builderW;
-    builderW["indentation"] = "";
-    const std::unique_ptr<Json::CharReader> reader(builderR.newCharReader());
-    const std::unique_ptr<Json::StreamWriter> writer(
-        builderW.newStreamWriter());
     Json::Value jlabel_map;
-    // select exclusively the IP addr from peer
-    unsigned start_delim = (peer_ip.find_first_of(":") + 1);
-    unsigned stop_delim = peer_ip.find_last_of(":");
-    std::string _peer_ip = peer_ip.substr(
-        start_delim, (stop_delim - start_delim));
-    const auto search = label_map.find(_peer_ip);
+    Json::CharReaderBuilder builder_r;
+    Json::StreamWriterBuilder builder_w;
+    builder_w["emitUTF8"] = true;
+    builder_w["indentation"] = "";
+
+    const std::unique_ptr<Json::CharReader> reader(builder_r.newCharReader());
+    const std::unique_ptr<Json::StreamWriter> writer(
+        builder_w.newStreamWriter());
+
+    const auto search = label_map.find(peer_ip);
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
-        &root, &err) && json_str_length != 0) {
+        &root, &error) && json_str_length != 0) {
         multi_logger->error("[AppendLabelMap] data-manipulation issue: "
-            "conversion to JSON failure, {}", err);
-        //std::cout << "Failing message: " << json_str << std::endl;
+            "conversion to JSON failure, {}", error);
         return false;
     } else {
         if (search != label_map.end()) {
-            jlabel_map["node_id"] = search->second.at(0);
-            jlabel_map["platform_id"] = search->second.at(1);
+            jlabel_map["nkey"] = search->second.at(0);
+            jlabel_map["pkey"] = search->second.at(1);
             multi_logger->info("[AppendLabelMap] data-manipulation: "
-                "{} data enrichment successful", _peer_ip);
-        } else{
+                "{} data enrichment successful", peer_ip);
+        } else {
             jlabel_map["node_id"] = "unknown";
             jlabel_map["platform_id"] = "unknown";
             multi_logger->warn("[AppendLabelMap] data-manipulation issue: "
-                "{} not found, data enrichment failure", _peer_ip);
+                "{} not found, data enrichment failure", peer_ip);
         }
 
         root["label"] = jlabel_map;
-        json_str_out = Json::writeString(builderW, root);
+        json_str_out = Json::writeString(builder_w, root);
     }
 
     return true;
 }
 
+// GPB-KV Normalization & generate JSON-Str
 bool DataManipulation::CiscoGpbkv2Json(
     const std::unique_ptr<cisco_telemetry::Telemetry> &cisco_tlm,
     std::string &json_str_out)
@@ -92,11 +140,12 @@ bool DataManipulation::CiscoGpbkv2Json(
     root["data_gpbkv"] = gpbkv;
 
     // Serialize the JSON value into a string
-    Json::StreamWriterBuilder builderW;
-    builderW["indentation"] = "";
+    Json::StreamWriterBuilder builder_w;
+    builder_w["emitUTF8"] = true;
+    builder_w["indentation"] = "";
     const std::unique_ptr<Json::StreamWriter> writer(
-        builderW.newStreamWriter());
-    json_str_out = Json::writeString(builderW, root);
+        builder_w.newStreamWriter());
+    json_str_out = Json::writeString(builder_w, root);
 
     return true;
 }
@@ -105,7 +154,8 @@ Json::Value DataManipulation::CiscoGpbkvField2Json(
     const cisco_telemetry::TelemetryField &field)
 {
     Json::Value root;
-    // gpbkv allows for nested kv fields, we recursively decode each one of them.
+    // gpbkv allows for nested kv fields, we recursively decode each one of
+    // them.
     Json::Value sub_fields;
     for (const cisco_telemetry::TelemetryField& sub_field: field.fields()) {
         Json::Value sub_field_value =
@@ -160,13 +210,15 @@ Json::Value DataManipulation::CiscoGpbkvField2Json(
     return value;
 }
 
+// 1. Decode & Extract mata-data & Add to JSON-Obj (juniper_tlm_header_ext)
+// 2. From JSON-Obj to JSON-Str
 bool DataManipulation::JuniperExtension(
     gnmi::SubscribeResponse &juniper_stream,
     const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
     &juniper_tlm_header_ext,
     Json::Value &root)
 {
-    bool parsing_str;
+    bool parsing_str {false};
     std::string stream_data_in;
 
     for (const auto &ext : juniper_stream.extension()) {
@@ -184,7 +236,7 @@ bool DataManipulation::JuniperExtension(
 
                 stream_data_in.clear();
                 google::protobuf::util::JsonPrintOptions opt;
-                opt.add_whitespace = true;
+                opt.add_whitespace = false;
                 google::protobuf::util::MessageToJsonString(
                     *juniper_tlm_header_ext,
                     &stream_data_in,
@@ -200,6 +252,7 @@ bool DataManipulation::JuniperExtension(
     return true;
 }
 
+// Generate the JSON-Str from the upadate msg
 bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
     std::string &json_str_out,
     Json::Value &root)
@@ -411,7 +464,7 @@ bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
 
     // Serialize the JSON value into a string
     Json::StreamWriterBuilder builderW;
-    builderW["emitUTF8"] = false;
+    builderW["emitUTF8"] = true;
     builderW["indentation"] = "";
     const std::unique_ptr<Json::StreamWriter> writer(
         builderW.newStreamWriter());
@@ -420,6 +473,9 @@ bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
     return true;
 }
 
+// 1. Decode & Extract mata-data & Add to JSON-Obj (huawei_tlm)
+// 2. Decode & Extract payload (record = content_s) & Add to JSON-Obj (oc-if)
+// 3. From JSON-Obj to JSON-Str
 bool DataManipulation::HuaweiGpbOpenconfigInterface(
     const std::unique_ptr<huawei_telemetry::Telemetry> &huawei_tlm,
     const std::unique_ptr<openconfig_interfaces::Interfaces> &oc_if,
@@ -452,7 +508,7 @@ bool DataManipulation::HuaweiGpbOpenconfigInterface(
         parsing_content = oc_if->ParseFromString(content);
         if (parsing_content == true) {
             google::protobuf::util::JsonPrintOptions opt;
-            opt.add_whitespace = true;
+            opt.add_whitespace = false;
             google::protobuf::util::MessageToJsonString(
                 *oc_if,
                 &content_s,
@@ -464,12 +520,12 @@ bool DataManipulation::HuaweiGpbOpenconfigInterface(
         root["decoded"].append(content_s);
 
         // Serialize the JSON value into a string
-        Json::StreamWriterBuilder builderW;
-        builderW["emitUTF8"] = false;
-        builderW["indentation"] = "";
+        Json::StreamWriterBuilder builder_w;
+        builder_w["emitUTF8"] = true;
+        builder_w["indentation"] = "";
         const std::unique_ptr<Json::StreamWriter> writer(
-        builderW.newStreamWriter());
-        json_str_out = Json::writeString(builderW, root);
+        builder_w.newStreamWriter());
+        json_str_out = Json::writeString(builder_w, root);
     }
 
     return true;

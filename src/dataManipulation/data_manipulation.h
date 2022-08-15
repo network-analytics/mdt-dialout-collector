@@ -7,6 +7,7 @@
 
 // C++ Standard Library headers
 #include <unordered_map>
+#include <ctime>
 // External Library headers
 #include <json/json.h>
 // mdt-dialout-collector Library headers
@@ -25,6 +26,13 @@ public:
         multi_logger->debug("constructor: DataManipulation()"); };
     ~DataManipulation() {
         multi_logger->debug("destructor: ~DataManipulation()"); };
+    bool MetaData(
+        std::string &json_str,
+        const std::string &peer_ip,
+        const std::string &peer_port,
+        std::string &json_str_out);
+    void set_sequence_number() { sequence_number++; };
+    uint64_t get_sequence_number() { return sequence_number; };
     bool AppendLabelMap(
         std::unordered_map<std::string,std::vector<std::string>> &label_map,
         const std::string &peer_ip,
@@ -46,6 +54,8 @@ public:
         const std::unique_ptr<huawei_telemetry::Telemetry> &huawei_tlm,
         const std::unique_ptr<openconfig_interfaces::Interfaces> &oc_if,
         std::string &json_str_out);
+private:
+    uint64_t sequence_number = 0;
 };
 
 #endif

@@ -302,14 +302,19 @@ void Srv::CiscoStream::Start(
             bool parsing_str {false};
             // From the network
             std::string stream_data_in;
+            // After normalization
+            std::string stream_data_in_normalization;
+            // After meta-data
+            std::string stream_data_out_meta;
             // After data enrichment
             std::string stream_data_out;
             const std::string _peer = cisco_server_ctx.peer();
-            // select exclusively the IP addr from peer
-            unsigned start_delim = (_peer.find_first_of(":") + 1);
-            unsigned stop_delim = _peer.find_last_of(":");
-            std::string peer = _peer.substr(
-                start_delim, (stop_delim - start_delim));
+            // select exclusively the IP addr/port from peer
+            int d1 = (_peer.find_first_of(":") + 1);
+            int d2 = _peer.find_last_of(":");
+            const std::string peer_ip = _peer.substr(d1, (d2 - d1));
+            const std::string peer_port = _peer.substr(
+                (d2 + 1), ((_peer.npos - 1) - (d2 + 1)));
             // the key-word "this" is used as a unique TAG
             cisco_resp.Read(&cisco_stream, this);
             // returns true for GPB-KV & GPB, false for JSON
@@ -321,48 +326,58 @@ void Srv::CiscoStream::Start(
             // Handling empty data
             if (stream_data_in.empty() == true) {
                 multi_logger->info("[CiscoStream::Start()] {} handling empty "
-                    "data", peer);
+                    "data", peer_ip);
             // Handling GPB-KV
             } else if (cisco_tlm->data_gpbkv().empty() == false &&
                 parsing_str == true) {
                 multi_logger->info("[CiscoStream::Start()] {} handling GPB-KV "
-                    "data", peer);
+                    "data", peer_ip);
                 // std::string:compare returns 0 when the compared strings are
                 // matching
                 if (data_manipulation_cfg_parameters.at(
                     "enable_cisco_gpbkv2json").compare("true") == 0) {
                     if (data_manipulation->CiscoGpbkv2Json(cisco_tlm,
-                        stream_data_in) == true) {
+                        stream_data_in_normalization) == true) {
                         multi_logger->info("[CiscoStream::Start()] {} "
                             "enable_cisco_gpbkv2json, data-normalization "
-                            "successful", peer);
+                            "successful", peer_ip);
                         // Data enrichment with label (node_id/platform_id)
                         if (data_manipulation_cfg_parameters.at(
                             "enable_label_encode_as_map").compare("true")
                                 == 0 || data_manipulation_cfg_parameters.at(
                             "enable_label_encode_as_map_ptm").compare("true")
                                 == 0) {
-                            if (data_manipulation->AppendLabelMap(
-                                label_map,
-                                peer,
-                                stream_data_in,
-                                stream_data_out) == true) {
+                            if (data_manipulation->MetaData(
+                                    stream_data_in_normalization,
+                                    peer_ip,
+                                    peer_port,
+                                    stream_data_out_meta) == true &&
+                                data_manipulation->AppendLabelMap(
+                                    label_map,
+                                    peer_ip,
+                                    stream_data_out_meta,
+                                    stream_data_out) == true ) {
                                 data_delivery->AsyncKafkaProducer(
                                     producer,
-                                    peer,
+                                    peer_ip,
                                     stream_data_out);
                             }
                         } else {
-                            stream_data_out = stream_data_in;
-                            data_delivery->AsyncKafkaProducer(
-                                producer,
-                                peer,
-                                stream_data_out);
+                            if (data_manipulation->MetaData(
+                                    stream_data_in_normalization,
+                                    peer_ip,
+                                    peer_port,
+                                    stream_data_out_meta) == true) {
+                                data_delivery->AsyncKafkaProducer(
+                                    producer,
+                                    peer_ip,
+                                    stream_data_out_meta);
+                            }
                         }
                     } else {
                         multi_logger->error("[CiscoStream::Start()] {} "
                             "enable_cisco_gpbkv2json, data-normalization "
-                            "failure", peer);
+                            "failure", peer_ip);
                     }
                 } else if (data_manipulation_cfg_parameters.at(
                     "enable_cisco_message_to_json_string").compare(
@@ -370,7 +385,7 @@ void Srv::CiscoStream::Start(
                     // MessageToJson is working directly on the PROTO-Obj
                     stream_data_in.clear();
                     google::protobuf::util::JsonPrintOptions opt;
-                    opt.add_whitespace = true;
+                    opt.add_whitespace = false;
                     google::protobuf::util::MessageToJsonString(
                         *cisco_tlm,
                         &stream_data_in,
@@ -381,83 +396,113 @@ void Srv::CiscoStream::Start(
                         data_manipulation_cfg_parameters.at(
                         "enable_label_encode_as_map_ptm").compare("true")
                             == 0) {
-                        if (data_manipulation->AppendLabelMap(
-                            label_map,
-                            peer,
-                            stream_data_in,
-                            stream_data_out) == true) {
+                        if (data_manipulation->MetaData(
+                                stream_data_in,
+                                peer_ip,
+                                peer_port,
+                                stream_data_out_meta) == true &&
+                            data_manipulation->AppendLabelMap(
+                                label_map,
+                                peer_ip,
+                                stream_data_out_meta,
+                                stream_data_out) == true) {
                             data_delivery->AsyncKafkaProducer(
                                 producer,
-                                peer,
+                                peer_ip,
                                 stream_data_out);
                         }
                     } else {
-                        stream_data_out = stream_data_in;
-                        data_delivery->AsyncKafkaProducer(
-                            producer,
-                            peer,
-                            stream_data_out);
+                        if (data_manipulation->MetaData(
+                                stream_data_in,
+                                peer_ip,
+                                peer_port,
+                                stream_data_out_meta) == true) {
+                            data_delivery->AsyncKafkaProducer(
+                                producer,
+                                peer_ip,
+                                stream_data_out_meta);
+                        }
                     }
                 } else {
                     // Use Case: both data manipulation funcs set to false:
                     // TBD: at the meoment simply alert
                     multi_logger->error("[CiscoStream::Start()] {} "
                         "general data-manipulation failure "
-                        "conflicting manipulation functions", peer);
+                        "conflicting manipulation functions", peer_ip);
                 }
 
             // Handling GPB
             } else if (cisco_tlm->has_data_gpb() == true &&
                 parsing_str == true) {
                 multi_logger->info("[CiscoStream::Start()] {} handling GPB "
-                    "data", peer);
+                    "data", peer_ip);
                 // Data enrichment with label (node_id/platform_id)
                 if (data_manipulation_cfg_parameters.at(
                     "enable_label_encode_as_map").compare("true") == 0 ||
                     data_manipulation_cfg_parameters.at(
                     "enable_label_encode_as_map_ptm").compare("true") == 0) {
-                    if (data_manipulation->AppendLabelMap(
-                        label_map,
-                        peer,
-                        stream_data_in,
-                        stream_data_out) == true) {
+                    if (data_manipulation->MetaData(
+                            stream_data_in,
+                            peer_ip,
+                            peer_port,
+                            stream_data_out_meta) == true &&
+                        data_manipulation->AppendLabelMap(
+                            label_map,
+                            peer_ip,
+                            stream_data_out_meta,
+                            stream_data_out) == true) {
                         data_delivery->AsyncKafkaProducer(
                             producer,
-                            peer,
+                            peer_ip,
                             stream_data_out);
                     }
                 } else {
-                    stream_data_out = stream_data_in;
-                    data_delivery->AsyncKafkaProducer(
-                        producer,
-                        peer,
-                        stream_data_out);
+                    if (data_manipulation->MetaData(
+                            stream_data_in,
+                            peer_ip,
+                            peer_port,
+                            stream_data_out_meta) == true) {
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer_ip,
+                            stream_data_out_meta);
+                    }
                 }
             // Handling JSON string
             } else if (parsing_str == false) {
                 multi_logger->info("[CiscoStream::Start()] {} handling JSON "
-                    "data", peer);
+                    "data", peer_ip);
                 // Data enrichment with label (node_id/platform_id)
                 if (data_manipulation_cfg_parameters.at(
                     "enable_label_encode_as_map").compare("true") == 0 ||
                     data_manipulation_cfg_parameters.at(
                     "enable_label_encode_as_map_ptm").compare("true") == 0) {
-                    if (data_manipulation->AppendLabelMap(
-                        label_map,
-                        peer,
-                        stream_data_in,
-                        stream_data_out) == true) {
+                    if (data_manipulation->MetaData(
+                            stream_data_in,
+                            peer_ip,
+                            peer_port,
+                            stream_data_out_meta) == true &&
+                        data_manipulation->AppendLabelMap(
+                            label_map,
+                            peer_ip,
+                            stream_data_out_meta,
+                            stream_data_out) == true) {
                         data_delivery->AsyncKafkaProducer(
                             producer,
-                            peer,
+                            peer_ip,
                             stream_data_out);
                     }
                 } else {
-                    stream_data_out = stream_data_in;
-                    data_delivery->AsyncKafkaProducer(
-                        producer,
-                        peer,
-                        stream_data_out);
+                    if (data_manipulation->MetaData(
+                            stream_data_in,
+                            peer_ip,
+                            peer_port,
+                            stream_data_out_meta) == true) {
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer_ip,
+                            stream_data_out_meta);
+                    }
                 }
             }
             cisco_stream_status = PROCESSING;
@@ -506,15 +551,19 @@ void Srv::JuniperStream::Start(
         } else {
             // From the network
             std::string stream_data_in;
+            // After meta-data
+            std::string stream_data_out_meta;
             // After data enrichment
             std::string stream_data_out;
             std::string json_str_out;
             const std::string _peer = juniper_server_ctx.peer();
-            // select exclusively the IP addr from peer
-            unsigned start_delim = (_peer.find_first_of(":") + 1);
-            unsigned stop_delim = _peer.find_last_of(":");
-            std::string peer = _peer.substr(
-                start_delim, (stop_delim - start_delim));
+            // select exclusively the IP addr/port from peer
+            int d1 = (_peer.find_first_of(":") + 1);
+            int d2 = _peer.find_last_of(":");
+            const std::string peer_ip = _peer.substr(d1, (d2 - d1));
+            const std::string peer_port = _peer.substr(
+                (d2 + 1), ((_peer.npos - 1) - (d2 + 1)));
+
             Json::Value root;
 
             // the key-word "this" is used as a unique TAG
@@ -525,35 +574,45 @@ void Srv::JuniperStream::Start(
                 data_manipulation->JuniperUpdate(juniper_stream, json_str_out,
                     root) == true) {
                     multi_logger->info("[JuniperStream::Start()] {} "
-                        "JuniperExtension, parsing successful", peer);
+                        "JuniperExtension, parsing successful", peer_ip);
             } else {
                     multi_logger->error("[JuniperStream::Start()] {} "
-                        "JuniperExtension, parsing failure", peer);
+                        "JuniperExtension, parsing failure", peer_ip);
             }
 
-            // Data enrichment with label (node_id/platform_id)
             stream_data_in = json_str_out;
 
+            // Data enrichment with label (node_id/platform_id)
             if (data_manipulation_cfg_parameters.at(
                 "enable_label_encode_as_map").compare("true") == 0 ||
                 data_manipulation_cfg_parameters.at(
                 "enable_label_encode_as_map_ptm").compare("true") == 0) {
-                if (data_manipulation->AppendLabelMap(
-                    label_map,
-                    peer,
-                    stream_data_in,
-                    stream_data_out) == true) {
+                if (data_manipulation->MetaData(
+                        stream_data_in,
+                        peer_ip,
+                        peer_port,
+                        stream_data_out_meta) == true &&
+                    data_manipulation->AppendLabelMap(
+                        label_map,
+                        peer_ip,
+                        stream_data_out_meta,
+                        stream_data_out) == true) {
                     data_delivery->AsyncKafkaProducer(
                         producer,
-                        peer,
+                        peer_ip,
                         stream_data_out);
-                }
+                    }
             } else {
-                stream_data_out = json_str_out;
-                data_delivery->AsyncKafkaProducer(
-                    producer,
-                    peer,
-                    stream_data_out);
+                if (data_manipulation->MetaData(
+                        stream_data_in,
+                        peer_ip,
+                        peer_port,
+                        stream_data_out_meta) == true) {
+                    data_delivery->AsyncKafkaProducer(
+                        producer,
+                        peer_ip,
+                        stream_data_out_meta);
+                }
             }
 
             juniper_stream_status = PROCESSING;
@@ -604,15 +663,18 @@ void Srv::HuaweiStream::Start(
             bool parsing_str {false};
             // From the network
             std::string stream_data_in;
+            // After meta-data
+            std::string stream_data_out_meta;
             // Afetr data enrichment
             std::string stream_data_out;
             std::string json_str_out;
             const std::string _peer = huawei_server_ctx.peer();
-            // select exclusively the IP addr from peer
-            unsigned start_delim = (_peer.find_first_of(":") + 1);
-            unsigned stop_delim = _peer.find_last_of(":");
-            std::string peer = _peer.substr(
-                start_delim, (stop_delim - start_delim));
+            // select exclusively the IP addr/port from peer
+            int d1 = (_peer.find_first_of(":") + 1);
+            int d2 = _peer.find_last_of(":");
+            const std::string peer_ip = _peer.substr(d1, (d2 - d1));
+            const std::string peer_port = _peer.substr(
+                (d2 + 1), ((_peer.npos - 1) - (d2 + 1)));
 
             huawei_resp.Read(&huawei_stream, this);
             parsing_str = huawei_tlm->ParseFromString(huawei_stream.data());
@@ -622,7 +684,7 @@ void Srv::HuaweiStream::Start(
             // Handling empty data
             if (stream_data_in.empty() == true) {
                 multi_logger->info("[HuaweiStream::Start()] {} handling empty "
-                    "data", peer);
+                    "data", peer_ip);
             }
 
             // Handling GPB
@@ -633,17 +695,17 @@ void Srv::HuaweiStream::Start(
                     huawei_tlm->proto_path().compare(
                         "openconfig_interfaces.Interfaces") == 0) {
                     multi_logger->info("[HuaweiStream::Start()] {} handling "
-                        "GPB data", peer);
+                        "GPB data", peer_ip);
 
                     if (data_manipulation->HuaweiGpbOpenconfigInterface(
                         huawei_tlm, oc_if, json_str_out) == true) {
                             multi_logger->info("[HuaweiStream::Start()] {} "
                                 "HuaweiGpbOpenconfigInterface, "
-                                "parsing successful", peer);
+                                "parsing successful", peer_ip);
                     } else {
                         multi_logger->error("[HuaweiStream::Start()] {}"
                             "HuaweiGpbOpenconfigInterface, "
-                            "parsing failure", peer);
+                            "parsing failure", peer_ip);
                     }
 
                     // Data enrichment with label (node_id/platform_id)
@@ -653,23 +715,32 @@ void Srv::HuaweiStream::Start(
                         data_manipulation_cfg_parameters.at(
                         "enable_label_encode_as_map_ptm").compare("true")
                             == 0) {
-                        if (data_manipulation->AppendLabelMap(
-                            label_map,
-                            peer,
-                            stream_data_in,
-                            stream_data_out) == true) {
-                            data_delivery->
-                                AsyncKafkaProducer(
-                                    producer,
-                                    peer,
-                                    stream_data_out);
+                        if (data_manipulation->MetaData(
+                                stream_data_in,
+                                peer_ip,
+                                peer_port,
+                                stream_data_out_meta) == true &&
+                            data_manipulation->AppendLabelMap(
+                                label_map,
+                                peer_ip,
+                                stream_data_out_meta,
+                                stream_data_out) == true) {
+                            data_delivery->AsyncKafkaProducer(
+                                producer,
+                                peer_ip,
+                                stream_data_out);
                         }
                     } else {
-                        stream_data_out = json_str_out;
-                        data_delivery->AsyncKafkaProducer(
-                            producer,
-                            peer,
-                            stream_data_out);
+                        if (data_manipulation->MetaData(
+                                stream_data_in,
+                                peer_ip,
+                                peer_port,
+                                stream_data_out_meta) == true) {
+                            data_delivery->AsyncKafkaProducer(
+                                producer,
+                                peer_ip,
+                                stream_data_out_meta);
+                        }
                     }
                 }
             }
@@ -679,35 +750,45 @@ void Srv::HuaweiStream::Start(
             // Handling empty data_json
             if (stream_data_in.empty() == true) {
                 multi_logger->info("[HuaweiStream::Start()] {} handling empty "
-                    "data_json", peer);
+                    "data_json", peer_ip);
             }
             // Handling JSON string
             else {
                 // ---
                 multi_logger->info("[HuaweiStream::Start()] {} handling JSON "
-                    "data_json", peer);
+                    "data_json", peer_ip);
 
                 // Data enrichment with label (node_id/platform_id)
                 if (data_manipulation_cfg_parameters.at(
                     "enable_label_encode_as_map").compare("true") == 0 ||
                     data_manipulation_cfg_parameters.at(
                     "enable_label_encode_as_map_ptm").compare("true") == 0) {
-                    if (data_manipulation->AppendLabelMap(
-                        label_map,
-                        peer,
-                        stream_data_in,
-                        stream_data_out) == true) {
+                    if (data_manipulation->MetaData(
+                            stream_data_in,
+                            peer_ip,
+                            peer_port,
+                            stream_data_out_meta) == true) {
+                        data_manipulation->AppendLabelMap(
+                            label_map,
+                            peer_ip,
+                            stream_data_out_meta,
+                            stream_data_out) == true &&
                         data_delivery->AsyncKafkaProducer(
                             producer,
-                            peer,
+                            peer_ip,
                             stream_data_out);
                     }
                 } else {
-                    stream_data_out = stream_data_in;
-                    data_delivery->AsyncKafkaProducer(
-                        producer,
-                        peer,
-                        stream_data_out);
+                    if (data_manipulation->MetaData(
+                            stream_data_in,
+                            peer_ip,
+                            peer_port,
+                            stream_data_out_meta) == true) {
+                        data_delivery->AsyncKafkaProducer(
+                            producer,
+                            peer_ip,
+                            stream_data_out_meta);
+                    }
                 }
             }
 
