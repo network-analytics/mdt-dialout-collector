@@ -22,7 +22,9 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
-        //std::cout << "Issues with iface binding for ..." << "\n";
+        multi_logger->error("[CustomSocketMutator()]: Unable to bind the "
+            "service(s) on the configured socket(s)");
+        std::abort();
     }
 
     return true;
