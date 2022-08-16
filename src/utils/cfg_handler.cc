@@ -278,6 +278,7 @@ MainCfgHandler::MainCfgHandler()
         this->mdt_dialout_collector_conf,
         this->main_parameters) == true) {
 
+        //this->writer_id = parameters.at("writer_id");
         //this->core_pid_folder = parameters.at("core_pid_folder");
         //this->iface = parameters.at("iface");
         //this->ipv4_socket_cisco = parameters.at("ipv4_socket_cisco");
@@ -305,6 +306,30 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
     }
 
     // Main parameters evaluation
+    bool writer_id = main_params->exists("writer_id");
+    if (writer_id == true) {
+        libconfig::Setting &writer_id =
+            main_params->lookup("writer_id");
+        try {
+            std::string writer_id_s = writer_id;
+            if (writer_id_s.empty() == false) {
+                params.insert({"writer_id", writer_id_s});
+            } else {
+                spdlog::get("multi-logger-cfg")->
+                    error("[writer_id] configuration issue: "
+                    "[ {} ] is an invalid writer_id", writer_id_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger-cfg")->
+                error("[writer_id] configuration issue: "
+                "{}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"writer_id", "mdt-dialout-collector"});
+    }
+
     // core_pid_folder: hidden option
     bool core_pid_folder =
         main_params->exists("core_pid_folder");

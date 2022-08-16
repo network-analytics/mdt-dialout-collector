@@ -105,6 +105,9 @@ Here below is an *example* of commented configuration:
 ```SHELL
 #### mdt-dialout-collector - main
 
+## writer-id - default = "mdt-dialout-collector"
+writer_id = "mdt-dout-collector-01";
+
 ## physical interface where to bind the daemon
 iface = "eth0";
 

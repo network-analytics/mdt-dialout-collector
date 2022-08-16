@@ -100,6 +100,8 @@ public:
         std::map<std::string, std::string> &params);
 
     // Getters
+    //const std::string &get_writer_id() const {
+    //    return writer_id; };
     //const std::string &get_core_pid_folder() const {
     //    return core_pid_folder; };
     //const std::string &get_iface() const {
@@ -123,6 +125,7 @@ public:
     //const std::string &get_huawei_workers() const {
     //    return huawei_workers; };
 private:
+    const std::string writer_id;
     const std::string core_pid_folder;
     const std::string iface;
     const std::string ipv4_socket_cisco;

@@ -40,11 +40,12 @@ bool DataManipulation::MetaData(std::string &json_str,
             json_str.end(), '\\'), json_str.end());
         // --- delete backslashes from the JSON-Str
         root["event_type"] = "gRPC";
+        root["serialization"] = "json_string";
         root["seq"] = static_cast<uint64_t>(get_sequence_number());
         root["timestamp"] = timestamp;
-        root["writer_id"] = "mdt-dialout-collector";
+        root["writer_id"] = main_cfg_parameters.at("writer_id");
         root["telemetry_node"] = peer_ip;
-        root["telemetry_port"] = peer_port;
+        root["telemetry_port"] = static_cast<uint16_t>(std::stoi(peer_port));
         root["telemetry_data"] = json_str;
         multi_logger->info("[MetaData] data-manipulation: "
             "{} meta-data added successfully", peer_ip);

@@ -18,6 +18,7 @@
 #include "openconfig_interfaces.pb.h"
 #include <google/protobuf/util/json_util.h>
 #include "logs_handler.h"
+#include "cfg_handler.h"
 
 
 class DataManipulation {
