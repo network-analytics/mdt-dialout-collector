@@ -257,10 +257,12 @@ void LoadLabelMapPreTagStyle(
         rapidcsv::Document label_map_doc(label_map_ptm_path,
             rapidcsv::LabelParams(-1, -1), rapidcsv::SeparatorParams(' '));
 
+        // Delete last row: set_label=nkey%unknown%pkey%unknown
+        label_map_doc.RemoveRow(label_map_doc.GetRowCount());
         _labels = label_map_doc.GetColumn<std::string>(0);
         _ipaddrs = label_map_doc.GetColumn<std::string>(1);
     } catch (std::exception &ex) {
-        multi_logger->error("malformed PTM file");
+        multi_logger->error("malformed PTM file: {}", ex.what());
         std::exit(EXIT_FAILURE);
     }
 
