@@ -40,7 +40,7 @@ bool LogsHandler::set_spdlog_sinks(
         try {
             auto spdlog_syslog =
                 std::make_shared<spdlog::sinks::syslog_sink_mt>(
-                    ident, 0, LOG_USER, true);
+                    ident, 0, LOG_LOCAL3, true);
             spdlog_sinks.push_back(spdlog_syslog);
         } catch (const spdlog::spdlog_ex &sex) {
             std::cout << "spdlog, syslog: " << sex.what() << "\n";
