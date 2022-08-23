@@ -262,7 +262,7 @@ void LoadLabelMapPreTagStyle(
         _labels = label_map_doc.GetColumn<std::string>(0);
         _ipaddrs = label_map_doc.GetColumn<std::string>(1);
     } catch (std::exception &ex) {
-        multi_logger->error("malformed PTM file: {}", ex.what());
+        multi_logger->error("malformed PTM file");
         std::exit(EXIT_FAILURE);
     }
 

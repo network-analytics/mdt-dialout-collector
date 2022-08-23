@@ -36,7 +36,7 @@ bool LogsCfgHandler::set_boot_spdlog_sinks(
     try {
         auto spdlog_syslog =
             std::make_shared<spdlog::sinks::syslog_sink_mt>(
-                ident, 0, LOG_USER, true);
+                ident, 0, LOG_LOCAL3, true);
         spdlog_sinks.push_back(spdlog_syslog);
     } catch (const spdlog::spdlog_ex &sex) {
         std::cout << "spdlog, syslog: " << sex.what() << "\n";
@@ -75,7 +75,7 @@ bool CfgHandler::set_cfg_spdlog_sinks(
         try {
             auto spdlog_syslog =
                 std::make_shared<spdlog::sinks::syslog_sink_mt>(
-                    ident, 0, LOG_USER, true);
+                    ident, 0, LOG_LOCAL3, true);
             spdlog_sinks.push_back(spdlog_syslog);
         } catch (const spdlog::spdlog_ex &sex) {
             std::cout << "spdlog, syslog: " << sex.what() << "\n";
@@ -152,7 +152,7 @@ LogsCfgHandler::LogsCfgHandler()
         std::exit(EXIT_FAILURE);
     } else {
         spdlog::get("multi-logger-boot")->
-            info("constructor: LogsCfgHandler()");
+            debug("constructor: LogsCfgHandler()");
         std::unique_ptr<libconfig::Config>
             logs_params(new libconfig::Config());
         if (lookup_logs_parameters(

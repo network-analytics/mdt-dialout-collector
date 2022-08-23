@@ -59,8 +59,6 @@ private:
 
 class CfgHandler {
 public:
-    //CfgHandler() {
-    //    spdlog::get("multi-logger-boot")->debug("constructor: CfgHandler()"); };
     CfgHandler();
     ~CfgHandler() { spdlog::get("multi-logger-cfg")->
         debug("destructor: ~CfgHandler()"); };
