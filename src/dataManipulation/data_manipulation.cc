@@ -13,7 +13,7 @@ bool DataManipulation::MetaData(std::string &json_str,
     std::string &json_str_out)
 {
     std::time_t timestamp = std::time(nullptr);
-    const auto json_str_length = static_cast<int>(json_str.length());
+    const auto json_str_length = json_str.length();
     //Json::String error;
     JSONCPP_STRING error;
     Json::Value root;
@@ -29,7 +29,8 @@ bool DataManipulation::MetaData(std::string &json_str,
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
         &root, &error) && json_str_length != 0) {
-        multi_logger->error("[MetaData] data-manipulation issue: "
+        spdlog::get("multi-logger")->
+            error("[MetaData] data-manipulation issue: "
             "conversion to JSON failure, {}", error);
         return false;
     } else {
@@ -47,7 +48,7 @@ bool DataManipulation::MetaData(std::string &json_str,
         root["telemetry_node"] = peer_ip;
         root["telemetry_port"] = static_cast<uint16_t>(std::stoi(peer_port));
         root["telemetry_data"] = json_str;
-        multi_logger->info("[MetaData] data-manipulation: "
+        spdlog::get("multi-logger")->info("[MetaData] data-manipulation: "
             "{} meta-data added successfully", peer_ip);
     }
 
@@ -63,7 +64,7 @@ bool DataManipulation::AppendLabelMap(
     const std::string &json_str,
     std::string &json_str_out)
 {
-    const auto json_str_length = static_cast<int>(json_str.length());
+    const auto json_str_length = json_str.length();
     //Json::String error;
     JSONCPP_STRING error;
     Json::Value root;
@@ -81,19 +82,22 @@ bool DataManipulation::AppendLabelMap(
 
     if (!reader->parse(json_str.c_str(), json_str.c_str() + json_str_length,
         &root, &error) && json_str_length != 0) {
-        multi_logger->error("[AppendLabelMap] data-manipulation issue: "
+        spdlog::get("multi-logger")->
+            error("[AppendLabelMap] data-manipulation issue: "
             "conversion to JSON failure, {}", error);
         return false;
     } else {
         if (search != label_map.end()) {
             jlabel_map["nkey"] = search->second.at(0);
             jlabel_map["pkey"] = search->second.at(1);
-            multi_logger->info("[AppendLabelMap] data-manipulation: "
+            spdlog::get("multi-logger")->
+                info("[AppendLabelMap] data-manipulation: "
                 "{} data enrichment successful", peer_ip);
         } else {
             jlabel_map["node_id"] = "unknown";
             jlabel_map["platform_id"] = "unknown";
-            multi_logger->warn("[AppendLabelMap] data-manipulation issue: "
+            spdlog::get("multi-logger")->
+                warn("[AppendLabelMap] data-manipulation issue: "
                 "{} not found, data enrichment failure", peer_ip);
         }
 
@@ -106,29 +110,29 @@ bool DataManipulation::AppendLabelMap(
 
 // GPB-KV Normalization & generate JSON-Str
 bool DataManipulation::CiscoGpbkv2Json(
-    const std::unique_ptr<cisco_telemetry::Telemetry> &cisco_tlm,
+    const cisco_telemetry::Telemetry &cisco_tlm,
     std::string &json_str_out)
 {
      Json::Value root;
     // First read the metadata defined in cisco_telemtry.proto
-    if (cisco_tlm->has_node_id_str()) {
-        root["node_id"] = cisco_tlm->node_id_str();
+    if (cisco_tlm.has_node_id_str()) {
+        root["node_id"] = cisco_tlm.node_id_str();
     }
-    if (cisco_tlm->has_subscription_id_str()) {
-        root["subscription_id"] = cisco_tlm->subscription_id_str();
+    if (cisco_tlm.has_subscription_id_str()) {
+        root["subscription_id"] = cisco_tlm.subscription_id_str();
     }
-    root["encoding_path"] = cisco_tlm->encoding_path();
-    root["collection_id"] = (Json::UInt64) cisco_tlm->collection_id();
+    root["encoding_path"] = cisco_tlm.encoding_path();
+    root["collection_id"] = (Json::UInt64) cisco_tlm.collection_id();
     root["collection_start_time"] =
-        (Json::UInt64) cisco_tlm->collection_start_time();
+        (Json::UInt64) cisco_tlm.collection_start_time();
     root["msg_timestamp"] =
-        (Json::UInt64) cisco_tlm->msg_timestamp();
+        (Json::UInt64) cisco_tlm.msg_timestamp();
     root["collection_end_time"] =
-        (Json::UInt64) cisco_tlm->collection_end_time();
+        (Json::UInt64) cisco_tlm.collection_end_time();
 
     // Iterate through the key/values in data_gpbkv
     Json::Value gpbkv;
-    for (auto const &field: cisco_tlm->data_gpbkv()) {
+    for (auto const &field: cisco_tlm.data_gpbkv()) {
         Json::Value value = DataManipulation::CiscoGpbkvField2Json(field);
         if (field.name().empty()) {
             gpbkv.append(value);
@@ -215,8 +219,7 @@ Json::Value DataManipulation::CiscoGpbkvField2Json(
 // 2. From JSON-Obj to JSON-Str
 bool DataManipulation::JuniperExtension(
     gnmi::SubscribeResponse &juniper_stream,
-    const std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
-    &juniper_tlm_header_ext,
+    GnmiJuniperTelemetryHeaderExtension &juniper_tlm_header_ext,
     Json::Value &root)
 {
     bool parsing_str {false};
@@ -226,12 +229,12 @@ bool DataManipulation::JuniperExtension(
         if (ext.has_registered_ext() &&
             ext.registered_ext().id() ==
                 gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
-            parsing_str = juniper_tlm_header_ext->ParseFromString(
+            parsing_str = juniper_tlm_header_ext.ParseFromString(
                 ext.registered_ext().msg());
 
             if (parsing_str == true) {
-                if (!juniper_tlm_header_ext->system_id().empty()) {
-                    root["system_id"] = juniper_tlm_header_ext->system_id();
+                if (!juniper_tlm_header_ext.system_id().empty()) {
+                    root["system_id"] = juniper_tlm_header_ext.system_id();
                     //std::cout << juniper_tlm_header_ext->system_id() << "\n";
                 }
 
@@ -239,7 +242,7 @@ bool DataManipulation::JuniperExtension(
                 google::protobuf::util::JsonPrintOptions opt;
                 opt.add_whitespace = false;
                 google::protobuf::util::MessageToJsonString(
-                    *juniper_tlm_header_ext,
+                    juniper_tlm_header_ext,
                     &stream_data_in,
                     opt);
                 root["extension"] = stream_data_in;
@@ -478,40 +481,40 @@ bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
 // 2. Decode & Extract payload (record = content_s) & Add to JSON-Obj (oc-if)
 // 3. From JSON-Obj to JSON-Str
 bool DataManipulation::HuaweiGpbOpenconfigInterface(
-    const std::unique_ptr<huawei_telemetry::Telemetry> &huawei_tlm,
-    const std::unique_ptr<openconfig_interfaces::Interfaces> &oc_if,
+    const huawei_telemetry::Telemetry &huawei_tlm,
+    openconfig_interfaces::Interfaces &oc_if,
     std::string &json_str_out)
 {
-    int data_rows = huawei_tlm->data_gpb().row_size();
+    int data_rows = huawei_tlm.data_gpb().row_size();
 
     bool parsing_content {false};
     std::string content_s;
     Json::Value root;
 
-    root["collection_id"] = huawei_tlm->collection_id();
-    root["collection_start_time"] = huawei_tlm->collection_start_time();
-    root["collection_end_time"] = huawei_tlm->collection_end_time();
-    root["current_period"] = huawei_tlm->current_period();
-    root["encoding"] = huawei_tlm->encoding();
-    root["except_desc"] = huawei_tlm->except_desc();
-    root["msg_timestamp"] = huawei_tlm->msg_timestamp();
-    root["node_id_str"] = huawei_tlm->node_id_str();
-    root["product_name"] = huawei_tlm->product_name();
-    root["proto_path"] = huawei_tlm->proto_path();
-    root["sensor_path"] = huawei_tlm->sensor_path();
-    root["software_version"] = huawei_tlm->software_version();
-    root["subscription_id_str"] = huawei_tlm->subscription_id_str();
+    root["collection_id"] = huawei_tlm.collection_id();
+    root["collection_start_time"] = huawei_tlm.collection_start_time();
+    root["collection_end_time"] = huawei_tlm.collection_end_time();
+    root["current_period"] = huawei_tlm.current_period();
+    root["encoding"] = huawei_tlm.encoding();
+    root["except_desc"] = huawei_tlm.except_desc();
+    root["msg_timestamp"] = huawei_tlm.msg_timestamp();
+    root["node_id_str"] = huawei_tlm.node_id_str();
+    root["product_name"] = huawei_tlm.product_name();
+    root["proto_path"] = huawei_tlm.proto_path();
+    root["sensor_path"] = huawei_tlm.sensor_path();
+    root["software_version"] = huawei_tlm.software_version();
+    root["subscription_id_str"] = huawei_tlm.subscription_id_str();
 
     for (int idx_0 = 0; idx_0 < data_rows; ++idx_0) {
         content_s.clear();
-        std::string content = huawei_tlm->
+        std::string content = huawei_tlm.
             data_gpb().row().at(idx_0).content();
-        parsing_content = oc_if->ParseFromString(content);
+        parsing_content = oc_if.ParseFromString(content);
         if (parsing_content == true) {
             google::protobuf::util::JsonPrintOptions opt;
             opt.add_whitespace = false;
             google::protobuf::util::MessageToJsonString(
-                *oc_if,
+                oc_if,
                 &content_s,
                 opt);
         } else {

@@ -19,9 +19,10 @@
 class DataDelivery {
 public:
     DataDelivery();
-    ~DataDelivery() { multi_logger->debug("destructor: ~DataDelivery()"); };
+    ~DataDelivery() { spdlog::get("multi-logger")->
+        debug("destructor: ~DataDelivery()"); };
     bool AsyncKafkaProducer(
-        std::unique_ptr<kafka::clients::KafkaProducer> &producer,
+        kafka::clients::KafkaProducer &producer,
         const std::string &peer,
         const std::string &json_str);
     void set_kafka_properties(kafka::Properties &properties);

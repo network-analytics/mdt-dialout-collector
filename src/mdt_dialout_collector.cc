@@ -16,9 +16,11 @@
 #include "logs_handler.h"
 
 
-void *CiscoThread(void *);
-void *HuaweiThread(void *);
-void *JuniperThread(void*);
+void *VendorThread(void *vendor_ptr, const std::string &);
+void LoadThreads(std::vector<std::thread> &workers_vec,
+    const std::string &ipv4_socket_str,
+    const std::string &replies_str,
+    const std::string &workers_str);
 void LoadLabelMap(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     const std::string &label_map_csv);
@@ -31,6 +33,9 @@ void SignalHandler(int sig_num);
 int main(void)
 {
     // --- DEBUG ---
+    //for (auto &lp : logs_cfg_parameters) {
+    //    std::cout << lp.first << " ---> " << lp.second << "\n";
+    //}
     //for (auto &mp : main_cfg_parameters) {
     //    std::cout << mp.first << " ---> " << mp.second << "\n";
     //}
@@ -42,118 +47,103 @@ int main(void)
     //}
     // --- DEBUG ---
 
+    // static log-sinks are configured within the constructor
+    LogsHandler logs_handler;
+    spdlog::get("multi-logger-boot")->debug("main: main()");
+
+    CfgHandler cfg_handler;
+    cfg_handler.set_cfg_path(
+        "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf");
+
+    LogsCfgHandler logs_cfg_handler;
+    if (logs_cfg_handler.lookup_logs_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_logs_parameters()) == false) {
+        // can't read the logs cfg params the destructor logging won't
+        // be possible (segmentation fault)
+        std::exit(EXIT_FAILURE);
+    } else {
+        logs_cfg_parameters = cfg_handler.get_logs_parameters();
+        // set the log-sinks after reading from the configuration file
+        logs_handler.set_spdlog_sinks();
+    }
+
+    MainCfgHandler main_cfg_handler;
+    if (main_cfg_handler.lookup_main_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_main_parameters()) == false) {
+        std::exit(EXIT_FAILURE);
+    } else {
+        main_cfg_parameters = cfg_handler.get_main_parameters();
+    }
+
+    DataManipulationCfgHandler data_manipulation_cfg_handler;
+    if (data_manipulation_cfg_handler.lookup_data_manipulation_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_data_manipulation_parameters()) ==false) {
+        std::exit(EXIT_FAILURE);
+    } else {
+        data_manipulation_cfg_parameters =
+            cfg_handler.get_data_manipulation_parameters();
+    }
+
+    KafkaCfgHandler kafka_cfg_handler;
+    if (kafka_cfg_handler.lookup_kafka_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_kafka_parameters()) == false) {
+        std::exit(EXIT_FAILURE);
+    } else {
+        data_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+    }
+
     int core_pid = getpid();
     const std::string core_pid_folder =
         main_cfg_parameters.at("core_pid_folder");
     const std::string core_pid_file = "mdt_dialout_collector.pid";
     const std::string core_pid_path = core_pid_folder + core_pid_file;
+
     if (DumpCorePid(core_pid, core_pid_path) == false) {
-        multi_logger->error(
+        spdlog::get("multi-logger")->error(
             "unable to dump PID {} to {}", core_pid, core_pid_path);
         return EXIT_FAILURE;
     }
 
     if (data_manipulation_cfg_parameters.at(
             "enable_label_encode_as_map").compare("true") == 0) {
-        multi_logger->info("Loading label-map-csv data ...");
+        spdlog::get("multi-logger")->info("Loading label-map-csv data ...");
         LoadLabelMap(label_map,
             data_manipulation_cfg_parameters.at("label_map_csv_path"));
     }
     if (data_manipulation_cfg_parameters.at(
             "enable_label_encode_as_map_ptm").compare("true") == 0) {
-        multi_logger->info("Loading label-map-ptm data ...");
+        spdlog::get("multi-logger")->info("Loading label-map-ptm data ...");
         LoadLabelMapPreTagStyle(label_map,
             data_manipulation_cfg_parameters.at("label_map_ptm_path"));
     }
 
-    std::vector<std::thread> workers;
-
     if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
         main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
         main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
-            multi_logger->error("[ipv4_socket_*] configuration issue: "
+            spdlog::get("multi-logger")->
+                error("[ipv4_socket_*] configuration issue: "
                 "unable to find at least one valid IPv4 socket where to bind "
                 "the daemon");
             return EXIT_FAILURE;
     }
 
+    std::vector<std::thread> workers;
+
     // Cisco
-    if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == false) {
-        int replies_cisco =
-            std::stoi(main_cfg_parameters.at("replies_cisco"));
-        if (replies_cisco < 0 || replies_cisco > 1000) {
-            multi_logger->error("[replies_cisco] configuaration issue: the "
-                "allowed amount of replies per session is defined between 10 "
-                "and 1000. (default = 0 => unlimited)");
-            return EXIT_FAILURE;
-        }
-        void *cisco_ptr {nullptr};
-        int cisco_workers =
-            std::stoi(main_cfg_parameters.at("cisco_workers"));
-        if (cisco_workers < 1 || cisco_workers > 5) {
-            multi_logger->error("[cisco_workers] configuaration issue: the "
-                "allowed amount of workers is defined between 1 "
-                "and 5. (default = 1)");
-            return EXIT_FAILURE;
-        }
-        for (int w = 0; w < cisco_workers; ++w) {
-            workers.push_back(std::thread(&CiscoThread, cisco_ptr));
-        }
-        multi_logger->info("mdt-dialout-collector listening on {} ",
-            main_cfg_parameters.at("ipv4_socket_cisco"));
-    }
+    LoadThreads(workers, "ipv4_socket_cisco", "replies_cisco",
+        "cisco_workers");
 
     // Juniper
-    if (main_cfg_parameters.at("ipv4_socket_juniper").empty() == false) {
-        int replies_juniper =
-            std::stoi(main_cfg_parameters.at("replies_juniper"));
-        if (replies_juniper < 0 || replies_juniper > 1000) {
-            multi_logger->error("[replies_juniper] configuaration issue: the "
-                "allowed amount of replies per session is defined between 10 "
-                "and 1000. (default = 0 => unlimited)");
-            return EXIT_FAILURE;
-        }
-        void *juniper_ptr {nullptr};
-        int juniper_workers =
-            std::stoi(main_cfg_parameters.at("juniper_workers"));
-        if (juniper_workers < 1 || juniper_workers > 5) {
-            multi_logger->error("[juniper_workers] configuaration issue: the "
-                "allowed amount of workers is defined between 1 "
-                "and 5. (default = 1)");
-            return EXIT_FAILURE;
-        }
-        for (int w = 0; w < juniper_workers; ++w) {
-            workers.push_back(std::thread(&JuniperThread, juniper_ptr));
-        }
-        multi_logger->info("mdt-dialout-collector listening on {} ",
-            main_cfg_parameters.at("ipv4_socket_juniper"));
-    }
+    LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
+        "juniper_workers");
 
     // Huawei
-    if (main_cfg_parameters.at("ipv4_socket_huawei").empty() == false) {
-        int replies_huawei =
-            std::stoi(main_cfg_parameters.at("replies_huawei"));
-        if (replies_huawei < 0 || replies_huawei > 1000) {
-            multi_logger->error("[replies_huawei] configuaration issue: the "
-                "allowed amount of replies per session is defined between 10 "
-                "and 1000. (default = 0 => unlimited)");
-            return EXIT_FAILURE;
-        }
-        void *huawei_ptr {nullptr};
-        int huawei_workers =
-            std::stoi(main_cfg_parameters.at("huawei_workers"));
-        if (huawei_workers < 1 || huawei_workers > 5) {
-            multi_logger->error("[huawei_workers] configuaration issue: the "
-                "allowed amount of workers is defined between 1 "
-                "and 5. (default = 1)");
-            return EXIT_FAILURE;
-        }
-        for (int w = 0; w < huawei_workers; ++w) {
-            workers.push_back(std::thread(&HuaweiThread, huawei_ptr));
-        }
-        multi_logger->info("mdt-dialout-collector listening on {} ",
-            main_cfg_parameters.at("ipv4_socket_huawei"));
-    }
+    LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
+        "huawei_workers");
 
     signal(SIGUSR1, SignalHandler);
 
@@ -166,40 +156,66 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
-void *CiscoThread(void *cisco_ptr)
+void *VendorThread(void *vendor_ptr, const std::string &ipv4_socket_str)
 {
-    std::string ipv4_socket_cisco =
-        main_cfg_parameters.at("ipv4_socket_cisco");
+    if (ipv4_socket_str.find("cisco") != std::string::npos) {
+        std::string ipv4_socket_cisco =
+            main_cfg_parameters.at(ipv4_socket_str);
 
-    std::string cisco_srv_socket {ipv4_socket_cisco};
-    Srv cisco_mdt_dialout_collector;
-    cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
+        std::string cisco_srv_socket {ipv4_socket_cisco};
+        Srv cisco_mdt_dialout_collector;
+        cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
+    } else if (ipv4_socket_str.find("juniper") != std::string::npos) {
+        std::string ipv4_socket_juniper =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string juniper_srv_socket {ipv4_socket_juniper};
+        Srv juniper_mdt_dialout_collector;
+        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
+    } else if (ipv4_socket_str.find("huawei") != std::string::npos) {
+        std::string ipv4_socket_huawei =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string huawei_srv_socket {ipv4_socket_huawei};
+        Srv huawei_mdt_dialout_collector;
+        huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
+    }
 
     return 0;
 }
 
-void *JuniperThread(void *juniper_ptr)
+void LoadThreads(std::vector<std::thread> &workers_vec,
+    const std::string &ipv4_socket_str,
+    const std::string &replies_str,
+    const std::string &workers_str)
 {
-    std::string ipv4_socket_juniper =
-        main_cfg_parameters.at("ipv4_socket_juniper");
-
-    std::string juniper_srv_socket {ipv4_socket_juniper};
-    Srv juniper_mdt_dialout_collector;
-    juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
-
-    return 0;
-}
-
-void *HuaweiThread(void *huawei_ptr)
-{
-    std::string ipv4_socket_huawei =
-        main_cfg_parameters.at("ipv4_socket_huawei");
-
-    std::string huawei_srv_socket {ipv4_socket_huawei};
-    Srv huawei_mdt_dialout_collector;
-    huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
-
-    return 0;
+    if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
+        int replies =
+            std::stoi(main_cfg_parameters.at(replies_str));
+        if (replies < 0 || replies > 1000) {
+            spdlog::get("multi-logger")->
+                error("[{}] configuaration issue: the "
+                "allowed amount of replies per session is defined between 10 "
+                "and 1000. (default = 0 => unlimited)", replies_str);
+            std::exit(EXIT_FAILURE);
+        }
+        void *vendor_ptr {nullptr};
+        int workers = std::stoi(main_cfg_parameters.at(workers_str));
+        if (workers < 1 || workers > 5) {
+            spdlog::get("multi-logger")->
+                error("[{}] configuaration issue: the "
+                "allowed amount of workers is defined between 1 "
+                "and 5. (default = 1)", workers_str);
+            std::exit(EXIT_FAILURE);
+        }
+        for (int w = 0; w < workers; ++w) {
+            workers_vec.push_back(std::thread(&VendorThread, vendor_ptr,
+                ipv4_socket_str));
+        }
+        spdlog::get("multi-logger")->
+            info("mdt-dialout-collector listening on {} ",
+            main_cfg_parameters.at(ipv4_socket_str));
+    }
 }
 
 void LoadLabelMap(
@@ -220,7 +236,7 @@ void LoadLabelMap(
         nid = label_map_doc.GetColumn<std::string>(1);
         pid = label_map_doc.GetColumn<std::string>(2);
     } catch (std::exception &ex) {
-        multi_logger->error("malformed CSV file");
+        spdlog::get("multi-logger")->error("malformed CSV file");
         std::exit(EXIT_FAILURE);
     }
 
@@ -234,7 +250,8 @@ void LoadLabelMap(
     }
     // --- DEBUG ---
     //for (auto &lm : label_map) {
-    //    multi_logger->info("{} ---> [ {} , {} ]", lm.first, lm.second.at(0),
+    //    spdlog::get("multi-logger")->
+    //      info("{} ---> [ {} , {} ]", lm.first, lm.second.at(0),
     //        lm.second.at(1));
     //}
     // --- DEBUG ---
@@ -262,7 +279,7 @@ void LoadLabelMapPreTagStyle(
         _labels = label_map_doc.GetColumn<std::string>(0);
         _ipaddrs = label_map_doc.GetColumn<std::string>(1);
     } catch (std::exception &ex) {
-        multi_logger->error("malformed PTM file");
+        spdlog::get("multi-logger")->error("malformed PTM file");
         std::exit(EXIT_FAILURE);
     }
 
@@ -307,7 +324,8 @@ void LoadLabelMapPreTagStyle(
     }
     // --- DEBUG ---
     //for (auto &lm : label_map) {
-    //    multi_logger->info("{} ---> [ {} , {} ]", lm.first, lm.second.at(0),
+    //    spdlog::get("multi-logger")->
+    //      info("{} ---> [ {} , {} ]", lm.first, lm.second.at(0),
     //        lm.second.at(1));
     //}
     // --- DEBUG ---
@@ -330,14 +348,14 @@ void SignalHandler(int sig_num)
 {
     if (data_manipulation_cfg_parameters.at(
             "enable_label_encode_as_map").compare("true") == 0) {
-        multi_logger->info(
+        spdlog::get("multi-logger")->info(
             "siganl {} received, re-freshing label-map-csv data ...", sig_num);
         LoadLabelMap(label_map,
             data_manipulation_cfg_parameters.at("label_map_csv_path"));
     }
     if (data_manipulation_cfg_parameters.at(
             "enable_label_encode_as_map_ptm").compare("true") == 0) {
-        multi_logger->info(
+        spdlog::get("multi-logger")->info(
             "siganl {} received, re-freshing label-map-ptm data ...", sig_num);
         LoadLabelMapPreTagStyle(label_map,
             data_manipulation_cfg_parameters.at("label_map_ptm_path"));

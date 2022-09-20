@@ -62,7 +62,7 @@ Debian$ sudo apt install libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog
 Redhat$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel spdlog-devel
 ```
 
-#### git Clone, Compile and Run
+#### git Clone, Compile and Run (compiler version >= gcc-toolset-11)
 ```SHELL
 $ cd /opt
 $ git clone https://github.com/scuzzilla/mdt-dialout-collector.git

@@ -8,7 +8,7 @@
 
 DataDelivery::DataDelivery()
 {
-    multi_logger->debug("constructor: DataDelivery()");
+    spdlog::get("multi-logger")->debug("constructor: DataDelivery()");
     this->topic =
         data_delivery_cfg_parameters.at("topic");
     this->bootstrap_servers =
@@ -44,12 +44,13 @@ void DataDelivery::set_kafka_properties(kafka::Properties &properties)
 }
 
 bool DataDelivery::AsyncKafkaProducer(
-    std::unique_ptr<kafka::clients::KafkaProducer> &producer,
+    kafka::clients::KafkaProducer &producer,
     const std::string &peer,
     const std::string &json_str)
 {
     if (json_str.empty()) {
-        multi_logger->error("[AsyncKafkaProducer] data-delivery issue: "
+        spdlog::get("multi-logger")->
+            error("[AsyncKafkaProducer] data-delivery issue: "
             "empty JSON received");
         return false;
     }
@@ -63,20 +64,23 @@ bool DataDelivery::AsyncKafkaProducer(
             kafka::Key(peer.c_str()),
             kafka::Value(json_str.c_str(), json_str.size()));
 
-        producer->send(
+        producer.send(
             msg,
             [](const kafka::clients::producer::RecordMetadata &mdata,
                 const kafka::Error &err) {
             if (!err) {
-                multi_logger->info("[AsyncKafkaProducer] data-delivery: "
+                spdlog::get("multi-logger")->
+                    info("[AsyncKafkaProducer] data-delivery: "
                     "message successfully delivered");
             } else {
-                multi_logger->error("[AsyncKafkaProducer] data-delivery "
+                spdlog::get("multi-logger")->
+                    error("[AsyncKafkaProducer] data-delivery "
                     "issue: message delivery failure, {}", err.message());
             }
         }, kafka::clients::KafkaProducer::SendOption::ToCopyRecordValue);
     } catch (const kafka::KafkaException &kex) {
-        multi_logger->error("[AsyncKafkaProducer] data-delivery issue: "
+        spdlog::get("multi-logger")->
+            error("[AsyncKafkaProducer] data-delivery issue: "
             "{}", kex.what());
         return false;
     }

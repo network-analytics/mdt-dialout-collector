@@ -27,9 +27,11 @@ extern std::unordered_map<std::string,std::vector<std::string>> label_map;
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
 public:
     ServerBuilderOptionImpl() {
-        multi_logger->debug("constructor: ServerBuilderOptionImpl()"); };
+        spdlog::get("multi-logger")->
+            debug("constructor: ServerBuilderOptionImpl()"); };
     ~ServerBuilderOptionImpl() {
-        multi_logger->debug("destructor: ~ServerBuilderOptionImpl()"); };
+        spdlog::get("multi-logger")->
+            debug("destructor: ~ServerBuilderOptionImpl()"); };
     virtual void UpdateArguments(grpc::ChannelArguments *args);
     virtual void UpdatePlugins(
         std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
@@ -39,7 +41,8 @@ class CustomSocketMutator: public grpc_socket_mutator {
 public:
     CustomSocketMutator();
     ~CustomSocketMutator() {
-        multi_logger->debug("destructor: ~CustomSocketMutator()"); };
+        spdlog::get("multi-logger")->
+            debug("destructor: ~CustomSocketMutator()"); };
     bool bindtodevice_socket_mutator(int fd);
 };
 
@@ -47,7 +50,7 @@ class Srv final {
 public:
     ~Srv()
     {
-        multi_logger->debug("destructor: ~Srv()");
+        spdlog::get("multi-logger")->debug("destructor: ~Srv()");
         cisco_server_->grpc::ServerInterface::Shutdown();
         juniper_server_->grpc::ServerInterface::Shutdown();
         huawei_server_->grpc::ServerInterface::Shutdown();
@@ -55,7 +58,7 @@ public:
         juniper_cq_->grpc::ServerCompletionQueue::Shutdown();
         huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
     }
-    Srv() { multi_logger->debug("constructor: Srv()"); };
+    Srv() { spdlog::get("multi-logger")->debug("constructor: Srv()"); };
     void CiscoBind(std::string cisco_srv_socket);
     void JuniperBind(std::string juniper_srv_socket);
     void HuaweiBind(std::string huawei_srv_socket);
@@ -77,21 +80,18 @@ private:
 
     class CiscoStream {
     public:
-        ~CiscoStream() { multi_logger->debug("destructor: ~CiscoStream()"); };
+        ~CiscoStream() { spdlog::get("multi-logger")->
+            debug("destructor: ~CiscoStream()"); };
         CiscoStream(
             mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
             grpc::ServerCompletionQueue *cisco_cq);
         void Start(
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
-            std::unique_ptr<DataManipulation>
-                &data_manipulation,
-            std::unique_ptr<DataDelivery>
-                &data_delivery,
-            std::unique_ptr<kafka::clients::KafkaProducer>
-                &producer,
-            std::unique_ptr<cisco_telemetry::Telemetry>
-                &cisco_tlm
+            DataManipulation &data_manipulation,
+            DataDelivery &data_delivery,
+            kafka::clients::KafkaProducer &producer,
+            cisco_telemetry::Telemetry &cisco_tlm
         );
     private:
         mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
@@ -108,21 +108,18 @@ private:
     class JuniperStream {
     public:
         ~JuniperStream() {
-            multi_logger->debug("destructor: ~JuniperStream()"); };
+            spdlog::get("multi-logger")->
+                debug("destructor: ~JuniperStream()"); };
         JuniperStream(
             Subscriber::AsyncService *juniper_service,
             grpc::ServerCompletionQueue *juniper_cq);
         void Start(
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
-            std::unique_ptr<DataManipulation>
-                &data_manipulation,
-            std::unique_ptr<DataDelivery>
-                &data_delivery,
-            std::unique_ptr<kafka::clients::KafkaProducer>
-                &producer,
-            std::unique_ptr<GnmiJuniperTelemetryHeaderExtension>
-                &juniper_tlm_hdr_ext
+            DataManipulation &data_manipulation,
+            DataDelivery &data_delivery,
+            kafka::clients::KafkaProducer &producer,
+            GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext
         );
     private:
         Subscriber::AsyncService *juniper_service_;
@@ -139,23 +136,19 @@ private:
     class HuaweiStream {
     public:
         ~HuaweiStream() {
-            multi_logger->debug("destructor: ~HuaweiStream()"); };
+            spdlog::get("multi-logger")->
+                debug("destructor: ~HuaweiStream()"); };
         HuaweiStream(
             huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
             grpc::ServerCompletionQueue *huawei_cq);
         void Start(
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
-            std::unique_ptr<DataManipulation>
-                &data_manipulation,
-            std::unique_ptr<DataDelivery>
-                &data_delivery,
-            std::unique_ptr<kafka::clients::KafkaProducer>
-                &producer,
-            std::unique_ptr<huawei_telemetry::Telemetry>
-                &huawei_tlm,
-            std::unique_ptr<openconfig_interfaces::Interfaces>
-                &oc_if
+            DataManipulation &data_manipulation,
+            DataDelivery &data_delivery,
+            kafka::clients::KafkaProducer &producer,
+            huawei_telemetry::Telemetry &huawei_tlm,
+            openconfig_interfaces::Interfaces &oc_if
         );
     private:
         huawei_dialout::gRPCDataservice::AsyncService *huawei_service_;

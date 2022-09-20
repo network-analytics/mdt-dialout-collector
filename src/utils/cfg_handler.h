@@ -22,22 +22,50 @@ extern std::map<std::string, std::string> main_cfg_parameters;
 extern std::map<std::string, std::string> data_manipulation_cfg_parameters;
 extern std::map<std::string, std::string> data_delivery_cfg_parameters;
 
-// Standalone Logs Configs Handler
+
+class CfgHandler {
+public:
+    CfgHandler() { spdlog::get("multi-logger-boot")->
+        debug("constructor: CfgHandler()"); };
+    ~CfgHandler() { spdlog::get("multi-logger")->
+        debug("destructor: ~CfgHandler()"); };
+    static bool set_parameters(libconfig::Config &params,
+        const std::string &cfg_path);
+    void set_cfg_path(const std::string &cfg) {
+        this->mdt_dialout_collector_conf = cfg; };
+    const std::string &get_cfg_path() const {
+        return this->mdt_dialout_collector_conf; };
+    // Single getter to handle them all
+    std::map<std::string, std::string>
+        &get_logs_parameters() {
+            return logs_parameters; };
+    std::map<std::string, std::string>
+        &get_main_parameters() {
+            return main_parameters; };
+    std::map<std::string, std::string>
+        &get_data_manipulation_parameters(){
+            return data_manipulation_parameters; };
+    std::map<std::string, std::string>
+        &get_kafka_parameters() {
+            return kafka_parameters; };
+protected:
+    std::string mdt_dialout_collector_conf;
+    std::map<std::string, std::string> logs_parameters;
+    std::map<std::string, std::string> main_parameters;
+    std::map<std::string, std::string> data_manipulation_parameters;
+    std::map<std::string, std::string> kafka_parameters;
+};
+
+// Logs Configs Handler
 class LogsCfgHandler {
 public:
-    LogsCfgHandler();
-    ~LogsCfgHandler() { spdlog::get("multi-logger-cfg")->
+    LogsCfgHandler() { spdlog::get("multi-logger-boot")->
+        debug("constructor: LogsCfgHandler()"); };
+    ~LogsCfgHandler() { spdlog::get("multi-logger")->
         debug("destructor: ~LogsCfgHandler()"); };
     // Setters - directly from the configuration file
     bool lookup_logs_parameters(const std::string &cfg_path,
         std::map<std::string, std::string> &params);
-    bool set_parameters(std::unique_ptr<libconfig::Config> &params,
-        const std::string &cfg_path);
-    const std::map<std::string, std::string>
-        &get_logs_parameters() const {
-            return logs_parameters; };
-    bool set_boot_spdlog_sinks(
-        std::shared_ptr<spdlog::logger> &multi_logger_boot);
 
     // Getters
     //const std::string &get_syslog() const {
@@ -46,51 +74,19 @@ public:
     //    return console_log; };
     //const std::string &get_spdlog_level() const {
     //    return spdlog_level; };
-protected:
-    const std::string mdt_dialout_collector_conf =
-        "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
-    std::map<std::string, std::string> logs_parameters;
-    std::shared_ptr<spdlog::logger> multi_logger_boot;
 private:
     const std::string syslog;
     const std::string console_log;
     const std::string spdlog_level;
 };
 
-class CfgHandler {
-public:
-    CfgHandler();
-    ~CfgHandler() { spdlog::get("multi-logger-cfg")->
-        debug("destructor: ~CfgHandler()"); };
-    bool set_parameters(std::unique_ptr<libconfig::Config> &params,
-        const std::string &cfg_path);
-    bool set_cfg_spdlog_sinks(
-        std::shared_ptr<spdlog::logger> &multi_logger);
-    // Single getter to handle them all
-    const std::map<std::string, std::string>
-        &get_main_parameters() const {
-            return main_parameters; };
-    const std::map<std::string, std::string>
-        &get_data_manipulation_parameters() const {
-            return data_manipulation_parameters; };
-    const std::map<std::string, std::string>
-        &get_kafka_parameters() const {
-            return kafka_parameters; };
-protected:
-    const std::string mdt_dialout_collector_conf =
-        "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
-    std::map<std::string, std::string> main_parameters;
-    std::map<std::string, std::string> data_manipulation_parameters;
-    std::map<std::string, std::string> kafka_parameters;
-    std::shared_ptr<spdlog::logger> multi_logger_cfg;
-};
-
 // Main configuration parameters
-class MainCfgHandler : public CfgHandler {
+class MainCfgHandler {
 public:
     // Params are initialized within the constructor
-    MainCfgHandler();
-    ~MainCfgHandler() { spdlog::get("multi-logger-cfg")->
+    MainCfgHandler() {spdlog::get("multi-logger")->
+        debug("constructor: MainCfgHandler()"); };
+    ~MainCfgHandler() { spdlog::get("multi-logger")->
         debug("destructor: ~MainCfgHandler()"); };
 
     // Setters - directly from the configuration file
@@ -138,11 +134,12 @@ private:
 };
 
 // Data manipulation configuration parameters
-class DataManipulationCfgHandler : public CfgHandler {
+class DataManipulationCfgHandler {
 public:
     // Params are initialized within the constructor
-    DataManipulationCfgHandler();
-    ~DataManipulationCfgHandler() { spdlog::get("multi-logger-cfg")->
+    DataManipulationCfgHandler() { spdlog::get("multi-logger")->
+        debug("constructor: DataManipulationCfgHandler()"); };
+    ~DataManipulationCfgHandler() { spdlog::get("multi-logger")->
         debug("destructor: ~DataManipulationCfgHandler()"); };
 
     // Setters - directly from the configuration file
@@ -172,11 +169,12 @@ private:
 };
 
 // Kafka configuration parameters
-class KafkaCfgHandler : public CfgHandler {
+class KafkaCfgHandler {
 public:
     // Params are initialized within the constructor
-    KafkaCfgHandler();
-    ~KafkaCfgHandler() { spdlog::get("multi-logger-cfg")->
+    KafkaCfgHandler() { spdlog::get("multi-logger")->
+        debug("constructor: KafkaCfgHandler()"); };
+    ~KafkaCfgHandler() { spdlog::get("multi-logger")->
         debug("destructor: ~KafkaCfgHandler()"); };
 
     // Setters - directly from the configuration file
