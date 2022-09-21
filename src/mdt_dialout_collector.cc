@@ -30,8 +30,47 @@ void LoadLabelMapPreTagStyle(
 bool DumpCorePid(int &core_pid, const std::string &core_pid_path);
 void SignalHandler(int sig_num);
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    std::string cfg_path;
+
+    int opt;
+    int f_option_flag = 0;
+    int v_option_flag = 0;
+
+    while ((opt = getopt(argc, argv, "vf:")) != -1) {
+        switch (opt) {
+        case 'f':
+            f_option_flag = 1;
+            cfg_path = optarg;
+            break;
+        case 'v':
+            v_option_flag = 1;
+            break;
+        default:
+            std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-v]\n";
+            return EXIT_FAILURE;
+        }
+    }
+
+    if (cfg_path.empty() == true) {
+        // default configuration file
+        cfg_path = "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
+    }
+
+    if ((f_option_flag == 1 and v_option_flag == 1) or (argc > 3)) {
+        std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-v]\n";
+        return EXIT_FAILURE;
+    }
+
+    if ((v_option_flag == 1) and (argc == 2)) {
+        std::cout << "Version: 1.0\n";
+        return EXIT_SUCCESS;
+    } else if ((v_option_flag == 1) and (argc > 2)) {
+        std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-v]\n";
+        return EXIT_FAILURE;
+    }
+
     // --- DEBUG ---
     //for (auto &lp : logs_cfg_parameters) {
     //    std::cout << lp.first << " ---> " << lp.second << "\n";
@@ -51,49 +90,50 @@ int main(void)
     LogsHandler logs_handler;
     spdlog::get("multi-logger-boot")->debug("main: main()");
 
-    CfgHandler cfg_handler;
-    cfg_handler.set_cfg_path(
-        "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf");
+    if (f_option_flag == 1 or cfg_path.empty() == false) {
+        CfgHandler cfg_handler;
+        cfg_handler.set_cfg_path(cfg_path);
 
-    LogsCfgHandler logs_cfg_handler;
-    if (logs_cfg_handler.lookup_logs_parameters(
-        cfg_handler.get_cfg_path(),
-        cfg_handler.get_logs_parameters()) == false) {
-        // can't read the logs cfg params the destructor logging won't
-        // be possible (segmentation fault)
-        std::exit(EXIT_FAILURE);
-    } else {
-        logs_cfg_parameters = cfg_handler.get_logs_parameters();
-        // set the log-sinks after reading from the configuration file
-        logs_handler.set_spdlog_sinks();
-    }
+        LogsCfgHandler logs_cfg_handler;
+        if (logs_cfg_handler.lookup_logs_parameters(
+            cfg_handler.get_cfg_path(),
+            cfg_handler.get_logs_parameters()) == false) {
+            // can't read the logs cfg params the destructor logging won't
+            // be possible (segmentation fault)
+            std::exit(EXIT_FAILURE);
+        } else {
+            logs_cfg_parameters = cfg_handler.get_logs_parameters();
+            // set the log-sinks after reading from the configuration file
+            logs_handler.set_spdlog_sinks();
+        }
 
-    MainCfgHandler main_cfg_handler;
-    if (main_cfg_handler.lookup_main_parameters(
-        cfg_handler.get_cfg_path(),
-        cfg_handler.get_main_parameters()) == false) {
-        std::exit(EXIT_FAILURE);
-    } else {
-        main_cfg_parameters = cfg_handler.get_main_parameters();
-    }
+        MainCfgHandler main_cfg_handler;
+        if (main_cfg_handler.lookup_main_parameters(
+            cfg_handler.get_cfg_path(),
+            cfg_handler.get_main_parameters()) == false) {
+            std::exit(EXIT_FAILURE);
+        } else {
+            main_cfg_parameters = cfg_handler.get_main_parameters();
+        }
 
-    DataManipulationCfgHandler data_manipulation_cfg_handler;
-    if (data_manipulation_cfg_handler.lookup_data_manipulation_parameters(
-        cfg_handler.get_cfg_path(),
-        cfg_handler.get_data_manipulation_parameters()) ==false) {
-        std::exit(EXIT_FAILURE);
-    } else {
-        data_manipulation_cfg_parameters =
-            cfg_handler.get_data_manipulation_parameters();
-    }
+        DataManipulationCfgHandler data_manipulation_cfg_handler;
+        if (data_manipulation_cfg_handler.lookup_data_manipulation_parameters(
+            cfg_handler.get_cfg_path(),
+            cfg_handler.get_data_manipulation_parameters()) ==false) {
+            std::exit(EXIT_FAILURE);
+        } else {
+            data_manipulation_cfg_parameters =
+                cfg_handler.get_data_manipulation_parameters();
+        }
 
-    KafkaCfgHandler kafka_cfg_handler;
-    if (kafka_cfg_handler.lookup_kafka_parameters(
-        cfg_handler.get_cfg_path(),
-        cfg_handler.get_kafka_parameters()) == false) {
-        std::exit(EXIT_FAILURE);
-    } else {
-        data_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+        KafkaCfgHandler kafka_cfg_handler;
+        if (kafka_cfg_handler.lookup_kafka_parameters(
+            cfg_handler.get_cfg_path(),
+            cfg_handler.get_kafka_parameters()) == false) {
+            std::exit(EXIT_FAILURE);
+        } else {
+            data_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+        }
     }
 
     int core_pid = getpid();
