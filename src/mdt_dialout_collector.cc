@@ -32,48 +32,6 @@ void SignalHandler(int sig_num);
 
 int main(int argc, char *argv[])
 {
-<<<<<<< HEAD
-    std::string cfg_path;
-
-    int opt;
-    int f_option_flag = 0;
-    int v_option_flag = 0;
-
-    while ((opt = getopt(argc, argv, "vf:")) != -1) {
-        switch (opt) {
-        case 'f':
-            f_option_flag = 1;
-            cfg_path = optarg;
-            break;
-        case 'v':
-            v_option_flag = 1;
-            break;
-        default:
-            std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-v]\n";
-            return EXIT_FAILURE;
-        }
-    }
-
-    if (cfg_path.empty() == true) {
-        // default configuration file
-        cfg_path = "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
-    }
-
-    if ((f_option_flag == 1 and v_option_flag == 1) or (argc > 3)) {
-        std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-v]\n";
-        return EXIT_FAILURE;
-    }
-
-    if ((v_option_flag == 1) and (argc == 2)) {
-        std::cout << "Version: 1.0\n";
-        return EXIT_SUCCESS;
-    } else if ((v_option_flag == 1) and (argc > 2)) {
-        std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-v]\n";
-        return EXIT_FAILURE;
-    }
-
-||||||| 835a094
-=======
     std::string cfg_path;
 
     int opt;
@@ -113,7 +71,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
->>>>>>> dcf
     // --- DEBUG ---
     //for (auto &lp : logs_cfg_parameters) {
     //    std::cout << lp.first << " ---> " << lp.second << "\n";
