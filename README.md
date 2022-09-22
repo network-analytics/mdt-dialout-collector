@@ -77,10 +77,11 @@ Depending on the selected Vendor/Operating System, the supported encondings are 
 
 The default configuration location is following the [FHS](https://refspecs.linuxfoundation.org/fhs.shtml) recommendation, therefore, by default:
 
-- the binary is available at "/opt/mdt-dialout-collector/bin/mdt_dialout_collector"
-- the configuration should be available at "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf"
+- the binary is available at **"/opt/mdt-dialout-collector/bin/mdt_dialout_collector"**
+- the configuration should be available at **"/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf"**
 
-However, via command-line, it's possible to specify an alternative location for the configuration. (the choosen flag is -f).
+However, via command-line, it's possible to specify an alternative location for the configuration.
+(the chosen flag is -f).
 
 Here below is a verbosely commented *example* of configuration:
 ```SHELL
