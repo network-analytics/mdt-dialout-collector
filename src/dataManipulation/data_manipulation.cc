@@ -36,10 +36,6 @@ bool DataManipulation::MetaData(std::string &json_str,
     } else {
         root.clear();
         set_sequence_number();
-        // --- delete backslashes from the JSON-Str
-        json_str.erase(std::remove(json_str.begin(),
-            json_str.end(), '\\'), json_str.end());
-        // --- delete backslashes from the JSON-Str
         root["event_type"] = "gRPC";
         root["serialization"] = "json_string";
         root["seq"] = static_cast<uint64_t>(get_sequence_number());
@@ -462,17 +458,17 @@ bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
             // only json_val() received
             value = _jup.val().json_val();
             //std::cout << value << "\n";
-            root[path] = value.toStyledString();
+            root[path] = value;
         }
     }
 
     // Serialize the JSON value into a string
-    Json::StreamWriterBuilder builderW;
-    builderW["emitUTF8"] = true;
-    builderW["indentation"] = "";
+    Json::StreamWriterBuilder builder_w;
+    builder_w["emitUTF8"] = true;
+    builder_w["indentation"] = "";
     const std::unique_ptr<Json::StreamWriter> writer(
-        builderW.newStreamWriter());
-    json_str_out = Json::writeString(builderW, root);
+        builder_w.newStreamWriter());
+    json_str_out = Json::writeString(builder_w, root);
 
     return true;
 }
