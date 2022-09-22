@@ -1,13 +1,4 @@
-title: Multi-vendor (async) gRPC dial-out collector
-author: Salvatore Cuzzilla
-date: 10.09.2022
-modified: 16.09.2022
-slug: mdt-dialout-collector
-keywords: gRPC, YANG, Telemetry
-cover: images/monitoring/mdt_dialout_collector/cover.jpg
-summary: TELCO Providers are usually dealing with a considerable amount of devices typically in a multi-vendor environment. Of course, all of them are equipped with the state-of-the-art telemetry technologies ...
-status: published
-
+### Multi-vendor (async) gRPC dial-out collector
 
 TELCOs are usually dealing with a considerable amount of devices, typically in a multi-vendor environment.
 Of course, all of them are equipped with the *state-of-the-art* telemetry technologies ... Well, **unfortunately**,
