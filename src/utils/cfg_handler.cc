@@ -45,12 +45,13 @@ bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
     }
 
     // Logs parameters evaluation
+    std::string syslog_s;
     bool syslog = logs_params.exists("syslog");
     if (syslog == true) {
         libconfig::Setting &syslog =
             logs_params.lookup("syslog");
         try {
-            std::string syslog_s = syslog;
+            syslog_s = syslog.c_str();
             if (syslog_s.empty() == false) {
                 params.insert({"syslog", syslog_s});
             } else {
@@ -66,6 +67,41 @@ bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
         }
     } else {
         params.insert({"syslog", "false"});
+    }
+
+    if (syslog_s.compare("true") == 0) {
+        bool syslog_facility = logs_params.exists("syslog_facility");
+        if (syslog_facility == true) {
+            libconfig::Setting &syslog_facility =
+                logs_params.lookup("syslog_facility");
+            try {
+                std::string syslog_facility_s = syslog_facility;
+                if (syslog_facility_s.empty()                 == false &&
+                   (syslog_facility_s.compare("LOG_DAEMON")   == 0 || //3
+                    syslog_facility_s.compare("LOG_USER")     == 0 || //8
+                    syslog_facility_s.compare("LOG_LOCAL0")   == 0 || //16
+                    syslog_facility_s.compare("LOG_LOCAL1")   == 0 || //17
+                    syslog_facility_s.compare("LOG_LOCAL2")   == 0 || //18
+                    syslog_facility_s.compare("LOG_LOCAL3")   == 0 || //19
+                    syslog_facility_s.compare("LOG_LOCAL4")   == 0 || //20
+                    syslog_facility_s.compare("LOG_LOCAL5")   == 0 || //21
+                    syslog_facility_s.compare("LOG_LOCAL6")   == 0 || //22
+                    syslog_facility_s.compare("LOG_LOCAL7")   == 0)) {//23
+                    params.insert({"syslog_facility", syslog_facility_s});
+                } else {
+                    spdlog::get("multi-logger-boot")->
+                        error("[syslog] configuration "
+                        "issue: [ {} ] is invalid", syslog_facility_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger-boot")->
+                    error("[syslog] configuration issue: {}", ste.what());
+                return false;
+            }
+        } else {
+            params.insert({"syslog_facility", "LOG_USER"});
+        }
     }
 
     bool console_log = logs_params.exists("console_log");

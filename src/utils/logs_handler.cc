@@ -5,6 +5,7 @@
 // mdt-dialout-collector Library headers
 #include "logs_handler.h"
 #include "cfg_handler.h"
+#include <spdlog/spdlog.h>
 
 
 LogsHandler::LogsHandler()
@@ -27,7 +28,7 @@ bool LogsHandler::set_boot_spdlog_sinks()
     try {
         auto spdlog_syslog =
             std::make_shared<spdlog::sinks::syslog_sink_mt>(
-                ident, 0, LOG_LOCAL3, true);
+                ident, 0, LOG_USER, true);
         spdlog_sinks.push_back(spdlog_syslog);
     } catch (const spdlog::spdlog_ex &sex) {
         std::cout << "spdlog, syslog: " << sex.what() << "\n";
@@ -57,13 +58,32 @@ bool LogsHandler::set_spdlog_sinks()
     std::vector<spdlog::sink_ptr> spdlog_sinks;
     std::string spdlog_level = logs_cfg_parameters.at("spdlog_level");
 
+	// Mapping syslog facility strings to codified integers.
+	// https://www.rfc-editor.org/rfc/rfc5424
+	std::map<std::string, int> syslog_facility {
+		{"LOG_DAEMON",3},
+		{"LOG_USER"  ,8},
+		{"LOG_LOCAL0",16},
+		{"LOG_LOCAL1",17},
+		{"LOG_LOCAL2",18},
+		{"LOG_LOCAL3",19},
+		{"LOG_LOCAL4",20},
+		{"LOG_LOCAL5",21},
+		{"LOG_LOCAL6",22},
+		{"LOG_LOCAL7",23},
+    };
+
     // Syslog
     if (logs_cfg_parameters.at("syslog").compare("true") == 0) {
         const std::string ident = "mdt-dialout-collector";
         try {
             auto spdlog_syslog =
                 std::make_shared<spdlog::sinks::syslog_sink_mt>(
-                    ident, 0, LOG_LOCAL3, true);
+                    ident, 0,
+                    // syslog facility codified integers are multiplied by 8
+                    syslog_facility[
+                        logs_cfg_parameters.at("syslog_facility")] * 8,
+                    true);
             spdlog_sinks.push_back(spdlog_syslog);
         } catch (const spdlog::spdlog_ex &sex) {
             std::cout << "spdlog, syslog: " << sex.what() << "\n";

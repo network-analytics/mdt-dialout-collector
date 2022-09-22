@@ -70,12 +70,15 @@ public:
     // Getters
     //const std::string &get_syslog() const {
     //    return syslog; };
+    //const std::string &get_syslog_facility() const {
+    //    return syslog_facility; };
     //const std::string &get_console_log() const {
     //    return console_log; };
     //const std::string &get_spdlog_level() const {
     //    return spdlog_level; };
 private:
     const std::string syslog;
+    const std::string syslog_facility;
     const std::string console_log;
     const std::string spdlog_level;
 };
