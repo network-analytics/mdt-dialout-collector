@@ -87,7 +87,8 @@ Here below is a verbosely commented *example* of configuration:
 ```SHELL
 #### mdt-dialout-collector - main
 
-## writer-id - default = "mdt-dialout-collector"
+## writer-id:
+## default = "mdt-dialout-collector"
 writer_id = "mdt-dout-collector-01";
 
 ## physical interface where to bind the daemon
@@ -108,44 +109,56 @@ replies_cisco = "10";
 replies_juniper = "100";
 replies_huawei = "1000";
 
-## workers (threads) per vendor - default = "1" | max = "5"
+## workers (threads) per vendor:
+## default = "1" | max = "5"
 cisco_workers = "1";
 juniper_workers = "1";
 huawei_workers = "1";
 
 ## logging:
-## Syslog support: default => syslog = "false" | facility (static) default => LOG_USER
+## Syslog support:
+## default => syslog = "false" | facility (static) default => LOG_USER
 syslog = "true";
 
-## Syslog Facility: default => syslog_facility = "LOG_USER" | supported [LOG_DAEMON, LOG_USER, LOG_LOCAL(0..7)]
+## Syslog Facility:
+## default => syslog_facility = "LOG_USER" | supported [LOG_DAEMON, LOG_USER, LOG_LOCAL(0..7)]
 syslog_facility = "LOG_LOCAL3";
 
-## Console support: default => console_log = "true"
+## Console support:
+## default => console_log = "true"
 console_log = "false";
 
-## Severity level: default => spdlog_level = "info" | supported [debug, info, warn, error, off]
+## Severity level:
+## default => spdlog_level = "info" | supported [debug, info, warn, error, off]
 spdlog_level = "debug";
 
 
 #### mdt-dialout-collector - data-flow manipulation
 
-## simplified JSON after GPB/GPB-KV decoding - default = "true"
+## simplified JSON after GPB/GPB-KV decoding:
+## default = "true"
 enable_cisco_gpbkv2json = "false";
 
-## standard JSON after GPB/GPB-KV deconding - default = "false"
+## standard JSON after GPB/GPB-KV deconding:
+## default = "false"
 enable_cisco_message_to_json_string = "true";
 
-## data-flow enrichment with node_id/platform_id - default = "false"
+## data-flow enrichment with node_id/platform_id:
+## default = "false"
 ## for additional details refer to "csv/README.md" or "ptm/README.md"
 
-## CSV format - default = "false"
+## CSV format:
+## default = "false"
 enable_label_encode_as_map = "false";
-## label_map_csv_path - default = "/opt/mdt_dialout_collector/csv/label_map.csv"
+## label_map_csv_path:
+## default = "/opt/mdt_dialout_collector/csv/label_map.csv"
 label_map_csv_path = "/define/here/your/custom_path.csv"
 
-## PTM format (pmacct's pretag) - default = "false"
+## PTM format (pmacct's pretag):
+## default = "false"
 enable_label_encode_as_map_ptm = "true";
-## label_map_ptm_path - default = "/opt/mdt_dialout_collector/ptm/label_map.ptm"
+## label_map_ptm_path:
+## default = "/opt/mdt_dialout_collector/ptm/label_map.ptm"
 label_map_ptm_path = "/define/here/your/custom_path.ptm"
 
 
