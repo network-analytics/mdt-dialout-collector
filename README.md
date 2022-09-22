@@ -114,7 +114,7 @@ juniper_workers = "1";
 huawei_workers = "1";
 
 ## logging:
-## Syslog support: default => syslog = "flase" | facility (static) default => LOG_USER
+## Syslog support: default => syslog = "false" | facility (static) default => LOG_USER
 syslog = "true";
 
 ## Syslog Facility: default => syslog_facility = "LOG_USER" | supported [LOG_DAEMON, LOG_USER, LOG_LOCAL(0..7)]
