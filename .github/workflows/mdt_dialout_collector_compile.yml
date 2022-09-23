@@ -1,0 +1,19 @@
+name: mdt-dialout-collector [compile]
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: mkdir
+      run: mkdir build
+    - name: cmake
+      run: cmake ../
+    - name: make -j
+      run: make
