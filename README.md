@@ -46,7 +46,7 @@ and thanks to Protocol Buffers, the exchanged data is binary encoded which consi
 
 ### gNMI vs gRPC Dial-in/gRPC Dial-out
 
-gNMI (**g**RPC **N**etwork **M**anagement **I**nterface) is using the gRPC framework and a [**Standardized Protobuff**](https://www.openconfig.net/projects/rpc/)
+gNMI (**g**RPC **N**etwork **M**anagement **I**nterface) is using the gRPC framework and a [**Standardized Protobuff**](https://www.openconfig.net/)
 file to implement a solution to **fully operate** the network.
 
 With gRPC dial-in/dial-out The data-stream is *(of course)* always PUSH(ed) from the router, however in case of Dial-in the connection
