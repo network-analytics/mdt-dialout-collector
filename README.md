@@ -63,6 +63,13 @@ the [**Cisco's gRPC Dial-out .proto file**](https://github.com/ios-xr/model-driv
 , the [**Juniper's gRPC Dial-out .proto file**](https://www.juniper.net/documentation/us/en/software/junos/interfaces-telemetry/topics/topic-map/telemetry-grpc-dialout-ta.html)
 and the [**Huawei's gRPC Dial-out .proto file**](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files).
 
+The collector functionalities are logically grouped into three categories and each one of them is including multiple options.
+The **Data Collection** block is including all configuration parameters associated with the daemons behavior,
+while the **Data Manipulation/Enrichment** block is taking care of conveniently transforming the in-transit data-stream up to Kafka.
+(Open the image in a new tab to Zoom-In)
+
+![alt text](https://www.alfanetti.org/images/monitoring/mdt_dialout_collector/mdt_dialout_collector_arch.jpg "mdt-dialout-collector, high-level arch")
+
 Depending on the selected Vendor/Operating System, the supported encondings are JSON, GPB-KV and GPB-Comapct (Huawei openconfig-interfaces).
 
 | Vendor | OS Version                     |   Encoding   |      .proto file                                                                                                                                                              |
