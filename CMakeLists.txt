@@ -1,5 +1,5 @@
 # Minimum CMake required
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.18)
 
 # Set compiler options
 set(CMAKE_CXX_FLAGS "-Wall -pedantic -pthread -std=c++17")
@@ -84,13 +84,13 @@ message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
 # librdkafka
 set(RDKAFKACPP_INCLUDE_DIR /usr/local/include)
 include_directories("${RDKAFKACPP_INCLUDE_DIR}")
-pkg_check_modules(RDKAFKA_CPP REQUIRED rdkafka++>=1.6.2)
+pkg_check_modules(RDKAFKA_CPP REQUIRED rdkafka++>=1.6.0)
 link_libraries(${RDKAFKA_CPP_LIBRARIES})
 message(STATUS "Using librdkafka++ ${RDKAFKA_CPP_VERSION}")
 
 set(RDKAFKA_INCLUDE_DIR /usr/local/include)
 include_directories("${RDKAFKA_INCLUDE_DIR}")
-pkg_check_modules(RDKAFKA REQUIRED rdkafka>=1.6.2)
+pkg_check_modules(RDKAFKA REQUIRED rdkafka>=1.6.0)
 link_libraries(${RDKAFKA_LIBRARIES})
 message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
 
