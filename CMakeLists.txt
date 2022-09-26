@@ -1,3 +1,7 @@
+# Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+# Distributed under the MIT License (http://opensource.org/licenses/MIT)
+
+
 # Minimum CMake required
 cmake_minimum_required(VERSION 3.18)
 
