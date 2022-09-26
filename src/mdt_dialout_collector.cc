@@ -139,8 +139,8 @@ int main(int argc, char *argv[])
     int core_pid = getpid();
     const std::string core_pid_folder =
         main_cfg_parameters.at("core_pid_folder");
-    const std::string core_pid_file = "mdt_dialout_collector.pid";
-    const std::string core_pid_path = core_pid_folder + core_pid_file;
+    const std::string core_pid_file = main_cfg_parameters.at("writer_id");
+    const std::string core_pid_path = core_pid_folder + "/" + core_pid_file;
 
     if (DumpCorePid(core_pid, core_pid_path) == false) {
         spdlog::get("multi-logger")->error(
