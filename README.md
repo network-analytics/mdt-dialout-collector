@@ -1,6 +1,6 @@
 ### Multi-vendor (async) gRPC dial-out collector
 
-TELCOs are usually dealing with a considerable amount of devices, typically in a multi-vendor environment.
+Telcos are usually dealing with a considerable amount of devices, typically in a multi-vendor environment.
 Of course, all of them are equipped with the *state-of-the-art* telemetry technologies ... Well, **unfortunately**,
 we all know that most of the time they're not!
 
