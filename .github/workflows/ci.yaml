@@ -1,36 +1,39 @@
-# This is a basic workflow to help you get started with Actions
+name: ci
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+env:
+  IMAGE_NAME: mdt-dialout-collector
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: [self-hosted, mdt-dialout-collector]
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Build image
+        run: docker build . --file docker/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Push image
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "master" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+
