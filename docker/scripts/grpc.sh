@@ -31,7 +31,7 @@ cmake -DgRPC_INSTALL=ON \
 -DgRPC_ZLIB_PROVIDER=module \
 ../..
 
-make -j
+make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
 
 make install
 popd
