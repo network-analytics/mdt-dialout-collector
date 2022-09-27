@@ -13,7 +13,7 @@ env:
   IMAGE_NAME: mdt-dialout-collector
 
 jobs:
-  push:
+  ci:
     runs-on: ubuntu-latest
     permissions:
       packages: write
