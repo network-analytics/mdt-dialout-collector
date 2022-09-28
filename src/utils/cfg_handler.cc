@@ -104,6 +104,31 @@ bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
         }
     }
 
+    if (syslog_s.compare("true") == 0) {
+        bool syslog_ident = logs_params.exists("syslog_ident");
+        if (syslog_ident == true) {
+            libconfig::Setting &syslog_ident =
+                logs_params.lookup("syslog_ident");
+            try {
+                std::string syslog_ident_s = syslog_ident;
+                if (syslog_ident_s.empty() == false) {
+                    params.insert({"syslog_ident", syslog_ident_s});
+                } else {
+                    spdlog::get("multi-logger-boot")->
+                        error("[syslog_ident] configuration "
+                        "issue: [ {} ] is invalid", syslog_ident_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger-boot")->
+                    error("[syslog_ident] configuration issue: {}", ste.what());
+                return false;
+            }
+        } else {
+            params.insert({"syslog_ident", "mdt-dialout-collector"});
+        }
+    }
+
     bool console_log = logs_params.exists("console_log");
     if (console_log == true) {
         libconfig::Setting &console_log =

@@ -75,7 +75,7 @@ bool LogsHandler::set_spdlog_sinks()
 
     // Syslog
     if (logs_cfg_parameters.at("syslog").compare("true") == 0) {
-        const std::string ident = "mdt-dialout-collector";
+        const std::string ident = logs_cfg_parameters.at("syslog_ident");
         try {
             auto spdlog_syslog =
                 std::make_shared<spdlog::sinks::syslog_sink_mt>(
@@ -106,6 +106,9 @@ bool LogsHandler::set_spdlog_sinks()
     this->multi_logger = std::make_shared<spdlog::logger>
         ("multi-logger", begin(spdlog_sinks), end(spdlog_sinks));
     this->multi_logger->set_level(spdlog::level::from_str(spdlog_level));
+    this->multi_logger->set_pattern(
+        "[%d-%m-%Y %T.%e] [%n] [%l] ["
+        + logs_cfg_parameters.at("syslog_ident") + "] %v");
     spdlog::register_logger(this->multi_logger);
 
     return true;
