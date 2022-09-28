@@ -107,7 +107,7 @@ bool LogsHandler::set_spdlog_sinks()
         ("multi-logger", begin(spdlog_sinks), end(spdlog_sinks));
     this->multi_logger->set_level(spdlog::level::from_str(spdlog_level));
     this->multi_logger->set_pattern(
-        "[%d-%m-%Y %T.%e] [%n] [%l] ["
+        "[%d-%m-%Y %T.%e] [%n] [%^%l%$] ["
         + logs_cfg_parameters.at("syslog_ident") + "] %v");
     spdlog::register_logger(this->multi_logger);
 
