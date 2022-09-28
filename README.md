@@ -131,6 +131,10 @@ syslog = "true";
 ## default => syslog_facility = "LOG_USER" | supported [LOG_DAEMON, LOG_USER, LOG_LOCAL(0..7)]
 syslog_facility = "LOG_LOCAL3";
 
+## Syslog Ident:
+## default => syslog_ident = "mdt-dialout-collector"
+syslog_ident = "mdt-dout-collector-01";
+
 ## Console support:
 ## default => console_log = "true"
 console_log = "false";
