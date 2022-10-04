@@ -9,7 +9,7 @@ FROM --platform=${PLATFORM} debian:${VERSION}
 
 LABEL Author="Salvatore Cuzzilla (Swisscom AG)"
 
-RUN apt-get update && apt-get full-upgrade && \
+RUN apt-get update && apt-get -y full-upgrade && \
   apt-get install -y \
     bash \
     git \
