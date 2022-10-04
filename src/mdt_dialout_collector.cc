@@ -16,7 +16,7 @@
 #include "logs_handler.h"
 
 
-void *VendorThread(void *vendor_ptr, const std::string &);
+void *VendorThread(void *vendor_ptr, const std::string &vendor);
 void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &ipv4_socket_str,
     const std::string &replies_str,
