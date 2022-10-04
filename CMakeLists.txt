@@ -6,9 +6,9 @@
 cmake_minimum_required(VERSION 3.18)
 
 # Set compiler options
-set(CMAKE_CXX_FLAGS "-Wall -pedantic -pthread -std=c++17")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+set(CMAKE_CXX_FLAGS "-O2 -g -Wall -pedantic -pthread -std=c++17")
+#set(CMAKE_CXX_FLAGS_DEBUG "-g")
+#set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # pkg-config
