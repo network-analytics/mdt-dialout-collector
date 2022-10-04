@@ -3,7 +3,7 @@
 
 
 // mdt-dialout-collector Library headers
-#include "dataDelivery/data_delivery.h"
+#include "data_delivery.h"
 
 
 DataDelivery::DataDelivery()

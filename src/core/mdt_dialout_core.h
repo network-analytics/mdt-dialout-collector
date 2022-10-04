@@ -10,14 +10,14 @@
 // External Library headers & System headers
 #include <sys/socket.h>
 #include <grpcpp/grpcpp.h>
-#include "grpc/socket_mutator.h"
 #include <grpc/support/alloc.h>
+#include "grpc/socket_mutator.h"
 // mdt-dialout-collector Library headers
 #include "cisco_dialout.grpc.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "juniper_dialout.grpc.pb.h"
-#include "dataManipulation/data_manipulation.h"
-#include "dataDelivery/data_delivery.h"
+#include "data_manipulation.h"
+#include "data_delivery.h"
 #include "juniper_gnmi.pb.h"
 
 

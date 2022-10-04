@@ -58,19 +58,19 @@ bool LogsHandler::set_spdlog_sinks()
     std::vector<spdlog::sink_ptr> spdlog_sinks;
     std::string spdlog_level = logs_cfg_parameters.at("spdlog_level");
 
-	// Mapping syslog facility strings to codified integers.
-	// https://www.rfc-editor.org/rfc/rfc5424
-	std::map<std::string, int> syslog_facility {
-		{"LOG_DAEMON",3},
-		{"LOG_USER"  ,8},
-		{"LOG_LOCAL0",16},
-		{"LOG_LOCAL1",17},
-		{"LOG_LOCAL2",18},
-		{"LOG_LOCAL3",19},
-		{"LOG_LOCAL4",20},
-		{"LOG_LOCAL5",21},
-		{"LOG_LOCAL6",22},
-		{"LOG_LOCAL7",23},
+    // Mapping syslog facility strings to codified integers.
+    // https://www.rfc-editor.org/rfc/rfc5424
+    std::map<std::string, int> syslog_facility {
+        {"LOG_DAEMON",3},
+        {"LOG_USER"  ,8},
+        {"LOG_LOCAL0",16},
+        {"LOG_LOCAL1",17},
+        {"LOG_LOCAL2",18},
+        {"LOG_LOCAL3",19},
+        {"LOG_LOCAL4",20},
+        {"LOG_LOCAL5",21},
+        {"LOG_LOCAL6",22},
+        {"LOG_LOCAL7",23},
     };
 
     // Syslog

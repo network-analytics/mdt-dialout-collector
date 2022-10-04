@@ -311,13 +311,12 @@ add_custom_command(
     "${openconfig_interfaces_proto}"
 )
 
-# Include local header files
+# Include headers folders
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Cisco")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Juniper")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Huawei")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/OpenConfig")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/core")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation")

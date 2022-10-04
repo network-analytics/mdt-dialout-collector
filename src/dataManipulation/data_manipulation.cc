@@ -3,7 +3,7 @@
 
 
 // mdt-dialout-collector Library headers
-#include "dataManipulation/data_manipulation.h"
+#include "data_manipulation.h"
 
 
 // Envelop & collector meta-data

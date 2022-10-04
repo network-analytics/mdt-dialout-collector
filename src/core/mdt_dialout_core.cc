@@ -3,7 +3,7 @@
 
 
 // mdt-dialout-collector Library headers
-#include "core/mdt_dialout_core.h"
+#include "mdt_dialout_core.h"
 
 
 // Global visibility to be able to signal the refresh --> CSV from main

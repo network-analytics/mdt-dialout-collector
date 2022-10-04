@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }
 
     if ((v_option_flag == 1) and (argc == 2)) {
-        std::cout << "Version: 1.0\n";
+        std::cout << "gRPC dial-out collector, mdt-dialout-collector v1.0.0\n";
         return EXIT_SUCCESS;
     } else if ((v_option_flag == 1) and (argc > 2)) {
         std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-V]\n";
