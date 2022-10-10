@@ -17,6 +17,7 @@
 #include "huawei_dialout.grpc.pb.h"
 #include "juniper_dialout.grpc.pb.h"
 #include "data_manipulation.h"
+#include "data_wrapper.h"
 #include "data_delivery.h"
 #include "juniper_gnmi.pb.h"
 

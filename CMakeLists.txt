@@ -320,6 +320,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/proto/OpenConfig")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/core")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/utils")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery")
 
 # set the bin folder
@@ -334,6 +335,7 @@ foreach(_target "mdt_dialout_collector")
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper/data_wrapper.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/data_delivery.cc"
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
