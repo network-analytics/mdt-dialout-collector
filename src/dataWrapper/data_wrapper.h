@@ -23,14 +23,12 @@ public:
             debug("destructor: ~DataWrapper()"); };
 
     bool BuildDataWrapper(
-        uint64_t sequence_number,
-        const std::string event_type,
-        const std::string serialization,
-        std::time_t timestamp,
-        const std::string writer_id,
-        const std::string telemetry_node,
-        uint16_t telemetry_port,
-        const std::string set_telemetry_data
+        const std::string &event_type,
+        const std::string &serialization,
+        const std::string &writer_id,
+        const std::string &telemetry_node,
+        const std::string &telemetry_port,
+        const std::string &set_telemetry_data
     );
 
     void DisplayDataWrapper();
@@ -46,7 +44,7 @@ public:
         this->serialization = serialization;
     };
     void set_timestamp() {
-        this->timestamp = std::time_t(nullptr);
+        this->timestamp = std::time(nullptr);
     };
     void set_writer_id(const std::string &writer_id) {
         this->writer_id = writer_id;
@@ -54,7 +52,7 @@ public:
     void set_telemetry_node(const std::string &telemetry_node) {
         this->telemetry_node = telemetry_node;
     };
-    void set_telemetry_port(uint16_t &telemetry_port) {
+    void set_telemetry_port(const std::string &telemetry_port) {
         this->telemetry_port = telemetry_port;
     };
     void set_telemetry_data(const std::string &telemetry_data) {
@@ -62,14 +60,14 @@ public:
     }
 
     // Getters
-    uint64_t get_sequence_number() { return this->sequence_number; };
-    std::string get_event_type() { return this->event_type; };
-    std::string get_serialization() { return this->serialization; };
-    std::time_t get_timestamp() { return this->timestamp; };
-    std::string get_writer_id() { return this->writer_id; };
-    std::string get_telemetry_node() { return this->telemetry_node; };
-    uint16_t get_telemetry_port() { return this->telemetry_port; };
-    std::string get_telemetry_data() { return this->telemetry_data; };
+    uint64_t &get_sequence_number() { return this->sequence_number; };
+    std::string &get_event_type() { return this->event_type; };
+    std::string &get_serialization() { return this->serialization; };
+    std::time_t &get_timestamp() { return this->timestamp; };
+    std::string &get_writer_id() { return this->writer_id; };
+    std::string &get_telemetry_node() { return this->telemetry_node; };
+    std::string &get_telemetry_port() { return this->telemetry_port; };
+    std::string &get_telemetry_data() { return this->telemetry_data; };
 private:
     uint64_t sequence_number = 0;
     std::string event_type;
@@ -77,7 +75,7 @@ private:
     std::time_t timestamp;
     std::string writer_id;
     std::string telemetry_node;
-    uint16_t telemetry_port;
+    std::string telemetry_port;
     std::string telemetry_data;
 };
 

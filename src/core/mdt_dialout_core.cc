@@ -120,14 +120,15 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 void Srv::CiscoFsmCtrl()
 {
     DataManipulation data_manipulation;
+    DataWrapper data_wrapper;
     DataDelivery data_delivery;
     kafka::clients::KafkaProducer producer(data_delivery.get_properties());
     cisco_telemetry::Telemetry cisco_tlm;
 
     std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
-    cisco_sstream->Start(label_map, data_manipulation, data_delivery, producer,
-        cisco_tlm);
+    cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
+        data_delivery, producer, cisco_tlm);
     //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
@@ -142,7 +143,8 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            label_map, data_manipulation, data_delivery, producer, cisco_tlm);
+            label_map, data_manipulation, data_wrapper, data_delivery,
+            producer, cisco_tlm);
         //cisco_counter++;
     }
 }
@@ -252,9 +254,11 @@ Srv::HuaweiStream::HuaweiStream(
     spdlog::get("multi-logger")->debug("constructor: HuaweiStream()");
 }
 
+
 void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
+    DataWrapper &data_wrapper,
     DataDelivery &data_delivery,
     kafka::clients::KafkaProducer &producer,
     cisco_telemetry::Telemetry &cisco_tlm)
@@ -273,8 +277,8 @@ void Srv::CiscoStream::Start(
             "new Srv::CiscoStream()");
         Srv::CiscoStream *cisco_sstream =
             new Srv::CiscoStream(cisco_service_, cisco_cq_);
-        cisco_sstream->Start(label_map, data_manipulation, data_delivery,
-            producer, cisco_tlm);
+        cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
+            data_delivery, producer, cisco_tlm);
         cisco_resp.Read(&cisco_stream, this);
         cisco_stream_status = PROCESSING;
         cisco_replies_sent++;
@@ -486,7 +490,16 @@ void Srv::CiscoStream::Start(
                             label_map,
                             peer_ip,
                             stream_data_out_meta,
-                            stream_data_out) == true) {
+                            stream_data_out) == true &&
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            //Original data-in
+                            stream_data_in) == true) {
+                        //data_wrapper.DisplayDataWrapper();
                         data_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,

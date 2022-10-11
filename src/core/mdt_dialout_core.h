@@ -90,6 +90,7 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
+            DataWrapper &data_wrapper,
             DataDelivery &data_delivery,
             kafka::clients::KafkaProducer &producer,
             cisco_telemetry::Telemetry &cisco_tlm
