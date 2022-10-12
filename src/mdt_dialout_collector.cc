@@ -16,7 +16,7 @@
 #include "logs_handler.h"
 
 
-void *VendorThread(void *vendor_ptr, const std::string &vendor);
+void *VendorThread(const std::string &vendor);
 void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &ipv4_socket_str,
     const std::string &replies_str,
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-void *VendorThread(void *vendor_ptr, const std::string &ipv4_socket_str)
+void *VendorThread(const std::string &ipv4_socket_str)
 {
     if (ipv4_socket_str.find("cisco") != std::string::npos) {
         std::string ipv4_socket_cisco =
@@ -239,7 +239,6 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
                 "and 1000. (default = 0 => unlimited)", replies_str);
             std::exit(EXIT_FAILURE);
         }
-        void *vendor_ptr {nullptr};
         int workers = std::stoi(main_cfg_parameters.at(workers_str));
         if (workers < 1 || workers > 5) {
             spdlog::get("multi-logger")->
@@ -249,8 +248,8 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
             std::exit(EXIT_FAILURE);
         }
         for (int w = 0; w < workers; ++w) {
-            workers_vec.push_back(std::thread(&VendorThread, vendor_ptr,
-                ipv4_socket_str));
+            workers_vec.push_back(std::thread(&VendorThread,
+                std::ref(ipv4_socket_str)));
         }
         spdlog::get("multi-logger")->
             info("mdt-dialout-collector listening on {} ",
