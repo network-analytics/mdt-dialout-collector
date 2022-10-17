@@ -519,8 +519,10 @@ void Srv::CiscoStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out);
-                        //zmq_delivery.ZmqPusher(
-                        //    stream_data_in);
+                        zmq_delivery.ZmqPusher(
+                            stream_data_in,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(

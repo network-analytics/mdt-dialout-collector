@@ -9,20 +9,30 @@
 ZmqDelivery::ZmqDelivery()
 {
     spdlog::get("multi-logger")->debug("constructor::ZmqDelivery()");
+    this->set_zmq_stransport_uri("ipc:///tmp/grpc.sock");
 }
 
-void ZmqDelivery::ZmqPusher(std::string &payload)
+bool ZmqDelivery::ZmqPusher(
+    std::string &payload,
+    zmq::context_t &zmq_ctx,
+    const std::string &zmq_transport_uri)
 {
-	zmq::context_t ctx;
-    zmq::socket_t sock(ctx, zmq::socket_type::push);
+    zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
 
-    std::string sok = "ipc:///tmp/grpc.sock";
+    sock.connect(zmq_transport_uri);
+
     try {
-        sock.connect(sok);
         sock.send(zmq::buffer(payload));
-        //sock.send(zmq::buffer(payload), zmq::send_flags::dontwait);
-    } catch(zmq::error_t &e) {
-        std::cout << "ZMQ Exception: " << e.what() << std::endl;
+        spdlog::get("multi-logger")->
+            info("[ZmqPusher] data-delivery: "
+                "message successfully delivered");
+    } catch(const zmq::error_t &zex) {
+        spdlog::get("multi-logger")->
+            error("[ZmqPusher] data-delivery issue: "
+            "{}", zex.what());
+        return false;
     }
+
+    return true;
 }
 
