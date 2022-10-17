@@ -94,6 +94,7 @@ private:
             DataWrapper &data_wrapper,
             KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
+            ZmqDelivery &zmq_delivery,
             cisco_telemetry::Telemetry &cisco_tlm
         );
     private:
