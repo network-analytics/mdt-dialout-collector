@@ -85,7 +85,7 @@ pkg_check_modules(JSONCPP REQUIRED jsoncpp>=1.8.4)
 link_libraries(${JSONCPP_LIBRARIES})
 message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
 
-# librdkafka
+# librdkafka (MANUAL == manually compiled)
 set(RDKAFKACPP_INCLUDE_DIR /usr/include/librdkafka)
 #set(RDKAFKACPP_INCLUDE_DIR_MANUAL /usr/local/include)
 include_directories("${RDKAFKACPP_INCLUDE_DIR}")
