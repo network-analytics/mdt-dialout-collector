@@ -8,7 +8,7 @@
 
 KafkaDelivery::KafkaDelivery()
 {
-    spdlog::get("multi-logger")->debug("constructor: DataDelivery()");
+    spdlog::get("multi-logger")->debug("constructor: KafkaDelivery()");
     this->topic =
         data_delivery_cfg_parameters.at("topic");
     this->bootstrap_servers =

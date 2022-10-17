@@ -20,7 +20,7 @@ class KafkaDelivery {
 public:
     KafkaDelivery();
     ~KafkaDelivery() { spdlog::get("multi-logger")->
-        debug("destructor: ~DataDelivery()"); };
+        debug("destructor: ~KafkaDelivery()"); };
     bool AsyncKafkaProducer(
         kafka::clients::KafkaProducer &producer,
         const std::string &peer,
