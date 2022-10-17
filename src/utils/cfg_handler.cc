@@ -10,7 +10,7 @@
 std::map<std::string, std::string> logs_cfg_parameters;
 std::map<std::string, std::string> main_cfg_parameters;
 std::map<std::string, std::string> data_manipulation_cfg_parameters;
-std::map<std::string, std::string> data_delivery_cfg_parameters;
+std::map<std::string, std::string> kafka_delivery_cfg_parameters;
 
 
 bool CfgHandler::set_parameters(libconfig::Config &params,

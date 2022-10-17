@@ -10,23 +10,23 @@ KafkaDelivery::KafkaDelivery()
 {
     spdlog::get("multi-logger")->debug("constructor: KafkaDelivery()");
     this->topic =
-        data_delivery_cfg_parameters.at("topic");
+        kafka_delivery_cfg_parameters.at("topic");
     this->bootstrap_servers =
-        data_delivery_cfg_parameters.at("bootstrap_servers");
+        kafka_delivery_cfg_parameters.at("bootstrap_servers");
     this->enable_idempotence =
-        data_delivery_cfg_parameters.at("enable_idempotence");
+        kafka_delivery_cfg_parameters.at("enable_idempotence");
     this->client_id =
-        data_delivery_cfg_parameters.at("client_id");
+        kafka_delivery_cfg_parameters.at("client_id");
     this->security_protocol =
-        data_delivery_cfg_parameters.at("security_protocol");
+        kafka_delivery_cfg_parameters.at("security_protocol");
     this->ssl_key_location =
-        data_delivery_cfg_parameters.at("ssl_key_location");
+        kafka_delivery_cfg_parameters.at("ssl_key_location");
     this->ssl_certificate_location =
-        data_delivery_cfg_parameters.at("ssl_certificate_location");
+        kafka_delivery_cfg_parameters.at("ssl_certificate_location");
     this->ssl_ca_location =
-        data_delivery_cfg_parameters.at("ssl_ca_location");
+        kafka_delivery_cfg_parameters.at("ssl_ca_location");
     this->log_level =
-        data_delivery_cfg_parameters.at("log_level");
+        kafka_delivery_cfg_parameters.at("log_level");
 
     set_kafka_properties(this->properties);
 }

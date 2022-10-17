@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     //for (auto &dm : data_manipulation_cfg_parameters) {
     //    std::cout << dm.first << " ---> " << dm.second << "\n";
     //}
-    //for (auto &dd : data_delivery_cfg_parameters) {
+    //for (auto &dd : kafka_delivery_cfg_parameters) {
     //    std::cout << dd.first << " ---> " << dd.second << "\n";
     //}
     // --- DEBUG ---
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
             cfg_handler.get_kafka_parameters()) == false) {
             std::exit(EXIT_FAILURE);
         } else {
-            data_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+            kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
         }
     }
 
