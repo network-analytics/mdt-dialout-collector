@@ -3,10 +3,10 @@
 
 
 // mdt-dialout-collector Library headers
-#include "data_delivery.h"
+#include "kafka_delivery.h"
 
 
-DataDelivery::DataDelivery()
+KafkaDelivery::KafkaDelivery()
 {
     spdlog::get("multi-logger")->debug("constructor: DataDelivery()");
     this->topic =
@@ -31,7 +31,7 @@ DataDelivery::DataDelivery()
     set_kafka_properties(this->properties);
 }
 
-void DataDelivery::set_kafka_properties(kafka::Properties &properties)
+void KafkaDelivery::set_kafka_properties(kafka::Properties &properties)
 {
     properties.put("bootstrap.servers", get_bootstrap_servers());
     properties.put("enable.idempotence", get_enable_idempotence());
@@ -43,7 +43,7 @@ void DataDelivery::set_kafka_properties(kafka::Properties &properties)
     properties.put("log_level", get_log_level());
 }
 
-bool DataDelivery::AsyncKafkaProducer(
+bool KafkaDelivery::AsyncKafkaProducer(
     kafka::clients::KafkaProducer &producer,
     const std::string &peer,
     const std::string &json_str)

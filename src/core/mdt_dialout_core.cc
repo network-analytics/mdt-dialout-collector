@@ -121,14 +121,14 @@ void Srv::CiscoFsmCtrl()
 {
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
-    DataDelivery data_delivery;
-    kafka::clients::KafkaProducer producer(data_delivery.get_properties());
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     cisco_telemetry::Telemetry cisco_tlm;
 
     std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
     cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-        data_delivery, producer, cisco_tlm);
+        kafka_delivery, producer, cisco_tlm);
     //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
@@ -143,7 +143,7 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            label_map, data_manipulation, data_wrapper, data_delivery,
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
             producer, cisco_tlm);
         //cisco_counter++;
     }
@@ -152,13 +152,13 @@ void Srv::CiscoFsmCtrl()
 void Srv::JuniperFsmCtrl()
 {
     DataManipulation data_manipulation;
-    DataDelivery data_delivery;
-    kafka::clients::KafkaProducer producer(data_delivery.get_properties());
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     GnmiJuniperTelemetryHeaderExtension juniper_tlm_hdr_ext;
 
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
-    juniper_sstream->Start(label_map, data_manipulation, data_delivery,
+    juniper_sstream->Start(label_map, data_manipulation, kafka_delivery,
         producer, juniper_tlm_hdr_ext);
     //int juniper_counter {0};
     void *juniper_tag {nullptr};
@@ -174,7 +174,7 @@ void Srv::JuniperFsmCtrl()
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
-            label_map, data_manipulation, data_delivery, producer,
+            label_map, data_manipulation, kafka_delivery, producer,
             juniper_tlm_hdr_ext);
         //juniper_counter++;
     }
@@ -183,14 +183,14 @@ void Srv::JuniperFsmCtrl()
 void Srv::HuaweiFsmCtrl()
 {
     DataManipulation data_manipulation;
-    DataDelivery data_delivery;
-    kafka::clients::KafkaProducer producer(data_delivery.get_properties());
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     huawei_telemetry::Telemetry huawei_tlm;
     openconfig_interfaces::Interfaces oc_if;
 
     std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
         new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get()));
-    huawei_sstream->Start(label_map, data_manipulation, data_delivery,
+    huawei_sstream->Start(label_map, data_manipulation, kafka_delivery,
         producer, huawei_tlm, oc_if);
     //int huawei_counter {0};
     void *huawei_tag {nullptr};
@@ -206,7 +206,7 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(
-            label_map, data_manipulation, data_delivery, producer,
+            label_map, data_manipulation, kafka_delivery, producer,
             huawei_tlm, oc_if);
         //huawei_counter++;
     }
@@ -259,7 +259,7 @@ void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
     DataWrapper &data_wrapper,
-    DataDelivery &data_delivery,
+    KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
@@ -278,7 +278,7 @@ void Srv::CiscoStream::Start(
         Srv::CiscoStream *cisco_sstream =
             new Srv::CiscoStream(cisco_service_, cisco_cq_);
         cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-            data_delivery, producer, cisco_tlm);
+            kafka_delivery, producer, cisco_tlm);
         cisco_resp.Read(&cisco_stream, this);
         cisco_stream_status = PROCESSING;
         cisco_replies_sent++;
@@ -357,7 +357,7 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     stream_data_out_meta,
                                     stream_data_out) == true ) {
-                                data_delivery.AsyncKafkaProducer(
+                                kafka_delivery.AsyncKafkaProducer(
                                     producer,
                                     peer_ip,
                                     stream_data_out);
@@ -368,7 +368,7 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     peer_port,
                                     stream_data_out_meta) == true) {
-                                data_delivery.AsyncKafkaProducer(
+                                kafka_delivery.AsyncKafkaProducer(
                                     producer,
                                     peer_ip,
                                     stream_data_out_meta);
@@ -407,7 +407,7 @@ void Srv::CiscoStream::Start(
                                 peer_ip,
                                 stream_data_out_meta,
                                 stream_data_out) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out);
@@ -418,7 +418,7 @@ void Srv::CiscoStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_out_meta) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out_meta);
@@ -454,7 +454,7 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out);
@@ -465,7 +465,7 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
@@ -500,7 +500,7 @@ void Srv::CiscoStream::Start(
                             //Original data-in
                             stream_data_in) == true) {
                         //data_wrapper.DisplayDataWrapper();
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out);
@@ -511,7 +511,7 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
@@ -532,7 +532,7 @@ void Srv::CiscoStream::Start(
 void Srv::JuniperStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
-    DataDelivery &data_delivery,
+    KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext)
 {
@@ -550,7 +550,7 @@ void Srv::JuniperStream::Start(
             "new Srv::JuniperStream()");
         Srv::JuniperStream *juniper_sstream =
             new Srv::JuniperStream(juniper_service_, juniper_cq_);
-        juniper_sstream->Start(label_map, data_manipulation, data_delivery,
+        juniper_sstream->Start(label_map, data_manipulation, kafka_delivery,
             producer, juniper_tlm_hdr_ext);
         juniper_resp.Read(&juniper_stream, this);
         juniper_stream_status = PROCESSING;
@@ -612,7 +612,7 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         stream_data_out_meta,
                         stream_data_out) == true) {
-                    data_delivery.AsyncKafkaProducer(
+                    kafka_delivery.AsyncKafkaProducer(
                         producer,
                         peer_ip,
                         stream_data_out);
@@ -623,7 +623,7 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_out_meta) == true) {
-                    data_delivery.AsyncKafkaProducer(
+                    kafka_delivery.AsyncKafkaProducer(
                         producer,
                         peer_ip,
                         stream_data_out_meta);
@@ -644,7 +644,7 @@ void Srv::JuniperStream::Start(
 void Srv::HuaweiStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
-    DataDelivery &data_delivery,
+    KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
     huawei_telemetry::Telemetry &huawei_tlm,
     openconfig_interfaces::Interfaces &oc_if)
@@ -663,7 +663,7 @@ void Srv::HuaweiStream::Start(
             "new Srv::HuaweiStream()");
         Srv::HuaweiStream *huawei_sstream =
             new Srv::HuaweiStream(huawei_service_, huawei_cq_);
-        huawei_sstream->Start(label_map, data_manipulation, data_delivery,
+        huawei_sstream->Start(label_map, data_manipulation, kafka_delivery,
             producer, huawei_tlm, oc_if);
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
@@ -744,7 +744,7 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 stream_data_out_meta,
                                 stream_data_out) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out);
@@ -755,7 +755,7 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_out_meta) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out_meta);
@@ -794,7 +794,7 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true &&
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out);
@@ -805,7 +805,7 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out_meta);

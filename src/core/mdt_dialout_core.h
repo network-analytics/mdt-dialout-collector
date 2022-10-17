@@ -18,7 +18,8 @@
 #include "juniper_dialout.grpc.pb.h"
 #include "data_manipulation.h"
 #include "data_wrapper.h"
-#include "data_delivery.h"
+#include "kafka_delivery.h"
+#include "zmq_delivery.h"
 #include "juniper_gnmi.pb.h"
 
 
@@ -91,7 +92,7 @@ private:
                 &label_map,
             DataManipulation &data_manipulation,
             DataWrapper &data_wrapper,
-            DataDelivery &data_delivery,
+            KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
             cisco_telemetry::Telemetry &cisco_tlm
         );
@@ -119,7 +120,7 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
-            DataDelivery &data_delivery,
+            KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
             GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext
         );
@@ -147,7 +148,7 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
-            DataDelivery &data_delivery,
+            KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
             huawei_telemetry::Telemetry &huawei_tlm,
             openconfig_interfaces::Interfaces &oc_if

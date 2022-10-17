@@ -196,8 +196,8 @@ you're running a Debian derived Linux distribution you can also refer to the [Al
 
 - Libraries like jsoncpp & librdkafka are also required.
 ```SHELL
-Debian$ sudo apt install libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev
-CentOS$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel spdlog-devel
+Debian$ sudo apt install libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev libzmq3-dev
+CentOS$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel spdlog-devel cppzmq-devel
 ```
 
 #### git Clone, Compile and Run (compiler version >= gcc-toolset-11)
@@ -241,6 +241,7 @@ running the make command
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
 | [JsonCpp](https://github.com/open-source-parsers/jsoncpp)                                                                                                                   | MIT License               |
 | [librdkafka](https://github.com/edenhill/librdkafka)                                                                                                                        | BSD 2-Clause License      |
+| [cppzmq](https://github.com/zeromq/cppzmq)                                                                                                                                  | MIT License               |
 | [Modern C++ Kafka API](https://github.com/morganstanley/modern-cpp-kafka)                                                                                                   | Apache License Version 2.0|
 | [libconfig](http://hyperrealm.github.io/libconfig/)                                                                                                                         | LGPL v2.1                 |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)                                                                                                                             | BSD-3-Clause license      |

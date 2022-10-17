@@ -86,17 +86,28 @@ link_libraries(${JSONCPP_LIBRARIES})
 message(STATUS "Using jsoncpp ${JSONCPP_VERSION}")
 
 # librdkafka
-set(RDKAFKACPP_INCLUDE_DIR /usr/local/include)
+set(RDKAFKACPP_INCLUDE_DIR /usr/include/librdkafka)
+set(RDKAFKACPP_INCLUDE_DIR_MANUAL /usr/local/include)
 include_directories("${RDKAFKACPP_INCLUDE_DIR}")
+include_directories("${RDKAFKACPP_INCLUDE_DIR_MANUAL}")
 pkg_check_modules(RDKAFKA_CPP REQUIRED rdkafka++>=1.6.0)
 link_libraries(${RDKAFKA_CPP_LIBRARIES})
 message(STATUS "Using librdkafka++ ${RDKAFKA_CPP_VERSION}")
 
-set(RDKAFKA_INCLUDE_DIR /usr/local/include)
+set(RDKAFKA_INCLUDE_DIR /usr/include/librdkafka)
+set(RDKAFKA_INCLUDE_DIR_MANUAL /usr/local/include)
 include_directories("${RDKAFKA_INCLUDE_DIR}")
+include_directories("${RDKAFKA_INCLUDE_DIR_MANUAL}")
 pkg_check_modules(RDKAFKA REQUIRED rdkafka>=1.6.0)
 link_libraries(${RDKAFKA_LIBRARIES})
 message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
+
+# CPPZMQ (https://github.com/zeromq/cppzmq)
+set(CPPZMQ_INCLUDE_DIR /usr/include)
+include_directories("${CPPZMQ_INCLUDE_DIR}")
+pkg_check_modules(ZMQ_CPP REQUIRED libzmq>=4.3.4)
+link_libraries(${ZMQ_CPP_LIBRARIES})
+message(STATUS "Using cppzmq ${ZMQ_CPP_VERSION}")
 
 # libconfig
 set(LIBCONFIG_CPP_INCLUDE_DIR /usr/include)
@@ -106,7 +117,7 @@ link_libraries(${LIBCONFIG_CPP_LIBRARIES})
 message(STATUS "Using libconfig++ ${LIBCONFIG_CPP_VERSION}")
 
 # spdlog
-set(SPDLOG_INCLUDE_DIR /usr/include)
+set(SPDLOG_INCLUDE_DIR /usr/include/spdlog)
 include_directories("${SPDLOG_INCLUDE_DIR}")
 pkg_check_modules(SPDLOG spdlog>=1.5.0)
 link_libraries(${SPDLOG_LIBRARIES})
@@ -336,7 +347,8 @@ foreach(_target "mdt_dialout_collector")
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper/data_wrapper.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/data_delivery.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/kafka_delivery.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/zmq_delivery.cc"
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
         ${cisco_telemetry_pb_cc}
@@ -364,3 +376,4 @@ foreach(_target "mdt_dialout_collector")
         ${LIBCONFIG_CPP_LIBRARIES}
     )
 endforeach()
+

@@ -2,8 +2,8 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-#ifndef _DATA_DELIVERY_H_
-#define _DATA_DELIVERY_H_
+#ifndef _KAFKA_DELIVERY_H_
+#define _KAFKA_DELIVERY_H_
 
 // C++ Standard Library headers
 
@@ -16,10 +16,10 @@
 #include "logs_handler.h"
 
 
-class DataDelivery {
+class KafkaDelivery {
 public:
-    DataDelivery();
-    ~DataDelivery() { spdlog::get("multi-logger")->
+    KafkaDelivery();
+    ~KafkaDelivery() { spdlog::get("multi-logger")->
         debug("destructor: ~DataDelivery()"); };
     bool AsyncKafkaProducer(
         kafka::clients::KafkaProducer &producer,
