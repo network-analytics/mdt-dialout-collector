@@ -8,8 +8,8 @@
 // C++ Standard Library headers
 
 // External Library headers
-#include "zmq/zmq.hpp"
-#include "zmq/zmq_addon.hpp"
+#include <zmq.hpp>
+#include <zmq_addon.hpp>
 // mdt-dialout-collector Library headers
 #include "cfg_handler.h"
 #include "logs_handler.h"
