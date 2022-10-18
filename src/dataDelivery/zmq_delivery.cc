@@ -4,6 +4,7 @@
 
 // mdt-dialout-collector Library headers
 #include "zmq_delivery.h"
+#include <zmq.hpp>
 
 
 ZmqDelivery::ZmqDelivery()
@@ -13,16 +14,15 @@ ZmqDelivery::ZmqDelivery()
 }
 
 bool ZmqDelivery::ZmqPusher(
-    std::string &payload,
+    const std::string &payload,
     zmq::context_t &zmq_ctx,
     const std::string &zmq_transport_uri)
 {
     zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
-
     sock.connect(zmq_transport_uri);
 
     try {
-        sock.send(zmq::buffer(payload));
+        sock.send(zmq::buffer(payload), zmq::send_flags::none);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
                 "message successfully delivered");

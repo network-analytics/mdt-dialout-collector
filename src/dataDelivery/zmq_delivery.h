@@ -11,6 +11,7 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 // mdt-dialout-collector Library headers
+#include "data_wrapper.h"
 #include "cfg_handler.h"
 #include "logs_handler.h"
 
@@ -21,7 +22,7 @@ public:
     ~ZmqDelivery() { spdlog::get("multi-logger")->
         debug("destructor: ~ZmqDelivery()"); };
     bool ZmqPusher(
-        std::string &payload,
+        const std::string &payload,
         zmq::context_t &zmq_ctx,
         const std::string &zmq_transport_uri);
     void set_zmq_stransport_uri(const std::string &zmq_transport_uri) {

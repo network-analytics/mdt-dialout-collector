@@ -43,7 +43,7 @@ void *zmq_pull(zmq::context_t &ctx)
     zmq::socket_t sock(ctx, zmq::socket_type::pull);
 
     // Message Buff preparation
-    const size_t size = 4092;
+    const size_t size = 8192;
     zmq::message_t message(size);
 
     // --- Convert the thread ID into string --- //
