@@ -94,7 +94,7 @@ void ZmqDelivery::ZmqPoller(
                     << static_cast<payload *>(message.data())->serialization
                     << " "
                     << static_cast<payload *>(message.data())->writer_id
-                    << "\n ";
+                    << "\n";
                     //<< static_cast<payload *>(message.data())->telemetry_node
                     //<< " "
                     //<< static_cast<payload *>(message.data())->telemetry_port
