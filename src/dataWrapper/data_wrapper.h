@@ -11,25 +11,32 @@
 // External Library headers
 
 // mdt-dialout-collector Library headers
-//#include "../utils/logs_handler.h"
+#include "logs_handler.h"
 
 
+// C++ Class
 class DataWrapper {
 public:
-    //DataWrapper() {
-    //    spdlog::get("multi-logger")->
-    //        debug("constructor: DataWrapper()"); };
-    //~DataWrapper() {
-    //    spdlog::get("multi-logger")->
-    //        debug("destructor: ~DataWrapper()"); };
+    DataWrapper() {
+        spdlog::get("multi-logger")->
+            debug("constructor: DataWrapper()"); };
+    ~DataWrapper() {
+        spdlog::get("multi-logger")->
+            debug("destructor: ~DataWrapper()"); };
 
     bool BuildDataWrapper(
-        const std::string &event_type = "gRPC",
-        const std::string &serialization = "json_string",
-        const std::string &writer_id = "mdt-dialout-collecor",
-        const std::string &telemetry_node = "none",
-        const std::string &telemetry_port = "none",
-        const std::string &set_telemetry_data = "empty"
+        //const std::string &event_type = "gRPC",
+        //const std::string &serialization = "json_string",
+        //const std::string &writer_id = "mdt-dialout-collecor",
+        //const std::string &telemetry_node = "none",
+        //const std::string &telemetry_port = "none",
+        //const std::string &telemetry_data = "none"
+        const std::string &event_type,
+        const std::string &serialization,
+        const std::string &writer_id,
+        const std::string &telemetry_node,
+        const std::string &telemetry_port,
+        const std::string &telemetry_data
     );
 
     void DisplayDataWrapper();

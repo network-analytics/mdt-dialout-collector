@@ -16,13 +16,29 @@
 #include "logs_handler.h"
 
 
+#define MAX_BUF 4096
+
+typedef struct {
+    char event_type[MAX_BUF];
+    //const char *event_type;
+    char serialization[MAX_BUF];
+    //const char *serialization;
+    char writer_id[MAX_BUF];
+    //const char *writer_id;
+    //const char *telemetry_node;
+    //const char *telemetry_port;
+    //const char *telemetry_data;
+} payload;
+
 class ZmqDelivery {
 public:
     ZmqDelivery();
     ~ZmqDelivery() { spdlog::get("multi-logger")->
         debug("destructor: ~ZmqDelivery()"); };
     bool ZmqPusher(
-        const std::string &payload,
+        zmq::context_t &zmq_ctx,
+        const std::string &zmq_transport_uri);
+    void ZmqPoller(
         zmq::context_t &zmq_ctx,
         const std::string &zmq_transport_uri);
     void set_zmq_stransport_uri(const std::string &zmq_transport_uri) {
@@ -35,6 +51,12 @@ private:
     zmq::context_t zmq_ctx;
     std::string zmq_transport_uri;
 };
+
+extern payload *pload;
+
+extern void set_payload(
+    ZmqDelivery &zmq_delivery,
+    DataWrapper &dwrapper);
 
 #endif
 

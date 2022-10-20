@@ -504,25 +504,23 @@ void Srv::CiscoStream::Start(
                             label_map,
                             peer_ip,
                             stream_data_out_meta,
-                            stream_data_out) == true) {
-                        //    stream_data_out) == true &&
-                        //data_wrapper.BuildDataWrapper (
-                        //    "gRPC",
-                        //    "json_string",
-                        //    main_cfg_parameters.at("writer_id"),
-                        //    peer_ip,
-                        //    peer_port,
-                        //    //Original data-in
-                        //    stream_data_in) == true) {
-                        //data_wrapper.DisplayDataWrapper();
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
+                        //    stream_data_out) == true) {
+                            stream_data_out) == true &&
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
                             peer_ip,
-                            stream_data_out);
-                        zmq_delivery.ZmqPusher(
-                            stream_data_out,
-                            zmq_delivery.get_zmq_ctx(),
-                            zmq_delivery.get_zmq_stransport_uri());
+                            peer_port,
+                            //Original data-in
+                            stream_data_in) == true) {
+                        //data_wrapper.DisplayDataWrapper();
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out);
+                        // Setting the payload struct
+                        set_payload(zmq_delivery, data_wrapper);
                     }
                 } else {
                     if (data_manipulation.MetaData(

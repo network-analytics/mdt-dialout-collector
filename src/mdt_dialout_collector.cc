@@ -187,6 +187,10 @@ int main(int argc, char *argv[])
 
     signal(SIGUSR1, SignalHandler);
 
+    //ZmqDelivery zmq_delivery;
+    //zmq_delivery.ZmqPoller(zmq_delivery.get_zmq_ctx(),
+    //    zmq_delivery.get_zmq_stransport_uri());
+
     for (std::thread &w : workers) {
         if (w.joinable()) {
             w.join();
