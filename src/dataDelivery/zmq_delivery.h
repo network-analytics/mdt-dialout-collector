@@ -16,19 +16,14 @@
 #include "logs_handler.h"
 
 
-#define MAX_BUF 4096
-
 typedef struct {
-    char event_type[MAX_BUF];
-    //const char *event_type;
-    char serialization[MAX_BUF];
-    //const char *serialization;
-    char writer_id[MAX_BUF];
-    //const char *writer_id;
-    //const char *telemetry_node;
-    //const char *telemetry_port;
-    //const char *telemetry_data;
-} payload;
+    char *event_type;
+    char *serialization;
+    char *writer_id;
+    char *telemetry_node;
+    char *telemetry_port;
+    char *telemetry_data;
+} __attribute__ ((packed)) Payload;
 
 class ZmqDelivery {
 public:
@@ -52,11 +47,12 @@ private:
     std::string zmq_transport_uri;
 };
 
-extern payload *pload;
-
-extern void set_payload(
-    ZmqDelivery &zmq_delivery,
-    DataWrapper &dwrapper);
+extern Payload *pload;
+extern void InitPayload(Payload *pload, const char *event_type,
+    const char *serialization, const char *writer_id,
+    const char *telemetry_node, const char *telemetry_port,
+    const char *telemetry_data);
+extern void FreePayload(Payload *pload);
 
 #endif
 

@@ -520,7 +520,20 @@ void Srv::CiscoStream::Start(
                         //    peer_ip,
                         //    stream_data_out);
                         // Setting the payload struct
-                        set_payload(zmq_delivery, data_wrapper);
+                        InitPayload(
+                            pload,
+                            data_wrapper.get_event_type().c_str(),
+                            data_wrapper.get_serialization().c_str(),
+                            data_wrapper.get_writer_id().c_str(),
+                            data_wrapper.get_telemetry_node().c_str(),
+                            data_wrapper.get_telemetry_port().c_str(),
+                            data_wrapper.get_telemetry_data().c_str());
+                        zmq_delivery.ZmqPusher(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
