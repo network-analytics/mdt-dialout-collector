@@ -515,20 +515,12 @@ void Srv::CiscoStream::Start(
                             //Original data-in
                             stream_data_in) == true) {
                         //data_wrapper.DisplayDataWrapper();
-                        //kafka_delivery.AsyncKafkaProducer(
-                        //    producer,
-                        //    peer_ip,
-                        //    stream_data_out);
-                        // Setting the payload struct
-                        InitPayload(
-                            pload,
-                            data_wrapper.get_event_type().c_str(),
-                            data_wrapper.get_serialization().c_str(),
-                            data_wrapper.get_writer_id().c_str(),
-                            data_wrapper.get_telemetry_node().c_str(),
-                            data_wrapper.get_telemetry_port().c_str(),
-                            data_wrapper.get_telemetry_data().c_str());
+                        kafka_delivery.AsyncKafkaProducer(
+                            producer,
+                            peer_ip,
+                            stream_data_out);
                         zmq_delivery.ZmqPusher(
+                            data_wrapper,
                             zmq_delivery.get_zmq_ctx(),
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(

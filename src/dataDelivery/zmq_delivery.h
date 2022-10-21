@@ -31,6 +31,7 @@ public:
     ~ZmqDelivery() { spdlog::get("multi-logger")->
         debug("destructor: ~ZmqDelivery()"); };
     bool ZmqPusher(
+        DataWrapper &data_wrapper,
         zmq::context_t &zmq_ctx,
         const std::string &zmq_transport_uri);
     void ZmqPoller(
@@ -47,8 +48,7 @@ private:
     std::string zmq_transport_uri;
 };
 
-extern Payload *pload;
-extern void InitPayload(Payload *pload, const char *event_type,
+extern void InitPayload(Payload **pload_, const char *event_type,
     const char *serialization, const char *writer_id,
     const char *telemetry_node, const char *telemetry_port,
     const char *telemetry_data);

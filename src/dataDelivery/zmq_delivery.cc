@@ -6,43 +6,21 @@
 #include "zmq_delivery.h"
 
 
-Payload *pload = (Payload *) malloc(sizeof(Payload));
-
-void InitPayload(Payload *pload, const char *event_type,
+void InitPayload(Payload **pload_, const char *event_type,
     const char *serialization, const char *writer_id,
     const char *telemetry_node, const char *telemetry_port,
     const char *telemetry_data)
 {
-    size_t length_event_type = (strlen(event_type) + 1);
-    size_t length_serialization = (strlen(serialization) + 1);
-    size_t length_writer_id = (strlen(writer_id) + 1);
-    size_t length_telemetry_node = (strlen(telemetry_node) + 1);
-    size_t length_telemetry_port = (strlen(telemetry_port) + 1);
-    size_t length_telemetry_data = (strlen(telemetry_data) + 1);
+    Payload *pload = (Payload *) malloc(sizeof(Payload));
 
-    pload->event_type = (char *) malloc(length_event_type);
-    memset(pload->event_type, 0, (length_event_type * sizeof(char)));
-    strncpy(pload->event_type, event_type, length_event_type);
+    pload->event_type = strndup(event_type, strlen(event_type));
+    pload->serialization = strndup(serialization, strlen(serialization));
+    pload->writer_id = strndup(writer_id, strlen(writer_id));
+    pload->telemetry_node = strndup(telemetry_node, strlen(telemetry_node));
+    pload->telemetry_port = strndup(telemetry_port, strlen(telemetry_port));
+    pload->telemetry_data = strndup(telemetry_data, strlen(telemetry_data));
 
-    pload->serialization = (char *) malloc(length_serialization);
-    memset(pload->serialization, 0, (length_serialization * sizeof(char)));
-    strncpy(pload->serialization, serialization, length_serialization);
-
-    pload->writer_id = (char *) malloc(length_writer_id);
-    memset(pload->writer_id, 0, (length_writer_id * sizeof(char)));
-    strncpy(pload->writer_id, writer_id, length_writer_id);
-
-    pload->telemetry_node = (char *) malloc(length_telemetry_node);
-    memset(pload->telemetry_node, 0, (length_telemetry_node * sizeof(char)));
-    strncpy(pload->telemetry_node, telemetry_node, length_telemetry_node);
-
-    pload->telemetry_port = (char *) malloc(length_telemetry_port);
-    memset(pload->telemetry_port, 0, (length_telemetry_port * sizeof(char)));
-    strncpy(pload->telemetry_port, telemetry_port, length_telemetry_port);
-
-    pload->telemetry_data = (char *) malloc(length_telemetry_data);
-    memset(pload->telemetry_data, 0, (length_telemetry_data * sizeof(char)));
-    strncpy(pload->telemetry_data, telemetry_data, length_telemetry_data);
+    *pload_ = pload;
 }
 
 void FreePayload(Payload *pload)
@@ -53,6 +31,7 @@ void FreePayload(Payload *pload)
     free(pload->telemetry_node);
     free(pload->telemetry_port);
     free(pload->telemetry_data);
+    free(pload);
 }
 
 ZmqDelivery::ZmqDelivery()
@@ -63,13 +42,25 @@ ZmqDelivery::ZmqDelivery()
 }
 
 bool ZmqDelivery::ZmqPusher(
+    DataWrapper &data_wrapper,
     zmq::context_t &zmq_ctx,
     const std::string &zmq_transport_uri)
 {
+    Payload *pload;
+
+    InitPayload(
+        &pload,
+        data_wrapper.get_event_type().c_str(),
+        data_wrapper.get_serialization().c_str(),
+        data_wrapper.get_writer_id().c_str(),
+        data_wrapper.get_telemetry_node().c_str(),
+        data_wrapper.get_telemetry_port().c_str(),
+        data_wrapper.get_telemetry_data().c_str());
+
     // Message Buff preparation
     // PUSH-ing only the pointer to the data-struct
-    const size_t size = sizeof(Payload);
-    zmq::message_t message(pload, size);
+    const size_t size = sizeof(Payload *);
+    zmq::message_t message(&pload, size);
 
     zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
     sock.connect(zmq_transport_uri);
@@ -96,32 +87,32 @@ void ZmqDelivery::ZmqPoller(
 {
     // Message Buff preparation
     // POLL-ing only the pointer to the data-struct
-    const size_t size = sizeof(Payload);
+    const size_t size = sizeof(Payload *);
     zmq::message_t message(size);
 
     zmq::socket_t sock(zmq_ctx, zmq::socket_type::pull);
     sock.bind(zmq_transport_uri);
 
     try {
-    //    while(true) {
-            auto res = sock.recv(message, zmq::recv_flags::none);
-            if (res.value() != 0) {
-                std::cout << "PULL-ing from " << zmq_transport_uri << ": "
-                    << static_cast<Payload *>(message.data())->event_type
-                    << " "
-                    << static_cast<Payload *>(message.data())->serialization
-                    << " "
-                    << static_cast<Payload *>(message.data())->writer_id
-                    << " "
-                    << static_cast<Payload *>(message.data())->telemetry_node
-                    << " "
-                    << static_cast<Payload *>(message.data())->telemetry_port
-                    << " "
-                    << static_cast<Payload *>(message.data())->telemetry_data
-                    << "\n";
-            }
-            //std::chrono::milliseconds(100);
-    //    }
+        auto res = sock.recv(message, zmq::recv_flags::none);
+        if (res.value() != 0) {
+            Payload *pload = *(Payload **) message.data();
+            std::cout << "PULL-ing from " << zmq_transport_uri << ": "
+                << pload->event_type
+                << " "
+                << pload->serialization
+                << " "
+                << pload->writer_id
+                << " "
+                << pload->telemetry_node
+                << " "
+                << pload->telemetry_port
+                << " "
+                << pload->telemetry_data
+                << "\n";
+            FreePayload(pload);
+        }
+        //std::chrono::milliseconds(100);
     } catch(const zmq::error_t &zex) {
         spdlog::get("multi-logger")->
             error("[ZmqPoller] data-delivery issue: "
