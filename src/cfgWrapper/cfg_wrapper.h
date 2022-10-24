@@ -25,13 +25,14 @@ public:
         spdlog::get("multi-logger")->
             debug("destructor: ~CfgWrapper()"); };
 
-    bool BuildCfgWrapper();
+    bool BuildCfgWrapper(
+        const std::string &writer_id);
 
     void DisplayCfgWrapper();
 
     // Setters
-    void set_writer_id() {
-        this->writer_id = main_cfg_parameters.at("writer_id");
+    void set_writer_id(const std::string &writer_id) {
+        this->writer_id = writer_id;
     };
 
     // Getters

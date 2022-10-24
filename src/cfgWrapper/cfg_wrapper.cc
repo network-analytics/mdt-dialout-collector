@@ -6,9 +6,10 @@
 #include "cfg_wrapper.h"
 
 
-bool CfgWrapper::BuildCfgWrapper()
+bool CfgWrapper::BuildCfgWrapper(
+    const std::string &writer_id)
 {
-    set_writer_id();
+    set_writer_id(writer_id);
 
     return true;
 }

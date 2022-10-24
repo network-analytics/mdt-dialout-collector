@@ -5,7 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include "libraries.h"
+#include "cfg_wrapper.h"
 
+
+Options *InitOptions()
+{
+    CfgWrapper cfg_wrapper;
+    cfg_wrapper.BuildCfgWrapper(
+        main_cfg_parameters.at("writer_id"));
+
+    Options *opts = (Options *) malloc(sizeof(Options));
+
+    const char *writer_id = cfg_wrapper.get_writer_id().c_str();
+    opts->writer_id = strndup(writer_id, strlen(writer_id));
+
+    return opts;
+}
 
 void InitPayload(Payload **pload_, const char *event_type,
     const char *serialization, const char *writer_id,
@@ -22,6 +37,12 @@ void InitPayload(Payload **pload_, const char *event_type,
     pload->telemetry_data = strndup(telemetry_data, strlen(telemetry_data));
 
     *pload_ = pload;
+}
+
+void FreeOptions(Options *opts)
+{
+    free(opts->writer_id);
+    free(opts);
 }
 
 void FreePayload(Payload *pload)

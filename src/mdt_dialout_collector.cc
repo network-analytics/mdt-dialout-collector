@@ -14,7 +14,7 @@
 #include "juniper_gnmi.pb.h"
 #include "mdt_dialout_core.h"
 #include "logs_handler.h"
-#include "cfg_wrapper.h"
+#include "libraries.h"
 
 
 void *VendorThread(const std::string &vendor);
@@ -137,10 +137,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    CfgWrapper cfg_wrapper;
-    cfg_wrapper.BuildCfgWrapper();
-    cfg_wrapper.DisplayCfgWrapper();
-
+    Options *opts = InitOptions();
+    printf("%s\n", opts->writer_id);
 
     int core_pid = getpid();
     const std::string core_pid_folder =

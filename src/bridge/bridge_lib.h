@@ -7,6 +7,10 @@
 
 
 typedef struct {
+    char *writer_id;
+} __attribute__ ((packed)) Options;
+
+typedef struct {
     char *event_type;
     char *serialization;
     char *writer_id;
@@ -15,10 +19,13 @@ typedef struct {
     char *telemetry_data;
 } __attribute__ ((packed)) Payload;
 
+extern Options *InitOptions();
 extern void InitPayload(Payload **pload_, const char *event_type,
     const char *serialization, const char *writer_id,
     const char *telemetry_node, const char *telemetry_port,
     const char *telemetry_data);
+
+extern void FreeOptions(Options *opts);
 extern void FreePayload(Payload *pload);
 
 #endif
