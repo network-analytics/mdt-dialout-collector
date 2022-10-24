@@ -2,12 +2,39 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-#ifndef _LIBS_H_
-#define _LIBS_H_
+#ifndef _BRIDGE_LIB_H_
+#define _BRIDGE_LIB_H_
+
+#include "cfg_wrapper.h"
 
 
 typedef struct {
+    /* main */
     char *writer_id;
+    char *iface;
+    char *ipv4_socket_cisco;
+    char *ipv4_socket_juniper;
+    char *ipv4_socket_huawei;
+    /* char *core_pid_folder; */
+    /* workers */
+    char *cisco_workers;
+    char *juniper_workers;
+    char *huawei_workers;
+    /* replies */
+    char *replies_cisco;
+    char *replies_juniper;
+    char *replies_huawei;
+    /* logging */
+    char *syslog;
+    char *syslog_facility;
+    char *syslog_ident;
+    char *console_log;
+    char *spdlog_level;
+    /* data-flow manipulation */
+    char *enable_cisco_gpbkv2json;
+    char *enable_cisco_message_to_json_string;
+    char *enable_label_encode_as_map;
+    char *enable_label_encode_as_map_ptm;
 } __attribute__ ((packed)) Options;
 
 typedef struct {

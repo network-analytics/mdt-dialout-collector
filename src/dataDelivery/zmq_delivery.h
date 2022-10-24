@@ -14,7 +14,7 @@
 #include "data_wrapper.h"
 #include "cfg_handler.h"
 #include "logs_handler.h"
-#include "libraries.h"
+#include "bridge_lib.h"
 
 
 class ZmqDelivery {

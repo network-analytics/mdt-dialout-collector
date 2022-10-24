@@ -334,7 +334,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/cfgWrapper")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/libs")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/bridge")
 
 # set the bin folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
@@ -352,7 +352,7 @@ foreach(_target "mdt_dialout_collector")
         "${CMAKE_CURRENT_SOURCE_DIR}/src/cfgWrapper/cfg_wrapper.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/kafka_delivery.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/zmq_delivery.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/libraries.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/bridge/bridge_lib.cc"
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
         ${cisco_telemetry_pb_cc}

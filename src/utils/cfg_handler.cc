@@ -102,6 +102,8 @@ bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
         } else {
             params.insert({"syslog_facility", "LOG_USER"});
         }
+    } else {
+        params.insert({"syslog_facility", "NONE"});
     }
 
     if (syslog_s.compare("true") == 0) {
@@ -127,6 +129,8 @@ bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
         } else {
             params.insert({"syslog_ident", "mdt-dialout-collector"});
         }
+    } else {
+        params.insert({"syslog_ident", "NONE"});
     }
 
     bool console_log = logs_params.exists("console_log");
