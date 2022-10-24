@@ -504,7 +504,7 @@ void Srv::CiscoStream::Start(
                             label_map,
                             peer_ip,
                             stream_data_out_meta,
-                        //    stream_data_out) == true) {
+                        //  stream_data_out) == true) {
                             stream_data_out) == true &&
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
@@ -515,10 +515,10 @@ void Srv::CiscoStream::Start(
                             //Original data-in
                             stream_data_in) == true) {
                         //data_wrapper.DisplayDataWrapper();
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out);
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
                             zmq_delivery.get_zmq_ctx(),

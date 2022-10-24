@@ -78,13 +78,13 @@ public:
     std::string &get_telemetry_data() { return this->telemetry_data; };
 private:
     uint64_t sequence_number = 0;
-    std::string event_type;
-    std::string serialization;
-    std::time_t timestamp;
-    std::string writer_id;
-    std::string telemetry_node;
-    std::string telemetry_port;
-    std::string telemetry_data;
+    std::string event_type = "gRPC";
+    std::string serialization = "json_string";
+    std::time_t timestamp = 0;
+    std::string writer_id = "mdt-dialout-collector";
+    std::string telemetry_node = "none";
+    std::string telemetry_port = "none";
+    std::string telemetry_data = "none";
 };
 
 #endif
