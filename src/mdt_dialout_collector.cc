@@ -14,6 +14,7 @@
 #include "juniper_gnmi.pb.h"
 #include "mdt_dialout_core.h"
 #include "logs_handler.h"
+#include "cfg_wrapper.h"
 
 
 void *VendorThread(const std::string &vendor);
@@ -135,6 +136,11 @@ int main(int argc, char *argv[])
             kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
         }
     }
+
+    CfgWrapper cfg_wrapper;
+    cfg_wrapper.BuildCfgWrapper();
+    cfg_wrapper.DisplayCfgWrapper();
+
 
     int core_pid = getpid();
     const std::string core_pid_folder =

@@ -14,16 +14,8 @@
 #include "data_wrapper.h"
 #include "cfg_handler.h"
 #include "logs_handler.h"
+#include "libraries.h"
 
-
-typedef struct {
-    char *event_type;
-    char *serialization;
-    char *writer_id;
-    char *telemetry_node;
-    char *telemetry_port;
-    char *telemetry_data;
-} __attribute__ ((packed)) Payload;
 
 class ZmqDelivery {
 public:
@@ -47,12 +39,6 @@ private:
     zmq::context_t zmq_ctx;
     std::string zmq_transport_uri;
 };
-
-extern void InitPayload(Payload **pload_, const char *event_type,
-    const char *serialization, const char *writer_id,
-    const char *telemetry_node, const char *telemetry_port,
-    const char *telemetry_data);
-extern void FreePayload(Payload *pload);
 
 #endif
 

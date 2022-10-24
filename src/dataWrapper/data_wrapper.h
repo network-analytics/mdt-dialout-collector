@@ -25,12 +25,6 @@ public:
             debug("destructor: ~DataWrapper()"); };
 
     bool BuildDataWrapper(
-        //const std::string &event_type = "gRPC",
-        //const std::string &serialization = "json_string",
-        //const std::string &writer_id = "mdt-dialout-collecor",
-        //const std::string &telemetry_node = "none",
-        //const std::string &telemetry_port = "none",
-        //const std::string &telemetry_data = "none"
         const std::string &event_type,
         const std::string &serialization,
         const std::string &writer_id,
