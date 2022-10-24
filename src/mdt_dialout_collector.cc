@@ -160,6 +160,8 @@ int main(int argc, char *argv[])
     printf("%s\n", opts->enable_label_encode_as_map);
     printf("%s\n", opts->enable_label_encode_as_map_ptm);
 
+    FreeOptions(opts);
+
     int core_pid = getpid();
     const std::string core_pid_folder =
         main_cfg_parameters.at("core_pid_folder");

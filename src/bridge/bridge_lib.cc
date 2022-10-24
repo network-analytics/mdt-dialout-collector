@@ -141,6 +141,26 @@ void InitPayload(Payload **pload_, const char *event_type,
 void FreeOptions(Options *opts)
 {
     free(opts->writer_id);
+    free(opts->iface);
+    free(opts->ipv4_socket_cisco);
+    free(opts->ipv4_socket_juniper);
+    free(opts->ipv4_socket_huawei);
+    //free(opts->core_pid_folder);
+    free(opts->cisco_workers);
+    free(opts->juniper_workers);
+    free(opts->huawei_workers);
+    free(opts->replies_cisco);
+    free(opts->replies_juniper);
+    free(opts->replies_huawei);
+    free(opts->syslog);
+    free(opts->syslog_facility);
+    free(opts->syslog_ident);
+    free(opts->console_log);
+    free(opts->spdlog_level);
+    free(opts->enable_cisco_gpbkv2json);
+    free(opts->enable_cisco_message_to_json_string);
+    free(opts->enable_label_encode_as_map);
+    free(opts->enable_label_encode_as_map_ptm);
     free(opts);
 }
 
