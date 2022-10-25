@@ -2,6 +2,7 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
+/*
 // C++ Standard Library headers
 #include <exception>
 #include <memory>
@@ -401,5 +402,16 @@ void SignalHandler(int sig_num)
         LoadLabelMapPreTagStyle(label_map,
             data_manipulation_cfg_parameters.at("label_map_ptm_path"));
     }
+}
+*/
+
+#include "bridge_lib.h"
+
+int main(int argc, char *argv[])
+{
+	pthread_t *workers = NULL;
+    StartGrpcDialoutCollector(workers);
+
+    return EXIT_SUCCESS;
 }
 

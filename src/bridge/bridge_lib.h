@@ -7,7 +7,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "cfg_wrapper.h"
+
+#define MAX_WORKERS 15
 
 
 typedef struct {
@@ -56,6 +59,12 @@ extern void InitPayload(Payload **pload_, const char *event_type,
 
 extern void FreeOptions(Options *opts);
 extern void FreePayload(Payload *pload);
+
+extern void StartGrpcDialoutCollector(pthread_t *workers);
+extern void LoadOptions();
+extern void *VendorThread(void *vendor);
+extern void LoadThreads(pthread_t *workers_vec, const char *ipv4_socket_str,
+    const char *replies_str, const char *workers_str);
 
 #endif
 

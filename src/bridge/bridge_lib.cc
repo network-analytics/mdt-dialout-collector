@@ -3,6 +3,7 @@
 
 
 #include "bridge_lib.h"
+#include "mdt_dialout_core.h"
 
 
 Options *InitOptions()
@@ -171,5 +172,159 @@ void FreePayload(Payload *pload)
     free(pload->telemetry_port);
     free(pload->telemetry_data);
     free(pload);
+}
+
+void StartGrpcDialoutCollector(pthread_t *workers)
+{
+    LoadOptions();
+
+    if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
+        main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
+        main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
+            spdlog::get("multi-logger")->
+                error("[ipv4_socket_*] configuration issue: "
+                "unable to find at least one valid IPv4 socket where to bind "
+                "the daemon");
+            std::exit(EXIT_FAILURE);
+    }
+
+    // Allocate MEM for MAX_WORKERS = 15
+    workers = (pthread_t *) malloc(MAX_WORKERS * sizeof(pthread_t));
+
+    // Cisco
+    LoadThreads(workers, "ipv4_socket_cisco", "replies_cisco",
+        "cisco_workers");
+
+    // Juniper
+    LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
+        "juniper_workers");
+
+    // Huawei
+    LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
+        "huawei_workers");
+
+    size_t workers_lenght = sizeof(&workers) / sizeof(pthread_t);
+
+    size_t w;
+    for (w = 0; w < workers_lenght; w++) {
+        pthread_join(workers[w], NULL);
+    }
+}
+
+void LoadOptions()
+{
+    // static log-sinks are configured within the constructor
+    LogsHandler logs_handler;
+    spdlog::get("multi-logger-boot")->debug("main: main()");
+
+    CfgHandler cfg_handler;
+    std::string cfg_path =
+        "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
+    cfg_handler.set_cfg_path(cfg_path);
+
+    LogsCfgHandler logs_cfg_handler;
+    if (logs_cfg_handler.lookup_logs_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_logs_parameters()) == false) {
+        // can't read the logs cfg params the destructor logging won't
+        // be possible (segmentation fault)
+        std::exit(EXIT_FAILURE);
+    } else {
+        logs_cfg_parameters = cfg_handler.get_logs_parameters();
+        // set the log-sinks after reading from the configuration file
+        logs_handler.set_spdlog_sinks();
+    }
+
+    MainCfgHandler main_cfg_handler;
+    if (main_cfg_handler.lookup_main_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_main_parameters()) == false) {
+        std::exit(EXIT_FAILURE);
+    } else {
+        main_cfg_parameters = cfg_handler.get_main_parameters();
+    }
+
+    DataManipulationCfgHandler data_manipulation_cfg_handler;
+    if (data_manipulation_cfg_handler.lookup_data_manipulation_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_data_manipulation_parameters()) ==false) {
+        std::exit(EXIT_FAILURE);
+    } else {
+        data_manipulation_cfg_parameters =
+            cfg_handler.get_data_manipulation_parameters();
+    }
+
+    KafkaCfgHandler kafka_cfg_handler;
+    if (kafka_cfg_handler.lookup_kafka_parameters(
+        cfg_handler.get_cfg_path(),
+        cfg_handler.get_kafka_parameters()) == false) {
+        std::exit(EXIT_FAILURE);
+    } else {
+        kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+    }
+}
+
+void *VendorThread(void *ipv4_socket_str_)
+{
+    const char *ipv4_socket_str = (char *) ipv4_socket_str_;
+
+    if (strstr(ipv4_socket_str, "cisco") != NULL) {
+        std::string ipv4_socket_cisco =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string cisco_srv_socket {ipv4_socket_cisco};
+        Srv cisco_mdt_dialout_collector;
+        cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
+    } else if (strstr(ipv4_socket_str, "juniper") != NULL) {
+        std::string ipv4_socket_juniper =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string juniper_srv_socket {ipv4_socket_juniper};
+        Srv juniper_mdt_dialout_collector;
+        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
+    } else if (strstr(ipv4_socket_str, "huawei") != NULL) {
+        std::string ipv4_socket_huawei =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string huawei_srv_socket {ipv4_socket_huawei};
+        Srv huawei_mdt_dialout_collector;
+        huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
+    }
+
+    return (NULL);
+}
+
+void LoadThreads(pthread_t *workers_vec,
+    const char *ipv4_socket_str,
+    const char *replies_str,
+    const char *workers_str)
+{
+    if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
+        int replies =
+            std::stoi(main_cfg_parameters.at(replies_str));
+        if (replies < 0 || replies > 1000) {
+            spdlog::get("multi-logger")->
+                error("[{}] configuaration issue: the "
+                "allowed amount of replies per session is defined between 10 "
+                "and 1000. (default = 0 => unlimited)", replies_str);
+            std::exit(EXIT_FAILURE);
+        }
+        size_t workers = std::stoi(main_cfg_parameters.at(workers_str));
+        if (workers < 1 || workers > 5) {
+            spdlog::get("multi-logger")->
+                error("[{}] configuaration issue: the "
+                "allowed amount of workers is defined between 1 "
+                "and 5. (default = 1)", workers_str);
+            std::exit(EXIT_FAILURE);
+        }
+        size_t w;
+        for (w = 0; w < workers; w++) {
+            pthread_create(&workers_vec[w], NULL, VendorThread,
+                (void *) ipv4_socket_str);
+        }
+        spdlog::get("multi-logger")->
+            info("mdt-dialout-collector listening on {} ",
+            main_cfg_parameters.at(ipv4_socket_str));
+    }
 }
 
