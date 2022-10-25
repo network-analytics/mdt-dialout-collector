@@ -2,8 +2,6 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-#include <stdlib.h>
-#include <string.h>
 #include "bridge_lib.h"
 
 

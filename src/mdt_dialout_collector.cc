@@ -11,10 +11,7 @@
 // External Library headers
 #include "csv/rapidcsv.h"
 // mdt-dialout-collector Library headers
-#include "juniper_gnmi.pb.h"
 #include "mdt_dialout_core.h"
-#include "logs_handler.h"
-#include "bridge_lib.h"
 
 
 void *VendorThread(const std::string &vendor);
@@ -136,31 +133,6 @@ int main(int argc, char *argv[])
             kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
         }
     }
-
-    Options *opts = InitOptions();
-    printf("%s\n", opts->writer_id);
-    printf("%s\n", opts->iface);
-    printf("%s\n", opts->ipv4_socket_cisco);
-    printf("%s\n", opts->ipv4_socket_juniper);
-    printf("%s\n", opts->ipv4_socket_huawei);
-    //printf("%s\n", opts->core_pid_folder);
-    printf("%s\n", opts->cisco_workers);
-    printf("%s\n", opts->juniper_workers);
-    printf("%s\n", opts->huawei_workers);
-    printf("%s\n", opts->replies_cisco);
-    printf("%s\n", opts->replies_juniper);
-    printf("%s\n", opts->replies_huawei);
-    printf("%s\n", opts->syslog);
-    printf("%s\n", opts->syslog_facility);
-    printf("%s\n", opts->syslog_ident);
-    printf("%s\n", opts->console_log);
-    printf("%s\n", opts->spdlog_level);
-    printf("%s\n", opts->enable_cisco_gpbkv2json);
-    printf("%s\n", opts->enable_cisco_message_to_json_string);
-    printf("%s\n", opts->enable_label_encode_as_map);
-    printf("%s\n", opts->enable_label_encode_as_map_ptm);
-
-    FreeOptions(opts);
 
     int core_pid = getpid();
     const std::string core_pid_folder =

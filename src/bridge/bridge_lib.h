@@ -5,6 +5,8 @@
 #ifndef _BRIDGE_LIB_H_
 #define _BRIDGE_LIB_H_
 
+#include <stdlib.h>
+#include <string.h>
 #include "cfg_wrapper.h"
 
 

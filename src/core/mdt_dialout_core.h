@@ -16,11 +16,12 @@
 #include "cisco_dialout.grpc.pb.h"
 #include "huawei_dialout.grpc.pb.h"
 #include "juniper_dialout.grpc.pb.h"
+#include "juniper_gnmi.pb.h"
 #include "data_manipulation.h"
 #include "data_wrapper.h"
 #include "kafka_delivery.h"
 #include "zmq_delivery.h"
-#include "juniper_gnmi.pb.h"
+#include "logs_handler.h"
 
 
 // Global visibility to be able to signal the refresh --> CSV/PTM from main
