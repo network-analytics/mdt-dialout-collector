@@ -24,7 +24,7 @@ bool CfgHandler::set_parameters(libconfig::Config &params,
             error("configuration file issues: {}", fioex.what());
         return false;
     } catch (const libconfig::ParseException &pex) {
-        // check it cfg is parsable
+        // check if the cfg is parsable
         spdlog::get("multi-logger-boot")->
             error("configuration file issues: {}", pex.what());
         return false;
