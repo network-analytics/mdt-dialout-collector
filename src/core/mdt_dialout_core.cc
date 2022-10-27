@@ -22,7 +22,7 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
-        spdlog::get("multi-logger")->
+        spdlog::get("multi-logger-boot")->
             error("[CustomSocketMutator()]: Unable to bind the "
             "service(s) on the configured socket(s)");
         std::exit(EXIT_FAILURE);
@@ -32,7 +32,7 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 }
 
 bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0) {
-    CustomSocketMutator *csm = (CustomSocketMutator *)mutator0;
+    CustomSocketMutator *csm = (CustomSocketMutator *) mutator0;
     return csm->bindtodevice_socket_mutator(fd);
 }
 
