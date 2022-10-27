@@ -20,8 +20,8 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Issues with getting the "
             "iface type");
-        std::abort();;
-        //std::exit(EXIT_FAILURE);
+        //std::abort();
+        std::exit(EXIT_FAILURE);
         //return false;
     }
 
@@ -30,8 +30,8 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to bind the "
             "service(s) on the configured socket(s)");
-        std::abort();;
-        //std::exit(EXIT_FAILURE);
+        //std::abort();
+        std::exit(EXIT_FAILURE);
         //return false;
     }
 
@@ -56,19 +56,23 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
 }
 
 const grpc_socket_mutator_vtable
-    custom_socket_mutator_vtable = grpc_socket_mutator_vtable{
+    custom_socket_mutator_vtable = grpc_socket_mutator_vtable
+    {
         custom_socket_mutator_fd,
         custom_socket_compare,
         custom_socket_destroy,
-        nullptr};
+        nullptr
+    };
 
 void ServerBuilderOptionImpl::UpdateArguments(
-    grpc::ChannelArguments *custom_args) {
-        CustomSocketMutator *csm_ = new CustomSocketMutator();
-        custom_args->SetSocketMutator(csm_);
+    grpc::ChannelArguments *custom_args)
+{
+    CustomSocketMutator *csm_ = new CustomSocketMutator();
+    custom_args->SetSocketMutator(csm_);
 }
 
-CustomSocketMutator::CustomSocketMutator() {
+CustomSocketMutator::CustomSocketMutator()
+{
     spdlog::get("multi-logger")->debug("constructor: CustomSocketMutator()");
     grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
 }
