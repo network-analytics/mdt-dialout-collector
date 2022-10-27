@@ -43,9 +43,9 @@ public:
 class CustomSocketMutator: public grpc_socket_mutator {
 public:
     CustomSocketMutator();
-    ~CustomSocketMutator() {
-        spdlog::get("multi-logger")->
-            debug("destructor: ~CustomSocketMutator()"); };
+    //~CustomSocketMutator() {
+    //    spdlog::get("multi-logger")->
+    //        debug("destructor: ~CustomSocketMutator()"); };
     bool bindtodevice_socket_mutator(int fd);
 };
 
