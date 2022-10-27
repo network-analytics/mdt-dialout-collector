@@ -194,15 +194,17 @@ void Srv::JuniperFsmCtrl()
 void Srv::HuaweiFsmCtrl()
 {
     DataManipulation data_manipulation;
+    DataWrapper data_wrapper;
     KafkaDelivery kafka_delivery;
     kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    ZmqDelivery zmq_delivery;
     huawei_telemetry::Telemetry huawei_tlm;
     openconfig_interfaces::Interfaces oc_if;
 
     std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
         new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get()));
-    huawei_sstream->Start(label_map, data_manipulation, kafka_delivery,
-        producer, huawei_tlm, oc_if);
+    huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
+        kafka_delivery, producer, zmq_delivery, huawei_tlm, oc_if);
     //int huawei_counter {0};
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
@@ -217,8 +219,8 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(
-            label_map, data_manipulation, kafka_delivery, producer,
-            huawei_tlm, oc_if);
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
+            producer, zmq_delivery, huawei_tlm, oc_if);
         //huawei_counter++;
     }
 }
@@ -789,8 +791,10 @@ void Srv::JuniperStream::Start(
 void Srv::HuaweiStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
+    DataWrapper &data_wrapper,
     KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
+    ZmqDelivery &zmq_delivery,
     huawei_telemetry::Telemetry &huawei_tlm,
     openconfig_interfaces::Interfaces &oc_if)
 {
@@ -808,8 +812,8 @@ void Srv::HuaweiStream::Start(
             "new Srv::HuaweiStream()");
         Srv::HuaweiStream *huawei_sstream =
             new Srv::HuaweiStream(huawei_service_, huawei_cq_);
-        huawei_sstream->Start(label_map, data_manipulation, kafka_delivery,
-            producer, huawei_tlm, oc_if);
+        huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
+            kafka_delivery, producer, zmq_delivery, huawei_tlm, oc_if);
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
         huawei_replies_sent++;
@@ -893,6 +897,20 @@ void Srv::HuaweiStream::Start(
                                 producer,
                                 peer_ip,
                                 stream_data_out);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                stream_data_in),
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -904,6 +922,20 @@ void Srv::HuaweiStream::Start(
                                 producer,
                                 peer_ip,
                                 stream_data_out_meta);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                stream_data_in),
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     }
                 }
@@ -943,6 +975,20 @@ void Srv::HuaweiStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in),
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -954,6 +1000,20 @@ void Srv::HuaweiStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in),
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             }

@@ -152,8 +152,10 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
+            DataWrapper &data_wrapper,
             KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
+            ZmqDelivery &zmq_delivery,
             huawei_telemetry::Telemetry &huawei_tlm,
             openconfig_interfaces::Interfaces &oc_if
         );
