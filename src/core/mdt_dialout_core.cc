@@ -25,7 +25,7 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to bind the "
             "service(s) on the configured socket(s)");
-        std::abort();
+        std::exit(EXIT_FAILURE);
     }
 
     return true;
