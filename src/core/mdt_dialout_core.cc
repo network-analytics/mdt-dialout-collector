@@ -43,7 +43,7 @@ int custom_socket_compare(grpc_socket_mutator *mutator1,
 
 void custom_socket_destroy(grpc_socket_mutator *mutator)
 {
-    //gpr_free(mutator);
+    gpr_free(mutator);
 }
 
 bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
@@ -52,6 +52,7 @@ bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
     return csm->bindtodevice_socket_mutator(fd);
 }
 
+// functions before were used to setup a custom vtable (struct)
 const grpc_socket_mutator_vtable custom_socket_mutator_vtable =
     grpc_socket_mutator_vtable {
         custom_socket_mutator_fd,
@@ -63,7 +64,6 @@ const grpc_socket_mutator_vtable custom_socket_mutator_vtable =
 CustomSocketMutator::CustomSocketMutator()
 {
     spdlog::get("multi-logger")->debug("constructor: CustomSocketMutator()");
-    // functions before were used to setup a custom vtable
     grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
 }
 
