@@ -32,9 +32,9 @@ public:
     ServerBuilderOptionImpl() {
         spdlog::get("multi-logger")->
             debug("constructor: ServerBuilderOptionImpl()"); };
-    ~ServerBuilderOptionImpl() {
-        spdlog::get("multi-logger")->
-            debug("destructor: ~ServerBuilderOptionImpl()"); };
+    //~ServerBuilderOptionImpl() {
+    //    spdlog::get("multi-logger")->
+    //        debug("destructor: ~ServerBuilderOptionImpl()"); };
     virtual void UpdateArguments(grpc::ChannelArguments *args);
     virtual void UpdatePlugins(
         std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
