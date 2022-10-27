@@ -63,7 +63,7 @@ const grpc_socket_mutator_vtable custom_socket_mutator_vtable =
 CustomSocketMutator::CustomSocketMutator()
 {
     spdlog::get("multi-logger")->debug("constructor: CustomSocketMutator()");
-    if (true) {
+    if (false) {
         grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
     } else {
         std::exit(EXIT_FAILURE);
