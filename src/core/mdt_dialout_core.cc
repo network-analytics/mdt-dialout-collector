@@ -77,12 +77,12 @@ void ServerBuilderOptionImpl::UpdateArguments(
 void Srv::CiscoBind(std::string cisco_srv_socket)
 {
     grpc::ServerBuilder cisco_builder;
-    cisco_builder.RegisterService(&cisco_service_);
     // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         csbo(new ServerBuilderOptionImpl());
     cisco_builder.SetOption(std::move(csbo));
     // --- Required for socket manipulation ---
+    cisco_builder.RegisterService(&cisco_service_);
     cisco_builder.AddListeningPort(cisco_srv_socket,
         grpc::InsecureServerCredentials());
     cisco_cq_ = cisco_builder.AddCompletionQueue();
@@ -94,12 +94,12 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
 void Srv::JuniperBind(std::string juniper_srv_socket)
 {
     grpc::ServerBuilder juniper_builder;
-    juniper_builder.RegisterService(&juniper_service_);
     // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         jsbo(new ServerBuilderOptionImpl());
     juniper_builder.SetOption(std::move(jsbo));
     // --- Required for socket manipulation ---
+    juniper_builder.RegisterService(&juniper_service_);
     juniper_builder.AddListeningPort(juniper_srv_socket,
         grpc::InsecureServerCredentials());
     juniper_cq_ = juniper_builder.AddCompletionQueue();
@@ -111,12 +111,12 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
 void Srv::HuaweiBind(std::string huawei_srv_socket)
 {
     grpc::ServerBuilder huawei_builder;
-    huawei_builder.RegisterService(&huawei_service_);
     // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         hsbo(new ServerBuilderOptionImpl());
     huawei_builder.SetOption(std::move(hsbo));
     // --- Required for socket manipulation ---
+    huawei_builder.RegisterService(&huawei_service_);
     huawei_builder.AddListeningPort(huawei_srv_socket,
         grpc::InsecureServerCredentials());
     huawei_cq_ = huawei_builder.AddCompletionQueue();
