@@ -8,45 +8,31 @@
 
 // Global visibility to be able to signal the refresh --> CSV from main
 std::unordered_map<std::string, std::vector<std::string>> label_map;
+grpc_socket_mutator_vtable custom_socket_mutator_vtable;
 
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
-    //int type;
-    //socklen_t len = sizeof(type);
+    int type;
+    socklen_t len = sizeof(type);
 
     std::string iface = main_cfg_parameters.at("iface");
 
-    //if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
-    //    spdlog::get("multi-logger")->
-    //        error("[CustomSocketMutator()]: Issues with getting the "
-    //        "iface type");
-    //    //std::abort();
-    //    //std::exit(EXIT_FAILURE);
-    //    return false;
-    //}
+    if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
+        spdlog::get("multi-logger")->
+            error("[CustomSocketMutator()]: Unable to get the "
+            "interface type");
+        return false;
+    }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to bind the "
             "service(s) on the configured socket(s)");
-        //std::abort();
-        //std::exit(EXIT_FAILURE);
         return false;
     }
 
     return true;
-}
-
-bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
-{
-    CustomSocketMutator *csm = (CustomSocketMutator *) mutator0;
-
-    if(csm->bindtodevice_socket_mutator(fd) == true) {
-        return csm->bindtodevice_socket_mutator(fd);
-    } else {
-        std::exit(EXIT_FAILURE);
-    }
 }
 
 #define GPR_ICMP(a, b) ((a) < (b) ? -1 : ((a) > (b) ? 1 : 0))
@@ -61,26 +47,35 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
     gpr_free(mutator);
 }
 
-const grpc_socket_mutator_vtable
-    custom_socket_mutator_vtable = grpc_socket_mutator_vtable
-    {
-        custom_socket_mutator_fd,
-        custom_socket_compare,
-        custom_socket_destroy,
-        nullptr
-    };
-
-void ServerBuilderOptionImpl::UpdateArguments(
-    grpc::ChannelArguments *custom_args)
+bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
 {
-    CustomSocketMutator *csm_ = new CustomSocketMutator();
-    custom_args->SetSocketMutator(csm_);
+    CustomSocketMutator *csm = (CustomSocketMutator *) mutator0;
+
+    if(csm->bindtodevice_socket_mutator(fd) == false) {
+        std::exit(EXIT_FAILURE);
+    } else {
+        custom_socket_mutator_vtable = grpc_socket_mutator_vtable
+        {
+            custom_socket_mutator_fd,
+            custom_socket_compare,
+            custom_socket_destroy,
+            nullptr
+        };
+    }
+    return true;
 }
 
 CustomSocketMutator::CustomSocketMutator()
 {
     spdlog::get("multi-logger")->debug("constructor: CustomSocketMutator()");
     grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
+}
+
+void ServerBuilderOptionImpl::UpdateArguments(
+    grpc::ChannelArguments *custom_args)
+{
+    CustomSocketMutator *csm_ = new CustomSocketMutator();
+    custom_args->SetSocketMutator(csm_);
 }
 
 void Srv::CiscoBind(std::string cisco_srv_socket)
