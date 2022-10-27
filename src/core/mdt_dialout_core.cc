@@ -377,8 +377,7 @@ void Srv::CiscoStream::Start(
                                     main_cfg_parameters.at("writer_id"),
                                     peer_ip,
                                     peer_port,
-                                    //Original data-in
-                                    stream_data_in),
+                                    stream_data_in_normalization),
                                 zmq_delivery.ZmqPusher(
                                     data_wrapper,
                                     zmq_delivery.get_zmq_ctx(),
@@ -403,8 +402,7 @@ void Srv::CiscoStream::Start(
                                     main_cfg_parameters.at("writer_id"),
                                     peer_ip,
                                     peer_port,
-                                    //Original data-in
-                                    stream_data_in),
+                                    stream_data_in_normalization),
                                 zmq_delivery.ZmqPusher(
                                     data_wrapper,
                                     zmq_delivery.get_zmq_ctx(),
@@ -457,7 +455,6 @@ void Srv::CiscoStream::Start(
                                 main_cfg_parameters.at("writer_id"),
                                 peer_ip,
                                 peer_port,
-                                //Original data-in
                                 stream_data_in),
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
@@ -483,7 +480,6 @@ void Srv::CiscoStream::Start(
                                 main_cfg_parameters.at("writer_id"),
                                 peer_ip,
                                 peer_port,
-                                //Original data-in
                                 stream_data_in),
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
@@ -534,7 +530,6 @@ void Srv::CiscoStream::Start(
                             main_cfg_parameters.at("writer_id"),
                             peer_ip,
                             peer_port,
-                            //Original data-in
                             stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
@@ -560,7 +555,6 @@ void Srv::CiscoStream::Start(
                             main_cfg_parameters.at("writer_id"),
                             peer_ip,
                             peer_port,
-                            //Original data-in
                             stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
@@ -601,7 +595,6 @@ void Srv::CiscoStream::Start(
                             main_cfg_parameters.at("writer_id"),
                             peer_ip,
                             peer_port,
-                            //Original data-in
                             stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
@@ -627,7 +620,6 @@ void Srv::CiscoStream::Start(
                             main_cfg_parameters.at("writer_id"),
                             peer_ip,
                             peer_port,
-                            //Original data-in
                             stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
