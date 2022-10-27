@@ -21,8 +21,8 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
             error("[CustomSocketMutator()]: Issues with getting the "
             "iface type");
         //std::abort();
-        std::exit(EXIT_FAILURE);
-        //return false;
+        //std::exit(EXIT_FAILURE);
+        return false;
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
@@ -31,8 +31,8 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
             error("[CustomSocketMutator()]: Unable to bind the "
             "service(s) on the configured socket(s)");
         //std::abort();
-        std::exit(EXIT_FAILURE);
-        //return false;
+        //std::exit(EXIT_FAILURE);
+        return false;
     }
 
     return true;
