@@ -20,7 +20,7 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to get the "
             "interface type");
-        std::exit(EXIT_FAILURE);
+        std::abort();
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
@@ -29,7 +29,6 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
             error("[CustomSocketMutator()]: Unable to bind [{}] "
             "on the configured socket(s)", iface);
         std::abort();
-        std::exit(EXIT_FAILURE);
     }
 
     return true;
