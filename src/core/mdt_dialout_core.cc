@@ -38,9 +38,15 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     return true;
 }
 
-bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0) {
+bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
+{
     CustomSocketMutator *csm = (CustomSocketMutator *) mutator0;
-    return csm->bindtodevice_socket_mutator(fd);
+
+    if(csm->bindtodevice_socket_mutator(fd) == true) {
+        return csm->bindtodevice_socket_mutator(fd);
+    } else {
+        std::exit(EXIT_FAILURE);
+    }
 }
 
 #define GPR_ICMP(a, b) ((a) < (b) ? -1 : ((a) > (b) ? 1 : 0))
