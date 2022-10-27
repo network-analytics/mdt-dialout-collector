@@ -122,8 +122,10 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
+            DataWrapper &data_wrapper,
             KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
+            ZmqDelivery &zmq_delivery,
             GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext
         );
     private:

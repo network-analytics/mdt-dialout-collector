@@ -161,14 +161,16 @@ void Srv::CiscoFsmCtrl()
 void Srv::JuniperFsmCtrl()
 {
     DataManipulation data_manipulation;
+    DataWrapper data_wrapper;
     KafkaDelivery kafka_delivery;
     kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    ZmqDelivery zmq_delivery;
     GnmiJuniperTelemetryHeaderExtension juniper_tlm_hdr_ext;
 
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
-    juniper_sstream->Start(label_map, data_manipulation, kafka_delivery,
-        producer, juniper_tlm_hdr_ext);
+    juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
+        kafka_delivery, producer, zmq_delivery, juniper_tlm_hdr_ext);
     //int juniper_counter {0};
     void *juniper_tag {nullptr};
     bool juniper_ok {false};
@@ -183,8 +185,8 @@ void Srv::JuniperFsmCtrl()
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
-            label_map, data_manipulation, kafka_delivery, producer,
-            juniper_tlm_hdr_ext);
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
+            producer, zmq_delivery, juniper_tlm_hdr_ext);
         //juniper_counter++;
     }
 }
@@ -645,8 +647,10 @@ void Srv::CiscoStream::Start(
 void Srv::JuniperStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
+    DataWrapper &data_wrapper,
     KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
+    ZmqDelivery &zmq_delivery,
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext)
 {
     // Initial stream_status set to START @constructor
@@ -663,8 +667,8 @@ void Srv::JuniperStream::Start(
             "new Srv::JuniperStream()");
         Srv::JuniperStream *juniper_sstream =
             new Srv::JuniperStream(juniper_service_, juniper_cq_);
-        juniper_sstream->Start(label_map, data_manipulation, kafka_delivery,
-            producer, juniper_tlm_hdr_ext);
+        juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
+            kafka_delivery, producer, zmq_delivery, juniper_tlm_hdr_ext);
         juniper_resp.Read(&juniper_stream, this);
         juniper_stream_status = PROCESSING;
         juniper_replies_sent++;
@@ -729,6 +733,20 @@ void Srv::JuniperStream::Start(
                         producer,
                         peer_ip,
                         stream_data_out);
+                    data_wrapper.BuildDataWrapper (
+                        "gRPC",
+                        "json_string",
+                        main_cfg_parameters.at("writer_id"),
+                        peer_ip,
+                        peer_port,
+                        stream_data_in),
+                    zmq_delivery.ZmqPusher(
+                        data_wrapper,
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
+                    zmq_delivery.ZmqPoller(
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
                     }
             } else {
                 if (data_manipulation.MetaData(
@@ -740,6 +758,20 @@ void Srv::JuniperStream::Start(
                         producer,
                         peer_ip,
                         stream_data_out_meta);
+                    data_wrapper.BuildDataWrapper (
+                        "gRPC",
+                        "json_string",
+                        main_cfg_parameters.at("writer_id"),
+                        peer_ip,
+                        peer_port,
+                        stream_data_in),
+                    zmq_delivery.ZmqPusher(
+                        data_wrapper,
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
+                    zmq_delivery.ZmqPoller(
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
                 }
             }
 
