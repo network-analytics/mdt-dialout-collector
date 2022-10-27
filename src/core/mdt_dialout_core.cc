@@ -43,7 +43,7 @@ int custom_socket_compare(grpc_socket_mutator *mutator1,
 
 void custom_socket_destroy(grpc_socket_mutator *mutator)
 {
-    gpr_free(mutator);
+    //gpr_free(mutator);
 }
 
 bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
