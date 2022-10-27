@@ -8,7 +8,6 @@
 
 // Global visibility to be able to signal the refresh --> CSV from main
 std::unordered_map<std::string, std::vector<std::string>> label_map;
-grpc_socket_mutator_vtable custom_socket_mutator_vtable;
 
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
@@ -50,20 +49,16 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
 bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
 {
     CustomSocketMutator *csm = (CustomSocketMutator *) mutator0;
-
-    if(csm->bindtodevice_socket_mutator(fd) == false) {
-        std::exit(EXIT_FAILURE);
-    } else {
-        custom_socket_mutator_vtable = grpc_socket_mutator_vtable
-        {
-            custom_socket_mutator_fd,
-            custom_socket_compare,
-            custom_socket_destroy,
-            nullptr
-        };
-    }
-    return true;
+    return csm->bindtodevice_socket_mutator(fd);
 }
+
+const grpc_socket_mutator_vtable custom_socket_mutator_vtable =
+    grpc_socket_mutator_vtable {
+        custom_socket_mutator_fd,
+        custom_socket_compare,
+        custom_socket_destroy,
+        nullptr
+    };
 
 CustomSocketMutator::CustomSocketMutator()
 {
