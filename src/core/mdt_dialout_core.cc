@@ -20,7 +20,9 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Issues with getting the "
             "iface type");
-        return false;
+        std::abort();;
+        //std::exit(EXIT_FAILURE);
+        //return false;
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
@@ -28,8 +30,9 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to bind the "
             "service(s) on the configured socket(s)");
-        return false;
+        std::abort();;
         //std::exit(EXIT_FAILURE);
+        //return false;
     }
 
     return true;
