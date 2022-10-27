@@ -17,15 +17,19 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     std::string iface = main_cfg_parameters.at("iface");
 
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
-        //std::cout << "Issues with getting the iface type ..." << "\n";
+        spdlog::get("multi-logger")->
+            error("[CustomSocketMutator()]: Issues with getting the "
+            "iface type");
+        return false;
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
-        spdlog::get("multi-logger-boot")->
+        spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to bind the "
             "service(s) on the configured socket(s)");
-        std::exit(EXIT_FAILURE);
+        return false;
+        //std::exit(EXIT_FAILURE);
     }
 
     return true;
