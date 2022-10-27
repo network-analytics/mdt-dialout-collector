@@ -28,6 +28,7 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to bind [{}] "
             "on the configured socket(s)", iface);
+        std::abort();
         std::exit(EXIT_FAILURE);
     }
 
