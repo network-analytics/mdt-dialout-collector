@@ -52,6 +52,7 @@ src/proto/OpenConfig/*.h
 
 # BIN
 bin/mdt_dialout_collector
+bin/pmtelemetryd
 bin/zmq_pull
 
 # YouCompleteMe

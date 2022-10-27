@@ -340,10 +340,13 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/bridge")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 # Compile
-foreach(_target "mdt_dialout_collector")
+file(GLOB APP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
+foreach(sourcefile ${APP_SOURCES})
+    file(RELATIVE_PATH filename ${CMAKE_CURRENT_SOURCE_DIR}/src ${sourcefile})
+    string(REPLACE ".cc" "" file ${filename})
     add_executable(
-        ${_target}
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/${_target}.cc"
+        ${file}
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/${file}.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mdt_dialout_core.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
@@ -368,9 +371,12 @@ foreach(_target "mdt_dialout_collector")
         ${huawei_telemetry_pb_cc}
         ${openconfig_interfaces_pb_cc}
     )
-    target_compile_features(${_target} PRIVATE)
+    target_compile_features(
+        ${file}
+        PRIVATE
+    )
     target_link_libraries(
-        ${_target}
+        ${file}
         ${_REFLECTION}
         ${_GRPC_GRPCPP}
         ${_PROTOBUF_LIBPROTOBUF}
@@ -379,5 +385,5 @@ foreach(_target "mdt_dialout_collector")
         ${RDKAFKA_LIBRARIES}
         ${LIBCONFIG_CPP_LIBRARIES}
     )
-endforeach()
+endforeach(sourcefile ${APP_SOURCES})
 
