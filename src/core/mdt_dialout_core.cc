@@ -371,6 +371,14 @@ void Srv::CiscoStream::Start(
                                     producer,
                                     peer_ip,
                                     stream_data_out);
+                                data_wrapper.BuildDataWrapper (
+                                    "gRPC",
+                                    "json_string",
+                                    main_cfg_parameters.at("writer_id"),
+                                    peer_ip,
+                                    peer_port,
+                                    //Original data-in
+                                    stream_data_in),
                                 zmq_delivery.ZmqPusher(
                                     data_wrapper,
                                     zmq_delivery.get_zmq_ctx(),
@@ -389,6 +397,14 @@ void Srv::CiscoStream::Start(
                                     producer,
                                     peer_ip,
                                     stream_data_out_meta);
+                                data_wrapper.BuildDataWrapper (
+                                    "gRPC",
+                                    "json_string",
+                                    main_cfg_parameters.at("writer_id"),
+                                    peer_ip,
+                                    peer_port,
+                                    //Original data-in
+                                    stream_data_in),
                                 zmq_delivery.ZmqPusher(
                                     data_wrapper,
                                     zmq_delivery.get_zmq_ctx(),
@@ -435,6 +451,14 @@ void Srv::CiscoStream::Start(
                                 producer,
                                 peer_ip,
                                 stream_data_out);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                //Original data-in
+                                stream_data_in),
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
                                 zmq_delivery.get_zmq_ctx(),
@@ -453,6 +477,14 @@ void Srv::CiscoStream::Start(
                                 producer,
                                 peer_ip,
                                 stream_data_out_meta);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                //Original data-in
+                                stream_data_in),
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
                                 zmq_delivery.get_zmq_ctx(),
@@ -496,6 +528,14 @@ void Srv::CiscoStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            //Original data-in
+                            stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
                             zmq_delivery.get_zmq_ctx(),
@@ -514,6 +554,14 @@ void Srv::CiscoStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            //Original data-in
+                            stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
                             zmq_delivery.get_zmq_ctx(),
@@ -542,8 +590,11 @@ void Srv::CiscoStream::Start(
                             label_map,
                             peer_ip,
                             stream_data_out_meta,
-                        //  stream_data_out) == true) {
-                            stream_data_out) == true &&
+                            stream_data_out) == true) {
+                        kafka_delivery.AsyncKafkaProducer(
+                            producer,
+                            peer_ip,
+                            stream_data_out);
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -551,12 +602,7 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             //Original data-in
-                            stream_data_in) == true) {
-                        data_wrapper.DisplayDataWrapper();
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out);
+                            stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
                             zmq_delivery.get_zmq_ctx(),
@@ -575,6 +621,14 @@ void Srv::CiscoStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            //Original data-in
+                            stream_data_in),
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
                             zmq_delivery.get_zmq_ctx(),
