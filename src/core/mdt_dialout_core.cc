@@ -49,7 +49,12 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
 bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
 {
     CustomSocketMutator *csm = (CustomSocketMutator *) mutator0;
-    return csm->bindtodevice_socket_mutator(fd);
+    if (csm->bindtodevice_socket_mutator(fd)) {
+        std::cout << fd << "\n";
+        return true;
+    } else {
+        return false;
+    }
 }
 
 const grpc_socket_mutator_vtable custom_socket_mutator_vtable =
