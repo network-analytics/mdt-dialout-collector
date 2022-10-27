@@ -371,8 +371,13 @@ void Srv::CiscoStream::Start(
                                     producer,
                                     peer_ip,
                                     stream_data_out);
-                                //zmq_delivery.ZmqPusher(
-                                //    stream_data_in_normalization);
+                                zmq_delivery.ZmqPusher(
+                                    data_wrapper,
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
+                                zmq_delivery.ZmqPoller(
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
                             }
                         } else {
                             if (data_manipulation.MetaData(
@@ -384,8 +389,13 @@ void Srv::CiscoStream::Start(
                                     producer,
                                     peer_ip,
                                     stream_data_out_meta);
-                                //zmq_delivery.ZmqPusher(
-                                //    stream_data_in_normalization);
+                                zmq_delivery.ZmqPusher(
+                                    data_wrapper,
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
+                                zmq_delivery.ZmqPoller(
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
                             }
                         }
                     } else {
@@ -425,8 +435,13 @@ void Srv::CiscoStream::Start(
                                 producer,
                                 peer_ip,
                                 stream_data_out);
-                            //zmq_delivery.ZmqPusher(
-                            //    stream_data_in);
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -438,8 +453,13 @@ void Srv::CiscoStream::Start(
                                 producer,
                                 peer_ip,
                                 stream_data_out_meta);
-                            //zmq_delivery.ZmqPusher(
-                            //    stream_data_in);
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     }
                 } else {
@@ -476,8 +496,13 @@ void Srv::CiscoStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out);
-                        //zmq_delivery.ZmqPusher(
-                        //    stream_data_in);
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -489,8 +514,13 @@ void Srv::CiscoStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
-                        //zmq_delivery.ZmqPusher(
-                        //    stream_data_in);
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             // Handling JSON string
@@ -522,11 +552,11 @@ void Srv::CiscoStream::Start(
                             peer_port,
                             //Original data-in
                             stream_data_in) == true) {
-                        //data_wrapper.DisplayDataWrapper();
-                        //kafka_delivery.AsyncKafkaProducer(
-                        //    producer,
-                        //    peer_ip,
-                        //    stream_data_out);
+                        data_wrapper.DisplayDataWrapper();
+                        kafka_delivery.AsyncKafkaProducer(
+                            producer,
+                            peer_ip,
+                            stream_data_out);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
                             zmq_delivery.get_zmq_ctx(),
@@ -545,8 +575,13 @@ void Srv::CiscoStream::Start(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
-                        //zmq_delivery.ZmqPusher(
-                        //    stream_data_in);
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             }

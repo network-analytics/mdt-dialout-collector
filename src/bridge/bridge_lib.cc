@@ -174,7 +174,7 @@ void FreePayload(Payload *pload)
     free(pload);
 }
 
-void StartGrpcDialoutCollector(pthread_t *workers)
+void start_grpc_dialout_collector(pthread_t *workers)
 {
     LoadOptions();
 

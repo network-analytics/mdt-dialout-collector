@@ -60,7 +60,7 @@ extern void InitPayload(Payload **pload_, const char *event_type,
 extern void FreeOptions(Options *opts);
 extern void FreePayload(Payload *pload);
 
-extern void StartGrpcDialoutCollector(pthread_t *workers);
+extern void start_grpc_dialout_collector(pthread_t *workers);
 extern void LoadOptions();
 extern void *VendorThread(void *vendor);
 extern void LoadThreads(pthread_t *workers_vec, const char *ipv4_socket_str,
