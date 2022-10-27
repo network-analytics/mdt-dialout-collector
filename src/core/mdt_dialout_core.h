@@ -32,9 +32,9 @@ public:
     ServerBuilderOptionImpl() {
         spdlog::get("multi-logger")->
             debug("constructor: ServerBuilderOptionImpl()"); };
-    //~ServerBuilderOptionImpl() {
-    //    spdlog::get("multi-logger")->
-    //        debug("destructor: ~ServerBuilderOptionImpl()"); };
+    ~ServerBuilderOptionImpl() {
+        spdlog::get("multi-logger")->
+            debug("destructor: ~ServerBuilderOptionImpl()"); };
     virtual void UpdateArguments(grpc::ChannelArguments *args);
     virtual void UpdatePlugins(
         std::vector<std::unique_ptr<grpc::ServerBuilderPlugin>> *plugins) {}
@@ -43,9 +43,9 @@ public:
 class CustomSocketMutator: public grpc_socket_mutator {
 public:
     CustomSocketMutator();
-    //~CustomSocketMutator() {
-    //    spdlog::get("multi-logger")->
-    //        debug("destructor: ~CustomSocketMutator()"); };
+    ~CustomSocketMutator() {
+        spdlog::get("multi-logger")->
+            debug("destructor: ~CustomSocketMutator()"); };
     bool bindtodevice_socket_mutator(int fd);
 };
 

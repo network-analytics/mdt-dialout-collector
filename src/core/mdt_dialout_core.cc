@@ -11,19 +11,19 @@ std::unordered_map<std::string, std::vector<std::string>> label_map;
 
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
-    int type;
-    socklen_t len = sizeof(type);
+    //int type;
+    //socklen_t len = sizeof(type);
 
     std::string iface = main_cfg_parameters.at("iface");
 
-    if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
-        spdlog::get("multi-logger")->
-            error("[CustomSocketMutator()]: Issues with getting the "
-            "iface type");
-        //std::abort();
-        //std::exit(EXIT_FAILURE);
-        return false;
-    }
+    //if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
+    //    spdlog::get("multi-logger")->
+    //        error("[CustomSocketMutator()]: Issues with getting the "
+    //        "iface type");
+    //    //std::abort();
+    //    //std::exit(EXIT_FAILURE);
+    //    return false;
+    //}
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
