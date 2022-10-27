@@ -20,15 +20,15 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         spdlog::get("multi-logger")->
             error("[CustomSocketMutator()]: Unable to get the "
             "interface type");
-        return false;
+        std::exit(EXIT_FAILURE);
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
         spdlog::get("multi-logger")->
-            error("[CustomSocketMutator()]: Unable to bind the "
-            "service(s) on the configured socket(s)");
-        return false;
+            error("[CustomSocketMutator()]: Unable to bind [{}] "
+            "on the configured socket(s)", iface);
+        std::exit(EXIT_FAILURE);
     }
 
     return true;
@@ -63,11 +63,8 @@ const grpc_socket_mutator_vtable custom_socket_mutator_vtable =
 CustomSocketMutator::CustomSocketMutator()
 {
     spdlog::get("multi-logger")->debug("constructor: CustomSocketMutator()");
-    if (false) {
-        grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
-    } else {
-        std::exit(EXIT_FAILURE);
-    }
+    // functions before were used to setup a custom vtable
+    grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
 }
 
 void ServerBuilderOptionImpl::UpdateArguments(
