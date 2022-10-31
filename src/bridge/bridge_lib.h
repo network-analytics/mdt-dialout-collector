@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include "cfg_wrapper.h"
+#include "../cfgWrapper/cfg_wrapper.h"
 
 #define MAX_WORKERS 15
 

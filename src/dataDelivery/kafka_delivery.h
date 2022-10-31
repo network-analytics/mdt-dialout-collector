@@ -10,10 +10,10 @@
 // External Library headers
 #include "kafka/KafkaProducer.h"
 // mdt-dialout-collector Library headers
-#include "cfg_handler.h"
+#include "../utils/cfg_handler.h"
 #include "kafka/Properties.h"
 #include "kafka/Types.h"
-#include "logs_handler.h"
+#include "../utils/logs_handler.h"
 
 
 class KafkaDelivery {

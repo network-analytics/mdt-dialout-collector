@@ -11,7 +11,7 @@
 // External Library headers
 #include "csv/rapidcsv.h"
 // mdt-dialout-collector Library headers
-#include "mdt_dialout_core.h"
+#include "core/mdt_dialout_core.h"
 
 
 void *VendorThread(const std::string &vendor);

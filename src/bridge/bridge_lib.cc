@@ -3,7 +3,7 @@
 
 
 #include "bridge_lib.h"
-#include "mdt_dialout_core.h"
+#include "../core/mdt_dialout_core.h"
 
 
 Options *InitOptions()

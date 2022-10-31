@@ -11,7 +11,7 @@
 // External Library headers
 
 // mdt-dialout-collector Library headers
-#include "logs_handler.h"
+#include "../utils/logs_handler.h"
 
 
 // C++ Class

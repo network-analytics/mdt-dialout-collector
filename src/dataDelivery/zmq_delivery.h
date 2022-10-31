@@ -11,9 +11,9 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 // mdt-dialout-collector Library headers
-#include "data_wrapper.h"
-#include "cfg_handler.h"
-#include "logs_handler.h"
+#include "../dataWrapper/data_wrapper.h"
+#include "../utils/cfg_handler.h"
+#include "../utils/logs_handler.h"
 
 
 class ZmqDelivery {

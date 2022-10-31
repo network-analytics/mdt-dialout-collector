@@ -62,3 +62,35 @@ compile_commands.json
 # CSV
 csv/*.csv
 
+# Autotools
+libtool.m4
+ltoptions.m4
+ltsugar.m4
+ltversion.m4
+lt~obsolete.m4
+*aclocal.m4
+
+Makefile.in
+Makefile
+.deps
+.libs
+autom4te.cache
+config.*
+configure
+install-sh
+ltmain.sh
+missing
+depcomp
+libtool
+compile
+m4
+ar-lib
+test-driver
+
+/build-*
+/build/*
+
+proto/.proto_mark
+
+!.gitignore
+!.travis.yml

@@ -2,7 +2,7 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-#include "bridge_lib.h"
+#include "bridge/bridge_lib.h"
 
 
 int main(int argc, char *argv[])
