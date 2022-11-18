@@ -21,7 +21,8 @@ RUN apt-get update && apt-get -y full-upgrade && \
     libjsoncpp-dev \
     librdkafka-dev \
     libconfig++-dev \
-    libspdlog-dev
+    libspdlog-dev \
+    libzmq3-dev
 
 WORKDIR /tmp/mdt-dialout-collector
 COPY docker/scripts/grpc.sh scripts/
