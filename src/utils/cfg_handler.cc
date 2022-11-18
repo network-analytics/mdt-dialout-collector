@@ -10,7 +10,7 @@
 std::map<std::string, std::string> logs_cfg_parameters;
 std::map<std::string, std::string> main_cfg_parameters;
 std::map<std::string, std::string> data_manipulation_cfg_parameters;
-std::map<std::string, std::string> data_delivery_cfg_parameters;
+std::map<std::string, std::string> kafka_delivery_cfg_parameters;
 
 
 bool CfgHandler::set_parameters(libconfig::Config &params,
@@ -102,6 +102,8 @@ bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
         } else {
             params.insert({"syslog_facility", "LOG_USER"});
         }
+    } else {
+        params.insert({"syslog_facility", "NONE"});
     }
 
     if (syslog_s.compare("true") == 0) {
@@ -127,6 +129,8 @@ bool LogsCfgHandler::lookup_logs_parameters(const std::string &cfg_path,
         } else {
             params.insert({"syslog_ident", "mdt-dialout-collector"});
         }
+    } else {
+        params.insert({"syslog_ident", "NONE"});
     }
 
     bool console_log = logs_params.exists("console_log");

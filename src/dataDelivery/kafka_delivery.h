@@ -2,25 +2,25 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-#ifndef _DATA_DELIVERY_H_
-#define _DATA_DELIVERY_H_
+#ifndef _KAFKA_DELIVERY_H_
+#define _KAFKA_DELIVERY_H_
 
 // C++ Standard Library headers
 
 // External Library headers
 #include "kafka/KafkaProducer.h"
 // mdt-dialout-collector Library headers
-#include "cfg_handler.h"
+#include "../utils/cfg_handler.h"
 #include "kafka/Properties.h"
 #include "kafka/Types.h"
-#include "logs_handler.h"
+#include "../utils/logs_handler.h"
 
 
-class DataDelivery {
+class KafkaDelivery {
 public:
-    DataDelivery();
-    ~DataDelivery() { spdlog::get("multi-logger")->
-        debug("destructor: ~DataDelivery()"); };
+    KafkaDelivery();
+    ~KafkaDelivery() { spdlog::get("multi-logger")->
+        debug("destructor: ~KafkaDelivery()"); };
     bool AsyncKafkaProducer(
         kafka::clients::KafkaProducer &producer,
         const std::string &peer,

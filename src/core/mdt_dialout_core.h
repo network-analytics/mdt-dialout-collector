@@ -11,14 +11,18 @@
 #include <sys/socket.h>
 #include <grpcpp/grpcpp.h>
 #include <grpc/support/alloc.h>
+
 #include "grpc/socket_mutator.h"
 // mdt-dialout-collector Library headers
-#include "cisco_dialout.grpc.pb.h"
-#include "huawei_dialout.grpc.pb.h"
-#include "juniper_dialout.grpc.pb.h"
-#include "data_manipulation.h"
-#include "data_delivery.h"
-#include "juniper_gnmi.pb.h"
+#include "proto/Cisco/cisco_dialout.grpc.pb.h"
+#include "proto/Huawei/huawei_dialout.grpc.pb.h"
+#include "proto/Juniper/juniper_dialout.grpc.pb.h"
+#include "proto/Juniper/juniper_gnmi.pb.h"
+#include "../dataManipulation/data_manipulation.h"
+#include "../dataWrapper/data_wrapper.h"
+#include "../dataDelivery/kafka_delivery.h"
+#include "../dataDelivery/zmq_delivery.h"
+#include "../utils/logs_handler.h"
 
 
 // Global visibility to be able to signal the refresh --> CSV/PTM from main
@@ -89,8 +93,10 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
-            DataDelivery &data_delivery,
+            DataWrapper &data_wrapper,
+            KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
+            ZmqDelivery &zmq_delivery,
             cisco_telemetry::Telemetry &cisco_tlm
         );
     private:
@@ -117,8 +123,10 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
-            DataDelivery &data_delivery,
+            DataWrapper &data_wrapper,
+            KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
+            ZmqDelivery &zmq_delivery,
             GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext
         );
     private:
@@ -145,8 +153,10 @@ private:
             std::unordered_map<std::string,std::vector<std::string>>
                 &label_map,
             DataManipulation &data_manipulation,
-            DataDelivery &data_delivery,
+            DataWrapper &data_wrapper,
+            KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
+            ZmqDelivery &zmq_delivery,
             huawei_telemetry::Telemetry &huawei_tlm,
             openconfig_interfaces::Interfaces &oc_if
         );

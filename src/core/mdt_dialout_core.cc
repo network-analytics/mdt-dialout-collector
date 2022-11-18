@@ -17,23 +17,21 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     std::string iface = main_cfg_parameters.at("iface");
 
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
-        //std::cout << "Issues with getting the iface type ..." << "\n";
+        spdlog::get("multi-logger")->
+            error("[CustomSocketMutator()]: Unable to get the "
+            "interface type");
+        std::abort();
     }
 
     if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
         iface.c_str(), strlen(iface.c_str())) != 0) {
         spdlog::get("multi-logger")->
-            error("[CustomSocketMutator()]: Unable to bind the "
-            "service(s) on the configured socket(s)");
+            error("[CustomSocketMutator()]: Unable to bind [{}] "
+            "on the configured socket(s)", iface);
         std::abort();
     }
 
     return true;
-}
-
-bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0) {
-    CustomSocketMutator *csm = (CustomSocketMutator *)mutator0;
-    return csm->bindtodevice_socket_mutator(fd);
 }
 
 #define GPR_ICMP(a, b) ((a) < (b) ? -1 : ((a) > (b) ? 1 : 0))
@@ -48,33 +46,43 @@ void custom_socket_destroy(grpc_socket_mutator *mutator)
     gpr_free(mutator);
 }
 
-const grpc_socket_mutator_vtable
-    custom_socket_mutator_vtable = grpc_socket_mutator_vtable{
+bool custom_socket_mutator_fd(int fd, grpc_socket_mutator *mutator0)
+{
+    CustomSocketMutator *csm = (CustomSocketMutator *) mutator0;
+    return csm->bindtodevice_socket_mutator(fd);
+}
+
+// functions before were used to setup a custom vtable (struct)
+const grpc_socket_mutator_vtable custom_socket_mutator_vtable =
+    grpc_socket_mutator_vtable {
         custom_socket_mutator_fd,
         custom_socket_compare,
         custom_socket_destroy,
-        nullptr};
+        nullptr
+    };
 
-void ServerBuilderOptionImpl::UpdateArguments(
-    grpc::ChannelArguments *custom_args) {
-        CustomSocketMutator *csm_ = new CustomSocketMutator();
-        custom_args->SetSocketMutator(csm_);
-}
-
-CustomSocketMutator::CustomSocketMutator() {
+CustomSocketMutator::CustomSocketMutator()
+{
     spdlog::get("multi-logger")->debug("constructor: CustomSocketMutator()");
     grpc_socket_mutator_init(this, &custom_socket_mutator_vtable);
+}
+
+void ServerBuilderOptionImpl::UpdateArguments(
+    grpc::ChannelArguments *custom_args)
+{
+    CustomSocketMutator *csm_ = new CustomSocketMutator();
+    custom_args->SetSocketMutator(csm_);
 }
 
 void Srv::CiscoBind(std::string cisco_srv_socket)
 {
     grpc::ServerBuilder cisco_builder;
-    cisco_builder.RegisterService(&cisco_service_);
     // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         csbo(new ServerBuilderOptionImpl());
     cisco_builder.SetOption(std::move(csbo));
     // --- Required for socket manipulation ---
+    cisco_builder.RegisterService(&cisco_service_);
     cisco_builder.AddListeningPort(cisco_srv_socket,
         grpc::InsecureServerCredentials());
     cisco_cq_ = cisco_builder.AddCompletionQueue();
@@ -86,12 +94,12 @@ void Srv::CiscoBind(std::string cisco_srv_socket)
 void Srv::JuniperBind(std::string juniper_srv_socket)
 {
     grpc::ServerBuilder juniper_builder;
-    juniper_builder.RegisterService(&juniper_service_);
     // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         jsbo(new ServerBuilderOptionImpl());
     juniper_builder.SetOption(std::move(jsbo));
     // --- Required for socket manipulation ---
+    juniper_builder.RegisterService(&juniper_service_);
     juniper_builder.AddListeningPort(juniper_srv_socket,
         grpc::InsecureServerCredentials());
     juniper_cq_ = juniper_builder.AddCompletionQueue();
@@ -103,12 +111,12 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
 void Srv::HuaweiBind(std::string huawei_srv_socket)
 {
     grpc::ServerBuilder huawei_builder;
-    huawei_builder.RegisterService(&huawei_service_);
     // --- Required for socket manipulation ---
     std::unique_ptr<ServerBuilderOptionImpl>
         hsbo(new ServerBuilderOptionImpl());
     huawei_builder.SetOption(std::move(hsbo));
     // --- Required for socket manipulation ---
+    huawei_builder.RegisterService(&huawei_service_);
     huawei_builder.AddListeningPort(huawei_srv_socket,
         grpc::InsecureServerCredentials());
     huawei_cq_ = huawei_builder.AddCompletionQueue();
@@ -120,14 +128,16 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 void Srv::CiscoFsmCtrl()
 {
     DataManipulation data_manipulation;
-    DataDelivery data_delivery;
-    kafka::clients::KafkaProducer producer(data_delivery.get_properties());
+    DataWrapper data_wrapper;
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    ZmqDelivery zmq_delivery;
     cisco_telemetry::Telemetry cisco_tlm;
 
     std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
-    cisco_sstream->Start(label_map, data_manipulation, data_delivery, producer,
-        cisco_tlm);
+    cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
+        kafka_delivery, producer, zmq_delivery, cisco_tlm);
     //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
@@ -142,7 +152,8 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            label_map, data_manipulation, data_delivery, producer, cisco_tlm);
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
+            producer, zmq_delivery, cisco_tlm);
         //cisco_counter++;
     }
 }
@@ -150,14 +161,16 @@ void Srv::CiscoFsmCtrl()
 void Srv::JuniperFsmCtrl()
 {
     DataManipulation data_manipulation;
-    DataDelivery data_delivery;
-    kafka::clients::KafkaProducer producer(data_delivery.get_properties());
+    DataWrapper data_wrapper;
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    ZmqDelivery zmq_delivery;
     GnmiJuniperTelemetryHeaderExtension juniper_tlm_hdr_ext;
 
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
-    juniper_sstream->Start(label_map, data_manipulation, data_delivery,
-        producer, juniper_tlm_hdr_ext);
+    juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
+        kafka_delivery, producer, zmq_delivery, juniper_tlm_hdr_ext);
     //int juniper_counter {0};
     void *juniper_tag {nullptr};
     bool juniper_ok {false};
@@ -172,8 +185,8 @@ void Srv::JuniperFsmCtrl()
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
-            label_map, data_manipulation, data_delivery, producer,
-            juniper_tlm_hdr_ext);
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
+            producer, zmq_delivery, juniper_tlm_hdr_ext);
         //juniper_counter++;
     }
 }
@@ -181,15 +194,17 @@ void Srv::JuniperFsmCtrl()
 void Srv::HuaweiFsmCtrl()
 {
     DataManipulation data_manipulation;
-    DataDelivery data_delivery;
-    kafka::clients::KafkaProducer producer(data_delivery.get_properties());
+    DataWrapper data_wrapper;
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    ZmqDelivery zmq_delivery;
     huawei_telemetry::Telemetry huawei_tlm;
     openconfig_interfaces::Interfaces oc_if;
 
     std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
         new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get()));
-    huawei_sstream->Start(label_map, data_manipulation, data_delivery,
-        producer, huawei_tlm, oc_if);
+    huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
+        kafka_delivery, producer, zmq_delivery, huawei_tlm, oc_if);
     //int huawei_counter {0};
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
@@ -204,8 +219,8 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(
-            label_map, data_manipulation, data_delivery, producer,
-            huawei_tlm, oc_if);
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
+            producer, zmq_delivery, huawei_tlm, oc_if);
         //huawei_counter++;
     }
 }
@@ -252,11 +267,14 @@ Srv::HuaweiStream::HuaweiStream(
     spdlog::get("multi-logger")->debug("constructor: HuaweiStream()");
 }
 
+
 void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
-    DataDelivery &data_delivery,
+    DataWrapper &data_wrapper,
+    KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
+    ZmqDelivery &zmq_delivery,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
     // Initial stream_status set to START @constructor
@@ -273,8 +291,8 @@ void Srv::CiscoStream::Start(
             "new Srv::CiscoStream()");
         Srv::CiscoStream *cisco_sstream =
             new Srv::CiscoStream(cisco_service_, cisco_cq_);
-        cisco_sstream->Start(label_map, data_manipulation, data_delivery,
-            producer, cisco_tlm);
+        cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
+            kafka_delivery, producer, zmq_delivery, cisco_tlm);
         cisco_resp.Read(&cisco_stream, this);
         cisco_stream_status = PROCESSING;
         cisco_replies_sent++;
@@ -353,10 +371,24 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     stream_data_out_meta,
                                     stream_data_out) == true ) {
-                                data_delivery.AsyncKafkaProducer(
+                                kafka_delivery.AsyncKafkaProducer(
                                     producer,
                                     peer_ip,
                                     stream_data_out);
+                                data_wrapper.BuildDataWrapper (
+                                    "gRPC",
+                                    "json_string",
+                                    main_cfg_parameters.at("writer_id"),
+                                    peer_ip,
+                                    peer_port,
+                                    stream_data_in_normalization);
+                                //zmq_delivery.ZmqPusher(
+                                //    data_wrapper,
+                                //    zmq_delivery.get_zmq_ctx(),
+                                //    zmq_delivery.get_zmq_stransport_uri());
+                                //zmq_delivery.ZmqPoller(
+                                //    zmq_delivery.get_zmq_ctx(),
+                                //    zmq_delivery.get_zmq_stransport_uri());
                             }
                         } else {
                             if (data_manipulation.MetaData(
@@ -364,10 +396,24 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     peer_port,
                                     stream_data_out_meta) == true) {
-                                data_delivery.AsyncKafkaProducer(
+                                kafka_delivery.AsyncKafkaProducer(
                                     producer,
                                     peer_ip,
                                     stream_data_out_meta);
+                                data_wrapper.BuildDataWrapper (
+                                    "gRPC",
+                                    "json_string",
+                                    main_cfg_parameters.at("writer_id"),
+                                    peer_ip,
+                                    peer_port,
+                                    stream_data_in_normalization);
+                                //zmq_delivery.ZmqPusher(
+                                //    data_wrapper,
+                                //    zmq_delivery.get_zmq_ctx(),
+                                //    zmq_delivery.get_zmq_stransport_uri());
+                                //zmq_delivery.ZmqPoller(
+                                //    zmq_delivery.get_zmq_ctx(),
+                                //    zmq_delivery.get_zmq_stransport_uri());
                             }
                         }
                     } else {
@@ -403,10 +449,24 @@ void Srv::CiscoStream::Start(
                                 peer_ip,
                                 stream_data_out_meta,
                                 stream_data_out) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                stream_data_in);
+                            //zmq_delivery.ZmqPusher(
+                            //    data_wrapper,
+                            //    zmq_delivery.get_zmq_ctx(),
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //zmq_delivery.ZmqPoller(
+                            //    zmq_delivery.get_zmq_ctx(),
+                            //    zmq_delivery.get_zmq_stransport_uri());
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -414,10 +474,24 @@ void Srv::CiscoStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_out_meta) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out_meta);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                stream_data_in),
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     }
                 } else {
@@ -450,10 +524,24 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        //zmq_delivery.ZmqPusher(
+                        //    data_wrapper,
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -461,10 +549,24 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        //zmq_delivery.ZmqPusher(
+                        //    data_wrapper,
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             // Handling JSON string
@@ -487,10 +589,24 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        //zmq_delivery.ZmqPusher(
+                        //    data_wrapper,
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -498,10 +614,24 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        //zmq_delivery.ZmqPusher(
+                        //    data_wrapper,
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             }
@@ -519,8 +649,10 @@ void Srv::CiscoStream::Start(
 void Srv::JuniperStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
-    DataDelivery &data_delivery,
+    DataWrapper &data_wrapper,
+    KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
+    ZmqDelivery &zmq_delivery,
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext)
 {
     // Initial stream_status set to START @constructor
@@ -537,8 +669,8 @@ void Srv::JuniperStream::Start(
             "new Srv::JuniperStream()");
         Srv::JuniperStream *juniper_sstream =
             new Srv::JuniperStream(juniper_service_, juniper_cq_);
-        juniper_sstream->Start(label_map, data_manipulation, data_delivery,
-            producer, juniper_tlm_hdr_ext);
+        juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
+            kafka_delivery, producer, zmq_delivery, juniper_tlm_hdr_ext);
         juniper_resp.Read(&juniper_stream, this);
         juniper_stream_status = PROCESSING;
         juniper_replies_sent++;
@@ -599,10 +731,24 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         stream_data_out_meta,
                         stream_data_out) == true) {
-                    data_delivery.AsyncKafkaProducer(
+                    kafka_delivery.AsyncKafkaProducer(
                         producer,
                         peer_ip,
                         stream_data_out);
+                    data_wrapper.BuildDataWrapper (
+                        "gRPC",
+                        "json_string",
+                        main_cfg_parameters.at("writer_id"),
+                        peer_ip,
+                        peer_port,
+                        stream_data_in);
+                    //zmq_delivery.ZmqPusher(
+                    //    data_wrapper,
+                    //    zmq_delivery.get_zmq_ctx(),
+                    //    zmq_delivery.get_zmq_stransport_uri());
+                    //zmq_delivery.ZmqPoller(
+                    //    zmq_delivery.get_zmq_ctx(),
+                    //    zmq_delivery.get_zmq_stransport_uri());
                     }
             } else {
                 if (data_manipulation.MetaData(
@@ -610,10 +756,24 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_out_meta) == true) {
-                    data_delivery.AsyncKafkaProducer(
+                    kafka_delivery.AsyncKafkaProducer(
                         producer,
                         peer_ip,
                         stream_data_out_meta);
+                    data_wrapper.BuildDataWrapper (
+                        "gRPC",
+                        "json_string",
+                        main_cfg_parameters.at("writer_id"),
+                        peer_ip,
+                        peer_port,
+                        stream_data_in);
+                    //zmq_delivery.ZmqPusher(
+                    //    data_wrapper,
+                    //    zmq_delivery.get_zmq_ctx(),
+                    //    zmq_delivery.get_zmq_stransport_uri());
+                    //zmq_delivery.ZmqPoller(
+                    //    zmq_delivery.get_zmq_ctx(),
+                    //    zmq_delivery.get_zmq_stransport_uri());
                 }
             }
 
@@ -631,8 +791,10 @@ void Srv::JuniperStream::Start(
 void Srv::HuaweiStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
-    DataDelivery &data_delivery,
+    DataWrapper &data_wrapper,
+    KafkaDelivery &kafka_delivery,
     kafka::clients::KafkaProducer &producer,
+    ZmqDelivery &zmq_delivery,
     huawei_telemetry::Telemetry &huawei_tlm,
     openconfig_interfaces::Interfaces &oc_if)
 {
@@ -650,8 +812,8 @@ void Srv::HuaweiStream::Start(
             "new Srv::HuaweiStream()");
         Srv::HuaweiStream *huawei_sstream =
             new Srv::HuaweiStream(huawei_service_, huawei_cq_);
-        huawei_sstream->Start(label_map, data_manipulation, data_delivery,
-            producer, huawei_tlm, oc_if);
+        huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
+            kafka_delivery, producer, zmq_delivery, huawei_tlm, oc_if);
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
         huawei_replies_sent++;
@@ -731,10 +893,24 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 stream_data_out_meta,
                                 stream_data_out) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                stream_data_in);
+                            //zmq_delivery.ZmqPusher(
+                            //    data_wrapper,
+                            //    zmq_delivery.get_zmq_ctx(),
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //zmq_delivery.ZmqPoller(
+                            //    zmq_delivery.get_zmq_ctx(),
+                            //    zmq_delivery.get_zmq_stransport_uri());
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -742,10 +918,24 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_out_meta) == true) {
-                            data_delivery.AsyncKafkaProducer(
+                            kafka_delivery.AsyncKafkaProducer(
                                 producer,
                                 peer_ip,
                                 stream_data_out_meta);
+                            data_wrapper.BuildDataWrapper (
+                                "gRPC",
+                                "json_string",
+                                main_cfg_parameters.at("writer_id"),
+                                peer_ip,
+                                peer_port,
+                                stream_data_in);
+                            //zmq_delivery.ZmqPusher(
+                            //    data_wrapper,
+                            //    zmq_delivery.get_zmq_ctx(),
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //zmq_delivery.ZmqPoller(
+                            //    zmq_delivery.get_zmq_ctx(),
+                            //    zmq_delivery.get_zmq_stransport_uri());
                         }
                     }
                 }
@@ -781,10 +971,24 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true &&
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        //zmq_delivery.ZmqPusher(
+                        //    data_wrapper,
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -792,10 +996,24 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        data_delivery.AsyncKafkaProducer(
+                        kafka_delivery.AsyncKafkaProducer(
                             producer,
                             peer_ip,
                             stream_data_out_meta);
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        //zmq_delivery.ZmqPusher(
+                        //    data_wrapper,
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    zmq_delivery.get_zmq_ctx(),
+                        //    zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             }

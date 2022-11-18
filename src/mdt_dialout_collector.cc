@@ -11,12 +11,10 @@
 // External Library headers
 #include "csv/rapidcsv.h"
 // mdt-dialout-collector Library headers
-#include "juniper_gnmi.pb.h"
-#include "mdt_dialout_core.h"
-#include "logs_handler.h"
+#include "core/mdt_dialout_core.h"
 
 
-void *VendorThread(void *vendor_ptr, const std::string &vendor);
+void *VendorThread(const std::string &vendor);
 void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &ipv4_socket_str,
     const std::string &replies_str,
@@ -71,21 +69,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // --- DEBUG ---
-    //for (auto &lp : logs_cfg_parameters) {
-    //    std::cout << lp.first << " ---> " << lp.second << "\n";
-    //}
-    //for (auto &mp : main_cfg_parameters) {
-    //    std::cout << mp.first << " ---> " << mp.second << "\n";
-    //}
-    //for (auto &dm : data_manipulation_cfg_parameters) {
-    //    std::cout << dm.first << " ---> " << dm.second << "\n";
-    //}
-    //for (auto &dd : data_delivery_cfg_parameters) {
-    //    std::cout << dd.first << " ---> " << dd.second << "\n";
-    //}
-    // --- DEBUG ---
-
     // static log-sinks are configured within the constructor
     LogsHandler logs_handler;
     spdlog::get("multi-logger-boot")->debug("main: main()");
@@ -132,9 +115,24 @@ int main(int argc, char *argv[])
             cfg_handler.get_kafka_parameters()) == false) {
             std::exit(EXIT_FAILURE);
         } else {
-            data_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+            kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
         }
     }
+
+    // --- DEBUG ---
+    //for (auto &lp : logs_cfg_parameters) {
+    //    std::cout << lp.first << " ---> " << lp.second << "\n";
+    //}
+    //for (auto &mp : main_cfg_parameters) {
+    //    std::cout << mp.first << " ---> " << mp.second << "\n";
+    //}
+    //for (auto &dm : data_manipulation_cfg_parameters) {
+    //    std::cout << dm.first << " ---> " << dm.second << "\n";
+    //}
+    //for (auto &dd : kafka_delivery_cfg_parameters) {
+    //    std::cout << dd.first << " ---> " << dd.second << "\n";
+    //}
+    // --- DEBUG ---
 
     int core_pid = getpid();
     const std::string core_pid_folder =
@@ -187,6 +185,8 @@ int main(int argc, char *argv[])
 
     signal(SIGUSR1, SignalHandler);
 
+    //std::cout << "WORKERS: " << workers.size() << "\n";
+
     for (std::thread &w : workers) {
         if (w.joinable()) {
             w.join();
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-void *VendorThread(void *vendor_ptr, const std::string &ipv4_socket_str)
+void *VendorThread(const std::string &ipv4_socket_str)
 {
     if (ipv4_socket_str.find("cisco") != std::string::npos) {
         std::string ipv4_socket_cisco =
@@ -221,7 +221,7 @@ void *VendorThread(void *vendor_ptr, const std::string &ipv4_socket_str)
         huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
     }
 
-    return 0;
+    return (NULL);
 }
 
 void LoadThreads(std::vector<std::thread> &workers_vec,
@@ -239,7 +239,6 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
                 "and 1000. (default = 0 => unlimited)", replies_str);
             std::exit(EXIT_FAILURE);
         }
-        void *vendor_ptr {nullptr};
         int workers = std::stoi(main_cfg_parameters.at(workers_str));
         if (workers < 1 || workers > 5) {
             spdlog::get("multi-logger")->
@@ -248,8 +247,9 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
                 "and 5. (default = 1)", workers_str);
             std::exit(EXIT_FAILURE);
         }
-        for (int w = 0; w < workers; ++w) {
-            workers_vec.push_back(std::thread(&VendorThread, vendor_ptr,
+        int w;
+        for (w = 0; w < workers; ++w) {
+            workers_vec.push_back(std::thread(&VendorThread,
                 ipv4_socket_str));
         }
         spdlog::get("multi-logger")->

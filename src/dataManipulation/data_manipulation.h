@@ -11,14 +11,14 @@
 // External Library headers
 #include <json/json.h>
 // mdt-dialout-collector Library headers
-#include "cisco_telemetry.pb.h"
-#include "juniper_gnmi.pb.h"
-#include "juniper_telemetry_header_extension.pb.h"
-#include "huawei_telemetry.pb.h"
-#include "openconfig_interfaces.pb.h"
+#include "proto/Cisco/cisco_telemetry.pb.h"
+#include "proto/Juniper/juniper_gnmi.pb.h"
+#include "proto/Juniper/juniper_telemetry_header_extension.pb.h"
+#include "proto/Huawei/huawei_telemetry.pb.h"
+#include "proto/OpenConfig/openconfig_interfaces.pb.h"
 #include <google/protobuf/util/json_util.h>
-#include "logs_handler.h"
-#include "cfg_handler.h"
+#include "../utils/logs_handler.h"
+#include "../utils/cfg_handler.h"
 
 
 class DataManipulation {
