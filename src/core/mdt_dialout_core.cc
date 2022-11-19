@@ -305,6 +305,8 @@ void Srv::CiscoStream::Start(
         } else {
             zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
                 zmq::socket_type::push);
+            zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
+                zmq::socket_type::pull);
             //  --- DEBUG ---
             //for (auto &e : label_map) {
             //    std::cout << e.first << " ---> "
@@ -390,13 +392,13 @@ void Srv::CiscoStream::Start(
                                     data_wrapper,
                                     sock,
                                     zmq_delivery.get_zmq_stransport_uri());
-                                //sock.close();
-                                sock.bind(
+                                sock.close();
+                                sock_pull.bind(
                                     zmq_delivery.get_zmq_stransport_uri());
                                 zmq_delivery.ZmqPoller(
                                     sock,
                                     zmq_delivery.get_zmq_stransport_uri());
-                                sock.close();
+                                sock_pull.close();
                             }
                         } else {
                             if (data_manipulation.MetaData(
@@ -421,13 +423,13 @@ void Srv::CiscoStream::Start(
                                     data_wrapper,
                                     sock,
                                     zmq_delivery.get_zmq_stransport_uri());
-                                //sock.close();
-                                sock.bind(
+                                sock.close();
+                                sock_pull.bind(
                                     zmq_delivery.get_zmq_stransport_uri());
                                 zmq_delivery.ZmqPoller(
                                     sock,
                                     zmq_delivery.get_zmq_stransport_uri());
-                                sock.close();
+                                sock_pull.close();
                             }
                         }
                     } else {
@@ -480,13 +482,13 @@ void Srv::CiscoStream::Start(
                                 data_wrapper,
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            //sock.close();
-                            sock.bind(
+                            sock.close();
+                            sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            sock.close();
+                            sock_pull.close();
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -511,13 +513,13 @@ void Srv::CiscoStream::Start(
                                 data_wrapper,
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            //sock.close();
-                            sock.bind(
+                            sock.close();
+                            sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            sock.close();
+                            sock_pull.close();
                         }
                     }
                 } else {
@@ -567,13 +569,13 @@ void Srv::CiscoStream::Start(
                             data_wrapper,
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        //sock.close();
-                        sock.bind(
+                        sock.close();
+                        sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        sock.close();
+                        sock_pull.close();
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -598,13 +600,13 @@ void Srv::CiscoStream::Start(
                             data_wrapper,
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        //sock.close();
-                        sock.bind(
+                        sock.close();
+                        sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        sock.close();
+                        sock_pull.close();
                     }
                 }
             // Handling JSON string
@@ -644,13 +646,13 @@ void Srv::CiscoStream::Start(
                             data_wrapper,
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        //sock.close();
-                        sock.bind(
+                        sock.close();
+                        sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        sock.close();
+                        sock_pull.close();
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -675,13 +677,13 @@ void Srv::CiscoStream::Start(
                             data_wrapper,
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        //sock.close();
-                        sock.bind(
+                        sock.close();
+                        sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        sock.close();
+                        sock_pull.close();
                     }
                 }
             }
@@ -733,6 +735,8 @@ void Srv::JuniperStream::Start(
         } else {
             zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
                 zmq::socket_type::push);
+            zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
+                zmq::socket_type::pull);
             // From the network
             std::string stream_data_in;
             // After meta-data
@@ -800,13 +804,13 @@ void Srv::JuniperStream::Start(
                         data_wrapper,
                         sock,
                         zmq_delivery.get_zmq_stransport_uri());
-                    //sock.close();
-                    sock.bind(
+                    sock.close();
+                    sock_pull.bind(
                         zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPoller(
                         sock,
                         zmq_delivery.get_zmq_stransport_uri());
-                    sock.close();
+                    sock_pull.close();
                     }
             } else {
                 if (data_manipulation.MetaData(
@@ -831,13 +835,13 @@ void Srv::JuniperStream::Start(
                         data_wrapper,
                         sock,
                         zmq_delivery.get_zmq_stransport_uri());
-                    //sock.close();
-                    sock.bind(
+                    sock.close();
+                    sock_pull.bind(
                         zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPoller(
                         sock,
                         zmq_delivery.get_zmq_stransport_uri());
-                    sock.close();
+                    sock_pull.close();
                 }
             }
 
@@ -890,6 +894,8 @@ void Srv::HuaweiStream::Start(
         } else {
             zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
                 zmq::socket_type::push);
+            zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
+                zmq::socket_type::pull);
             bool parsing_str {false};
             // From the network
             std::string stream_data_in;
@@ -976,13 +982,13 @@ void Srv::HuaweiStream::Start(
                                 data_wrapper,
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            //sock.close();
-                            sock.bind(
+                            sock.close();
+                            sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            sock.close();
+                            sock_pull.close();
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -1007,13 +1013,13 @@ void Srv::HuaweiStream::Start(
                                 data_wrapper,
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            //sock.close();
-                            sock.bind(
+                            sock.close();
+                            sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
-                            sock.close();
+                            sock_pull.close();
                         }
                     }
                 }
@@ -1066,13 +1072,13 @@ void Srv::HuaweiStream::Start(
                             data_wrapper,
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        //sock.close();
-                        sock.bind(
+                        sock.close();
+                        sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        sock.close();
+                        sock_pull.close();
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -1097,13 +1103,13 @@ void Srv::HuaweiStream::Start(
                             data_wrapper,
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        //sock.close();
-                        sock.bind(
+                        sock.close();
+                        sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
-                        sock.close();
+                        sock_pull.close();
                     }
                 }
             }
