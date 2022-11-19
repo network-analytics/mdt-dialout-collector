@@ -36,16 +36,16 @@ bool ZmqDelivery::ZmqPusher(
     const size_t size = sizeof(Payload *);
     zmq::message_t message(&pload, size);
 
-    zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
-    sock.connect(zmq_transport_uri);
+    //zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
+    zmq_sock.connect(zmq_transport_uri);
 
     try {
         //sock.send(zmq::buffer(payload), zmq::send_flags::none);
-        sock.send(message, zmq::send_flags::none);
+        zmq_sock.send(message, zmq::send_flags::none);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
                 "message successfully delivered");
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     } catch(const zmq::error_t &zex) {
         spdlog::get("multi-logger")->
             error("[ZmqPusher] data-delivery issue: "
