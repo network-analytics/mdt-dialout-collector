@@ -171,7 +171,8 @@ int main(int argc, char *argv[])
     }
 
     ZmqDelivery zmq_delivery;
-    std::thread zmq_single_thread_Poller(&ZmqSingleThreadPoller, zmq_delivery);
+    std::thread zmq_single_thread_Poller(&ZmqSingleThreadPoller,
+        std::ref(zmq_delivery));
 
     std::vector<std::thread> workers;
 
