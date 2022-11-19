@@ -44,13 +44,13 @@ bool ZmqDelivery::ZmqPusher(
         //sock.send(zmq::buffer(payload), zmq::send_flags::none);
         //sock.send(message, zmq::send_flags::none);
         //zmq_sock.set(zmq::sockopt::sndhwm, 1000);
-        int sndhwm = 1;
-        zmq_sock.setsockopt(ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm));
+        //int sndhwm = 1;
+        //zmq_sock.setsockopt(ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm));
         zmq_sock.send(message, zmq::send_flags::none);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
                 "message successfully delivered");
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(300));
     } catch(const zmq::error_t &zex) {
         spdlog::get("multi-logger")->
             error("[ZmqPusher] data-delivery issue: "
