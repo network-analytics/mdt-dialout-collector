@@ -44,7 +44,6 @@ bool ZmqDelivery::ZmqPusher(
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
                 "message successfully delivered");
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     } catch(const zmq::error_t &zex) {
         spdlog::get("multi-logger")->
             error("[ZmqPusher] data-delivery issue: "
@@ -85,6 +84,7 @@ void ZmqDelivery::ZmqPoller(
                 << pload->telemetry_data
                 << "\n";
             FreePayload(pload);
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
         //std::chrono::milliseconds(100);
     } catch(const zmq::error_t &zex) {
