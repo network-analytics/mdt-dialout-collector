@@ -203,7 +203,9 @@ int main(int argc, char *argv[])
 
 void *ZmqSingleThreadPoller()
 {
+    size_t counter = 0;
     while(true) {
+        std::cout << counter++ << "\n";
         ZmqDelivery zmq_delivery;
         zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
             zmq::socket_type::pull);
