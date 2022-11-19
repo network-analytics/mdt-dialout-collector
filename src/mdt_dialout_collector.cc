@@ -14,7 +14,7 @@
 #include "core/mdt_dialout_core.h"
 
 
-void *ZmqSingleThreadPoller(ZmqDelivery &zmq_delivery);
+void *ZmqSingleThreadPoller();
 void *VendorThread(const std::string &vendor);
 void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &ipv4_socket_str,
