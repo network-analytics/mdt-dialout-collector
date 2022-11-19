@@ -215,6 +215,7 @@ void *ZmqSingleThreadPoller()
         zmq_delivery.ZmqPoller(
             sock_pull,
             zmq_delivery.get_zmq_stransport_uri());
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 
     return (NULL);
