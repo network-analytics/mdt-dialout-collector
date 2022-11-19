@@ -170,8 +170,6 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
     }
 
-    std::thread zmq_single_thread_poller(&ZmqSingleThreadPoller);
-
     std::vector<std::thread> workers;
 
     // Cisco
@@ -196,6 +194,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    std::thread zmq_single_thread_poller(&ZmqSingleThreadPoller);
     zmq_single_thread_poller.join();
 
     return EXIT_SUCCESS;
@@ -203,19 +202,19 @@ int main(int argc, char *argv[])
 
 void *ZmqSingleThreadPoller()
 {
+    ZmqDelivery zmq_delivery;
+    zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
+        zmq::socket_type::pull);
+    sock_pull.bind(
+        zmq_delivery.get_zmq_stransport_uri());
     size_t counter = 0;
+
     while(true) {
         std::cout << counter++ << "\n";
-        ZmqDelivery zmq_delivery;
-        zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
-            zmq::socket_type::pull);
-
-        sock_pull.bind(
-            zmq_delivery.get_zmq_stransport_uri());
         zmq_delivery.ZmqPoller(
             sock_pull,
             zmq_delivery.get_zmq_stransport_uri());
-        sock_pull.close();
+        //sock_pull.close();
     }
 
     return (NULL);
