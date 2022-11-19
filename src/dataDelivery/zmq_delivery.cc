@@ -18,6 +18,7 @@ ZmqDelivery::ZmqDelivery()
 bool ZmqDelivery::ZmqPusher(
     DataWrapper &data_wrapper,
     zmq::socket_t &zmq_sock,
+    //zmq::context_t &zmq_ctx,
     const std::string &zmq_transport_uri)
 {
     Payload *pload;
@@ -37,10 +38,11 @@ bool ZmqDelivery::ZmqPusher(
     zmq::message_t message(&pload, size);
 
     //zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
-    //zmq_sock.connect(zmq_transport_uri);
+    //sock.connect(zmq_transport_uri);
 
     try {
         //sock.send(zmq::buffer(payload), zmq::send_flags::none);
+        //sock.send(message, zmq::send_flags::none);
         zmq_sock.send(message, zmq::send_flags::none);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
@@ -57,7 +59,8 @@ bool ZmqDelivery::ZmqPusher(
 }
 
 void ZmqDelivery::ZmqPoller(
-    zmq::context_t &zmq_ctx,
+    zmq::socket_t &zmq_sock,
+    //zmq::context_t &zmq_ctx,
     const std::string &zmq_transport_uri)
 {
     // Message Buff preparation
@@ -65,11 +68,12 @@ void ZmqDelivery::ZmqPoller(
     const size_t size = sizeof(Payload *);
     zmq::message_t message(size);
 
-    zmq::socket_t sock(zmq_ctx, zmq::socket_type::pull);
-    sock.bind(zmq_transport_uri);
+    //zmq::socket_t sock(zmq_ctx, zmq::socket_type::pull);
+    //sock.bind(zmq_transport_uri);
 
     try {
-        auto res = sock.recv(message, zmq::recv_flags::none);
+        auto res = zmq_sock.recv(message, zmq::recv_flags::none);
+        //auto res = sock.recv(message, zmq::recv_flags::none);
         if (res.value() != 0) {
             Payload *pload = *(Payload **) message.data();
             std::cout << "PULL-ing from " << zmq_transport_uri << ": "
