@@ -371,10 +371,10 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     stream_data_out_meta,
                                     stream_data_out) == true ) {
-                                kafka_delivery.AsyncKafkaProducer(
-                                    producer,
-                                    peer_ip,
-                                    stream_data_out);
+                                //kafka_delivery.AsyncKafkaProducer(
+                                //    producer,
+                                //    peer_ip,
+                                //    stream_data_out);
                                 data_wrapper.BuildDataWrapper (
                                     "gRPC",
                                     "json_string",
@@ -382,13 +382,13 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     peer_port,
                                     stream_data_in_normalization);
-                                //zmq_delivery.ZmqPusher(
-                                //    data_wrapper,
-                                //    zmq_delivery.get_zmq_ctx(),
-                                //    zmq_delivery.get_zmq_stransport_uri());
-                                //zmq_delivery.ZmqPoller(
-                                //    zmq_delivery.get_zmq_ctx(),
-                                //    zmq_delivery.get_zmq_stransport_uri());
+                                zmq_delivery.ZmqPusher(
+                                    data_wrapper,
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
+                                zmq_delivery.ZmqPoller(
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
                             }
                         } else {
                             if (data_manipulation.MetaData(
@@ -396,10 +396,10 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     peer_port,
                                     stream_data_out_meta) == true) {
-                                kafka_delivery.AsyncKafkaProducer(
-                                    producer,
-                                    peer_ip,
-                                    stream_data_out_meta);
+                                //kafka_delivery.AsyncKafkaProducer(
+                                //    producer,
+                                //    peer_ip,
+                                //    stream_data_out_meta);
                                 data_wrapper.BuildDataWrapper (
                                     "gRPC",
                                     "json_string",
@@ -407,13 +407,13 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     peer_port,
                                     stream_data_in_normalization);
-                                //zmq_delivery.ZmqPusher(
-                                //    data_wrapper,
-                                //    zmq_delivery.get_zmq_ctx(),
-                                //    zmq_delivery.get_zmq_stransport_uri());
-                                //zmq_delivery.ZmqPoller(
-                                //    zmq_delivery.get_zmq_ctx(),
-                                //    zmq_delivery.get_zmq_stransport_uri());
+                                zmq_delivery.ZmqPusher(
+                                    data_wrapper,
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
+                                zmq_delivery.ZmqPoller(
+                                    zmq_delivery.get_zmq_ctx(),
+                                    zmq_delivery.get_zmq_stransport_uri());
                             }
                         }
                     } else {
@@ -449,10 +449,10 @@ void Srv::CiscoStream::Start(
                                 peer_ip,
                                 stream_data_out_meta,
                                 stream_data_out) == true) {
-                            kafka_delivery.AsyncKafkaProducer(
-                                producer,
-                                peer_ip,
-                                stream_data_out);
+                            //kafka_delivery.AsyncKafkaProducer(
+                            //    producer,
+                            //    peer_ip,
+                            //    stream_data_out);
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -460,13 +460,13 @@ void Srv::CiscoStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_in);
-                            //zmq_delivery.ZmqPusher(
-                            //    data_wrapper,
-                            //    zmq_delivery.get_zmq_ctx(),
-                            //    zmq_delivery.get_zmq_stransport_uri());
-                            //zmq_delivery.ZmqPoller(
-                            //    zmq_delivery.get_zmq_ctx(),
-                            //    zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -474,10 +474,10 @@ void Srv::CiscoStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_out_meta) == true) {
-                            kafka_delivery.AsyncKafkaProducer(
-                                producer,
-                                peer_ip,
-                                stream_data_out_meta);
+                            //kafka_delivery.AsyncKafkaProducer(
+                            //    producer,
+                            //    peer_ip,
+                            //    stream_data_out_meta);
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -524,10 +524,10 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true) {
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out);
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out);
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -535,13 +535,13 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_in);
-                        //zmq_delivery.ZmqPusher(
-                        //    data_wrapper,
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
-                        //zmq_delivery.ZmqPoller(
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -549,10 +549,10 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out_meta);
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out_meta);
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -560,13 +560,13 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_in);
-                        //zmq_delivery.ZmqPusher(
-                        //    data_wrapper,
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
-                        //zmq_delivery.ZmqPoller(
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             // Handling JSON string
@@ -589,10 +589,10 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true) {
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out);
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out);
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -600,13 +600,13 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_in);
-                        //zmq_delivery.ZmqPusher(
-                        //    data_wrapper,
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
-                        //zmq_delivery.ZmqPoller(
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -614,10 +614,10 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out_meta);
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out_meta);
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -625,13 +625,13 @@ void Srv::CiscoStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_in);
-                        //zmq_delivery.ZmqPusher(
-                        //    data_wrapper,
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
-                        //zmq_delivery.ZmqPoller(
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             }
@@ -731,10 +731,10 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         stream_data_out_meta,
                         stream_data_out) == true) {
-                    kafka_delivery.AsyncKafkaProducer(
-                        producer,
-                        peer_ip,
-                        stream_data_out);
+                    //kafka_delivery.AsyncKafkaProducer(
+                    //    producer,
+                    //    peer_ip,
+                    //    stream_data_out);
                     data_wrapper.BuildDataWrapper (
                         "gRPC",
                         "json_string",
@@ -742,13 +742,13 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_in);
-                    //zmq_delivery.ZmqPusher(
-                    //    data_wrapper,
-                    //    zmq_delivery.get_zmq_ctx(),
-                    //    zmq_delivery.get_zmq_stransport_uri());
-                    //zmq_delivery.ZmqPoller(
-                    //    zmq_delivery.get_zmq_ctx(),
-                    //    zmq_delivery.get_zmq_stransport_uri());
+                    zmq_delivery.ZmqPusher(
+                        data_wrapper,
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
+                    zmq_delivery.ZmqPoller(
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
                     }
             } else {
                 if (data_manipulation.MetaData(
@@ -756,10 +756,10 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_out_meta) == true) {
-                    kafka_delivery.AsyncKafkaProducer(
-                        producer,
-                        peer_ip,
-                        stream_data_out_meta);
+                    //kafka_delivery.AsyncKafkaProducer(
+                    //    producer,
+                    //    peer_ip,
+                    //    stream_data_out_meta);
                     data_wrapper.BuildDataWrapper (
                         "gRPC",
                         "json_string",
@@ -767,13 +767,13 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_in);
-                    //zmq_delivery.ZmqPusher(
-                    //    data_wrapper,
-                    //    zmq_delivery.get_zmq_ctx(),
-                    //    zmq_delivery.get_zmq_stransport_uri());
-                    //zmq_delivery.ZmqPoller(
-                    //    zmq_delivery.get_zmq_ctx(),
-                    //    zmq_delivery.get_zmq_stransport_uri());
+                    zmq_delivery.ZmqPusher(
+                        data_wrapper,
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
+                    zmq_delivery.ZmqPoller(
+                        zmq_delivery.get_zmq_ctx(),
+                        zmq_delivery.get_zmq_stransport_uri());
                 }
             }
 
@@ -893,10 +893,10 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 stream_data_out_meta,
                                 stream_data_out) == true) {
-                            kafka_delivery.AsyncKafkaProducer(
-                                producer,
-                                peer_ip,
-                                stream_data_out);
+                            //kafka_delivery.AsyncKafkaProducer(
+                            //    producer,
+                            //    peer_ip,
+                            //    stream_data_out);
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -904,13 +904,13 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_in);
-                            //zmq_delivery.ZmqPusher(
-                            //    data_wrapper,
-                            //    zmq_delivery.get_zmq_ctx(),
-                            //    zmq_delivery.get_zmq_stransport_uri());
-                            //zmq_delivery.ZmqPoller(
-                            //    zmq_delivery.get_zmq_ctx(),
-                            //    zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -918,10 +918,10 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_out_meta) == true) {
-                            kafka_delivery.AsyncKafkaProducer(
-                                producer,
-                                peer_ip,
-                                stream_data_out_meta);
+                            //kafka_delivery.AsyncKafkaProducer(
+                            //    producer,
+                            //    peer_ip,
+                            //    stream_data_out_meta);
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -929,13 +929,13 @@ void Srv::HuaweiStream::Start(
                                 peer_ip,
                                 peer_port,
                                 stream_data_in);
-                            //zmq_delivery.ZmqPusher(
-                            //    data_wrapper,
-                            //    zmq_delivery.get_zmq_ctx(),
-                            //    zmq_delivery.get_zmq_stransport_uri());
-                            //zmq_delivery.ZmqPoller(
-                            //    zmq_delivery.get_zmq_ctx(),
-                            //    zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPusher(
+                                data_wrapper,
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
+                            zmq_delivery.ZmqPoller(
+                                zmq_delivery.get_zmq_ctx(),
+                                zmq_delivery.get_zmq_stransport_uri());
                         }
                     }
                 }
@@ -971,10 +971,10 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             stream_data_out_meta,
                             stream_data_out) == true &&
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out);
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out);
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -982,13 +982,13 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_in);
-                        //zmq_delivery.ZmqPusher(
-                        //    data_wrapper,
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
-                        //zmq_delivery.ZmqPoller(
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -996,10 +996,10 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_out_meta) == true) {
-                        kafka_delivery.AsyncKafkaProducer(
-                            producer,
-                            peer_ip,
-                            stream_data_out_meta);
+                        //kafka_delivery.AsyncKafkaProducer(
+                        //    producer,
+                        //    peer_ip,
+                        //    stream_data_out_meta);
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -1007,13 +1007,13 @@ void Srv::HuaweiStream::Start(
                             peer_ip,
                             peer_port,
                             stream_data_in);
-                        //zmq_delivery.ZmqPusher(
-                        //    data_wrapper,
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
-                        //zmq_delivery.ZmqPoller(
-                        //    zmq_delivery.get_zmq_ctx(),
-                        //    zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPusher(
+                            data_wrapper,
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
+                        zmq_delivery.ZmqPoller(
+                            zmq_delivery.get_zmq_ctx(),
+                            zmq_delivery.get_zmq_stransport_uri());
                     }
                 }
             }
