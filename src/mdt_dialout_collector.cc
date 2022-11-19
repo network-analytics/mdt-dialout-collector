@@ -208,14 +208,14 @@ void *ZmqSingleThreadPoller()
         zmq::socket_type::pull);
     sock_pull.bind(
         zmq_delivery.get_zmq_stransport_uri());
-    size_t counter = 0;
+    //size_t counter = 0;
 
     while(true) {
-        std::cout << counter++ << "\n";
+        //std::cout << counter++ << "\n";
         zmq_delivery.ZmqPoller(
             sock_pull,
             zmq_delivery.get_zmq_stransport_uri());
-        //sock_pull.close();
+        sock_pull.close();
     }
 
     return (NULL);
