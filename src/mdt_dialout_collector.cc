@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
     }
 
-    std::thread zmq_single_thread_Poller(&ZmqSingleThreadPoller);
+    std::thread zmq_single_thread_poller(&ZmqSingleThreadPoller);
 
     std::vector<std::thread> workers;
 
@@ -190,13 +190,13 @@ int main(int argc, char *argv[])
 
     //std::cout << "WORKERS: " << workers.size() << "\n";
 
-    zmq_single_thread_Poller.join();
-
     for (std::thread &w : workers) {
         if (w.joinable()) {
             w.join();
         }
     }
+
+    zmq_single_thread_poller.join();
 
     return EXIT_SUCCESS;
 }
