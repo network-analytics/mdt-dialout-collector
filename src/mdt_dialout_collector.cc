@@ -203,16 +203,18 @@ int main(int argc, char *argv[])
 
 void *ZmqSingleThreadPoller()
 {
-    ZmqDelivery zmq_delivery;
-    zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
-        zmq::socket_type::pull);
+    while(true) {
+        ZmqDelivery zmq_delivery;
+        zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
+            zmq::socket_type::pull);
 
-    sock_pull.bind(
-        zmq_delivery.get_zmq_stransport_uri());
-    zmq_delivery.ZmqPoller(
-        sock_pull,
-        zmq_delivery.get_zmq_stransport_uri());
-    sock_pull.close();
+        sock_pull.bind(
+            zmq_delivery.get_zmq_stransport_uri());
+        zmq_delivery.ZmqPoller(
+            sock_pull,
+            zmq_delivery.get_zmq_stransport_uri());
+        sock_pull.close();
+    }
 
     return (NULL);
 }
