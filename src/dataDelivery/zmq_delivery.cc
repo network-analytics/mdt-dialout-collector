@@ -37,7 +37,7 @@ bool ZmqDelivery::ZmqPusher(
     zmq::message_t message(&pload, size);
 
     //zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
-    zmq_sock.connect(zmq_transport_uri);
+    //zmq_sock.connect(zmq_transport_uri);
 
     try {
         //sock.send(zmq::buffer(payload), zmq::send_flags::none);
