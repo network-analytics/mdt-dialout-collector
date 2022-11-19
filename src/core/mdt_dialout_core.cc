@@ -393,12 +393,12 @@ void Srv::CiscoStream::Start(
                                     sock,
                                     zmq_delivery.get_zmq_stransport_uri());
                                 sock.close();
-                                sock_pull.bind(
-                                    zmq_delivery.get_zmq_stransport_uri());
-                                zmq_delivery.ZmqPoller(
-                                    sock_pull,
-                                    zmq_delivery.get_zmq_stransport_uri());
-                                sock_pull.close();
+                                //sock_pull.bind(
+                                //    zmq_delivery.get_zmq_stransport_uri());
+                                //zmq_delivery.ZmqPoller(
+                                //    sock_pull,
+                                //    zmq_delivery.get_zmq_stransport_uri());
+                                //sock_pull.close();
                             }
                         } else {
                             if (data_manipulation.MetaData(
@@ -424,12 +424,12 @@ void Srv::CiscoStream::Start(
                                     sock,
                                     zmq_delivery.get_zmq_stransport_uri());
                                 sock.close();
-                                sock_pull.bind(
-                                    zmq_delivery.get_zmq_stransport_uri());
-                                zmq_delivery.ZmqPoller(
-                                    sock_pull,
-                                    zmq_delivery.get_zmq_stransport_uri());
-                                sock_pull.close();
+                                //sock_pull.bind(
+                                //    zmq_delivery.get_zmq_stransport_uri());
+                                //zmq_delivery.ZmqPoller(
+                                //    sock_pull,
+                                //    zmq_delivery.get_zmq_stransport_uri());
+                                //sock_pull.close();
                             }
                         }
                     } else {
@@ -483,12 +483,12 @@ void Srv::CiscoStream::Start(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock.close();
-                            sock_pull.bind(
-                                zmq_delivery.get_zmq_stransport_uri());
-                            zmq_delivery.ZmqPoller(
-                                sock_pull,
-                                zmq_delivery.get_zmq_stransport_uri());
-                            sock_pull.close();
+                            //sock_pull.bind(
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //zmq_delivery.ZmqPoller(
+                            //    sock_pull,
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //sock_pull.close();
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -514,12 +514,12 @@ void Srv::CiscoStream::Start(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock.close();
-                            sock_pull.bind(
-                                zmq_delivery.get_zmq_stransport_uri());
-                            zmq_delivery.ZmqPoller(
-                                sock_pull,
-                                zmq_delivery.get_zmq_stransport_uri());
-                            sock_pull.close();
+                            //sock_pull.bind(
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //zmq_delivery.ZmqPoller(
+                            //    sock_pull,
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //sock_pull.close();
                         }
                     }
                 } else {
@@ -570,12 +570,12 @@ void Srv::CiscoStream::Start(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock.close();
-                        sock_pull.bind(
-                            zmq_delivery.get_zmq_stransport_uri());
-                        zmq_delivery.ZmqPoller(
-                            sock_pull,
-                            zmq_delivery.get_zmq_stransport_uri());
-                        sock_pull.close();
+                        //sock_pull.bind(
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    sock_pull,
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //sock_pull.close();
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -601,12 +601,12 @@ void Srv::CiscoStream::Start(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock.close();
-                        sock_pull.bind(
-                            zmq_delivery.get_zmq_stransport_uri());
-                        zmq_delivery.ZmqPoller(
-                            sock_pull,
-                            zmq_delivery.get_zmq_stransport_uri());
-                        sock_pull.close();
+                        //sock_pull.bind(
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    sock_pull,
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //sock_pull.close();
                     }
                 }
             // Handling JSON string
@@ -647,12 +647,12 @@ void Srv::CiscoStream::Start(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock.close();
-                        sock_pull.bind(
-                            zmq_delivery.get_zmq_stransport_uri());
-                        zmq_delivery.ZmqPoller(
-                            sock_pull,
-                            zmq_delivery.get_zmq_stransport_uri());
-                        sock_pull.close();
+                        //sock_pull.bind(
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    sock_pull,
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //sock_pull.close();
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -678,12 +678,12 @@ void Srv::CiscoStream::Start(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock.close();
-                        sock_pull.bind(
-                            zmq_delivery.get_zmq_stransport_uri());
-                        zmq_delivery.ZmqPoller(
-                            sock_pull,
-                            zmq_delivery.get_zmq_stransport_uri());
-                        sock_pull.close();
+                        //sock_pull.bind(
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    sock_pull,
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //sock_pull.close();
                     }
                 }
             }
@@ -805,12 +805,12 @@ void Srv::JuniperStream::Start(
                         sock,
                         zmq_delivery.get_zmq_stransport_uri());
                     sock.close();
-                    sock_pull.bind(
-                        zmq_delivery.get_zmq_stransport_uri());
-                    zmq_delivery.ZmqPoller(
-                        sock_pull,
-                        zmq_delivery.get_zmq_stransport_uri());
-                    sock_pull.close();
+                    //sock_pull.bind(
+                    //    zmq_delivery.get_zmq_stransport_uri());
+                    //zmq_delivery.ZmqPoller(
+                    //    sock_pull,
+                    //    zmq_delivery.get_zmq_stransport_uri());
+                    //sock_pull.close();
                     }
             } else {
                 if (data_manipulation.MetaData(
@@ -836,12 +836,12 @@ void Srv::JuniperStream::Start(
                         sock,
                         zmq_delivery.get_zmq_stransport_uri());
                     sock.close();
-                    sock_pull.bind(
-                        zmq_delivery.get_zmq_stransport_uri());
-                    zmq_delivery.ZmqPoller(
-                        sock_pull,
-                        zmq_delivery.get_zmq_stransport_uri());
-                    sock_pull.close();
+                    //sock_pull.bind(
+                    //    zmq_delivery.get_zmq_stransport_uri());
+                    //zmq_delivery.ZmqPoller(
+                    //    sock_pull,
+                    //    zmq_delivery.get_zmq_stransport_uri());
+                    //sock_pull.close();
                 }
             }
 
@@ -983,12 +983,12 @@ void Srv::HuaweiStream::Start(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock.close();
-                            sock_pull.bind(
-                                zmq_delivery.get_zmq_stransport_uri());
-                            zmq_delivery.ZmqPoller(
-                                sock_pull,
-                                zmq_delivery.get_zmq_stransport_uri());
-                            sock_pull.close();
+                            //sock_pull.bind(
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //zmq_delivery.ZmqPoller(
+                            //    sock_pull,
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //sock_pull.close();
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -1014,12 +1014,12 @@ void Srv::HuaweiStream::Start(
                                 sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock.close();
-                            sock_pull.bind(
-                                zmq_delivery.get_zmq_stransport_uri());
-                            zmq_delivery.ZmqPoller(
-                                sock_pull,
-                                zmq_delivery.get_zmq_stransport_uri());
-                            sock_pull.close();
+                            //sock_pull.bind(
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //zmq_delivery.ZmqPoller(
+                            //    sock_pull,
+                            //    zmq_delivery.get_zmq_stransport_uri());
+                            //sock_pull.close();
                         }
                     }
                 }
@@ -1073,12 +1073,12 @@ void Srv::HuaweiStream::Start(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock.close();
-                        sock_pull.bind(
-                            zmq_delivery.get_zmq_stransport_uri());
-                        zmq_delivery.ZmqPoller(
-                            sock_pull,
-                            zmq_delivery.get_zmq_stransport_uri());
-                        sock_pull.close();
+                        //sock_pull.bind(
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    sock_pull,
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //sock_pull.close();
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -1104,12 +1104,12 @@ void Srv::HuaweiStream::Start(
                             sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock.close();
-                        sock_pull.bind(
-                            zmq_delivery.get_zmq_stransport_uri());
-                        zmq_delivery.ZmqPoller(
-                            sock_pull,
-                            zmq_delivery.get_zmq_stransport_uri());
-                        sock_pull.close();
+                        //sock_pull.bind(
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //zmq_delivery.ZmqPoller(
+                        //    sock_pull,
+                        //    zmq_delivery.get_zmq_stransport_uri());
+                        //sock_pull.close();
                     }
                 }
             }
