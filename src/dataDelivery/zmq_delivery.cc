@@ -5,6 +5,7 @@
 // mdt-dialout-collector Library headers
 #include "zmq_delivery.h"
 #include "../bridge/bridge_lib.h"
+#include <zmq.hpp>
 
 
 ZmqDelivery::ZmqDelivery()
@@ -16,7 +17,7 @@ ZmqDelivery::ZmqDelivery()
 
 bool ZmqDelivery::ZmqPusher(
     DataWrapper &data_wrapper,
-    zmq::context_t &zmq_ctx,
+    zmq::socket_t &zmq_sock,
     const std::string &zmq_transport_uri)
 {
     Payload *pload;
