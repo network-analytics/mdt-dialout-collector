@@ -43,7 +43,8 @@ bool ZmqDelivery::ZmqPusher(
     try {
         //sock.send(zmq::buffer(payload), zmq::send_flags::none);
         //sock.send(message, zmq::send_flags::none);
-        zmq_sock.set(zmq::sockopt::sndhwm, 1000);
+        //zmq_sock.set(zmq::sockopt::sndhwm, 1000);
+        zmq_sock.setsockopt(ZMQ_SNDHWM, &message, sizeof(message));
         zmq_sock.send(message, zmq::send_flags::none);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
