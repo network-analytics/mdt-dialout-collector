@@ -14,6 +14,7 @@
 #include "core/mdt_dialout_core.h"
 
 
+void *ZmqSingleThreadPoller(ZmqDelivery &zmq_delivery);
 void *VendorThread(const std::string &vendor);
 void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &ipv4_socket_str,
@@ -169,6 +170,9 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
     }
 
+    ZmqDelivery zmq_delivery;
+    std::thread zmq_single_thread_Poller(&ZmqSingleThreadPoller, zmq_delivery);
+
     std::vector<std::thread> workers;
 
     // Cisco
@@ -187,6 +191,8 @@ int main(int argc, char *argv[])
 
     //std::cout << "WORKERS: " << workers.size() << "\n";
 
+    zmq_single_thread_Poller.join();
+
     for (std::thread &w : workers) {
         if (w.joinable()) {
             w.join();
@@ -194,6 +200,21 @@ int main(int argc, char *argv[])
     }
 
     return EXIT_SUCCESS;
+}
+
+void *ZmqSingleThreadPoller(ZmqDelivery &zmq_delivery)
+{
+    zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
+        zmq::socket_type::pull);
+
+    sock_pull.bind(
+        zmq_delivery.get_zmq_stransport_uri());
+    zmq_delivery.ZmqPoller(
+        sock_pull,
+        zmq_delivery.get_zmq_stransport_uri());
+    sock_pull.close();
+
+    return (NULL);
 }
 
 void *VendorThread(const std::string &ipv4_socket_str)
