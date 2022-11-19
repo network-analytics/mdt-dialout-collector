@@ -23,7 +23,8 @@ public:
         debug("destructor: ~ZmqDelivery()"); };
     bool ZmqPusher(
         DataWrapper &data_wrapper,
-        zmq::context_t &zmq_ctx,
+        zmq::socket_t &zmq_sock,
+        //zmq::context_t &zmq_ctx,
         const std::string &zmq_transport_uri);
     void ZmqPoller(
         zmq::context_t &zmq_ctx,

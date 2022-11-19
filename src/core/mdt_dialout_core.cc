@@ -303,6 +303,8 @@ void Srv::CiscoStream::Start(
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
         } else {
+            zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
+                zmq::socket_type::push);
             //  --- DEBUG ---
             //for (auto &e : label_map) {
             //    std::cout << e.first << " ---> "
@@ -384,7 +386,7 @@ void Srv::CiscoStream::Start(
                                     stream_data_in_normalization);
                                 zmq_delivery.ZmqPusher(
                                     data_wrapper,
-                                    zmq_delivery.get_zmq_ctx(),
+                                    sock,
                                     zmq_delivery.get_zmq_stransport_uri());
                                 zmq_delivery.ZmqPoller(
                                     zmq_delivery.get_zmq_ctx(),
@@ -409,7 +411,7 @@ void Srv::CiscoStream::Start(
                                     stream_data_in_normalization);
                                 zmq_delivery.ZmqPusher(
                                     data_wrapper,
-                                    zmq_delivery.get_zmq_ctx(),
+                                    sock,
                                     zmq_delivery.get_zmq_stransport_uri());
                                 zmq_delivery.ZmqPoller(
                                     zmq_delivery.get_zmq_ctx(),
@@ -462,7 +464,7 @@ void Srv::CiscoStream::Start(
                                 stream_data_in);
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
-                                zmq_delivery.get_zmq_ctx(),
+                                sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 zmq_delivery.get_zmq_ctx(),
@@ -487,7 +489,7 @@ void Srv::CiscoStream::Start(
                                 stream_data_in),
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
-                                zmq_delivery.get_zmq_ctx(),
+                                sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 zmq_delivery.get_zmq_ctx(),
@@ -537,7 +539,7 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
-                            zmq_delivery.get_zmq_ctx(),
+                            sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             zmq_delivery.get_zmq_ctx(),
@@ -562,7 +564,7 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
-                            zmq_delivery.get_zmq_ctx(),
+                            sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             zmq_delivery.get_zmq_ctx(),
@@ -602,7 +604,7 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
-                            zmq_delivery.get_zmq_ctx(),
+                            sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             zmq_delivery.get_zmq_ctx(),
@@ -627,7 +629,7 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
-                            zmq_delivery.get_zmq_ctx(),
+                            sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             zmq_delivery.get_zmq_ctx(),
@@ -681,6 +683,8 @@ void Srv::JuniperStream::Start(
             juniper_stream_status = END;
             juniper_resp.Finish(grpc::Status::OK, this);
         } else {
+            zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
+                zmq::socket_type::push);
             // From the network
             std::string stream_data_in;
             // After meta-data
@@ -744,7 +748,7 @@ void Srv::JuniperStream::Start(
                         stream_data_in);
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        zmq_delivery.get_zmq_ctx(),
+                        sock,
                         zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPoller(
                         zmq_delivery.get_zmq_ctx(),
@@ -769,7 +773,7 @@ void Srv::JuniperStream::Start(
                         stream_data_in);
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        zmq_delivery.get_zmq_ctx(),
+                        sock,
                         zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPoller(
                         zmq_delivery.get_zmq_ctx(),
@@ -824,6 +828,8 @@ void Srv::HuaweiStream::Start(
             huawei_stream_status = END;
             huawei_resp.Finish(grpc::Status::OK, this);
         } else {
+            zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
+                zmq::socket_type::push);
             bool parsing_str {false};
             // From the network
             std::string stream_data_in;
@@ -906,7 +912,7 @@ void Srv::HuaweiStream::Start(
                                 stream_data_in);
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
-                                zmq_delivery.get_zmq_ctx(),
+                                sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 zmq_delivery.get_zmq_ctx(),
@@ -931,7 +937,7 @@ void Srv::HuaweiStream::Start(
                                 stream_data_in);
                             zmq_delivery.ZmqPusher(
                                 data_wrapper,
-                                zmq_delivery.get_zmq_ctx(),
+                                sock,
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
                                 zmq_delivery.get_zmq_ctx(),
@@ -984,7 +990,7 @@ void Srv::HuaweiStream::Start(
                             stream_data_in);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
-                            zmq_delivery.get_zmq_ctx(),
+                            sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             zmq_delivery.get_zmq_ctx(),
@@ -1009,7 +1015,7 @@ void Srv::HuaweiStream::Start(
                             stream_data_in);
                         zmq_delivery.ZmqPusher(
                             data_wrapper,
-                            zmq_delivery.get_zmq_ctx(),
+                            sock,
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
                             zmq_delivery.get_zmq_ctx(),
