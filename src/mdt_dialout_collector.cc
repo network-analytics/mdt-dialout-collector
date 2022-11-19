@@ -170,9 +170,7 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
     }
 
-    ZmqDelivery zmq_delivery;
-    std::thread zmq_single_thread_Poller(&ZmqSingleThreadPoller,
-        std::ref(zmq_delivery));
+    std::thread zmq_single_thread_Poller(&ZmqSingleThreadPoller);
 
     std::vector<std::thread> workers;
 
@@ -203,8 +201,9 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-void *ZmqSingleThreadPoller(ZmqDelivery &zmq_delivery)
+void *ZmqSingleThreadPoller()
 {
+    ZmqDelivery zmq_delivery;
     zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
         zmq::socket_type::pull);
 
