@@ -396,7 +396,7 @@ void Srv::CiscoStream::Start(
                                 sock_pull.bind(
                                     zmq_delivery.get_zmq_stransport_uri());
                                 zmq_delivery.ZmqPoller(
-                                    sock,
+                                    sock_pull,
                                     zmq_delivery.get_zmq_stransport_uri());
                                 sock_pull.close();
                             }
@@ -427,7 +427,7 @@ void Srv::CiscoStream::Start(
                                 sock_pull.bind(
                                     zmq_delivery.get_zmq_stransport_uri());
                                 zmq_delivery.ZmqPoller(
-                                    sock,
+                                    sock_pull,
                                     zmq_delivery.get_zmq_stransport_uri());
                                 sock_pull.close();
                             }
@@ -486,7 +486,7 @@ void Srv::CiscoStream::Start(
                             sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
-                                sock,
+                                sock_pull,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock_pull.close();
                         }
@@ -517,7 +517,7 @@ void Srv::CiscoStream::Start(
                             sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
-                                sock,
+                                sock_pull,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock_pull.close();
                         }
@@ -573,7 +573,7 @@ void Srv::CiscoStream::Start(
                         sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
-                            sock,
+                            sock_pull,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock_pull.close();
                     }
@@ -604,7 +604,7 @@ void Srv::CiscoStream::Start(
                         sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
-                            sock,
+                            sock_pull,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock_pull.close();
                     }
@@ -650,7 +650,7 @@ void Srv::CiscoStream::Start(
                         sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
-                            sock,
+                            sock_pull,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock_pull.close();
                     }
@@ -681,7 +681,7 @@ void Srv::CiscoStream::Start(
                         sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
-                            sock,
+                            sock_pull,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock_pull.close();
                     }
@@ -808,7 +808,7 @@ void Srv::JuniperStream::Start(
                     sock_pull.bind(
                         zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPoller(
-                        sock,
+                        sock_pull,
                         zmq_delivery.get_zmq_stransport_uri());
                     sock_pull.close();
                     }
@@ -839,7 +839,7 @@ void Srv::JuniperStream::Start(
                     sock_pull.bind(
                         zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPoller(
-                        sock,
+                        sock_pull,
                         zmq_delivery.get_zmq_stransport_uri());
                     sock_pull.close();
                 }
@@ -986,7 +986,7 @@ void Srv::HuaweiStream::Start(
                             sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
-                                sock,
+                                sock_pull,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock_pull.close();
                         }
@@ -1017,7 +1017,7 @@ void Srv::HuaweiStream::Start(
                             sock_pull.bind(
                                 zmq_delivery.get_zmq_stransport_uri());
                             zmq_delivery.ZmqPoller(
-                                sock,
+                                sock_pull,
                                 zmq_delivery.get_zmq_stransport_uri());
                             sock_pull.close();
                         }
@@ -1076,7 +1076,7 @@ void Srv::HuaweiStream::Start(
                         sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
-                            sock,
+                            sock_pull,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock_pull.close();
                     }
@@ -1107,7 +1107,7 @@ void Srv::HuaweiStream::Start(
                         sock_pull.bind(
                             zmq_delivery.get_zmq_stransport_uri());
                         zmq_delivery.ZmqPoller(
-                            sock,
+                            sock_pull,
                             zmq_delivery.get_zmq_stransport_uri());
                         sock_pull.close();
                     }
