@@ -168,11 +168,6 @@ void Srv::JuniperFsmCtrl()
     ZmqDelivery zmq_delivery;
     GnmiJuniperTelemetryHeaderExtension juniper_tlm_hdr_ext;
 
-    // ZMQ - Push sock creation & connect
-    zmq_delivery.set_zmq_sock_ref();
-    zmq_delivery.get_zmq_sock_ref().connect(
-        zmq_delivery.get_zmq_stransport_uri());
-
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
     juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
@@ -195,9 +190,6 @@ void Srv::JuniperFsmCtrl()
             producer, zmq_delivery, juniper_tlm_hdr_ext);
         //juniper_counter++;
     }
-
-    // ZMQ - Push sock close
-    //sock_ref.disconnect(zmq_delivery.get_zmq_stransport_uri());
 }
 
 void Srv::HuaweiFsmCtrl()
@@ -712,6 +704,7 @@ void Srv::JuniperStream::Start(
     ZmqDelivery &zmq_delivery,
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext)
 {
+    zmq::socket_t sock(zmq_delivery.get_zmq_ctx(), zmq::socket_type::push);
     // Initial stream_status set to START @constructor
     if (juniper_stream_status == START) {
         juniper_service_->RequestDialOutSubscriber(
@@ -721,6 +714,7 @@ void Srv::JuniperStream::Start(
             juniper_cq_,
             this);
         juniper_stream_status = FLOW;
+        sock.connect(zmq_delivery.get_zmq_stransport_uri());
     } else if (juniper_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
             "new Srv::JuniperStream()");
@@ -801,7 +795,7 @@ void Srv::JuniperStream::Start(
                         stream_data_in);
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        zmq_delivery.get_zmq_sock_ref(),
+                        sock,
                         zmq_delivery.get_zmq_stransport_uri());
                     //sock_pull.bind(
                     //    zmq_delivery.get_zmq_stransport_uri());
@@ -829,7 +823,7 @@ void Srv::JuniperStream::Start(
                         stream_data_in);
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        zmq_delivery.get_zmq_sock_ref(),
+                        sock,
                         zmq_delivery.get_zmq_stransport_uri());
                     //sock_pull.bind(
                     //    zmq_delivery.get_zmq_stransport_uri());

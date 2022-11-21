@@ -17,7 +17,7 @@ ZmqDelivery::ZmqDelivery()
 
 bool ZmqDelivery::ZmqPusher(
     DataWrapper &data_wrapper,
-    zmq::socket_ref zmq_sock_ref,
+    zmq::socket_t &zmq_sock,
     const std::string &zmq_transport_uri)
 {
     Payload *pload;
@@ -37,7 +37,7 @@ bool ZmqDelivery::ZmqPusher(
     zmq::message_t message(&pload, size);
 
     try {
-        zmq_sock_ref.send(message, zmq::send_flags::none);
+        zmq_sock.send(message, zmq::send_flags::none);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
                 "message successfully delivered");
