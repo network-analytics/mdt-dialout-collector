@@ -37,7 +37,7 @@ public:
         return zmq_transport_uri; };
     zmq::context_t &get_zmq_ctx() {
         return zmq_ctx; };
-    zmq::socket_ref get_zmq_sock_ref() {
+    zmq::socket_ref &get_zmq_sock_ref() {
         return zmq_sock_ref; };
 private:
     zmq::context_t zmq_ctx;
