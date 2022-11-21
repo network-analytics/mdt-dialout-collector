@@ -705,6 +705,7 @@ void Srv::JuniperStream::Start(
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext)
 {
     zmq::socket_t sock(zmq_delivery.get_zmq_ctx(), zmq::socket_type::push);
+    sock.connect(zmq_delivery.get_zmq_stransport_uri());
     // Initial stream_status set to START @constructor
     if (juniper_stream_status == START) {
         juniper_service_->RequestDialOutSubscriber(
@@ -714,7 +715,6 @@ void Srv::JuniperStream::Start(
             juniper_cq_,
             this);
         juniper_stream_status = FLOW;
-        sock.connect(zmq_delivery.get_zmq_stransport_uri());
     } else if (juniper_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
             "new Srv::JuniperStream()");
