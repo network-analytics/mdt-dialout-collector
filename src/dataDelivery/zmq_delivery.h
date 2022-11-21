@@ -31,13 +31,13 @@ public:
     void set_zmq_stransport_uri(const std::string &zmq_transport_uri) {
         this->zmq_transport_uri = zmq_transport_uri; };
     void set_zmq_sock_ref() {
-        zmq::socket_t zmq_sock(this->zmq_ctx, zmq::socket_type::pull);
+        zmq::socket_t zmq_sock(this->zmq_ctx, zmq::socket_type::push);
         this->zmq_sock_ref = zmq_sock; };
     std::string get_zmq_stransport_uri() {
         return zmq_transport_uri; };
     zmq::context_t &get_zmq_ctx() {
         return zmq_ctx; };
-    zmq::socket_ref &get_zmq_sock_ref() {
+    zmq::socket_ref get_zmq_sock_ref() {
         return zmq_sock_ref; };
 private:
     zmq::context_t zmq_ctx;
