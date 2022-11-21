@@ -17,8 +17,7 @@ ZmqDelivery::ZmqDelivery()
 
 bool ZmqDelivery::ZmqPusher(
     DataWrapper &data_wrapper,
-    zmq::socket_ref zmq_sock,
-    //zmq::context_t &zmq_ctx,
+    zmq::socket_ref zmq_sock_ref,
     const std::string &zmq_transport_uri)
 {
     Payload *pload;
@@ -37,16 +36,8 @@ bool ZmqDelivery::ZmqPusher(
     const size_t size = sizeof(Payload *);
     zmq::message_t message(&pload, size);
 
-    //zmq::socket_t sock(zmq_ctx, zmq::socket_type::push);
-    //sock.connect(zmq_transport_uri);
-
     try {
-        //sock.send(zmq::buffer(payload), zmq::send_flags::none);
-        //sock.send(message, zmq::send_flags::none);
-        //zmq_sock.set(zmq::sockopt::sndhwm, 1000);
-        //int sndhwm = 1;
-        //zmq_sock.setsockopt(ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm));
-        zmq_sock.send(message, zmq::send_flags::none);
+        zmq_sock_ref.send(message, zmq::send_flags::none);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
                 "message successfully delivered");
@@ -62,8 +53,7 @@ bool ZmqDelivery::ZmqPusher(
 }
 
 void ZmqDelivery::ZmqPoller(
-    zmq::socket_ref zmq_sock,
-    //zmq::context_t &zmq_ctx,
+    zmq::socket_ref zmq_sock_ref,
     const std::string &zmq_transport_uri)
 {
     // Message Buff preparation
@@ -71,11 +61,8 @@ void ZmqDelivery::ZmqPoller(
     const size_t size = sizeof(Payload *);
     zmq::message_t message(size);
 
-    //zmq::socket_t sock(zmq_ctx, zmq::socket_type::pull);
-    //sock.bind(zmq_transport_uri);
-
     try {
-        auto res = zmq_sock.recv(message, zmq::recv_flags::none);
+        auto res = zmq_sock_ref.recv(message, zmq::recv_flags::none);
         //auto res = sock.recv(message, zmq::recv_flags::none);
         if (res.value() != 0) {
             Payload *pload = *(Payload **) message.data();
@@ -95,7 +82,6 @@ void ZmqDelivery::ZmqPoller(
             FreePayload(pload);
             //std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
-        //std::chrono::milliseconds(100);
     } catch(const zmq::error_t &zex) {
         spdlog::get("multi-logger")->
             error("[ZmqPoller] data-delivery issue: "
