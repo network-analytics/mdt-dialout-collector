@@ -80,7 +80,6 @@ private:
     void CiscoFsmCtrl();
     void JuniperFsmCtrl();
     void HuaweiFsmCtrl();
-    enum StreamStatus { START, FLOW, PROCESSING, END };
 
     class CiscoStream {
     public:
@@ -108,6 +107,7 @@ private:
             mdt_dialout::MdtDialoutArgs> cisco_resp;
         int cisco_replies_sent;
         const int kCiscoMaxReplies;
+        enum StreamStatus { START, FLOW, PROCESSING, END };
         StreamStatus cisco_stream_status;
     };
 
@@ -138,6 +138,7 @@ private:
             gnmi::SubscribeResponse> juniper_resp;
         int juniper_replies_sent;
         const int kJuniperMaxReplies;
+        enum StreamStatus { START, FLOW, PROCESSING, END };
         StreamStatus juniper_stream_status;
     };
 
@@ -169,6 +170,7 @@ private:
             huawei_dialout::serviceArgs> huawei_resp;
         int huawei_replies_sent;
         const int kHuaweiMaxReplies;
+        enum StreamStatus { START, FLOW, PROCESSING, END };
         StreamStatus huawei_stream_status;
     };
 };
