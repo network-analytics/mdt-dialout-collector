@@ -511,7 +511,7 @@ void Srv::CiscoStream::Start(
                                 main_cfg_parameters.at("writer_id"),
                                 peer_ip,
                                 peer_port,
-                                stream_data_in),
+                                stream_data_in);
                             //sock.connect(
                             //    zmq_delivery.get_zmq_stransport_uri());
                             //zmq_delivery.ZmqPusher(
