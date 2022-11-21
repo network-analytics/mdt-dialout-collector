@@ -278,8 +278,8 @@ void Srv::CiscoStream::Start(
     ZmqPush &zmq_pusher,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
-    zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
-    sock.connect(zmq_pusher.get_zmq_stransport_uri());
+    //zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
+    //sock.connect(zmq_pusher.get_zmq_stransport_uri());
     // Initial stream_status set to START @constructor
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
@@ -387,10 +387,10 @@ void Srv::CiscoStream::Start(
                                     stream_data_in_normalization);
                                 //sock.connect(
                                 //    zmq_pusher.get_zmq_stransport_uri());
-                                zmq_pusher.ZmqPusher(
-                                    data_wrapper,
-                                    sock,
-                                    zmq_pusher.get_zmq_stransport_uri());
+                                //zmq_pusher.ZmqPusher(
+                                //    data_wrapper,
+                                //    sock,
+                                //    zmq_pusher.get_zmq_stransport_uri());
                                 //sock.close();
                                 //sock_pull.bind(
                                 //    zmq_pusher.get_zmq_stransport_uri());
@@ -418,10 +418,10 @@ void Srv::CiscoStream::Start(
                                     stream_data_in_normalization);
                                 //sock.connect(
                                 //    zmq_pusher.get_zmq_stransport_uri());
-                                zmq_pusher.ZmqPusher(
-                                    data_wrapper,
-                                    sock,
-                                    zmq_pusher.get_zmq_stransport_uri());
+                                //zmq_pusher.ZmqPusher(
+                                //    data_wrapper,
+                                //    sock,
+                                //    zmq_pusher.get_zmq_stransport_uri());
                                 //sock.close();
                                 //sock_pull.bind(
                                 //    zmq_pusher.get_zmq_stransport_uri());
@@ -477,10 +477,10 @@ void Srv::CiscoStream::Start(
                                 stream_data_in);
                             //sock.connect(
                             //    zmq_pusher.get_zmq_stransport_uri());
-                            zmq_pusher.ZmqPusher(
-                                data_wrapper,
-                                sock,
-                                zmq_pusher.get_zmq_stransport_uri());
+                            //zmq_pusher.ZmqPusher(
+                            //    data_wrapper,
+                            //    sock,
+                            //    zmq_pusher.get_zmq_stransport_uri());
                             //sock.close();
                             //sock_pull.bind(
                             //    zmq_pusher.get_zmq_stransport_uri());
@@ -508,10 +508,10 @@ void Srv::CiscoStream::Start(
                                 stream_data_in);
                             //sock.connect(
                             //    zmq_pusher.get_zmq_stransport_uri());
-                            zmq_pusher.ZmqPusher(
-                                data_wrapper,
-                                sock,
-                                zmq_pusher.get_zmq_stransport_uri());
+                            //zmq_pusher.ZmqPusher(
+                            //    data_wrapper,
+                            //    sock,
+                            //    zmq_pusher.get_zmq_stransport_uri());
                             //sock.close();
                             //sock_pull.bind(
                             //    zmq_pusher.get_zmq_stransport_uri());
@@ -564,10 +564,10 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         //sock.connect(
                         //    zmq_pusher.get_zmq_stransport_uri());
-                        zmq_pusher.ZmqPusher(
-                            data_wrapper,
-                            sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                        //zmq_pusher.ZmqPusher(
+                        //    data_wrapper,
+                        //    sock,
+                        //    zmq_pusher.get_zmq_stransport_uri());
                         //sock.close();
                         //sock_pull.bind(
                         //    zmq_pusher.get_zmq_stransport_uri());
@@ -595,10 +595,10 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         //sock.connect(
                         //    zmq_pusher.get_zmq_stransport_uri());
-                        zmq_pusher.ZmqPusher(
-                            data_wrapper,
-                            sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                        //zmq_pusher.ZmqPusher(
+                        //    data_wrapper,
+                        //    sock,
+                        //    zmq_pusher.get_zmq_stransport_uri());
                         //sock.close();
                         //sock_pull.bind(
                         //    zmq_pusher.get_zmq_stransport_uri());
@@ -641,10 +641,10 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         //sock.connect(
                         //    zmq_pusher.get_zmq_stransport_uri());
-                        zmq_pusher.ZmqPusher(
-                            data_wrapper,
-                            sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                        //zmq_pusher.ZmqPusher(
+                        //    data_wrapper,
+                        //    sock,
+                        //    zmq_pusher.get_zmq_stransport_uri());
                         //sock.close();
                         //sock_pull.bind(
                         //    zmq_pusher.get_zmq_stransport_uri());
@@ -672,10 +672,10 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         //sock.connect(
                         //    zmq_pusher.get_zmq_stransport_uri());
-                        zmq_pusher.ZmqPusher(
-                            data_wrapper,
-                            sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                        //zmq_pusher.ZmqPusher(
+                        //    data_wrapper,
+                        //    sock,
+                        //    zmq_pusher.get_zmq_stransport_uri());
                         //sock.close();
                         //sock_pull.bind(
                         //    zmq_pusher.get_zmq_stransport_uri());
@@ -688,7 +688,7 @@ void Srv::CiscoStream::Start(
             }
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
-            sock.close();
+            //sock.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
@@ -707,8 +707,8 @@ void Srv::JuniperStream::Start(
     ZmqPush &zmq_pusher,
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext)
 {
-    zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
-    sock.connect(zmq_pusher.get_zmq_stransport_uri());
+    //zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
+    //sock.connect(zmq_pusher.get_zmq_stransport_uri());
     // Initial stream_status set to START @constructor
     if (juniper_stream_status == START) {
         juniper_service_->RequestDialOutSubscriber(
@@ -796,10 +796,10 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_in);
-                    zmq_pusher.ZmqPusher(
-                        data_wrapper,
-                        sock,
-                        zmq_pusher.get_zmq_stransport_uri());
+                    //zmq_pusher.ZmqPusher(
+                    //    data_wrapper,
+                    //    sock,
+                    //    zmq_pusher.get_zmq_stransport_uri());
                     //sock_pull.bind(
                     //    zmq_pusher.get_zmq_stransport_uri());
                     //zmq_pusher.ZmqPoller(
@@ -824,10 +824,10 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_in);
-                    zmq_pusher.ZmqPusher(
-                        data_wrapper,
-                        sock,
-                        zmq_pusher.get_zmq_stransport_uri());
+                    //zmq_pusher.ZmqPusher(
+                    //    data_wrapper,
+                    //    sock,
+                    //    zmq_pusher.get_zmq_stransport_uri());
                     //sock_pull.bind(
                     //    zmq_pusher.get_zmq_stransport_uri());
                     //zmq_pusher.ZmqPoller(
@@ -839,7 +839,7 @@ void Srv::JuniperStream::Start(
 
             juniper_stream_status = PROCESSING;
             juniper_replies_sent++;
-            sock.close();
+            //sock.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
