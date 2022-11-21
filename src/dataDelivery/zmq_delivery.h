@@ -31,9 +31,10 @@ private:
 
 class ZmqPush : public ZmqDelivery {
 public:
-    ZmqPush();
+    ZmqPush() { spdlog::get("multi-logger")->
+        debug("constructor: ZmqPush()"); };
     ~ZmqPush() { spdlog::get("multi-logger")->
-        debug("destructor: ~ZmqPush"); };
+        debug("destructor: ~ZmqPush()"); };
     bool ZmqPusher(
         DataWrapper &data_wrapper,
         zmq::socket_t &zmq_sock,
@@ -46,7 +47,8 @@ private:
 
 class ZmqPull : public ZmqDelivery {
 public:
-    ZmqPull();
+    ZmqPull() { spdlog::get("multi-logger")->
+        debug("constructor: ZmqPull()"); };
     ~ZmqPull() { spdlog::get("multi-logger")->
         debug("destructor: ~ZmqPull()"); };
     void ZmqPoller(

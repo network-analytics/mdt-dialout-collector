@@ -95,7 +95,7 @@ private:
             DataWrapper &data_wrapper,
             KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
-            ZmqPush &zmq_delivery,
+            ZmqPush &zmq_pusher,
             cisco_telemetry::Telemetry &cisco_tlm
         );
     private:
@@ -126,7 +126,7 @@ private:
             DataWrapper &data_wrapper,
             KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
-            ZmqPush &zmq_delivery,
+            ZmqPush &zmq_pusher,
             GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext
         );
     private:
@@ -157,7 +157,7 @@ private:
             DataWrapper &data_wrapper,
             KafkaDelivery &kafka_delivery,
             kafka::clients::KafkaProducer &producer,
-            ZmqPush &zmq_delivery,
+            ZmqPush &zmq_pusher,
             huawei_telemetry::Telemetry &huawei_tlm,
             openconfig_interfaces::Interfaces &oc_if
         );
