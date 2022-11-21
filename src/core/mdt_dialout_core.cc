@@ -167,6 +167,10 @@ void Srv::JuniperFsmCtrl()
     ZmqDelivery zmq_delivery;
     GnmiJuniperTelemetryHeaderExtension juniper_tlm_hdr_ext;
 
+    // ZMQ - Push sock creation & connect
+    zmq::socket_t sock(zmq_delivery.get_zmq_ctx(), zmq::socket_type::push);
+    sock.connect(zmq_delivery.get_zmq_stransport_uri());
+
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
     juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
@@ -189,6 +193,9 @@ void Srv::JuniperFsmCtrl()
             producer, zmq_delivery, juniper_tlm_hdr_ext);
         //juniper_counter++;
     }
+
+    // ZMQ - Push sock close
+    sock.close();
 }
 
 void Srv::HuaweiFsmCtrl()
@@ -305,8 +312,6 @@ void Srv::CiscoStream::Start(
         } else {
             zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
                 zmq::socket_type::push);
-            zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
-                zmq::socket_type::pull);
             //  --- DEBUG ---
             //for (auto &e : label_map) {
             //    std::cout << e.first << " ---> "
@@ -733,10 +738,6 @@ void Srv::JuniperStream::Start(
             juniper_stream_status = END;
             juniper_resp.Finish(grpc::Status::OK, this);
         } else {
-            zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
-                zmq::socket_type::push);
-            zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
-                zmq::socket_type::pull);
             // From the network
             std::string stream_data_in;
             // After meta-data
@@ -798,13 +799,10 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_in);
-                    sock.connect(
-                        zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        sock,
+                        zmq_delivery.get_zmq_sock(),
                         zmq_delivery.get_zmq_stransport_uri());
-                    sock.close();
                     //sock_pull.bind(
                     //    zmq_delivery.get_zmq_stransport_uri());
                     //zmq_delivery.ZmqPoller(
@@ -829,13 +827,10 @@ void Srv::JuniperStream::Start(
                         peer_ip,
                         peer_port,
                         stream_data_in);
-                    sock.connect(
-                        zmq_delivery.get_zmq_stransport_uri());
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        sock,
+                        zmq_delivery.get_zmq_sock(),
                         zmq_delivery.get_zmq_stransport_uri());
-                    sock.close();
                     //sock_pull.bind(
                     //    zmq_delivery.get_zmq_stransport_uri());
                     //zmq_delivery.ZmqPoller(
@@ -894,8 +889,6 @@ void Srv::HuaweiStream::Start(
         } else {
             zmq::socket_t sock(zmq_delivery.get_zmq_ctx(),
                 zmq::socket_type::push);
-            zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
-                zmq::socket_type::pull);
             bool parsing_str {false};
             // From the network
             std::string stream_data_in;

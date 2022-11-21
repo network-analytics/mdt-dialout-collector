@@ -36,8 +36,11 @@ public:
         return zmq_transport_uri; };
     zmq::context_t &get_zmq_ctx() {
         return zmq_ctx; };
+    zmq::socket_t &get_zmq_sock() {
+        return zmq_sock; };
 private:
     zmq::context_t zmq_ctx;
+    zmq::socket_t zmq_sock;
     std::string zmq_transport_uri;
 };
 
