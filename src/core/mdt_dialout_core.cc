@@ -170,8 +170,8 @@ void Srv::JuniperFsmCtrl()
 
     // ZMQ - Push sock creation & connect
     zmq_delivery.set_zmq_sock_ref();
-    zmq::socket_ref sock_ref = zmq_delivery.get_zmq_sock_ref();
-    sock_ref.connect(zmq_delivery.get_zmq_stransport_uri());
+    zmq_delivery.get_zmq_sock_ref().connect(
+        zmq_delivery.get_zmq_stransport_uri());
 
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
