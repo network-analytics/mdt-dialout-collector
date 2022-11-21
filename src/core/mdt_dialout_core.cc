@@ -4,6 +4,7 @@
 
 // mdt-dialout-collector Library headers
 #include "mdt_dialout_core.h"
+#include <zmq.hpp>
 
 
 // Global visibility to be able to signal the refresh --> CSV from main
@@ -168,7 +169,8 @@ void Srv::JuniperFsmCtrl()
     GnmiJuniperTelemetryHeaderExtension juniper_tlm_hdr_ext;
 
     // ZMQ - Push sock creation & connect
-    zmq::socket_t sock(zmq_delivery.get_zmq_ctx(), zmq::socket_type::push);
+    zmq_delivery.set_zmq_sock();
+    zmq::socket_ref sock = zmq_delivery.get_zmq_sock_ref();
     sock.connect(zmq_delivery.get_zmq_stransport_uri());
 
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
@@ -195,7 +197,7 @@ void Srv::JuniperFsmCtrl()
     }
 
     // ZMQ - Push sock close
-    sock.close();
+    sock.disconnect(zmq_delivery.get_zmq_stransport_uri());
 }
 
 void Srv::HuaweiFsmCtrl()
@@ -801,7 +803,7 @@ void Srv::JuniperStream::Start(
                         stream_data_in);
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        zmq_delivery.get_zmq_sock(),
+                        zmq_delivery.get_zmq_sock_ref(),
                         zmq_delivery.get_zmq_stransport_uri());
                     //sock_pull.bind(
                     //    zmq_delivery.get_zmq_stransport_uri());
@@ -829,7 +831,7 @@ void Srv::JuniperStream::Start(
                         stream_data_in);
                     zmq_delivery.ZmqPusher(
                         data_wrapper,
-                        zmq_delivery.get_zmq_sock(),
+                        zmq_delivery.get_zmq_sock_ref(),
                         zmq_delivery.get_zmq_stransport_uri());
                     //sock_pull.bind(
                     //    zmq_delivery.get_zmq_stransport_uri());

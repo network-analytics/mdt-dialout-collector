@@ -17,7 +17,7 @@ ZmqDelivery::ZmqDelivery()
 
 bool ZmqDelivery::ZmqPusher(
     DataWrapper &data_wrapper,
-    zmq::socket_t &zmq_sock,
+    zmq::socket_ref zmq_sock,
     //zmq::context_t &zmq_ctx,
     const std::string &zmq_transport_uri)
 {
@@ -62,7 +62,7 @@ bool ZmqDelivery::ZmqPusher(
 }
 
 void ZmqDelivery::ZmqPoller(
-    zmq::socket_t &zmq_sock,
+    zmq::socket_ref zmq_sock,
     //zmq::context_t &zmq_ctx,
     const std::string &zmq_transport_uri)
 {
