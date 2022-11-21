@@ -405,10 +405,10 @@ void Srv::CiscoStream::Start(
                                     peer_ip,
                                     peer_port,
                                     stream_data_out_meta) == true) {
-                                //kafka_delivery.AsyncKafkaProducer(
-                                //    producer,
-                                //    peer_ip,
-                                //    stream_data_out_meta);
+                                kafka_delivery.AsyncKafkaProducer(
+                                    producer,
+                                    peer_ip,
+                                    stream_data_out_meta);
                                 data_wrapper.BuildDataWrapper (
                                     "gRPC",
                                     "json_string",
