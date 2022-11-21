@@ -53,7 +53,7 @@ bool ZmqDelivery::ZmqPusher(
 }
 
 void ZmqDelivery::ZmqPoller(
-    zmq::socket_ref zmq_sock_ref,
+    zmq::socket_t &zmq_sock,
     const std::string &zmq_transport_uri)
 {
     // Message Buff preparation
@@ -62,7 +62,7 @@ void ZmqDelivery::ZmqPoller(
     zmq::message_t message(size);
 
     try {
-        auto res = zmq_sock_ref.recv(message, zmq::recv_flags::none);
+        auto res = zmq_sock.recv(message, zmq::recv_flags::none);
         //auto res = sock.recv(message, zmq::recv_flags::none);
         if (res.value() != 0) {
             Payload *pload = *(Payload **) message.data();
