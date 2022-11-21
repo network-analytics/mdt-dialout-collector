@@ -15,7 +15,7 @@ ZmqDelivery::ZmqDelivery()
     //this->set_zmq_stransport_uri("inproc://grpc");
 }
 
-bool ZmqDelivery::ZmqPusher(
+bool ZmqPush::ZmqPusher(
     DataWrapper &data_wrapper,
     zmq::socket_t &zmq_sock,
     const std::string &zmq_transport_uri)
@@ -52,7 +52,7 @@ bool ZmqDelivery::ZmqPusher(
     return true;
 }
 
-void ZmqDelivery::ZmqPoller(
+void ZmqPull::ZmqPoller(
     zmq::socket_t &zmq_sock,
     const std::string &zmq_transport_uri)
 {

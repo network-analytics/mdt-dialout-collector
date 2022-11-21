@@ -8,6 +8,7 @@
 #include <thread>
 #include <csignal>
 #include <fstream>
+#include <zmq.hpp>
 // External Library headers
 #include "csv/rapidcsv.h"
 // mdt-dialout-collector Library headers
@@ -203,18 +204,18 @@ int main(int argc, char *argv[])
 
 void *ZmqSingleThreadPoller()
 {
-    ZmqDelivery zmq_delivery;
-    zmq::socket_t sock_pull(zmq_delivery.get_zmq_ctx(),
+    ZmqPull zmq_poller;
+    zmq::socket_t sock_pull(zmq_poller.get_zmq_ctx(),
         zmq::socket_type::pull);
     sock_pull.bind(
-        zmq_delivery.get_zmq_stransport_uri());
+        zmq_poller.get_zmq_stransport_uri());
 
     //size_t counter = 0;
     while(true) {
         //std::cout << counter++ << "\n";
-        zmq_delivery.ZmqPoller(
+        zmq_poller.ZmqPoller(
             sock_pull,
-            zmq_delivery.get_zmq_stransport_uri());
+            zmq_poller.get_zmq_stransport_uri());
         //std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 
