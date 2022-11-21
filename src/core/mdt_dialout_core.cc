@@ -836,6 +836,7 @@ void Srv::JuniperStream::Start(
 
             juniper_stream_status = PROCESSING;
             juniper_replies_sent++;
+            sock.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
