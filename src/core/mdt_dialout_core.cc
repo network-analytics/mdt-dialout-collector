@@ -128,13 +128,19 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 
 void Srv::CiscoFsmCtrl()
 {
+	auto tid = std::this_thread::get_id();
+	std::stringstream stid;
+	stid << tid;
+    spdlog::get("multi-logger")->debug("Srv::CiscoFsmCtrl() - Thread-ID: {}",
+        stid.str());
+
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
     cisco_telemetry::Telemetry cisco_tlm;
 
     // ZMQ Sock creation & connect
     ZmqPush zmq_pusher;
-    std::string zmq_uri = zmq_pusher.get_zmq_stransport_uri();
+    const std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
     zmq::socket_t zmq_sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
     zmq_sock.connect(zmq_uri);
 
@@ -166,6 +172,12 @@ void Srv::CiscoFsmCtrl()
 
 void Srv::JuniperFsmCtrl()
 {
+	auto tid = std::this_thread::get_id();
+	std::stringstream stid;
+	stid << tid;
+    spdlog::get("multi-logger")->debug("Srv::JuniperFsmCtrl() - Thread-ID: {}",
+        stid.str());
+
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
     //KafkaDelivery kafka_delivery;
@@ -199,6 +211,12 @@ void Srv::JuniperFsmCtrl()
 
 void Srv::HuaweiFsmCtrl()
 {
+	auto tid = std::this_thread::get_id();
+	std::stringstream stid;
+	stid << tid;
+    spdlog::get("multi-logger")->debug("Srv::HuaweiFsmCtrl() - Thread-ID: {}",
+        stid.str());
+
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
     //KafkaDelivery kafka_delivery;
@@ -273,7 +291,6 @@ Srv::HuaweiStream::HuaweiStream(
     spdlog::get("multi-logger")->debug("constructor: HuaweiStream()");
 }
 
-
 void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
@@ -314,6 +331,12 @@ void Srv::CiscoStream::Start(
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
         } else {
+			auto tid = std::this_thread::get_id();
+			std::stringstream stid;
+			stid << tid;
+            spdlog::get("multi-logger")->debug(
+                "Srv::CiscoStream::Start() - Thread-ID: {}",
+                stid.str());
             //  --- DEBUG ---
             //for (auto &e : label_map) {
             //    std::cout << e.first << " ---> "
@@ -418,7 +441,7 @@ void Srv::CiscoStream::Start(
                                 zmq_pusher.ZmqPusher(
                                     data_wrapper,
                                     zmq_sock,
-                                    zmq_pusher.get_zmq_stransport_uri());
+                                    zmq_uri);
                             }
                         }
                     } else {
@@ -468,7 +491,7 @@ void Srv::CiscoStream::Start(
                             zmq_pusher.ZmqPusher(
                                 data_wrapper,
                                 zmq_sock,
-                                zmq_pusher.get_zmq_stransport_uri());
+                                zmq_uri);
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -490,7 +513,7 @@ void Srv::CiscoStream::Start(
                             zmq_pusher.ZmqPusher(
                                 data_wrapper,
                                 zmq_sock,
-                                zmq_pusher.get_zmq_stransport_uri());
+                                zmq_uri);
                         }
                     }
                 } else {
@@ -537,7 +560,7 @@ void Srv::CiscoStream::Start(
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
                             zmq_sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                            zmq_uri);
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -559,7 +582,7 @@ void Srv::CiscoStream::Start(
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
                             zmq_sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                            zmq_uri);
                     }
                 }
             // Handling JSON string
@@ -596,7 +619,7 @@ void Srv::CiscoStream::Start(
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
                             zmq_sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                            zmq_uri);
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -618,7 +641,7 @@ void Srv::CiscoStream::Start(
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
                             zmq_sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                            zmq_uri);
                     }
                 }
             }
@@ -647,7 +670,7 @@ void Srv::JuniperStream::Start(
     kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     // ZMQ Sock creation & connect
     zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
-    sock.connect(zmq_pusher.get_zmq_stransport_uri());
+    sock.connect(zmq_pusher.get_zmq_transport_uri());
 
     // Initial stream_status set to START @constructor
     if (juniper_stream_status == START) {
@@ -675,6 +698,12 @@ void Srv::JuniperStream::Start(
             juniper_stream_status = END;
             juniper_resp.Finish(grpc::Status::OK, this);
         } else {
+			auto tid = std::this_thread::get_id();
+			std::stringstream stid;
+			stid << tid;
+            spdlog::get("multi-logger")->debug(
+                "Srv::JuniperStream::Start() - Thread-ID: {}",
+                stid.str());
             // From the network
             std::string stream_data_in;
             // After meta-data
@@ -739,7 +768,7 @@ void Srv::JuniperStream::Start(
                     zmq_pusher.ZmqPusher(
                         data_wrapper,
                         sock,
-                        zmq_pusher.get_zmq_stransport_uri());
+                        zmq_pusher.get_zmq_transport_uri());
                     }
             } else {
                 if (data_manipulation.MetaData(
@@ -761,7 +790,7 @@ void Srv::JuniperStream::Start(
                     zmq_pusher.ZmqPusher(
                         data_wrapper,
                         sock,
-                        zmq_pusher.get_zmq_stransport_uri());
+                        zmq_pusher.get_zmq_transport_uri());
                 }
             }
 
@@ -792,7 +821,7 @@ void Srv::HuaweiStream::Start(
     kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     // ZMQ Sock creation & connect
     zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
-    sock.connect(zmq_pusher.get_zmq_stransport_uri());
+    sock.connect(zmq_pusher.get_zmq_transport_uri());
 
     // Initial stream_status set to START @constructor
     if (huawei_stream_status == START) {
@@ -820,6 +849,12 @@ void Srv::HuaweiStream::Start(
             huawei_stream_status = END;
             huawei_resp.Finish(grpc::Status::OK, this);
         } else {
+			auto tid = std::this_thread::get_id();
+			std::stringstream stid;
+			stid << tid;
+            spdlog::get("multi-logger")->debug(
+                "Srv::HuaweiStream::Start() - Thread-ID: {}",
+                stid.str());
             bool parsing_str {false};
             // From the network
             std::string stream_data_in;
@@ -903,7 +938,7 @@ void Srv::HuaweiStream::Start(
                             zmq_pusher.ZmqPusher(
                                 data_wrapper,
                                 sock,
-                                zmq_pusher.get_zmq_stransport_uri());
+                                zmq_pusher.get_zmq_transport_uri());
                         }
                     } else {
                         if (data_manipulation.MetaData(
@@ -925,7 +960,7 @@ void Srv::HuaweiStream::Start(
                             zmq_pusher.ZmqPusher(
                                 data_wrapper,
                                 sock,
-                                zmq_pusher.get_zmq_stransport_uri());
+                                zmq_pusher.get_zmq_transport_uri());
                         }
                     }
                 }
@@ -975,7 +1010,7 @@ void Srv::HuaweiStream::Start(
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
                             sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                            zmq_pusher.get_zmq_transport_uri());
                     }
                 } else {
                     if (data_manipulation.MetaData(
@@ -997,7 +1032,7 @@ void Srv::HuaweiStream::Start(
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
                             sock,
-                            zmq_pusher.get_zmq_stransport_uri());
+                            zmq_pusher.get_zmq_transport_uri());
                     }
                 }
             }

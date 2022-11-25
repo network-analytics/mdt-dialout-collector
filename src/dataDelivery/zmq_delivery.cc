@@ -11,8 +11,8 @@
 ZmqDelivery::ZmqDelivery()
 {
     spdlog::get("multi-logger")->debug("constructor::ZmqDelivery()");
-    this->set_zmq_stransport_uri("ipc:///tmp/grpc.sock");
-    //this->set_zmq_stransport_uri("inproc://grpc");
+    this->set_zmq_transport_uri("ipc:///tmp/grpc.sock");
+    //this->set_zmq_transport_uri("inproc://grpc");
 }
 
 bool ZmqPush::ZmqPusher(
@@ -37,10 +37,10 @@ bool ZmqPush::ZmqPusher(
     zmq::message_t message(&pload, size);
 
     try {
-        zmq_sock.send(message, zmq::send_flags::none);
+        zmq_sock.send(message, zmq::send_flags::dontwait);
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
-                "message successfully delivered");
+                "message successfully sent");
         //std::this_thread::sleep_for(std::chrono::milliseconds(300));
     } catch(const zmq::error_t &zex) {
         spdlog::get("multi-logger")->
@@ -63,8 +63,10 @@ void ZmqPull::ZmqPoller(
 
     try {
         auto res = zmq_sock.recv(message, zmq::recv_flags::none);
-        //auto res = sock.recv(message, zmq::recv_flags::none);
         if (res.value() != 0) {
+            spdlog::get("multi-logger")->
+                info("[ZmqPoller] data-delivery: "
+                    "message successfully received");
             Payload *pload = *(Payload **) message.data();
             std::cout << "PULL-ing from " << zmq_transport_uri << ": "
                 << pload->event_type

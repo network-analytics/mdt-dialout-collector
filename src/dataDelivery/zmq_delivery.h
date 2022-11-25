@@ -21,11 +21,14 @@ public:
     ZmqDelivery();
     ~ZmqDelivery() { spdlog::get("multi-logger")->
         debug("destructor: ~ZmqDelivery()"); };
-    void set_zmq_stransport_uri(const std::string &zmq_transport_uri) {
+    void set_zmq_transport_uri(const std::string zmq_transport_uri) {
         this->zmq_transport_uri = zmq_transport_uri; };
-    std::string get_zmq_stransport_uri() {
+    zmq::context_t &get_zmq_ctx() {
+        return this->zmq_ctx; };
+    const std::string &get_zmq_transport_uri() {
         return this->zmq_transport_uri; };
 private:
+    zmq::context_t zmq_ctx;
     std::string zmq_transport_uri;
 };
 
@@ -39,10 +42,10 @@ public:
         DataWrapper &data_wrapper,
         zmq::socket_t &zmq_sock,
         const std::string &zmq_transport_uri);
-    zmq::context_t &get_zmq_ctx() {
-        return this->zmq_ctx; };
-private:
-    zmq::context_t zmq_ctx;
+//    zmq::context_t &get_zmq_ctx() {
+//        return this->zmq_ctx; };
+//private:
+//    zmq::context_t zmq_ctx;
 };
 
 class ZmqPull : public ZmqDelivery {
@@ -54,10 +57,10 @@ public:
     void ZmqPoller(
         zmq::socket_t &zmq_sock,
         const std::string &zmq_transport_uri);
-    zmq::context_t &get_zmq_ctx() {
-        return this->zmq_ctx; };
-private:
-    zmq::context_t zmq_ctx;
+//    zmq::context_t &get_zmq_ctx() {
+//        return this->zmq_ctx; };
+//private:
+//    zmq::context_t zmq_ctx;
 };
 
 #endif

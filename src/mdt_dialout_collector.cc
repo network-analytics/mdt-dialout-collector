@@ -15,7 +15,8 @@
 #include "core/mdt_dialout_core.h"
 
 
-void *ZmqSingleThreadPoller();
+void *ZmqSingleThreadPoller(ZmqPull &zmq_poller,
+    zmq::socket_t &zmq_sock);
 void *VendorThread(const std::string &vendor);
 void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &ipv4_socket_str,
@@ -171,7 +172,17 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
     }
 
-    std::thread zmq_single_thread_poller(&ZmqSingleThreadPoller);
+    // --- ZMQ - Poller ---
+    ZmqPull zmq_poller;
+    zmq::socket_t sock_pull(zmq_poller.get_zmq_ctx(),
+        zmq::socket_type::pull);
+    sock_pull.bind(zmq_poller.get_zmq_transport_uri());
+    std::thread zmq_single_thread_poller(
+        &ZmqSingleThreadPoller,
+        std::ref(zmq_poller),
+        std::ref(sock_pull));
+    zmq_single_thread_poller.detach();
+    // --- ZMQ - Poller ---
 
     std::vector<std::thread> workers;
 
@@ -192,30 +203,24 @@ int main(int argc, char *argv[])
     //std::cout << "WORKERS: " << workers.size() << "\n";
 
     for (std::thread &w : workers) {
-        if (w.joinable()) {
+        if(w.joinable()) {
             w.join();
         }
     }
 
-    zmq_single_thread_poller.join();
-
     return EXIT_SUCCESS;
 }
 
-void *ZmqSingleThreadPoller()
+void *ZmqSingleThreadPoller(ZmqPull &zmq_poller, zmq::socket_t &sock_pull)
 {
-    ZmqPull zmq_poller;
-    zmq::socket_t sock_pull(zmq_poller.get_zmq_ctx(),
-        zmq::socket_type::pull);
-    sock_pull.bind(
-        zmq_poller.get_zmq_stransport_uri());
+    const std::string zmq_uri = zmq_poller.get_zmq_transport_uri();
 
     //size_t counter = 0;
     while(true) {
         //std::cout << counter++ << "\n";
         zmq_poller.ZmqPoller(
             sock_pull,
-            zmq_poller.get_zmq_stransport_uri());
+            zmq_uri);
         //std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 
