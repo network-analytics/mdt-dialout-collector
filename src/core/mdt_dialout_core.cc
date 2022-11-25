@@ -130,15 +130,24 @@ void Srv::CiscoFsmCtrl()
 {
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
-    //KafkaDelivery kafka_delivery;
-    //kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
-    ZmqPush zmq_pusher;
     cisco_telemetry::Telemetry cisco_tlm;
+
+    // Kafka Producer
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer kafka_producer(
+        kafka_delivery.get_properties());
+
+    // ZMQ Sock creation & connect
+    ZmqPush zmq_pusher;
+    std::string zmq_uri = zmq_pusher.get_zmq_stransport_uri();
+    zmq::socket_t zmq_sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
+    zmq_sock.connect(zmq_uri);
 
     std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
     cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-        zmq_pusher, cisco_tlm);
+        kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
+        cisco_tlm);
     //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
@@ -153,10 +162,13 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            label_map, data_manipulation, data_wrapper,
-            zmq_pusher, cisco_tlm);
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
+            kafka_producer, zmq_pusher, zmq_sock, zmq_uri, cisco_tlm);
         //cisco_counter++;
     }
+
+    kafka_producer.close();
+    zmq_sock.close();
 }
 
 void Srv::JuniperFsmCtrl()
@@ -273,17 +285,13 @@ void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
     DataWrapper &data_wrapper,
-    //KafkaDelivery &kafka_delivery,
-    //kafka::clients::KafkaProducer &producer,
+    KafkaDelivery &kafka_delivery,
+    kafka::clients::KafkaProducer &kafka_producer,
     ZmqPush &zmq_pusher,
+    zmq::socket_t &zmq_sock,
+    const std::string &zmq_uri,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
-    KafkaDelivery kafka_delivery;
-    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
-    // ZMQ Sock creation & connect
-    zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
-    sock.connect(zmq_pusher.get_zmq_stransport_uri());
-
     // Initial stream_status set to START @constructor
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
@@ -299,7 +307,8 @@ void Srv::CiscoStream::Start(
         Srv::CiscoStream *cisco_sstream =
             new Srv::CiscoStream(cisco_service_, cisco_cq_);
         cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-            zmq_pusher, cisco_tlm);
+            kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
+            cisco_tlm);
         cisco_resp.Read(&cisco_stream, this);
         cisco_stream_status = PROCESSING;
         cisco_replies_sent++;
@@ -379,7 +388,7 @@ void Srv::CiscoStream::Start(
                                     stream_data_out_meta,
                                     stream_data_out) == true ) {
                                 kafka_delivery.AsyncKafkaProducer(
-                                    producer,
+                                    kafka_producer,
                                     peer_ip,
                                     stream_data_out);
                                 data_wrapper.BuildDataWrapper (
@@ -391,8 +400,8 @@ void Srv::CiscoStream::Start(
                                     stream_data_in_normalization);
                                 zmq_pusher.ZmqPusher(
                                     data_wrapper,
-                                    sock,
-                                    zmq_pusher.get_zmq_stransport_uri());
+                                    zmq_sock,
+                                    zmq_uri);
                             }
                         } else {
                             if (data_manipulation.MetaData(
@@ -401,7 +410,7 @@ void Srv::CiscoStream::Start(
                                     peer_port,
                                     stream_data_out_meta) == true) {
                                 kafka_delivery.AsyncKafkaProducer(
-                                    producer,
+                                    kafka_producer,
                                     peer_ip,
                                     stream_data_out_meta);
                                 data_wrapper.BuildDataWrapper (
@@ -413,7 +422,7 @@ void Srv::CiscoStream::Start(
                                     stream_data_in_normalization);
                                 zmq_pusher.ZmqPusher(
                                     data_wrapper,
-                                    sock,
+                                    zmq_sock,
                                     zmq_pusher.get_zmq_stransport_uri());
                             }
                         }
@@ -451,7 +460,7 @@ void Srv::CiscoStream::Start(
                                 stream_data_out_meta,
                                 stream_data_out) == true) {
                             kafka_delivery.AsyncKafkaProducer(
-                                producer,
+                                kafka_producer,
                                 peer_ip,
                                 stream_data_out);
                             data_wrapper.BuildDataWrapper (
@@ -463,7 +472,7 @@ void Srv::CiscoStream::Start(
                                 stream_data_in);
                             zmq_pusher.ZmqPusher(
                                 data_wrapper,
-                                sock,
+                                zmq_sock,
                                 zmq_pusher.get_zmq_stransport_uri());
                         }
                     } else {
@@ -473,7 +482,7 @@ void Srv::CiscoStream::Start(
                                 peer_port,
                                 stream_data_out_meta) == true) {
                             kafka_delivery.AsyncKafkaProducer(
-                                producer,
+                                kafka_producer,
                                 peer_ip,
                                 stream_data_out_meta);
                             data_wrapper.BuildDataWrapper (
@@ -485,7 +494,7 @@ void Srv::CiscoStream::Start(
                                 stream_data_in);
                             zmq_pusher.ZmqPusher(
                                 data_wrapper,
-                                sock,
+                                zmq_sock,
                                 zmq_pusher.get_zmq_stransport_uri());
                         }
                     }
@@ -520,7 +529,7 @@ void Srv::CiscoStream::Start(
                             stream_data_out_meta,
                             stream_data_out) == true) {
                         kafka_delivery.AsyncKafkaProducer(
-                            producer,
+                            kafka_producer,
                             peer_ip,
                             stream_data_out);
                         data_wrapper.BuildDataWrapper (
@@ -532,7 +541,7 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
-                            sock,
+                            zmq_sock,
                             zmq_pusher.get_zmq_stransport_uri());
                     }
                 } else {
@@ -542,7 +551,7 @@ void Srv::CiscoStream::Start(
                             peer_port,
                             stream_data_out_meta) == true) {
                         kafka_delivery.AsyncKafkaProducer(
-                            producer,
+                            kafka_producer,
                             peer_ip,
                             stream_data_out_meta);
                         data_wrapper.BuildDataWrapper (
@@ -554,7 +563,7 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
-                            sock,
+                            zmq_sock,
                             zmq_pusher.get_zmq_stransport_uri());
                     }
                 }
@@ -579,7 +588,7 @@ void Srv::CiscoStream::Start(
                             stream_data_out_meta,
                             stream_data_out) == true) {
                         kafka_delivery.AsyncKafkaProducer(
-                            producer,
+                            kafka_producer,
                             peer_ip,
                             stream_data_out);
                         data_wrapper.BuildDataWrapper (
@@ -591,7 +600,7 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
-                            sock,
+                            zmq_sock,
                             zmq_pusher.get_zmq_stransport_uri());
                     }
                 } else {
@@ -601,7 +610,7 @@ void Srv::CiscoStream::Start(
                             peer_port,
                             stream_data_out_meta) == true) {
                         kafka_delivery.AsyncKafkaProducer(
-                            producer,
+                            kafka_producer,
                             peer_ip,
                             stream_data_out_meta);
                         data_wrapper.BuildDataWrapper (
@@ -613,15 +622,13 @@ void Srv::CiscoStream::Start(
                             stream_data_in);
                         zmq_pusher.ZmqPusher(
                             data_wrapper,
-                            sock,
+                            zmq_sock,
                             zmq_pusher.get_zmq_stransport_uri());
                     }
                 }
             }
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
-            producer.close();
-            sock.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "

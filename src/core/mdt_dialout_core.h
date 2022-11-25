@@ -93,9 +93,11 @@ private:
                 &label_map,
             DataManipulation &data_manipulation,
             DataWrapper &data_wrapper,
-            //KafkaDelivery &kafka_delivery,
-            //kafka::clients::KafkaProducer &producer,
+            KafkaDelivery &kafka_delivery,
+            kafka::clients::KafkaProducer &kafka_producer,
             ZmqPush &zmq_pusher,
+            zmq::socket_t &zmq_sock,
+            const std::string &zmq_uri,
             cisco_telemetry::Telemetry &cisco_tlm
         );
     private:
