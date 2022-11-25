@@ -319,7 +319,6 @@ void Srv::CiscoStream::Start(
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
         } else {
-            zmq_sock.connect(zmq_uri);
             //  --- DEBUG ---
             //for (auto &e : label_map) {
             //    std::cout << e.first << " ---> "
@@ -630,8 +629,6 @@ void Srv::CiscoStream::Start(
             }
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
-            kafka_producer.close();
-            zmq_sock.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
