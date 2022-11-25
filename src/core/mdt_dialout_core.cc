@@ -128,9 +128,9 @@ void Srv::HuaweiBind(std::string huawei_srv_socket)
 
 void Srv::CiscoFsmCtrl()
 {
-	auto tid = std::this_thread::get_id();
-	std::stringstream stid;
-	stid << tid;
+    auto tid = std::this_thread::get_id();
+    std::stringstream stid;
+    stid << tid;
     spdlog::get("multi-logger")->debug("Srv::CiscoFsmCtrl() - Thread-ID: {}",
         stid.str());
 
@@ -172,9 +172,9 @@ void Srv::CiscoFsmCtrl()
 
 void Srv::JuniperFsmCtrl()
 {
-	auto tid = std::this_thread::get_id();
-	std::stringstream stid;
-	stid << tid;
+    auto tid = std::this_thread::get_id();
+    std::stringstream stid;
+    stid << tid;
     spdlog::get("multi-logger")->debug("Srv::JuniperFsmCtrl() - Thread-ID: {}",
         stid.str());
 
@@ -216,9 +216,9 @@ void Srv::JuniperFsmCtrl()
 
 void Srv::HuaweiFsmCtrl()
 {
-	auto tid = std::this_thread::get_id();
-	std::stringstream stid;
-	stid << tid;
+    auto tid = std::this_thread::get_id();
+    std::stringstream stid;
+    stid << tid;
     spdlog::get("multi-logger")->debug("Srv::HuaweiFsmCtrl() - Thread-ID: {}",
         stid.str());
 
@@ -341,9 +341,9 @@ void Srv::CiscoStream::Start(
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
         } else {
-			auto tid = std::this_thread::get_id();
-			std::stringstream stid;
-			stid << tid;
+            auto tid = std::this_thread::get_id();
+            std::stringstream stid;
+            stid << tid;
             spdlog::get("multi-logger")->debug(
                 "Srv::CiscoStream::Start() - Thread-ID: {}",
                 stid.str());
@@ -711,9 +711,9 @@ void Srv::JuniperStream::Start(
             juniper_stream_status = END;
             juniper_resp.Finish(grpc::Status::OK, this);
         } else {
-			auto tid = std::this_thread::get_id();
-			std::stringstream stid;
-			stid << tid;
+            auto tid = std::this_thread::get_id();
+            std::stringstream stid;
+            stid << tid;
             spdlog::get("multi-logger")->debug(
                 "Srv::JuniperStream::Start() - Thread-ID: {}",
                 stid.str());
@@ -864,9 +864,9 @@ void Srv::HuaweiStream::Start(
             huawei_stream_status = END;
             huawei_resp.Finish(grpc::Status::OK, this);
         } else {
-			auto tid = std::this_thread::get_id();
-			std::stringstream stid;
-			stid << tid;
+            auto tid = std::this_thread::get_id();
+            std::stringstream stid;
+            stid << tid;
             spdlog::get("multi-logger")->debug(
                 "Srv::HuaweiStream::Start() - Thread-ID: {}",
                 stid.str());
