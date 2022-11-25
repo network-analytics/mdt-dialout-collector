@@ -630,7 +630,6 @@ void Srv::CiscoStream::Start(
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
             kafka_producer.close();
-            zmq_sock.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
