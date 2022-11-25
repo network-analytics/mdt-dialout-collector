@@ -132,11 +132,6 @@ void Srv::CiscoFsmCtrl()
     DataWrapper data_wrapper;
     cisco_telemetry::Telemetry cisco_tlm;
 
-    // Kafka Producer
-    KafkaDelivery kafka_delivery;
-    kafka::clients::KafkaProducer kafka_producer(
-        kafka_delivery.get_properties());
-
     // ZMQ Sock creation & connect
     ZmqPush zmq_pusher;
     std::string zmq_uri = zmq_pusher.get_zmq_stransport_uri();
@@ -146,8 +141,7 @@ void Srv::CiscoFsmCtrl()
     std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
     cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-        kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
-        cisco_tlm);
+        zmq_pusher, zmq_sock, zmq_uri, cisco_tlm);
     //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
@@ -162,12 +156,11 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            label_map, data_manipulation, data_wrapper, kafka_delivery,
-            kafka_producer, zmq_pusher, zmq_sock, zmq_uri, cisco_tlm);
+            label_map, data_manipulation, data_wrapper, zmq_pusher, zmq_sock,
+            zmq_uri, cisco_tlm);
         //cisco_counter++;
     }
 
-    kafka_producer.close();
     zmq_sock.close();
 }
 
@@ -285,13 +278,16 @@ void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
     DataWrapper &data_wrapper,
-    KafkaDelivery &kafka_delivery,
-    kafka::clients::KafkaProducer &kafka_producer,
     ZmqPush &zmq_pusher,
     zmq::socket_t &zmq_sock,
     const std::string &zmq_uri,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
+    // Kafka Producer
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer kafka_producer(
+        kafka_delivery.get_properties());
+
     // Initial stream_status set to START @constructor
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
@@ -307,8 +303,7 @@ void Srv::CiscoStream::Start(
         Srv::CiscoStream *cisco_sstream =
             new Srv::CiscoStream(cisco_service_, cisco_cq_);
         cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-            kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
-            cisco_tlm);
+            zmq_pusher, zmq_sock, zmq_uri, cisco_tlm);
         cisco_resp.Read(&cisco_stream, this);
         cisco_stream_status = PROCESSING;
         cisco_replies_sent++;
@@ -629,6 +624,7 @@ void Srv::CiscoStream::Start(
             }
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
+            kafka_producer.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
