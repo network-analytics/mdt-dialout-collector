@@ -292,8 +292,6 @@ void Srv::CiscoStream::Start(
     const std::string &zmq_uri,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
-    zmq_sock.connect(zmq_uri);
-
     // Initial stream_status set to START @constructor
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
@@ -321,6 +319,7 @@ void Srv::CiscoStream::Start(
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
         } else {
+            zmq_sock.connect(zmq_uri);
             //  --- DEBUG ---
             //for (auto &e : label_map) {
             //    std::cout << e.first << " ---> "
