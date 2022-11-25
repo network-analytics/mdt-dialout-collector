@@ -292,6 +292,8 @@ void Srv::CiscoStream::Start(
     const std::string &zmq_uri,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
+    zmq_sock.connect(zmq_uri);
+
     // Initial stream_status set to START @constructor
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
@@ -630,6 +632,7 @@ void Srv::CiscoStream::Start(
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
             kafka_producer.close();
+            zmq_sock.close();
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
