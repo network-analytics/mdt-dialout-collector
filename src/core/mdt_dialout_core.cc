@@ -130,15 +130,15 @@ void Srv::CiscoFsmCtrl()
 {
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
-    KafkaDelivery kafka_delivery;
-    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    //KafkaDelivery kafka_delivery;
+    //kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     ZmqPush zmq_pusher;
     cisco_telemetry::Telemetry cisco_tlm;
 
     std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
     cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-        kafka_delivery, producer, zmq_pusher, cisco_tlm);
+        zmq_pusher, cisco_tlm);
     //int cisco_counter {0};
     void *cisco_tag {nullptr};
     bool cisco_ok {false};
@@ -153,8 +153,8 @@ void Srv::CiscoFsmCtrl()
             continue;
         }
         static_cast<CiscoStream *>(cisco_tag)->Srv::CiscoStream::Start(
-            label_map, data_manipulation, data_wrapper, kafka_delivery,
-            producer, zmq_pusher, cisco_tlm);
+            label_map, data_manipulation, data_wrapper,
+            zmq_pusher, cisco_tlm);
         //cisco_counter++;
     }
 }
@@ -163,15 +163,15 @@ void Srv::JuniperFsmCtrl()
 {
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
-    KafkaDelivery kafka_delivery;
-    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    //KafkaDelivery kafka_delivery;
+    //kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     ZmqPush zmq_pusher;
     GnmiJuniperTelemetryHeaderExtension juniper_tlm_hdr_ext;
 
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
     juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
-        kafka_delivery, producer, zmq_pusher, juniper_tlm_hdr_ext);
+        zmq_pusher, juniper_tlm_hdr_ext);
     //int juniper_counter {0};
     void *juniper_tag {nullptr};
     bool juniper_ok {false};
@@ -186,8 +186,8 @@ void Srv::JuniperFsmCtrl()
             continue;
         }
         static_cast<JuniperStream *>(juniper_tag)->Srv::JuniperStream::Start(
-            label_map, data_manipulation, data_wrapper, kafka_delivery,
-            producer, zmq_pusher, juniper_tlm_hdr_ext);
+            label_map, data_manipulation, data_wrapper,
+            zmq_pusher, juniper_tlm_hdr_ext);
         //juniper_counter++;
     }
 }
@@ -196,8 +196,8 @@ void Srv::HuaweiFsmCtrl()
 {
     DataManipulation data_manipulation;
     DataWrapper data_wrapper;
-    KafkaDelivery kafka_delivery;
-    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
+    //KafkaDelivery kafka_delivery;
+    //kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     ZmqPush zmq_pusher;
     huawei_telemetry::Telemetry huawei_tlm;
     openconfig_interfaces::Interfaces oc_if;
@@ -205,7 +205,7 @@ void Srv::HuaweiFsmCtrl()
     std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
         new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get()));
     huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
-        kafka_delivery, producer, zmq_pusher, huawei_tlm, oc_if);
+        zmq_pusher, huawei_tlm, oc_if);
     //int huawei_counter {0};
     void *huawei_tag {nullptr};
     bool huawei_ok {false};
@@ -220,8 +220,8 @@ void Srv::HuaweiFsmCtrl()
             continue;
         }
         static_cast<HuaweiStream *>(huawei_tag)->Srv::HuaweiStream::Start(
-            label_map, data_manipulation, data_wrapper, kafka_delivery,
-            producer, zmq_pusher, huawei_tlm, oc_if);
+            label_map, data_manipulation, data_wrapper,
+            zmq_pusher, huawei_tlm, oc_if);
         //huawei_counter++;
     }
 }
@@ -273,11 +273,13 @@ void Srv::CiscoStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
     DataWrapper &data_wrapper,
-    KafkaDelivery &kafka_delivery,
-    kafka::clients::KafkaProducer &producer,
+    //KafkaDelivery &kafka_delivery,
+    //kafka::clients::KafkaProducer &producer,
     ZmqPush &zmq_pusher,
     cisco_telemetry::Telemetry &cisco_tlm)
 {
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     // ZMQ Sock creation & connect
     zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
     sock.connect(zmq_pusher.get_zmq_stransport_uri());
@@ -293,11 +295,11 @@ void Srv::CiscoStream::Start(
         cisco_stream_status = FLOW;
     } else if (cisco_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
-            "new Srv::CiscoStream()");
+            "new Srv::CiscoStream() {}", cisco_server_ctx.peer());
         Srv::CiscoStream *cisco_sstream =
             new Srv::CiscoStream(cisco_service_, cisco_cq_);
         cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
-            kafka_delivery, producer, zmq_pusher, cisco_tlm);
+            zmq_pusher, cisco_tlm);
         cisco_resp.Read(&cisco_stream, this);
         cisco_stream_status = PROCESSING;
         cisco_replies_sent++;
@@ -618,6 +620,7 @@ void Srv::CiscoStream::Start(
             }
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
+            producer.close();
             sock.close();
         }
     } else {
@@ -632,11 +635,13 @@ void Srv::JuniperStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
     DataWrapper &data_wrapper,
-    KafkaDelivery &kafka_delivery,
-    kafka::clients::KafkaProducer &producer,
+    //KafkaDelivery &kafka_delivery,
+    //kafka::clients::KafkaProducer &producer,
     ZmqPush &zmq_pusher,
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext)
 {
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     // ZMQ Sock creation & connect
     zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
     sock.connect(zmq_pusher.get_zmq_stransport_uri());
@@ -652,11 +657,11 @@ void Srv::JuniperStream::Start(
         juniper_stream_status = FLOW;
     } else if (juniper_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
-            "new Srv::JuniperStream()");
+            "new Srv::JuniperStream() {}", juniper_server_ctx.peer());
         Srv::JuniperStream *juniper_sstream =
             new Srv::JuniperStream(juniper_service_, juniper_cq_);
         juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
-            kafka_delivery, producer, zmq_pusher, juniper_tlm_hdr_ext);
+            zmq_pusher, juniper_tlm_hdr_ext);
         juniper_resp.Read(&juniper_stream, this);
         juniper_stream_status = PROCESSING;
         juniper_replies_sent++;
@@ -759,6 +764,7 @@ void Srv::JuniperStream::Start(
 
             juniper_stream_status = PROCESSING;
             juniper_replies_sent++;
+            producer.close();
             sock.close();
         }
     } else {
@@ -773,12 +779,14 @@ void Srv::HuaweiStream::Start(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     DataManipulation &data_manipulation,
     DataWrapper &data_wrapper,
-    KafkaDelivery &kafka_delivery,
-    kafka::clients::KafkaProducer &producer,
+    //KafkaDelivery &kafka_delivery,
+    //kafka::clients::KafkaProducer &producer,
     ZmqPush &zmq_pusher,
     huawei_telemetry::Telemetry &huawei_tlm,
     openconfig_interfaces::Interfaces &oc_if)
 {
+    KafkaDelivery kafka_delivery;
+    kafka::clients::KafkaProducer producer(kafka_delivery.get_properties());
     // ZMQ Sock creation & connect
     zmq::socket_t sock(zmq_pusher.get_zmq_ctx(), zmq::socket_type::push);
     sock.connect(zmq_pusher.get_zmq_stransport_uri());
@@ -798,7 +806,7 @@ void Srv::HuaweiStream::Start(
         Srv::HuaweiStream *huawei_sstream =
             new Srv::HuaweiStream(huawei_service_, huawei_cq_);
         huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
-            kafka_delivery, producer, zmq_pusher, huawei_tlm, oc_if);
+            zmq_pusher, huawei_tlm, oc_if);
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
         huawei_replies_sent++;
@@ -993,6 +1001,7 @@ void Srv::HuaweiStream::Start(
 
             huawei_stream_status = PROCESSING;
             huawei_replies_sent++;
+            producer.close();
             sock.close();
         }
     } else {

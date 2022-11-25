@@ -93,8 +93,8 @@ private:
                 &label_map,
             DataManipulation &data_manipulation,
             DataWrapper &data_wrapper,
-            KafkaDelivery &kafka_delivery,
-            kafka::clients::KafkaProducer &producer,
+            //KafkaDelivery &kafka_delivery,
+            //kafka::clients::KafkaProducer &producer,
             ZmqPush &zmq_pusher,
             cisco_telemetry::Telemetry &cisco_tlm
         );
@@ -124,8 +124,8 @@ private:
                 &label_map,
             DataManipulation &data_manipulation,
             DataWrapper &data_wrapper,
-            KafkaDelivery &kafka_delivery,
-            kafka::clients::KafkaProducer &producer,
+            //KafkaDelivery &kafka_delivery,
+            //kafka::clients::KafkaProducer &producer,
             ZmqPush &zmq_pusher,
             GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext
         );
@@ -155,8 +155,8 @@ private:
                 &label_map,
             DataManipulation &data_manipulation,
             DataWrapper &data_wrapper,
-            KafkaDelivery &kafka_delivery,
-            kafka::clients::KafkaProducer &producer,
+            //KafkaDelivery &kafka_delivery,
+            //kafka::clients::KafkaProducer &producer,
             ZmqPush &zmq_pusher,
             huawei_telemetry::Telemetry &huawei_tlm,
             openconfig_interfaces::Interfaces &oc_if
