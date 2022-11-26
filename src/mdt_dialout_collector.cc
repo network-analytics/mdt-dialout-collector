@@ -191,12 +191,12 @@ int main(int argc, char *argv[])
         "cisco_workers");
 
     // Juniper
-    LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
-        "juniper_workers");
+    //LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
+    //    "juniper_workers");
 
-    // Huawei
-    LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
-        "huawei_workers");
+    //// Huawei
+    //LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
+    //    "huawei_workers");
 
     signal(SIGUSR1, SignalHandler);
 
@@ -236,20 +236,20 @@ void *VendorThread(const std::string &ipv4_socket_str)
         std::string cisco_srv_socket {ipv4_socket_cisco};
         Srv cisco_mdt_dialout_collector;
         cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
-    } else if (ipv4_socket_str.find("juniper") != std::string::npos) {
-        std::string ipv4_socket_juniper =
-            main_cfg_parameters.at(ipv4_socket_str);
-
-        std::string juniper_srv_socket {ipv4_socket_juniper};
-        Srv juniper_mdt_dialout_collector;
-        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
-    } else if (ipv4_socket_str.find("huawei") != std::string::npos) {
-        std::string ipv4_socket_huawei =
-            main_cfg_parameters.at(ipv4_socket_str);
-
-        std::string huawei_srv_socket {ipv4_socket_huawei};
-        Srv huawei_mdt_dialout_collector;
-        huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
+//    } else if (ipv4_socket_str.find("juniper") != std::string::npos) {
+//        std::string ipv4_socket_juniper =
+//            main_cfg_parameters.at(ipv4_socket_str);
+//
+//        std::string juniper_srv_socket {ipv4_socket_juniper};
+//        Srv juniper_mdt_dialout_collector;
+//        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
+//    } else if (ipv4_socket_str.find("huawei") != std::string::npos) {
+//        std::string ipv4_socket_huawei =
+//            main_cfg_parameters.at(ipv4_socket_str);
+//
+//        std::string huawei_srv_socket {ipv4_socket_huawei};
+//        Srv huawei_mdt_dialout_collector;
+//        huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
     }
 
     return (NULL);
@@ -271,15 +271,19 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
             std::exit(EXIT_FAILURE);
         }
         int workers = std::stoi(main_cfg_parameters.at(workers_str));
-        if (workers < 1 || workers > 5) {
+        if (workers < 1 || workers > 1) {
+            //spdlog::get("multi-logger")->
+            //    error("[{}] configuaration issue: the "
+            //    "allowed amount of workers is defined between 1 "
+            //    "and 5. (default = 1)", workers_str);
             spdlog::get("multi-logger")->
                 error("[{}] configuaration issue: the "
-                "allowed amount of workers is defined between 1 "
-                "and 5. (default = 1)", workers_str);
+                "allowed amount of workers is 1 per Vendor (default = 1)",
+                workers_str);
             std::exit(EXIT_FAILURE);
         }
         int w;
-        for (w = 0; w < workers; ++w) {
+        for (w = 0; w < workers; w++) {
             workers_vec.push_back(std::thread(&VendorThread,
                 ipv4_socket_str));
         }

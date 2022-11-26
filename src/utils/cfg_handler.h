@@ -21,6 +21,7 @@ extern std::map<std::string, std::string> logs_cfg_parameters;
 extern std::map<std::string, std::string> main_cfg_parameters;
 extern std::map<std::string, std::string> data_manipulation_cfg_parameters;
 extern std::map<std::string, std::string> kafka_delivery_cfg_parameters;
+extern std::map<std::string, std::string> zmq_delivery_cfg_parameters;
 
 
 class CfgHandler {
@@ -48,12 +49,16 @@ public:
     std::map<std::string, std::string>
         &get_kafka_parameters() {
             return kafka_parameters; };
+    std::map<std::string, std::string>
+        &get_zmq_parameters() {
+            return zmq_parameters; };
 protected:
     std::string mdt_dialout_collector_conf;
     std::map<std::string, std::string> logs_parameters;
     std::map<std::string, std::string> main_parameters;
     std::map<std::string, std::string> data_manipulation_parameters;
     std::map<std::string, std::string> kafka_parameters;
+    std::map<std::string, std::string> zmq_parameters;
 };
 
 // Logs Configs Handler
@@ -121,6 +126,8 @@ public:
     //    return juniper_workers; };
     //const std::string &get_huawei_workers() const {
     //    return huawei_workers; };
+    //const std::string &get_data_delivery_method() const {
+    //    return data_delivery_method; };
 private:
     const std::string writer_id;
     const std::string core_pid_folder;
@@ -134,6 +141,7 @@ private:
     const std::string cisco_workers;
     const std::string juniper_workers;
     const std::string huawei_workers;
+    const std::string data_delivery_method;
 };
 
 // Data manipulation configuration parameters
@@ -213,6 +221,26 @@ private:
     const std::string ssl_certificate_location;
     const std::string ssl_ca_location;
     const std::string log_level;
+};
+
+// Kafka configuration parameters
+class ZmqCfgHandler {
+public:
+    // Params are initialized within the constructor
+    ZmqCfgHandler() { spdlog::get("multi-logger")->
+        debug("constructor: ZmqCfgHandler()"); };
+    ~ZmqCfgHandler() { spdlog::get("multi-logger")->
+        debug("destructor: ~ZmqCfgHandler()"); };
+
+    // Setters - directly from the configuration file
+    bool lookup_zmq_parameters(const std::string &cfg_path,
+        std::map<std::string, std::string> &params);
+
+    // Getters
+    //const std::string &get_zmq_uri() const {
+    //    return zmq_uri; };
+private:
+    const std::string zmq_uri;
 };
 
 #endif

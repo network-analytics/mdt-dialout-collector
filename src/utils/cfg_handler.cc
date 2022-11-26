@@ -525,6 +525,33 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         }
     }
 
+    bool data_delivery_method = main_params.exists("data_delivery_method");
+    if (data_delivery_method == true) {
+        libconfig::Setting &data_delivery_method =
+            main_params.lookup("data_delivery_method");
+        try {
+            std::string data_delivery_method_s = data_delivery_method;
+            if (data_delivery_method_s.empty()          == false &&
+               (data_delivery_method_s.compare("kafka") == 0 ||
+                data_delivery_method_s.compare("zmq")   == 0 )) {
+                params.insert({"data_delivery_method", data_delivery_method_s});
+            } else {
+                spdlog::get("multi-logger")->
+                    error("[data_delivery_method] configuration "
+                    "issue: [ {} ] is an invalid data delivery method",
+                    data_delivery_method_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger")->
+                error("[data_delivery_method] configuration issue: "
+                "{}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"data_delivery_method", "kafka"});
+    }
+
     return true;
 }
 
