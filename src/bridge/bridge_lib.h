@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include "../cfgWrapper/cfg_wrapper.h"
 
-#define MAX_WORKERS 15
+#define MAX_WORKERS 3
 
 
 typedef struct {

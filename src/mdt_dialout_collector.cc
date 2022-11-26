@@ -191,12 +191,12 @@ int main(int argc, char *argv[])
         "cisco_workers");
 
     // Juniper
-    //LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
-    //    "juniper_workers");
+    LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
+        "juniper_workers");
 
-    //// Huawei
-    //LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
-    //    "huawei_workers");
+    // Huawei
+    LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
+        "huawei_workers");
 
     signal(SIGUSR1, SignalHandler);
 
@@ -236,20 +236,20 @@ void *VendorThread(const std::string &ipv4_socket_str)
         std::string cisco_srv_socket {ipv4_socket_cisco};
         Srv cisco_mdt_dialout_collector;
         cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
-//    } else if (ipv4_socket_str.find("juniper") != std::string::npos) {
-//        std::string ipv4_socket_juniper =
-//            main_cfg_parameters.at(ipv4_socket_str);
-//
-//        std::string juniper_srv_socket {ipv4_socket_juniper};
-//        Srv juniper_mdt_dialout_collector;
-//        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
-//    } else if (ipv4_socket_str.find("huawei") != std::string::npos) {
-//        std::string ipv4_socket_huawei =
-//            main_cfg_parameters.at(ipv4_socket_str);
-//
-//        std::string huawei_srv_socket {ipv4_socket_huawei};
-//        Srv huawei_mdt_dialout_collector;
-//        huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
+    } else if (ipv4_socket_str.find("juniper") != std::string::npos) {
+        std::string ipv4_socket_juniper =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string juniper_srv_socket {ipv4_socket_juniper};
+        Srv juniper_mdt_dialout_collector;
+        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
+    } else if (ipv4_socket_str.find("huawei") != std::string::npos) {
+        std::string ipv4_socket_huawei =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string huawei_srv_socket {ipv4_socket_huawei};
+        Srv huawei_mdt_dialout_collector;
+        huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
     }
 
     return (NULL);
