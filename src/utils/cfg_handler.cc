@@ -824,6 +824,9 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
                 "configuration issue: {}", ste.what());
             return false;
         }
+    } else if (
+        main_cfg_parameters.at("data_delivery_method").compare("kafka") !=0) {
+        params.insert({"topic", "dummy_topic"});
     } else {
         spdlog::get("multi-logger")->error("[topic] configuration issue: "
             "a valid topic is mandatory");
@@ -849,6 +852,9 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
                 "configuration issue: {}", ste.what());
             return false;
         }
+    } else if (
+        main_cfg_parameters.at("data_delivery_method").compare("kafka") !=0) {
+        params.insert({"bootstrap_servers", "dummy_servers"});
     } else {
         spdlog::get("multi-logger")->
             error("[bootstrap_servers] configuration issue: "
@@ -947,6 +953,9 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
                 "configuration issue: {}", ste.what());
             return false;
         }
+    } else if (
+        main_cfg_parameters.at("data_delivery_method").compare("kafka") !=0) {
+        params.insert({"security_protocol", "dummy_security_protocol"});
     } else {
         spdlog::get("multi-logger")->
             error("[security_protocol] configuration issue: "
