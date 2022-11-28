@@ -147,10 +147,23 @@ void Srv::CiscoFsmCtrl()
 
     // Zmq pusher
     ZmqPush zmq_pusher;
-    std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
+    const std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
     zmq::socket_t zmq_sock(zmq_pusher.get_zmq_ctx(),
         zmq::socket_type::push);
     zmq_sock.connect(zmq_uri);
+
+    if (ddm.compare("kafka") != 0) {
+        kafka_producer.~KafkaProducer();
+        kafka_delivery.~KafkaDelivery();
+    } else if (ddm.compare("zmq") != 0) {
+        zmq_sock.~socket_t();
+        zmq_pusher.~ZmqPush();
+    } else {
+        spdlog::get("multi-logger")->
+            error("[Srv::CiscoFsmCtrl()]: Unable to set the "
+            "delivery function");
+        std::abort();
+    }
 
     std::unique_ptr<Srv::CiscoStream> cisco_sstream(
         new Srv::CiscoStream(&cisco_service_, cisco_cq_.get()));
@@ -178,9 +191,7 @@ void Srv::CiscoFsmCtrl()
 
     if (ddm.compare("kafka") == 0) {
         kafka_producer.close();
-    }
-
-    if (ddm.compare("zmq") == 0) {
+    } else if (ddm.compare("zmq") == 0) {
         zmq_sock.close();
     }
 }
@@ -206,10 +217,23 @@ void Srv::JuniperFsmCtrl()
 
     // Zmq pusher
     ZmqPush zmq_pusher;
-    std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
+    const std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
     zmq::socket_t zmq_sock(zmq_pusher.get_zmq_ctx(),
         zmq::socket_type::push);
     zmq_sock.connect(zmq_uri);
+
+    if (ddm.compare("kafka") != 0) {
+        kafka_producer.~KafkaProducer();
+        kafka_delivery.~KafkaDelivery();
+    } else if (ddm.compare("zmq") != 0) {
+        zmq_sock.~socket_t();
+        zmq_pusher.~ZmqPush();
+    } else {
+        spdlog::get("multi-logger")->
+            error("[Srv::CiscoFsmCtrl()]: Unable to set the "
+            "delivery function");
+        std::abort();
+    }
 
     std::unique_ptr<Srv::JuniperStream> juniper_sstream(
         new Srv::JuniperStream(&juniper_service_, juniper_cq_.get()));
@@ -237,9 +261,7 @@ void Srv::JuniperFsmCtrl()
 
     if (ddm.compare("kafka") == 0) {
         kafka_producer.close();
-    }
-
-    if (ddm.compare("zmq") == 0) {
+    } else if (ddm.compare("zmq") == 0) {
         zmq_sock.close();
     }
 }
@@ -266,10 +288,23 @@ void Srv::HuaweiFsmCtrl()
 
     // Zmq pusher
     ZmqPush zmq_pusher;
-    std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
+    const std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
     zmq::socket_t zmq_sock(zmq_pusher.get_zmq_ctx(),
         zmq::socket_type::push);
     zmq_sock.connect(zmq_uri);
+
+    if (ddm.compare("kafka") != 0) {
+        kafka_producer.~KafkaProducer();
+        kafka_delivery.~KafkaDelivery();
+    } else if (ddm.compare("zmq") != 0) {
+        zmq_sock.~socket_t();
+        zmq_pusher.~ZmqPush();
+    } else {
+        spdlog::get("multi-logger")->
+            error("[Srv::CiscoFsmCtrl()]: Unable to set the "
+            "delivery function");
+        std::abort();
+    }
 
     std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
         new Srv::HuaweiStream(&huawei_service_, huawei_cq_.get()));
@@ -297,9 +332,7 @@ void Srv::HuaweiFsmCtrl()
 
     if (ddm.compare("kafka") == 0) {
         kafka_producer.close();
-    }
-
-    if (ddm.compare("zmq") == 0) {
+    } else if (ddm.compare("zmq") == 0) {
         zmq_sock.close();
     }
 }
@@ -465,8 +498,7 @@ void Srv::CiscoStream::Start(
                                         kafka_producer,
                                         peer_ip,
                                         stream_data_out);
-                                }
-                                if (ddm.compare("zmq") == 0) {
+                                } else if (ddm.compare("zmq") == 0) {
                                     data_wrapper.BuildDataWrapper (
                                         "gRPC",
                                         "json_string",
@@ -491,8 +523,7 @@ void Srv::CiscoStream::Start(
                                         kafka_producer,
                                         peer_ip,
                                         stream_data_out_meta);
-                                }
-                                if (ddm.compare("zmq") == 0) {
+                                } else if (ddm.compare("zmq") == 0) {
                                     data_wrapper.BuildDataWrapper (
                                         "gRPC",
                                         "json_string",
@@ -545,8 +576,7 @@ void Srv::CiscoStream::Start(
                                     kafka_producer,
                                     peer_ip,
                                     stream_data_out);
-                            }
-                            if (ddm.compare("zmq") == 0) {
+                            } else if (ddm.compare("zmq") == 0) {
                                 data_wrapper.BuildDataWrapper (
                                     "gRPC",
                                     "json_string",
@@ -571,8 +601,7 @@ void Srv::CiscoStream::Start(
                                     kafka_producer,
                                     peer_ip,
                                     stream_data_out_meta);
-                            }
-                            if (ddm.compare("zmq") == 0) {
+                            } else if (ddm.compare("zmq") == 0) {
                                 data_wrapper.BuildDataWrapper (
                                     "gRPC",
                                     "json_string",
@@ -622,8 +651,7 @@ void Srv::CiscoStream::Start(
                                 kafka_producer,
                                 peer_ip,
                                 stream_data_out);
-                        }
-                        if (ddm.compare("zmq") == 0) {
+                        } else if (ddm.compare("zmq") == 0) {
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -648,8 +676,7 @@ void Srv::CiscoStream::Start(
                                 kafka_producer,
                                 peer_ip,
                                 stream_data_out_meta);
-                        }
-                        if (ddm.compare("zmq") == 0) {
+                        } else if (ddm.compare("zmq") == 0) {
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -689,8 +716,7 @@ void Srv::CiscoStream::Start(
                                 kafka_producer,
                                 peer_ip,
                                 stream_data_out);
-                        }
-                        if (ddm.compare("zmq") == 0) {
+                        } else if (ddm.compare("zmq") == 0) {
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -715,8 +741,7 @@ void Srv::CiscoStream::Start(
                                 kafka_producer,
                                 peer_ip,
                                 stream_data_out_meta);
-                        }
-                        if (ddm.compare("zmq") == 0) {
+                        } else if (ddm.compare("zmq") == 0) {
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -844,8 +869,7 @@ void Srv::JuniperStream::Start(
                             kafka_producer,
                             peer_ip,
                             stream_data_out);
-                    }
-                    if (ddm.compare("zmq") == 0) {
+                    } else if (ddm.compare("zmq") == 0) {
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -870,8 +894,7 @@ void Srv::JuniperStream::Start(
                             kafka_producer,
                             peer_ip,
                             stream_data_out_meta);
-                    }
-                    if (ddm.compare("zmq") == 0) {
+                    } else if (ddm.compare("zmq") == 0) {
                         data_wrapper.BuildDataWrapper (
                             "gRPC",
                             "json_string",
@@ -1018,8 +1041,7 @@ void Srv::HuaweiStream::Start(
                                     kafka_producer,
                                     peer_ip,
                                     stream_data_out);
-                            }
-                            if (ddm.compare("zmq") == 0) {
+                            } else if (ddm.compare("zmq") == 0) {
                                 data_wrapper.BuildDataWrapper (
                                     "gRPC",
                                     "json_string",
@@ -1044,8 +1066,7 @@ void Srv::HuaweiStream::Start(
                                     kafka_producer,
                                     peer_ip,
                                     stream_data_out_meta);
-                            }
-                            if (ddm.compare("zmq") == 0) {
+                            } else if (ddm.compare("zmq") == 0) {
                                 data_wrapper.BuildDataWrapper (
                                     "gRPC",
                                     "json_string",
@@ -1098,8 +1119,7 @@ void Srv::HuaweiStream::Start(
                                 kafka_producer,
                                 peer_ip,
                                 stream_data_out);
-                        }
-                        if (ddm.compare("zmq") == 0) {
+                        } else if (ddm.compare("zmq") == 0) {
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
@@ -1124,8 +1144,7 @@ void Srv::HuaweiStream::Start(
                                 kafka_producer,
                                 peer_ip,
                                 stream_data_out_meta);
-                        }
-                        if (ddm.compare("zmq") == 0) {
+                        } else if (ddm.compare("zmq") == 0) {
                             data_wrapper.BuildDataWrapper (
                                 "gRPC",
                                 "json_string",
