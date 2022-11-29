@@ -271,15 +271,11 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
             std::exit(EXIT_FAILURE);
         }
         int workers = std::stoi(main_cfg_parameters.at(workers_str));
-        if (workers < 1 || workers > 1) {
-            //spdlog::get("multi-logger")->
-            //    error("[{}] configuaration issue: the "
-            //    "allowed amount of workers is defined between 1 "
-            //    "and 5. (default = 1)", workers_str);
+        if (workers < 1 || workers > 5) {
             spdlog::get("multi-logger")->
                 error("[{}] configuaration issue: the "
-                "allowed amount of workers is 1 per Vendor (default = 1)",
-                workers_str);
+                "allowed amount of workers is defined between 1 "
+                "and 5. (default = 1)", workers_str);
             std::exit(EXIT_FAILURE);
         }
         int w;
