@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <condition_variable>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -38,8 +39,9 @@ public:
      *   - RD_KAFKA_RESP_ERR__INVALID_ARG      : Invalid BOOTSTRAP_SERVERS property
      *   - RD_KAFKA_RESP_ERR__CRIT_SYS_RESOURCE: Fail to create internal threads
      */
-    explicit KafkaProducer(const Properties&   properties,
-                           EventsPollingOption eventsPollingOption = EventsPollingOption::Auto);
+    explicit KafkaProducer(const Properties&    properties,
+                           EventsPollingOption  eventsPollingOption = EventsPollingOption::Auto,
+                           const Interceptors&  interceptors        = Interceptors{});
 
     /**
      * The destructor for KafkaProducer.
@@ -52,7 +54,7 @@ public:
      * Possible error values:
      *   - RD_KAFKA_RESP_ERR__TIMED_OUT: The `timeout` was reached before all outstanding requests were completed.
      */
-    Error flush(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
+    Error flush(std::chrono::milliseconds timeout = InfiniteTimeout);
 
     /**
      * Purge messages currently handled by the KafkaProducer.
@@ -62,7 +64,7 @@ public:
     /**
      * Close this producer. This method would wait up to timeout for the producer to complete the sending of all incomplete requests (before purging them).
      */
-    void close(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
+    void close(std::chrono::milliseconds timeout = InfiniteTimeout);
 
     /**
      * Options for sending messages.
@@ -140,7 +142,7 @@ public:
     /**
      * Needs to be called before any other methods when the transactional.id is set in the configuration.
      */
-    void initTransactions(std::chrono::milliseconds timeout = std::chrono::milliseconds(KafkaProducer::DEFAULT_INIT_TRANSACTIONS_TIMEOUT_MS));
+    void initTransactions(std::chrono::milliseconds timeout = InfiniteTimeout);
 
     /**
      * Should be called before the start of each new transaction.
@@ -150,12 +152,12 @@ public:
     /**
      * Commit the ongoing transaction.
      */
-    void commitTransaction(std::chrono::milliseconds timeout = std::chrono::milliseconds(KafkaProducer::DEFAULT_COMMIT_TRANSACTION_TIMEOUT_MS));
+    void commitTransaction(std::chrono::milliseconds timeout = InfiniteTimeout);
 
     /**
      * Abort the ongoing transaction.
      */
-    void abortTransaction(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
+    void abortTransaction(std::chrono::milliseconds timeout = InfiniteTimeout);
 
 
     /**
@@ -164,14 +166,6 @@ public:
     void sendOffsetsToTransaction(const TopicPartitionOffsets&           topicPartitionOffsets,
                                   const consumer::ConsumerGroupMetadata& groupMetadata,
                                   std::chrono::milliseconds              timeout);
-
-#if COMPILER_SUPPORTS_CPP_17
-    static constexpr int DEFAULT_INIT_TRANSACTIONS_TIMEOUT_MS  = 10000;
-    static constexpr int DEFAULT_COMMIT_TRANSACTION_TIMEOUT_MS = 10000;
-#else
-    enum { DEFAULT_INIT_TRANSACTIONS_TIMEOUT_MS  = 10000 };
-    enum { DEFAULT_COMMIT_TRANSACTION_TIMEOUT_MS = 10000 };
-#endif
 
 private:
     void pollCallbacks(int timeoutMs)
@@ -228,11 +222,14 @@ private:
 };
 
 inline
-KafkaProducer::KafkaProducer(const Properties& properties, EventsPollingOption eventsPollingOption)
+KafkaProducer::KafkaProducer(const Properties&      properties,
+                             EventsPollingOption    eventsPollingOption,
+                             const Interceptors&    interceptors)
     : KafkaClient(ClientType::KafkaProducer,
                   validateAndReformProperties(properties),
                   registerConfigCallbacks,
-                  eventsPollingOption)
+                  eventsPollingOption,
+                  interceptors)
 {
     // Start background polling (if needed)
     startBackgroundPollingIfNecessary([this](int timeoutMs){ pollCallbacks(timeoutMs); });
@@ -398,12 +395,12 @@ KafkaProducer::send(const producer::ProducerRecord& record,
         vu.vtype         = RD_KAFKA_VTYPE_HEADER;
         vu.u.header.name = header.key.c_str();
         vu.u.header.val  = header.value.data();
-        vu.u.header.size = header.value.size();
+        vu.u.header.size = static_cast<int64_t>(header.value.size());
     }
 
     assert(uvCount == rkVUs.size());
 
-    Error sendResult{ rd_kafka_produceva(rk, rkVUs.data(), rkVUs.size()) };
+    const Error sendResult{ rd_kafka_produceva(rk, rkVUs.data(), rkVUs.size()) };
     KAFKA_THROW_IF_WITH_ERROR(sendResult);
 
     // KafkaProducer::deliveryCallback would delete the "opaque"
@@ -419,7 +416,7 @@ KafkaProducer::syncSend(const producer::ProducerRecord& record)
     std::condition_variable  delivered;
 
     auto deliveryCb = [&deliveryResult, &recordMetadata, &mtx, &delivered] (const producer::RecordMetadata& metadata, const Error& error) {
-        std::lock_guard<std::mutex> guard(mtx);
+        const std::lock_guard<std::mutex> guard(mtx);
 
         deliveryResult = error;
         recordMetadata = metadata;
@@ -432,7 +429,7 @@ KafkaProducer::syncSend(const producer::ProducerRecord& record)
     std::unique_lock<std::mutex> lock(mtx);
     delivered.wait(lock, [&deliveryResult]{ return static_cast<bool>(deliveryResult); });
 
-    KAFKA_THROW_IF_WITH_ERROR(*deliveryResult);
+    KAFKA_THROW_IF_WITH_ERROR(*deliveryResult); // NOLINT
 
     return recordMetadata;
 }
@@ -457,7 +454,7 @@ KafkaProducer::close(std::chrono::milliseconds timeout)
 
     stopBackgroundPollingIfNecessary();
 
-    Error result = flush(timeout);
+    const Error result = flush(timeout);
     if (result.value() == RD_KAFKA_RESP_ERR__TIMED_OUT)
     {
         KAFKA_API_DO_LOG(Log::Level::Notice, "purge messages before close, outQLen[%d]", rd_kafka_outq_len(getClientHandle()));
@@ -473,28 +470,28 @@ KafkaProducer::close(std::chrono::milliseconds timeout)
 inline void
 KafkaProducer::initTransactions(std::chrono::milliseconds timeout)
 {
-    Error result{ rd_kafka_init_transactions(getClientHandle(), static_cast<int>(timeout.count())) };  // NOLINT
+    const Error result{ rd_kafka_init_transactions(getClientHandle(), static_cast<int>(timeout.count())) };
     KAFKA_THROW_IF_WITH_ERROR(result);
 }
 
 inline void
 KafkaProducer::beginTransaction()
 {
-    Error result{ rd_kafka_begin_transaction(getClientHandle()) };
+    const Error result{ rd_kafka_begin_transaction(getClientHandle()) };
     KAFKA_THROW_IF_WITH_ERROR(result);
 }
 
 inline void
 KafkaProducer::commitTransaction(std::chrono::milliseconds timeout)
 {
-    Error result{ rd_kafka_commit_transaction(getClientHandle(), static_cast<int>(timeout.count())) };  // NOLINT
+    const Error result{ rd_kafka_commit_transaction(getClientHandle(), static_cast<int>(timeout.count())) };
     KAFKA_THROW_IF_WITH_ERROR(result);
 }
 
 inline void
 KafkaProducer::abortTransaction(std::chrono::milliseconds timeout)
 {
-    Error result{ rd_kafka_abort_transaction(getClientHandle(), static_cast<int>(timeout.count())) };   // NOLINT
+    const Error result{ rd_kafka_abort_transaction(getClientHandle(), static_cast<int>(timeout.count())) };
     KAFKA_THROW_IF_WITH_ERROR(result);
 }
 
@@ -504,10 +501,10 @@ KafkaProducer::sendOffsetsToTransaction(const TopicPartitionOffsets&           t
                                         std::chrono::milliseconds              timeout)
 {
     auto rk_tpos = rd_kafka_topic_partition_list_unique_ptr(createRkTopicPartitionList(topicPartitionOffsets));
-    Error result{ rd_kafka_send_offsets_to_transaction(getClientHandle(),
-                                                       rk_tpos.get(),
-                                                       groupMetadata.rawHandle(),
-                                                       static_cast<int>(timeout.count())) };            // NOLINT
+    const Error result{ rd_kafka_send_offsets_to_transaction(getClientHandle(),
+                                                             rk_tpos.get(),
+                                                             groupMetadata.rawHandle(),
+                                                             static_cast<int>(timeout.count())) };
     KAFKA_THROW_IF_WITH_ERROR(result);
 }
 

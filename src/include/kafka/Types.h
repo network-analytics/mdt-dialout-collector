@@ -60,6 +60,17 @@ private:
     std::size_t _size;
 };
 
+
+/**
+ * Infinite timeout.
+ */
+#if COMPILER_SUPPORTS_CPP_17
+const inline std::chrono::milliseconds InfiniteTimeout = (std::chrono::milliseconds::max)();
+#else
+const static std::chrono::milliseconds InfiniteTimeout = (std::chrono::milliseconds::max)();
+#endif
+
+
 /**
  * Topic name.
  */
@@ -187,6 +198,21 @@ inline std::string toString(const TopicPartitionOffsets& tpos)
                   });
     return ret;
 }
+
+
+/**
+ * SASL OAUTHBEARER token info.
+ */
+struct SaslOauthbearerToken
+{
+    using KeyValuePairs = std::map<std::string, std::string>;
+
+    std::string               value;
+    std::chrono::microseconds mdLifetime{};
+    std::string               mdPrincipalName;
+    KeyValuePairs             extensions;
+};
+
 
 } // end of KAFKA_API
 

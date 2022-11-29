@@ -4,6 +4,7 @@
 
 #include <kafka/BrokerMetadata.h>
 #include <kafka/Error.h>
+#include <kafka/Interceptors.h>
 #include <kafka/KafkaException.h>
 #include <kafka/Log.h>
 #include <kafka/Properties.h>
@@ -20,6 +21,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <vector>
 
 
 namespace KAFKA_API { namespace clients {
@@ -34,6 +36,8 @@ public:
      * The option shows whether user wants to call `pollEvents()` manually to trigger internal callbacks.
      */
     enum class EventsPollingOption { Manual, Auto };
+
+    virtual ~KafkaClient() = default;
 
     /**
      * Get the client id.
@@ -85,6 +89,16 @@ public:
      * Set callback for error notification.
      */
     void setErrorCallback(ErrorCallback cb) { _errorCb = std::move(cb); }
+
+    /**
+     * Callback type for OAUTHBEARER token refresh.
+     */
+    using OauthbearerTokenRefreshCallback = std::function<SaslOauthbearerToken(const std::string&)>;
+
+    /**
+     * Set callback for OAUTHBEARER token refresh.
+     */
+    void setOauthbearerTokernRefreshCallback(OauthbearerTokenRefreshCallback cb) { _oauthbearerTokenRefreshCb = std::move(cb); }
 
     /**
      * Return the properties which took effect.
@@ -166,12 +180,11 @@ protected:
 
     using ConfigCallbacksRegister = std::function<void(rd_kafka_conf_t*)>;
 
-    KafkaClient(ClientType                     clientType,
-                const Properties&              properties,
-                const ConfigCallbacksRegister& extraConfigRegister = ConfigCallbacksRegister{},
-                EventsPollingOption            eventsPollingOption = EventsPollingOption::Auto);
-
-    virtual ~KafkaClient() = default;
+    KafkaClient(ClientType                      clientType,
+                const Properties&               properties,
+                const ConfigCallbacksRegister&  extraConfigRegister,
+                EventsPollingOption             eventsPollingOption,
+                Interceptors                    interceptors);
 
     rd_kafka_t* getClientHandle() const { return _rk.get(); }
 
@@ -217,12 +230,18 @@ protected:
 private:
     std::string         _clientId;
     std::string         _clientName;
+
     std::atomic<int>    _logLevel = {Log::Level::Notice};
     Logger              _logger;
-    StatsCallback       _statsCb;
-    ErrorCallback       _errorCb;
-    rd_kafka_unique_ptr _rk;
+
+    StatsCallback                   _statsCb;
+    ErrorCallback                   _errorCb;
+    OauthbearerTokenRefreshCallback _oauthbearerTokenRefreshCb;
+
     EventsPollingOption _eventsPollingOption;
+    Interceptors        _interceptors;
+
+    rd_kafka_unique_ptr _rk;
 
     static std::string getClientTypeString(ClientType type)
     {
@@ -239,6 +258,14 @@ private:
     // Error callback (for librdkafka)
     static void errorCallback(rd_kafka_t* rk, int err, const char* reason, void* opaque);
 
+    // OAUTHBEARER Toker Refresh Callback (for librdkafka)
+    static void oauthbearerTokenRefreshCallback(rd_kafka_t* rk, const char* oauthbearerConfig, void* /*opaque*/);
+
+    // Interceptor callback (for librdkafka)
+    static rd_kafka_resp_err_t configInterceptorOnNew(rd_kafka_t* rk, const rd_kafka_conf_t* conf, void* opaque, char* errStr, std::size_t maxErrStrSize);
+    static rd_kafka_resp_err_t interceptorOnThreadStart(rd_kafka_t* rk, rd_kafka_thread_type_t threadType, const char* threadName, void* opaque);
+    static rd_kafka_resp_err_t interceptorOnThreadExit(rd_kafka_t* rk, rd_kafka_thread_type_t threadType, const char* threadName, void* opaque);
+
     // Log callback (for class instance)
     void onLog(int level, const char* fac, const char* buf) const;
 
@@ -247,6 +274,13 @@ private:
 
     // Error callback (for class instance)
     void onError(const Error& error);
+
+    // OAUTHBEARER Toker Refresh Callback (for class instance)
+    SaslOauthbearerToken onOauthbearerTokenRefresh(const std::string& oauthbearerConfig);
+
+    // Interceptor callback (for class instance)
+    void interceptThreadStart(const std::string& threadName, const std::string& threadType);
+    void interceptThreadExit(const std::string& threadName, const std::string& threadType);
 
     static const constexpr char* BOOTSTRAP_SERVERS = "bootstrap.servers";
     static const constexpr char* CLIENT_ID         = "client.id";
@@ -275,8 +309,9 @@ protected:
     class PollThread
     {
     public:
-        explicit PollThread(Pollable& pollable)
-            : _running(true), _thread(keepPolling, std::ref(_running), std::ref(pollable))
+        using InterceptorCb = std::function<void()>;
+        explicit PollThread(const InterceptorCb& entryCb, const InterceptorCb& exitCb, Pollable& pollable)
+            : _running(true), _thread(keepPolling, std::ref(_running), entryCb, exitCb, std::ref(pollable))
         {
         }
 
@@ -288,12 +323,19 @@ protected:
         }
 
     private:
-        static void keepPolling(std::atomic_bool& running, Pollable& pollable)
+        static void keepPolling(std::atomic_bool&       running,
+                                const InterceptorCb&    entryCb,
+                                const InterceptorCb&    exitCb,
+                                Pollable&               pollable)
         {
+            entryCb();
+
             while (running.load())
             {
                 pollable.poll(CALLBACK_POLLING_INTERVAL_MS);
             }
+
+            exitCb();
         }
 
         static constexpr int CALLBACK_POLLING_INTERVAL_MS = 10;
@@ -306,7 +348,10 @@ protected:
     {
         _pollable = std::make_unique<KafkaClient::PollableCallback>(pollableCallback);
 
-        if (isWithAutoEventsPolling()) _pollThread = std::make_unique<PollThread>(*_pollable);
+        auto entryCb = [this]() { interceptThreadStart("events-polling", "background"); };
+        auto exitCb =  [this]() { interceptThreadExit("events-polling", "background"); };
+
+        if (isWithAutoEventsPolling()) _pollThread = std::make_unique<PollThread>(entryCb, exitCb, *_pollable);
     }
 
     void stopBackgroundPollingIfNecessary()
@@ -331,8 +376,10 @@ inline
 KafkaClient::KafkaClient(ClientType                     clientType,
                          const Properties&              properties,
                          const ConfigCallbacksRegister& extraConfigRegister,
-                         EventsPollingOption            eventsPollingOption)
-    : _eventsPollingOption(eventsPollingOption)
+                         EventsPollingOption            eventsPollingOption,
+                         Interceptors                   interceptors)
+    : _eventsPollingOption(eventsPollingOption),
+      _interceptors(std::move(interceptors))
 {
     static const std::set<std::string> PRIVATE_PROPERTY_KEYS = { "max.poll.records" };
 
@@ -377,7 +424,11 @@ KafkaClient::KafkaClient(ClientType                     clientType,
             continue;
         }
 
-        rd_kafka_conf_res_t result = rd_kafka_conf_set(rk_conf.get(), prop.first.c_str(), prop.second.c_str(), errInfo.str(), errInfo.capacity());
+        const rd_kafka_conf_res_t result = rd_kafka_conf_set(rk_conf.get(),
+                                                             prop.first.c_str(),
+                                                             prop.second.c_str(),
+                                                             errInfo.str(),
+                                                             errInfo.capacity());
         if (result == RD_KAFKA_CONF_OK)
         {
             _properties.put(prop.first, prop.second);
@@ -400,8 +451,19 @@ KafkaClient::KafkaClient(ClientType                     clientType,
     // Error Callback
     rd_kafka_conf_set_error_cb(rk_conf.get(), KafkaClient::errorCallback);
 
+    // OAUTHBEARER Toker Refresh Callback
+    rd_kafka_conf_set_oauthbearer_token_refresh_cb(rk_conf.get(), KafkaClient::oauthbearerTokenRefreshCallback);
+
     // Other Callbacks
     if (extraConfigRegister) extraConfigRegister(rk_conf.get());
+
+    // Interceptor
+    if (!_interceptors.empty())
+    {
+        const Error result{ rd_kafka_conf_interceptor_add_on_new(rk_conf.get(), "on_new", KafkaClient::configInterceptorOnNew, nullptr) };
+        KAFKA_THROW_IF_WITH_ERROR(result);
+    }
+
 
     // Set client handler
     _rk.reset(rd_kafka_new((clientType == ClientType::KafkaConsumer ? RD_KAFKA_CONSUMER : RD_KAFKA_PRODUCER),
@@ -412,10 +474,10 @@ KafkaClient::KafkaClient(ClientType                     clientType,
 
     // Add brokers
     auto brokers = properties.getProperty(BOOTSTRAP_SERVERS);
-    if (rd_kafka_brokers_add(getClientHandle(), brokers->c_str()) == 0)
+    if (!brokers || rd_kafka_brokers_add(getClientHandle(), brokers->c_str()) == 0)
     {
         KAFKA_THROW_ERROR(Error(RD_KAFKA_RESP_ERR__INVALID_ARG,\
-                                "No broker could be added successfully, BOOTSTRAP_SERVERS=[" + *brokers + "]"));
+                                "No broker could be added successfully, BOOTSTRAP_SERVERS=[" + (brokers ? *brokers : "NA") + "]"));
     }
 
     _opened = true;
@@ -468,7 +530,7 @@ KafkaClient::getProperty(const std::string& name) const
     if (valueSize > valueBuf.size())
     {
         valueBuf.resize(valueSize);
-        [[maybe_unused]] rd_kafka_conf_res_t result = rd_kafka_conf_get(conf, name.c_str(), valueBuf.data(), &valueSize);
+        [[maybe_unused]] const rd_kafka_conf_res_t result = rd_kafka_conf_get(conf, name.c_str(), valueBuf.data(), &valueSize);
         assert(result == RD_KAFKA_CONF_OK);
     }
 
@@ -503,7 +565,7 @@ KafkaClient::onStats(const std::string& jsonString)
 inline int
 KafkaClient::statsCallback(rd_kafka_t* rk, char* jsonStrBuf, size_t jsonStrLen, void* /*opaque*/)
 {
-    std::string stats(jsonStrBuf, jsonStrBuf+jsonStrLen);
+    const std::string stats(jsonStrBuf, jsonStrBuf+jsonStrLen);
     kafkaClient(rk).onStats(stats);
     return 0;
 }
@@ -512,6 +574,17 @@ inline void
 KafkaClient::onError(const Error& error)
 {
     if (_errorCb) _errorCb(error);
+}
+
+inline SaslOauthbearerToken
+KafkaClient::onOauthbearerTokenRefresh(const std::string& oauthbearerConfig)
+{
+    if (!_oauthbearerTokenRefreshCb)
+    {
+        throw std::runtime_error("No OAUTHBEARER token refresh callback configured!");
+    }
+
+    return _oauthbearerTokenRefreshCb(oauthbearerConfig);
 }
 
 inline void
@@ -534,12 +607,95 @@ KafkaClient::errorCallback(rd_kafka_t* rk, int err, const char* reason, void* /*
     kafkaClient(rk).onError(error);
 }
 
+inline void
+KafkaClient::oauthbearerTokenRefreshCallback(rd_kafka_t* rk, const char* oauthbearerConfig, void* /* opaque */)
+{
+    SaslOauthbearerToken oauthbearerToken;
+
+    try
+    {
+        oauthbearerToken = kafkaClient(rk).onOauthbearerTokenRefresh(oauthbearerConfig);
+    }
+    catch (const std::exception& e)
+    {
+        rd_kafka_oauthbearer_set_token_failure(rk, e.what());
+    }
+
+    LogBuffer<LOG_BUFFER_SIZE> errInfo;
+
+    std::vector<const char*> extensions;
+    extensions.reserve(oauthbearerToken.extensions.size() * 2);
+    for (const auto& kv: oauthbearerToken.extensions)
+    {
+        extensions.push_back(kv.first.c_str());
+        extensions.push_back(kv.second.c_str());
+    }
+
+    if (rd_kafka_oauthbearer_set_token(rk,
+                                       oauthbearerToken.value.c_str(),
+                                       oauthbearerToken.mdLifetime.count(),
+                                       oauthbearerToken.mdPrincipalName.c_str(),
+                                       extensions.data(), extensions.size(),
+                                       errInfo.str(), errInfo.capacity()) != RD_KAFKA_RESP_ERR_NO_ERROR)
+    {
+        rd_kafka_oauthbearer_set_token_failure(rk, errInfo.c_str());
+    }
+}
+
+inline void
+KafkaClient::interceptThreadStart(const std::string& threadName, const std::string& threadType)
+{
+    if (const auto& cb = _interceptors.onThreadStart()) cb(threadName, threadType);
+}
+
+inline void
+KafkaClient::interceptThreadExit(const std::string& threadName, const std::string& threadType)
+{
+    if (const auto& cb = _interceptors.onThreadExit()) cb(threadName, threadType);
+}
+
+inline rd_kafka_resp_err_t
+KafkaClient::configInterceptorOnNew(rd_kafka_t* rk, const rd_kafka_conf_t* /*conf*/, void* opaque, char* /*errStr*/, std::size_t /*maxErrStrSize*/)
+{
+    if (auto result = rd_kafka_interceptor_add_on_thread_start(rk, "on_thread_start", KafkaClient::interceptorOnThreadStart, opaque))
+    {
+        return result;
+    }
+
+    if (auto result = rd_kafka_interceptor_add_on_thread_exit(rk, "on_thread_exit", KafkaClient::interceptorOnThreadExit, opaque))
+    {
+        return result;
+    }
+
+    return RD_KAFKA_RESP_ERR_NO_ERROR;
+}
+
+inline rd_kafka_resp_err_t
+KafkaClient::interceptorOnThreadStart(rd_kafka_t* rk, rd_kafka_thread_type_t threadType, const char* threadName, void* /*opaque*/)
+{
+    kafkaClient(rk).interceptThreadStart(threadName, toString(threadType));
+
+    return RD_KAFKA_RESP_ERR_NO_ERROR;
+}
+
+inline rd_kafka_resp_err_t
+KafkaClient::interceptorOnThreadExit(rd_kafka_t* rk, rd_kafka_thread_type_t threadType, const char* threadName, void* /*opaque*/)
+{
+    kafkaClient(rk).interceptThreadExit(threadName, toString(threadType));
+
+    return RD_KAFKA_RESP_ERR_NO_ERROR;
+}
+
 inline Optional<BrokerMetadata>
 KafkaClient::fetchBrokerMetadata(const std::string& topic, std::chrono::milliseconds timeout, bool disableErrorLogging)
 {
     const rd_kafka_metadata_t* rk_metadata = nullptr;
     // Here the input parameter for `all_topics` is `true`, since we want the `cgrp_update`
-    rd_kafka_resp_err_t err = rd_kafka_metadata(getClientHandle(), true, nullptr, &rk_metadata, convertMsDurationToInt(timeout));
+    const rd_kafka_resp_err_t err = rd_kafka_metadata(getClientHandle(),
+                                                      true,
+                                                      nullptr,
+                                                      &rk_metadata,
+                                                      convertMsDurationToInt(timeout));
 
     auto guard = rd_kafka_metadata_unique_ptr(rk_metadata);
 
@@ -591,7 +747,7 @@ KafkaClient::fetchBrokerMetadata(const std::string& topic, std::chrono::millisec
     {
         const rd_kafka_metadata_partition& metadata_partition = metadata_topic->partitions[i];
 
-        Partition partition = metadata_partition.id;
+        const Partition partition = metadata_partition.id;
 
         if (metadata_partition.err != 0)
         {

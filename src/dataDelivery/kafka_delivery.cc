@@ -59,13 +59,14 @@ bool KafkaDelivery::AsyncKafkaProducer(
         kafka::Topic topic = get_topic();
         kafka::Properties properties = get_properties();
 
-        auto msg = kafka::clients::producer::ProducerRecord(
+        auto record = kafka::clients::producer::ProducerRecord(
             topic,
             kafka::Key(peer.c_str()),
-            kafka::Value(json_str.c_str(), json_str.size()));
+            kafka::Value(json_str.c_str(), json_str.size())
+            );
 
         producer.send(
-            msg,
+            record,
             [](const kafka::clients::producer::RecordMetadata &mdata,
                 const kafka::Error &err) {
             if (!err) {

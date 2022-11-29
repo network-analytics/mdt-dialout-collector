@@ -55,7 +55,7 @@ public:
     Timestamp   timestamp() const
     {
         rd_kafka_timestamp_type_t tstype{};
-        Timestamp::Value tsValue = rd_kafka_message_timestamp(_rk_msg.get(), &tstype);
+        const Timestamp::Value tsValue = rd_kafka_message_timestamp(_rk_msg.get(), &tstype);
         return {tsValue, tstype};
     }
 
@@ -107,7 +107,7 @@ ConsumerRecord::headers() const
     const char* name      = nullptr;
     const void* valuePtr  = nullptr;
     std::size_t valueSize = 0;
-    for (int i = 0; !rd_kafka_header_get_all(hdrs, i, &name, &valuePtr, &valueSize); i++)
+    for (std::size_t i = 0; !rd_kafka_header_get_all(hdrs, i, &name, &valuePtr, &valueSize); i++)
     {
         headers.emplace_back(name, Header::Value(valuePtr, valueSize));
     }
