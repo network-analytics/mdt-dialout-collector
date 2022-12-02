@@ -30,14 +30,17 @@ libgrpc_collector_la_LIBADD = bridge/libgrpc_collector_bridge.la               \
 # bin program
 #
 AM_CPPFLAGS = -I$(top_srcdir)/src/include/
+AM_LDFLAGS = "-Wl,--copy-dt-needed-entries"
 
 DEPS = $(GRPC_LIBS) $(GRPCCPP_LIBS) $(PROTOBUF_LIBS) \
 	$(JSONCPP_LIBS) \
-	$(KAFKA_LIBS) $(KAFKACPP_LIBS) \
+	$(KAFKA_LIBS) \
+	$(KAFKACPP_LIBS) \
+	$(SPDLOG_LIBS) \
 	-lzmq \
 	-lconfig++ \
-	$(SPDLOG_LIBS) \
-	-lfmt -lpthread
+	-lfmt \
+	-lpthread
 
 # Program name
 bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
@@ -45,5 +48,5 @@ bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
 mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
 mdt_dialout_collector_LDADD = libgrpc_collector.la $(DEPS)
 
-pmtelemetryd_SOURCES = pmtelemetryd.cc
+pmtelemetryd_SOURCES = pmtelemetryd.c
 pmtelemetryd_LDADD = libgrpc_collector.la $(DEPS)

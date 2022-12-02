@@ -6,6 +6,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 # Set compiler options
+#set(CMAKE_C_FLAGS "-O2 -g -Werror -Wall -std=gnu89")
 set(CMAKE_CXX_FLAGS "-O2 -g -Wall -pedantic -pthread -std=c++17")
 #set(CMAKE_CXX_FLAGS_DEBUG "-g")
 #set(CMAKE_CXX_FLAGS_RELEASE "-O2")
@@ -340,7 +341,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 # set the bin folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
-# Compile
+# Compile CC
 file(GLOB APP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 foreach(sourcefile ${APP_SOURCES})
     file(RELATIVE_PATH filename ${CMAKE_CURRENT_SOURCE_DIR}/src ${sourcefile})
@@ -388,3 +389,50 @@ foreach(sourcefile ${APP_SOURCES})
     )
 endforeach(sourcefile ${APP_SOURCES})
 
+# Compile C
+file(GLOB APP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+foreach(sourcefile ${APP_SOURCES})
+    file(RELATIVE_PATH filename ${CMAKE_CURRENT_SOURCE_DIR}/src ${sourcefile})
+    string(REPLACE ".c" "" file ${filename})
+    add_executable(
+        ${file}
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/${file}.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mdt_dialout_core.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper/data_wrapper.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/cfgWrapper/cfg_wrapper.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/kafka_delivery.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/zmq_delivery.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/bridge/bridge_lib.cc"
+        ${cisco_dialout_pb_cc}
+        ${cisco_dialout_pb_grpc_cc}
+        ${cisco_telemetry_pb_cc}
+        ${juniper_gnmi_pb_cc}
+        ${juniper_gnmi_ext_pb_cc}
+        ${juniper_gnmi_dialout_pb_cc}
+        ${juniper_gnmi_dialout_pb_grpc_cc}
+        ${juniper_telemetry_pb_cc}
+        ${juniper_telemetry_header_pb_cc}
+        ${juniper_telemetry_header_extension_pb_cc}
+        ${huawei_dialout_pb_cc}
+        ${huawei_dialout_pb_grpc_cc}
+        ${huawei_telemetry_pb_cc}
+        ${openconfig_interfaces_pb_cc}
+    )
+    target_compile_features(
+        ${file}
+        PRIVATE
+    )
+    target_link_libraries(
+        ${file}
+        ${_REFLECTION}
+        ${_GRPC_GRPCPP}
+        ${_PROTOBUF_LIBPROTOBUF}
+        ${JSONCPP_LIBRARIES}
+        ${RDKAFKA_CPP_LIBRARIES}
+        ${RDKAFKA_LIBRARIES}
+        ${LIBCONFIG_CPP_LIBRARIES}
+    )
+endforeach(sourcefile ${APP_SOURCES})

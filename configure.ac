@@ -24,7 +24,7 @@ LT_INIT
 AC_ENABLE_STATIC
 
 # Some useful default flags
-CFLAGS="-std=gnu89 -Werror -Wall $CFLAGS"
+CFLAGS="-Werror -Wall -std=gnu89 $CFLAGS"
 CXXFLAGS="-Werror -Wall -std=c++17 $CXXFLAGS"
 AC_DEFINE([__STDC_FORMAT_MACROS], [], [Description])
 
