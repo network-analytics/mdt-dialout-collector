@@ -22,7 +22,7 @@ libgrpc_collector_la_LIBADD = bridge/libgrpc_collector_bridge.la               \
 			dataManipulation/libgrpc_collector_data_manipulation.la\
 			dataWrapper/libgrpc_collector_data_wrapper.la          \
 			proto/libgrpc_collector_proto.la                       \
-			utils/libgrpc_collector_utils.la                       \
+			utils/libgrpc_collector_utils.la
 #Distributable headers
 #include_HEADERS = distributable_header.h
 
