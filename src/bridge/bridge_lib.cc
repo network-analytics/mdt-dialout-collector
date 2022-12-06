@@ -176,7 +176,7 @@ extern "C" {
         free(pload);
     }
 
-    void start_grpc_dialout_collector(pthread_t *workers)
+    void start_grpc_dialout_collector()
     {
         LoadOptions();
 
@@ -191,7 +191,8 @@ extern "C" {
         }
 
         // Allocate MEM for MAX_WORKERS = 15
-        workers = (pthread_t *) malloc(MAX_WORKERS * sizeof(pthread_t));
+        pthread_t *workers =
+            (pthread_t *) malloc(MAX_WORKERS * sizeof(pthread_t));
 
         // Cisco
         LoadThreads(workers, "ipv4_socket_cisco", "replies_cisco",

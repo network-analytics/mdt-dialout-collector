@@ -16,7 +16,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    #define MAX_WORKERS 3
+    #define MAX_WORKERS 15
 
     typedef struct {
         /* main */
@@ -65,7 +65,7 @@ extern "C" {
     extern void FreeOptions(Options *opts);
     extern void FreePayload(Payload *pload);
 
-    extern void start_grpc_dialout_collector(pthread_t *workers);
+    extern void start_grpc_dialout_collector();
     extern void LoadOptions();
     extern void *VendorThread(void *vendor);
     extern void LoadThreads(pthread_t *workers_vec, const char *ipv4_socket_str,
