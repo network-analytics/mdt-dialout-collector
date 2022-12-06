@@ -209,7 +209,7 @@ extern "C" {
 
         size_t w;
         for (w = 0; w < workers_lenght; w++) {
-            pthread_join(workers[w], NULL);
+            pthread_detach(workers[w]);
         }
     }
 

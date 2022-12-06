@@ -22,7 +22,8 @@ libgrpc_collector_la_LIBADD = bridge/libgrpc_collector_bridge.la               \
 			dataManipulation/libgrpc_collector_data_manipulation.la\
 			dataWrapper/libgrpc_collector_data_wrapper.la          \
 			proto/libgrpc_collector_proto.la                       \
-			utils/libgrpc_collector_utils.la
+			utils/libgrpc_collector_utils.la                       \
+			$(DEPS)
 #Distributable headers
 #include_HEADERS = distributable_header.h
 
@@ -46,7 +47,7 @@ DEPS = $(GRPC_LIBS) $(GRPCCPP_LIBS) $(PROTOBUF_LIBS) \
 bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
 
 mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
-mdt_dialout_collector_LDADD = libgrpc_collector.la $(DEPS)
+mdt_dialout_collector_LDADD = libgrpc_collector.la
 
 pmtelemetryd_SOURCES = pmtelemetryd.c
-pmtelemetryd_LDADD = libgrpc_collector.la $(DEPS)
+pmtelemetryd_LDADD = libgrpc_collector.la

@@ -5,9 +5,12 @@
 #ifndef _BRIDGE_LIB_H_
 #define _BRIDGE_LIB_H_
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <zmq.h>
 
 
 #ifdef __cplusplus
