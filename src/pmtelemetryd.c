@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
         printf("%s\n", pload->telemetry_node);
         printf("%s\n", pload->telemetry_port);
         printf("%s\n", pload->telemetry_data);
+        FreePayload(pload);
     }
 
     return EXIT_SUCCESS;
