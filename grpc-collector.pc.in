@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+
+Name: mdt-dialout-collecor
+Description: Model-Driven Telemetry - Collecting <multi-vendor> metrics via gRPC dialout
+URL: https://github.com/scuzzilla/mdt-dialout-collector
+Version: @VERSION@
+Cflags: -I${includedir}/grpc_collector
+Requires: @GRPC_LIBS@ @GRPCCPP_LIBS@ @PROTOBUF_LIBS@ @JSONCPP_LIBS@ @KAFKA_LIBS@ @KAFKACPP_LIBS@ @SPDLOG_LIBS@ -lzmq -lconfig++ -lfmt -lpthread
+Libs: -L${libdir} -lgrpc_collector

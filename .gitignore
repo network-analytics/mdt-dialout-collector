@@ -90,6 +90,7 @@ compile
 m4
 ar-lib
 test-driver
+grpc-collector.pc
 
 /build-*
 /build/*

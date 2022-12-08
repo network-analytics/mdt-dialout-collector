@@ -1,45 +1,59 @@
 MAINTAINERCLEANFILES = Makefile.in
 
 SUBDIRS =          \
-	bridge           \
-	cfgWrapper       \
-	core             \
-	dataDelivery     \
-	dataManipulation \
-	dataWrapper      \
-	proto            \
-	utils
+  bridge           \
+  cfgWrapper       \
+  core             \
+  dataDelivery     \
+  dataManipulation \
+  dataWrapper      \
+  proto            \
+  utils            \
+  $(NULL)
 
 #
 # Libs
 #
 lib_LTLIBRARIES = libgrpc_collector.la
+
 libgrpc_collector_la_SOURCES =
-libgrpc_collector_la_LIBADD = bridge/libgrpc_collector_bridge.la               \
-			cfgWrapper/libgrpc_collector_cfg_wrapper.la            \
-			core/libgrpc_collector_core.la                         \
-			dataDelivery/libgrpc_collector_data_delivery.la        \
-			dataManipulation/libgrpc_collector_data_manipulation.la\
-			dataWrapper/libgrpc_collector_data_wrapper.la          \
-			proto/libgrpc_collector_proto.la                       \
-			utils/libgrpc_collector_utils.la
-#Distributable headers
-#include_HEADERS = distributable_header.h
+
+libgrpc_collector_la_LIBADD =                             \
+  bridge/libgrpc_collector_bridge.la                      \
+  cfgWrapper/libgrpc_collector_cfg_wrapper.la             \
+  core/libgrpc_collector_core.la                          \
+  dataDelivery/libgrpc_collector_data_delivery.la         \
+  dataManipulation/libgrpc_collector_data_manipulation.la \
+  dataWrapper/libgrpc_collector_data_wrapper.la           \
+  proto/libgrpc_collector_proto.la                        \
+  utils/libgrpc_collector_utils.la                        \
+  $(NULL)
+
+# Distributable headers
+grpc_collector_includedir = $(includedir)/grpc_collector
+
+grpc_collector_include_HEADERS = \
+  bridge/bridge_lib.h            \
+  $(NULL)
 
 #
 # bin program
 #
 AM_CPPFLAGS = -I$(top_srcdir)/src/include/
 
-DEPS = $(GRPC_LIBS) $(GRPCCPP_LIBS) $(PROTOBUF_LIBS) \
-	$(JSONCPP_LIBS) \
-	$(KAFKA_LIBS) \
-	$(KAFKACPP_LIBS) \
-	$(SPDLOG_LIBS) \
-	-lzmq \
-	-lconfig++ \
-	-lfmt \
-	-lpthread
+DEPS =             \
+  $(GRPC_LIBS)     \
+  $(GRPCCPP_LIBS)  \
+  $(PROTOBUF_LIBS) \
+  $(JSONCPP_LIBS)  \
+  $(KAFKA_LIBS)    \
+  $(KAFKACPP_LIBS) \
+  $(SPDLOG_LIBS)   \
+  -lzmq            \
+  -lconfig++       \
+  -lfmt            \
+  -lpthread        \
+  $(NULL)
 
 # Program name
 bin_PROGRAMS = mdt_dialout_collector pmtelemetryd

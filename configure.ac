@@ -1,8 +1,15 @@
 m4_include([VERSION]) #Force reconf on VERSION change
-AC_INIT([mdt-dialout-collector],[m4_esyscmd_s(cat VERSION)],[salvatore@cuzzilla.org],[mdt-dialout-collector],[http://github.com/scuzzilla/mdt-dialout-collector])
+
+AC_INIT(
+  [mdt-dialout-collector],
+  [m4_esyscmd_s(cat VERSION)],
+  [salvatore@cuzzilla.org],
+  [mdt-dialout-collector],
+  [http://github.com/scuzzilla/mdt-dialout-collector])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
+AC_PREFIX_DEFAULT([/usr/local])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
@@ -26,7 +33,16 @@ AC_ENABLE_STATIC
 # Some useful default flags
 CFLAGS="-Werror -Wall -std=gnu89 $CFLAGS"
 CXXFLAGS="-Werror -Wall -std=c++17 $CXXFLAGS"
-AC_DEFINE([__STDC_FORMAT_MACROS], [], [Description])
+
+AC_ARG_WITH(
+  [pkgconfigdir],
+  [AS_HELP_STRING([--with-pkgconfigdir],
+  [pkg-config directory to install the .pc file.])],
+  [ with_pkgconfigdir=$with_pkgconfigdir ],
+  [ with_pkgconfigdir=$libdir/pkgconfig ])
+
+PKGCONFIG_USER=$with_pkgconfigdir
+AC_SUBST([PKGCONFIG_USER])
 
 # Debug
 m4_include([config_m4/debug.m4])
@@ -38,38 +54,39 @@ m4_include([config_m4/profiling.m4])
 m4_include([config_m4/versioning.m4])
 
 PKG_CHECK_MODULES([JSONCPP], [jsoncpp], [],
-	[AC_MSG_ERROR([Please install libjsoncpp ])])
+  [AC_MSG_ERROR([Please install libjsoncpp ])])
 
 PKG_CHECK_MODULES([KAFKA], [rdkafka], [],
-	[AC_MSG_ERROR([Please install librdkafka ])])
+  [AC_MSG_ERROR([Please install librdkafka ])])
 PKG_CHECK_MODULES([KAFKACPP], [rdkafka++], [],
-	[AC_MSG_ERROR([Please install librdkafka++ ])])
+  [AC_MSG_ERROR([Please install librdkafka++ ])])
 
 PKG_CHECK_MODULES([SPDLOG], [spdlog], [],
-	[AC_MSG_ERROR([Please install libspdlog ])])
+  [AC_MSG_ERROR([Please install libspdlog ])])
 
 PKG_CHECK_MODULES([PROTOBUF], [protobuf], [],
-	[AC_MSG_ERROR([Please install libgrpc ])])
+  [AC_MSG_ERROR([Please install libgrpc ])])
 
 PKG_CHECK_MODULES([GRPC], [grpc], [],
-	[AC_MSG_ERROR([Please install libgrpc ])])
+  [AC_MSG_ERROR([Please install libgrpc ])])
 
 PKG_CHECK_MODULES([GRPCCPP], [grpc++], [],
-	[AC_MSG_ERROR([Please install libgrpc++ ])])
+  [AC_MSG_ERROR([Please install libgrpc++ ])])
 
 # Output files
 AC_CONFIG_FILES([
-	Makefile
-	proto/Makefile
-	src/Makefile
-	src/bridge/Makefile
-	src/cfgWrapper/Makefile
-	src/core/Makefile
-	src/dataDelivery/Makefile
-	src/dataManipulation/Makefile
-	src/dataWrapper/Makefile
-	src/proto/Makefile
-	src/utils/Makefile
+  Makefile
+  proto/Makefile
+  src/Makefile
+  src/bridge/Makefile
+  src/cfgWrapper/Makefile
+  src/core/Makefile
+  src/dataDelivery/Makefile
+  src/dataManipulation/Makefile
+  src/dataWrapper/Makefile
+  src/proto/Makefile
+  src/utils/Makefile
+  grpc-collector.pc
 ])
 
 AC_OUTPUT
