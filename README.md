@@ -194,46 +194,9 @@ log_level = "0";
 The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) is describing in detail the compile/install procedure. If
 you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation.
 
-- Libraries like jsoncpp & librdkafka are also required.
-```SHELL
-# jsoncpp >= 1.8.4 | rdkafka++ >= 1.6.0 | libconfig++ >= 1.5 | spdlog >= 1.5.0
+- Debian based systems
 
-Debian$ sudo apt install libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev libzmq3-dev
-CentOS$ sudo yum install jsoncpp-devel librdkafka-devel libconfig-devel spdlog-devel cppzmq-devel
-```
-
-#### git Clone, Compile and Run (compiler version >= gcc-toolset-11)
-```SHELL
-$ cd /opt
-$ git clone https://github.com/scuzzilla/mdt-dialout-collector.git
-
-$ cd mdt-dialout-collector
-$ mkdir build
-$ cmake ../
-$ make
-
-$ ./bin/mdt-dialout-collector
-```
-
-#### Additional Install notes
-
-If you refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation to compile gRPC, you might want to configure the $PATH variable to include your local
-"libs/header" folder.
-```SHELL
-$ export MY_INSTALL_DIR=$HOME/.local
-$ export PATH="$MY_INSTALL_DIR/bin:$PATH"
-```
-
-On CentOS you might need to modify the pkg-config path to allow cmake to find all required libraries.
-```SHELL
-$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
-```
-
-On CentOS the "spdlog" library should use the external 'fmt' library.
-```TEXT
-uncomment #define SPDLOG_FMT_EXTERNAL from /usr/include/spdlog/tweakme.h before
-running the make command
-```
+- CentOS based systems
 
 ---
 
