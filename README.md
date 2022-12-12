@@ -194,9 +194,9 @@ log_level = "0";
 The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) is describing in detail the compile/install procedure. If
 you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation.
 
-- Debian based systems
+- [Debian based systems](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/debian_INSTALL.md)
 
-- CentOS based systems
+- [CentOS based systems](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/centos_INSTALL.md)
 
 ---
 
