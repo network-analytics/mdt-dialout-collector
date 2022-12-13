@@ -38,7 +38,7 @@ make install
 popd
 ```
 
-- Build & install the collector deamons
+- Build & install the collector deamons (Run the collector natively)
 ```SHELL
 export PATH="/root/.local/bin:$PATH"
 
@@ -55,7 +55,7 @@ cmake ../
 make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
 ```
 
-- Build & install the collector libraries
+- Build & install the collector libraries (Integrate the collector, via ZMQ, with [pmacct](https://github.com/pmacct/pmacct])
 ```SHELL
 export PATH="/root/.local/bin:$PATH"
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/root/.local/lib/pkgconfig

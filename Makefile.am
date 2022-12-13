@@ -1,14 +1,12 @@
 MAINTAINERCLEANFILES =      \
   $(top_srcdir)/aclocal.m4  \
   $(top_srcdir)/configure   \
-  $(top_srcdir)/Makefile.in \
-  $(NULL)
+  $(top_srcdir)/Makefile.in
 
 # PKGCONFIG_USER comes from configure.ac
 pkgconfigdir = $(PKGCONFIG_USER)
 pkgconfig_DATA =           \
-  grpc-collector.pc \
-  $(NULL)
+  grpc-collector.pc
 
 SUBDIRS = proto src
 

@@ -8,8 +8,7 @@ SUBDIRS =          \
   dataManipulation \
   dataWrapper      \
   proto            \
-  utils            \
-  $(NULL)
+  utils
 
 #
 # Libs
@@ -27,19 +26,19 @@ libgrpc_collector_la_LIBADD =                             \
   dataWrapper/libgrpc_collector_data_wrapper.la           \
   proto/libgrpc_collector_proto.la                        \
   utils/libgrpc_collector_utils.la                        \
-  $(NULL)
+  $(DEPS)
 
 # Distributable headers
 grpc_collector_includedir = $(includedir)/grpc_collector
 
 grpc_collector_include_HEADERS = \
-  bridge/bridge_lib.h            \
-  $(NULL)
+  bridge/bridge_lib.h
 
 #
 # bin program
 #
 AM_CPPFLAGS = -I$(top_srcdir)/src/include/
+AM_LDFLAGS = "-Wl,--copy-dt-needed-entries"
 
 DEPS =             \
   $(GRPC_LIBS)     \
@@ -52,14 +51,13 @@ DEPS =             \
   -lzmq            \
   -lconfig++       \
   -lfmt            \
-  -lpthread        \
-  $(NULL)
+  -lpthread
 
 # Program name
 bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
 
 mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
-mdt_dialout_collector_LDADD = libgrpc_collector.la $(DEPS)
+mdt_dialout_collector_LDADD = libgrpc_collector.la
 
-pmtelemetryd_SOURCES = pmtelemetryd.cc
-pmtelemetryd_LDADD = libgrpc_collector.la $(DEPS)
+pmtelemetryd_SOURCES = pmtelemetryd.c
+pmtelemetryd_LDADD = libgrpc_collector.la
