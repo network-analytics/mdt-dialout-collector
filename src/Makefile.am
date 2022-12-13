@@ -54,23 +54,6 @@ DEPS =             \
   -lpthread
 
 # Program name
-<<<<<<< HEAD
-bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
-
-mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
-mdt_dialout_collector_LDADD = libgrpc_collector.la
-
-pmtelemetryd_SOURCES = pmtelemetryd.c
-pmtelemetryd_LDADD = libgrpc_collector.la
-||||||| 7fdbfa0
-bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
-
-mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
-mdt_dialout_collector_LDADD = libgrpc_collector.la $(DEPS)
-
-pmtelemetryd_SOURCES = pmtelemetryd.cc
-pmtelemetryd_LDADD = libgrpc_collector.la $(DEPS)
-=======
 #bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
 #
 #mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
@@ -78,4 +61,3 @@ pmtelemetryd_LDADD = libgrpc_collector.la $(DEPS)
 #
 #pmtelemetryd_SOURCES = pmtelemetryd.c
 #pmtelemetryd_LDADD = libgrpc_collector.la
->>>>>>> grpc
