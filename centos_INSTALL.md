@@ -70,7 +70,7 @@ cmake ../
 make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
 ```
 
-- Build & install the collector libraries (Integrate the collector, via ZMQ, with [pmacct](https://github.com/pmacct/pmacct)
+- Build & install the collector libraries (Integrate the collector, via ZMQ, with [pmacct](https://github.com/pmacct/pmacct))
 ```SHELL
 cd /root
 scl enable gcc-toolset-11 bash
