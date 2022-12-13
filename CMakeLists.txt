@@ -357,7 +357,7 @@ foreach(sourcefile ${APP_SOURCES})
         "${CMAKE_CURRENT_SOURCE_DIR}/src/cfgWrapper/cfg_wrapper.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/kafka_delivery.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/zmq_delivery.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/bridge/bridge_lib.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/bridge/grpc_collector_bridge.cc"
         ${cisco_dialout_pb_cc}
         ${cisco_dialout_pb_grpc_cc}
         ${cisco_telemetry_pb_cc}
@@ -390,49 +390,49 @@ foreach(sourcefile ${APP_SOURCES})
 endforeach(sourcefile ${APP_SOURCES})
 
 # Compile C
-file(GLOB APP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
-foreach(sourcefile ${APP_SOURCES})
-    file(RELATIVE_PATH filename ${CMAKE_CURRENT_SOURCE_DIR}/src ${sourcefile})
-    string(REPLACE ".c" "" file ${filename})
-    add_executable(
-        ${file}
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/${file}.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mdt_dialout_core.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper/data_wrapper.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/cfgWrapper/cfg_wrapper.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/kafka_delivery.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/zmq_delivery.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/bridge/bridge_lib.cc"
-        ${cisco_dialout_pb_cc}
-        ${cisco_dialout_pb_grpc_cc}
-        ${cisco_telemetry_pb_cc}
-        ${juniper_gnmi_pb_cc}
-        ${juniper_gnmi_ext_pb_cc}
-        ${juniper_gnmi_dialout_pb_cc}
-        ${juniper_gnmi_dialout_pb_grpc_cc}
-        ${juniper_telemetry_pb_cc}
-        ${juniper_telemetry_header_pb_cc}
-        ${juniper_telemetry_header_extension_pb_cc}
-        ${huawei_dialout_pb_cc}
-        ${huawei_dialout_pb_grpc_cc}
-        ${huawei_telemetry_pb_cc}
-        ${openconfig_interfaces_pb_cc}
-    )
-    target_compile_features(
-        ${file}
-        PRIVATE
-    )
-    target_link_libraries(
-        ${file}
-        ${_REFLECTION}
-        ${_GRPC_GRPCPP}
-        ${_PROTOBUF_LIBPROTOBUF}
-        ${JSONCPP_LIBRARIES}
-        ${RDKAFKA_CPP_LIBRARIES}
-        ${RDKAFKA_LIBRARIES}
-        ${LIBCONFIG_CPP_LIBRARIES}
-    )
-endforeach(sourcefile ${APP_SOURCES})
+#file(GLOB APP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+#foreach(sourcefile ${APP_SOURCES})
+#    file(RELATIVE_PATH filename ${CMAKE_CURRENT_SOURCE_DIR}/src ${sourcefile})
+#    string(REPLACE ".c" "" file ${filename})
+#    add_executable(
+#        ${file}
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/${file}.c"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mdt_dialout_core.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper/data_wrapper.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/cfgWrapper/cfg_wrapper.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/kafka_delivery.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/zmq_delivery.cc"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/src/bridge/grpc_collector_bridge.cc"
+#        ${cisco_dialout_pb_cc}
+#        ${cisco_dialout_pb_grpc_cc}
+#        ${cisco_telemetry_pb_cc}
+#        ${juniper_gnmi_pb_cc}
+#        ${juniper_gnmi_ext_pb_cc}
+#        ${juniper_gnmi_dialout_pb_cc}
+#        ${juniper_gnmi_dialout_pb_grpc_cc}
+#        ${juniper_telemetry_pb_cc}
+#        ${juniper_telemetry_header_pb_cc}
+#        ${juniper_telemetry_header_extension_pb_cc}
+#        ${huawei_dialout_pb_cc}
+#        ${huawei_dialout_pb_grpc_cc}
+#        ${huawei_telemetry_pb_cc}
+#        ${openconfig_interfaces_pb_cc}
+#    )
+#    target_compile_features(
+#        ${file}
+#        PRIVATE
+#    )
+#    target_link_libraries(
+#        ${file}
+#        ${_REFLECTION}
+#        ${_GRPC_GRPCPP}
+#        ${_PROTOBUF_LIBPROTOBUF}
+#        ${JSONCPP_LIBRARIES}
+#        ${RDKAFKA_CPP_LIBRARIES}
+#        ${RDKAFKA_LIBRARIES}
+#        ${LIBCONFIG_CPP_LIBRARIES}
+#    )
+#endforeach(sourcefile ${APP_SOURCES})

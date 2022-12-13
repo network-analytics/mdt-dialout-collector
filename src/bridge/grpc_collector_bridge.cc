@@ -2,7 +2,7 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-#include "bridge_lib.h"
+#include "grpc_collector_bridge.h"
 #include "../core/mdt_dialout_core.h"
 #include "../cfgWrapper/cfg_wrapper.h"
 

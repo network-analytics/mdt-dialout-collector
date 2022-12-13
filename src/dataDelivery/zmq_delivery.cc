@@ -4,7 +4,7 @@
 
 // mdt-dialout-collector Library headers
 #include "zmq_delivery.h"
-#include "../bridge/bridge_lib.h"
+#include "../bridge/grpc_collector_bridge.h"
 #include <zmq.hpp>
 
 

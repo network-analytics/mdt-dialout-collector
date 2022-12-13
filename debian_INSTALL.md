@@ -8,7 +8,8 @@ apt install bash git cmake build-essential autoconf libtool pkg-config
 
 - Build & install the gRPC framework
 ```SHELL
-cd /root/
+cd /root
+
 git clone --recurse-submodules -b v1.45.2 --depth 1 --shallow-submodules https://github.com/grpc/grpc
 
 export MY_INSTALL_DIR=$HOME/.local
@@ -40,6 +41,8 @@ popd
 
 - Build & install the collector deamons (Run the collector natively)
 ```SHELL
+cd /root
+
 export PATH="/root/.local/bin:$PATH"
 
 apt install -y libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev libzmq3-dev libssl-dev
@@ -57,6 +60,8 @@ make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
 
 - Build & install the collector libraries (Integrate the collector, via ZMQ, with [pmacct](https://github.com/pmacct/pmacct])
 ```SHELL
+cd /root
+
 export PATH="/root/.local/bin:$PATH"
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/root/.local/lib/pkgconfig
 ln -s /root/.local/bin/grpc_cpp_plugin /usr/local/bin/grpc_cpp_plugin

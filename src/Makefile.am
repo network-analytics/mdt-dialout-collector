@@ -29,10 +29,10 @@ libgrpc_collector_la_LIBADD =                             \
   $(DEPS)
 
 # Distributable headers
-grpc_collector_includedir = $(includedir)/grpc_collector
+grpc_collector_includedir = $(includedir)/grpc_collector_bridge
 
 grpc_collector_include_HEADERS = \
-  bridge/bridge_lib.h
+  bridge/grpc_collector_bridge.h
 
 #
 # bin program
@@ -54,6 +54,7 @@ DEPS =             \
   -lpthread
 
 # Program name
+<<<<<<< HEAD
 bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
 
 mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
@@ -61,3 +62,20 @@ mdt_dialout_collector_LDADD = libgrpc_collector.la
 
 pmtelemetryd_SOURCES = pmtelemetryd.c
 pmtelemetryd_LDADD = libgrpc_collector.la
+||||||| 7fdbfa0
+bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
+
+mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
+mdt_dialout_collector_LDADD = libgrpc_collector.la $(DEPS)
+
+pmtelemetryd_SOURCES = pmtelemetryd.cc
+pmtelemetryd_LDADD = libgrpc_collector.la $(DEPS)
+=======
+#bin_PROGRAMS = mdt_dialout_collector pmtelemetryd
+#
+#mdt_dialout_collector_SOURCES = mdt_dialout_collector.cc
+#mdt_dialout_collector_LDADD = libgrpc_collector.la
+#
+#pmtelemetryd_SOURCES = pmtelemetryd.c
+#pmtelemetryd_LDADD = libgrpc_collector.la
+>>>>>>> grpc

@@ -42,6 +42,9 @@ popd
 
 - Build & install the collector deamons (Run the collector natively)
 ```SHELL
+cd /root
+scl enable gcc-toolset-11 bash
+
 export PATH="/root/.local/bin:$PATH"
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
 
@@ -69,6 +72,9 @@ make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
 
 - Build & install the collector libraries (Integrate the collector, via ZMQ, with [pmacct](https://github.com/pmacct/pmacct])
 ```SHELL
+cd /root
+scl enable gcc-toolset-11 bash
+
 export PATH="/root/.local/bin:$PATH"
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/root/.local/lib/pkgconfig:/root/.local/lib64/pkgconfig:/usr/local/lib/pkgconfig/
 ln -s /root/.local/bin/grpc_cpp_plugin /usr/local/bin/grpc_cpp_plugin

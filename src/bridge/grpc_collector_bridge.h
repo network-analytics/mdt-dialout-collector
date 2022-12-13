@@ -2,8 +2,8 @@
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-#ifndef _BRIDGE_LIB_H_
-#define _BRIDGE_LIB_H_
+#ifndef _GRPC_COLLECTOR_BRIDGE_H_
+#define _GRPC_COLLECTOR_BRIDGE_H_
 
 #include <stdio.h>
 #include <stdlib.h>
