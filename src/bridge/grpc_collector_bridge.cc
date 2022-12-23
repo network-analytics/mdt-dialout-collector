@@ -176,9 +176,9 @@ extern "C" {
         free(pload);
     }
 
-    void start_grpc_dialout_collector()
+    void start_grpc_dialout_collector(const char *cfg_path)
     {
-        LoadOptions();
+        LoadOptions(cfg_path);
 
         if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
             main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
@@ -214,15 +214,13 @@ extern "C" {
         }
     }
 
-    void LoadOptions()
+    void LoadOptions(const char *cfg_path)
     {
         // static log-sinks are configured within the constructor
         LogsHandler logs_handler;
         spdlog::get("multi-logger-boot")->debug("main: main()");
 
         CfgHandler cfg_handler;
-        std::string cfg_path =
-            "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
         cfg_handler.set_cfg_path(cfg_path);
 
         LogsCfgHandler logs_cfg_handler;
