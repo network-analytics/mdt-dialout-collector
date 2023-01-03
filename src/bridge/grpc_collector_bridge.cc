@@ -122,12 +122,12 @@ extern "C" {
         return opts;
     }
 
-    void InitPayload(Payload **pload_, const char *event_type,
+    void InitGrpcPayload(grpc_payload **pload_, const char *event_type,
         const char *serialization, const char *writer_id,
         const char *telemetry_node, const char *telemetry_port,
         const char *telemetry_data)
     {
-        Payload *pload = (Payload *) malloc(sizeof(Payload));
+        grpc_payload *pload = (grpc_payload *) malloc(sizeof(grpc_payload));
 
         pload->event_type = strndup(event_type, strlen(event_type));
         pload->serialization = strndup(serialization, strlen(serialization));
@@ -165,7 +165,7 @@ extern "C" {
         free(opts);
     }
 
-    void FreePayload(Payload *pload)
+    void free_grpc_payload(grpc_payload *pload)
     {
         free(pload->event_type);
         free(pload->serialization);

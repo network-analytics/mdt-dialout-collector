@@ -20,9 +20,9 @@ bool ZmqPush::ZmqPusher(
     zmq::socket_t &zmq_sock,
     const std::string &zmq_transport_uri)
 {
-    Payload *pload;
+    grpc_payload *pload;
 
-    InitPayload(
+    InitGrpcPayload(
         &pload,
         data_wrapper.get_event_type().c_str(),
         data_wrapper.get_serialization().c_str(),
@@ -33,7 +33,7 @@ bool ZmqPush::ZmqPusher(
 
     // Message Buff preparation
     // PUSH-ing only the pointer to the data-struct
-    const size_t size = sizeof(Payload *);
+    const size_t size = sizeof(grpc_payload *);
     zmq::message_t message(&pload, size);
 
     try {
@@ -58,7 +58,7 @@ void ZmqPull::ZmqPoller(
 {
     // Message Buff preparation
     // POLL-ing only the pointer to the data-struct
-    const size_t size = sizeof(Payload *);
+    const size_t size = sizeof(grpc_payload *);
     zmq::message_t message(size);
 
     try {
@@ -67,7 +67,7 @@ void ZmqPull::ZmqPoller(
             spdlog::get("multi-logger")->
                 info("[ZmqPoller] data-delivery: "
                     "message successfully received");
-            Payload *pload = *(Payload **) message.data();
+            grpc_payload *pload = *(grpc_payload **) message.data();
             std::cout << "PULL-ing from " << zmq_transport_uri << ": "
                 << pload->event_type
                 << " "
@@ -81,7 +81,7 @@ void ZmqPull::ZmqPoller(
                 << " "
                 << pload->telemetry_data
                 << "\n";
-            FreePayload(pload);
+            free_grpc_payload(pload);
             //std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     } catch(const zmq::error_t &zex) {
