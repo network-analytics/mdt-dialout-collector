@@ -496,14 +496,15 @@ grpc_collector_deploy() {
   esac
 }
 
-command -v uname   >/dev/null 2>&1 || die "error - expected uname command" "${error_cmd_notfound}"
-command -v egrep   >/dev/null 2>&1 || die "error - expected egrep command" "${error_cmd_notfound}"
-command -v awk     >/dev/null 2>&1 || die "error - expected awk command"   "${error_cmd_notfound}"
-command -v git     >/dev/null 2>&1 || die "error - expected git command"   "${error_cmd_notfound}"
-command -v id      >/dev/null 2>&1 || die "error - expected id command"    "${error_cmd_notfound}"
-command -v make    >/dev/null 2>&1 || die "error - expected make command"  "${error_cmd_notfound}"
-command -v cmake   >/dev/null 2>&1 || die "error - expected cmake command" "${error_cmd_notfound}"
-command -v g++     >/dev/null 2>&1 || die "error - expected g++ command"   "${error_cmd_notfound}"
+command -v uname      >/dev/null 2>&1 || die "error - expected uname command"                   "${error_cmd_notfound}"
+command -v egrep      >/dev/null 2>&1 || die "error - expected egrep command"                   "${error_cmd_notfound}"
+command -v awk        >/dev/null 2>&1 || die "error - expected awk command"                     "${error_cmd_notfound}"
+command -v git        >/dev/null 2>&1 || die "error - expected git command"                     "${error_cmd_notfound}"
+command -v id         >/dev/null 2>&1 || die "error - expected id command"                      "${error_cmd_notfound}"
+command -v make       >/dev/null 2>&1 || die "error - expected make command"                    "${error_cmd_notfound}"
+command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                   "${error_cmd_notfound}"
+command -v g++        >/dev/null 2>&1 || die "error - expected g++ command"                     "${error_cmd_notfound}"
+command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command"   "${error_cmd_notfound}"
 
 parse_user_options "${@}"
 
