@@ -457,7 +457,7 @@ grpc_collector_deploy() {
 
   case "${_os_info}" in
   "Linux debian 11"    | \
-  "Linux ubuntu 20.04" | \
+  #"Linux ubuntu 20.04" | \
   "Linux ubuntu 22.04" | \
   "Linux ubuntu 22.10" | \
   "Linux pop 22.04")
@@ -491,7 +491,7 @@ grpc_collector_deploy() {
     ;;
   *)
     # Should never see the sun
-    die "error - grpc_collector_install()" "${error_unimplemented_options}"
+    die "error - grpc_collector_install(): ${_os_info} offcially not supported" "${error_unimplemented_options}"
     ;;
   esac
 }
