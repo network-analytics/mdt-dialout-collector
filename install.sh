@@ -505,6 +505,7 @@ command -v make       >/dev/null 2>&1 || die "error - expected make command"    
 command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                   "${error_cmd_notfound}"
 command -v g++        >/dev/null 2>&1 || die "error - expected g++ command"                     "${error_cmd_notfound}"
 command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command"   "${error_cmd_notfound}"
+command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"    "${error_cmd_notfound}"
 
 parse_user_options "${@}"
 
