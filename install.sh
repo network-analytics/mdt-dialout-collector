@@ -319,7 +319,7 @@ grpc_collector_bin_install_rpm() {
   sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
 
   if [ ! "${yum_install}" -eq 0 ]; then
-    die "error - apt install failure" "${error_yum_install_failure}"
+    die "error - yum install failure" "${error_yum_install_failure}"
   fi
 
   local git_clone_rdkafka=1
@@ -413,7 +413,7 @@ grpc_collector_lib_install_rpm() {
   sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
 
   if [ ! "${yum_install}" -eq 0 ]; then
-    die "error - apt install failure" "${error_yum_install_failure}"
+    die "error - yum install failure" "${error_yum_install_failure}"
   fi
 
   local git_clone_rdkafka=1
