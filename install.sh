@@ -15,15 +15,24 @@ readonly grpc_install_dir="$HOME/.local"
 
 # MDT install parameters
 readonly mdt_url="https://github.com/scuzzilla/mdt-dialout-collector.git"
+readonly mdt_version=""
 readonly mdt_install_dir="/opt/mdt-dialout-collector"
 
 # librdkafka parameters
 readonly librdkafka_url="https://github.com/edenhill/librdkafka.git"
+readonly librdkafka_version="v1.6.0"
 readonly librdkafka_install_dir="/opt/librdkafka"
+
+# libjsoncpp parameters
+readonly libjsoncpp_url="https://github.com/open-source-parsers/jsoncpp"
+readonly libjsoncpp_version="1.8.4"
+readonly libjsoncpp_install_dir="/opt/libjsoncpp"
 
 work_dir="$(dirname "$(readlink --canonicalize-existing "${0}" 2> /dev/null)")"
 
 readonly epoch=$(date +'%s')
+readonly libjsoncpp_version_failure=69
+readonly librdkafka_version_failure=70
 readonly error_yum_install_failure=71
 readonly error_apt_install_failure=72
 readonly error_run_as_root=73
@@ -222,9 +231,33 @@ os_release_helper() {
 }
 
 check_if_root() {
-	local id_chk="$(id -u)"
+  local id_chk="$(id -u)"
   if [ ! "${id_chk}" -eq 0 ]; then
     die "error - run as root" "${error_run_as_root}"
+  fi
+}
+
+detect_librdkafka() {
+  rdkafka_installed=0
+  local rdkafka_pkg_find=$(find /usr -name "rdkafka\+\+.pc")
+  if [ ! -z "${rdkafka_pkg_find}" ]; then
+    rdkafka_installed=1
+  fi
+  if [ "${rdkafka_installed}" -eq 1 ]; then
+    rdkafka_raw_version=$(egrep "Version" "${rdkafka_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
+    rdkafka_version=$(egrep "Version" "${rdkafka_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\.")
+  fi
+}
+
+detect_libjsoncpp() {
+  jsoncpp_installed=0
+  local jsoncpp_pkg_find=$(find /usr -name "jsoncpp.pc")
+  if [ ! -z "${jsoncpp_pkg_find}" ]; then
+    jsoncpp_installed=1
+  fi
+  if [ "${jsoncpp_installed}" -eq 1 ]; then
+    jsoncpp_raw_version=$(egrep "Version" "${jsoncpp_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
+    jsoncpp_version=$(egrep "Version" "${jsoncpp_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\.")
   fi
 }
 
@@ -296,13 +329,13 @@ grpc_collector_bin_install_deb() {
     die "error - git clone failure" "${error_git_clone_failure}"
   fi
 
-  cd "${mdt_install_dir}"
-  if [ ! -d "build" ]; then
-    mkdir -p build
-    cd build
-    cmake ../
-    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+  if [ ! -d "${mdt_install_dir}/build" ]; then
+    mkdir -p "${mdt_install_dir}/build"
   fi
+
+  cd "${mdt_install_dir}/build"
+  cmake ../
+  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
 
   # deploy a customizable configuration
 }
@@ -322,19 +355,27 @@ grpc_collector_bin_install_rpm() {
     die "error - yum install failure" "${error_yum_install_failure}"
   fi
 
-  local git_clone_rdkafka=1
-  if [ ! -d "${librdkafka_install_dir}" ]; then
-    git clone "${librdkafka_url}" "${librdkafka_install_dir}"
-    git_clone_rdkafka="$?"
-  else
-    # assuming that the clone was already performed
-    git_clone_rdkafka=0
+  detect_librdkafka
+  # librdkafka not installed ---> then install
+  if [ "${rdkafka_installed}" -eq 0 ]; then
+    local git_clone_rdkafka=1
+    if [ ! -d "${librdkafka_install_dir}" ]; then
+      git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_install_dir}"
+      git_clone_rdkafka="$?"
+    else
+      # assuming that the clone was already performed
+      git_clone_rdkafka=0
+    fi
+    cd "${librdkafka_install_dir}"
+    ./configure
+    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+    make install
   fi
 
-  cd "${librdkafka_install_dir}"
-  ./configure
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-  make install
+  # librdkafka installed && version number insuffcient ---> exit!
+  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt 160 ]; then
+    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${librdkafka_version_failure}"
+  fi
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
@@ -349,13 +390,13 @@ grpc_collector_bin_install_rpm() {
     die "error - git clone failure" "${error_git_clone_failure}"
   fi
 
-  cd "${mdt_install_dir}"
-  if [ ! -d "build" ]; then
-    mkdir -p build
-    cd build
-    cmake ../
-    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+  if [ ! -d "${mdt_install_dir}/build" ]; then
+    mkdir -p "${mdt_install_dir}/build"
   fi
+
+  cd "${mdt_install_dir}/build"
+  cmake ../
+  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
 
   # deploy a customizable configuration
 }
@@ -416,19 +457,28 @@ grpc_collector_lib_install_rpm() {
     die "error - yum install failure" "${error_yum_install_failure}"
   fi
 
-  local git_clone_rdkafka=1
-  if [ ! -d "${librdkafka_install_dir}" ]; then
-    git clone "${librdkafka_url}" "${librdkafka_install_dir}"
-    git_clone_rdkafka="$?"
-  else
-    # assuming that the clone was already performed
-    git_clone_rdkafka=0
+  detect_librdkafka
+  # librdkafka not installed ---> then install
+  if [ "${rdkafka_installed}" -eq 0 ]; then
+    local git_clone_rdkafka=1
+    if [ ! -d "${librdkafka_install_dir}" ]; then
+      git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_install_dir}"
+      git_clone_rdkafka="$?"
+     else
+      # assuming that the clone was already performed
+      git_clone_rdkafka=0
+    fi
+    cd "${librdkafka_install_dir}"
+    ./configure
+    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+    make install
   fi
 
-  cd "${librdkafka_install_dir}"
-  ./configure
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-  make install
+  # librdkafka installed && version number insuffcient ---> exit!
+  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt 160 ]; then
+    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${librdkafka_version_failure}"
+  fi
+
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
@@ -456,8 +506,19 @@ grpc_collector_deploy() {
   _os_info="$(os_release_detect "release")"
 
   case "${_os_info}" in
+  "Linux ubuntu 20.04")
+    #echo "grpc_collector_deploy_ubuntu2004()"
+    command -v apt-get >/dev/null 2>&1 || die "error - expected apt command"   "${error_cmd_notfound}"
+    check_if_root
+    grpc_framework_install
+    if [ "${b_option_flag}" -eq 1 ]; then
+      echo "grpc_collector_bin_install_ubuntu2004()"
+    fi
+    if [ "${l_option_flag}" -eq 1 ]; then
+      echo "grpc_collector_lib_install_ubuntu2004()"
+    fi
+    ;;
   "Linux debian 11"    | \
-  #"Linux ubuntu 20.04" | \
   "Linux ubuntu 22.04" | \
   "Linux ubuntu 22.10" | \
   "Linux pop 22.04")
@@ -503,7 +564,7 @@ command -v git        >/dev/null 2>&1 || die "error - expected git command"     
 command -v id         >/dev/null 2>&1 || die "error - expected id command"                      "${error_cmd_notfound}"
 command -v make       >/dev/null 2>&1 || die "error - expected make command"                    "${error_cmd_notfound}"
 command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                   "${error_cmd_notfound}"
-command -v g++        >/dev/null 2>&1 || die "error - expected g++ command"                     "${error_cmd_notfound}"
+command -v gcc        >/dev/null 2>&1 || die "error - expected gcc command"                     "${error_cmd_notfound}"
 command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command"   "${error_cmd_notfound}"
 command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"    "${error_cmd_notfound}"
 
