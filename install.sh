@@ -409,30 +409,6 @@ libjsoncpp_install_from_src() {
   fi
 }
 
-detect_librdkafka() {
-  rdkafka_installed=0
-  local rdkafka_pkg_find=$(find /usr -name "rdkafka\+\+.pc")
-  if [ ! -z "${rdkafka_pkg_find}" ]; then
-    rdkafka_installed=1
-  fi
-  if [ "${rdkafka_installed}" -eq 1 ]; then
-    rdkafka_raw_version=$(egrep "Version" "${rdkafka_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
-    rdkafka_version=$(egrep "Version" "${rdkafka_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\.")
-  fi
-}
-
-detect_libjsoncpp() {
-  jsoncpp_installed=0
-  local jsoncpp_pkg_find=$(find /usr -name "jsoncpp.pc")
-  if [ ! -z "${jsoncpp_pkg_find}" ]; then
-    jsoncpp_installed=1
-  fi
-  if [ "${jsoncpp_installed}" -eq 1 ]; then
-    jsoncpp_raw_version=$(egrep "Version" "${jsoncpp_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
-    jsoncpp_version=$(egrep "Version" "${jsoncpp_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\.")
-  fi
-}
-
 grpc_framework_install() {
   export PATH="$PATH:${grpc_install_dir}/bin"
 
@@ -543,31 +519,6 @@ grpc_collector_bin_install_rpm() {
     die "error - yum install failure" "${err_yum_failure}"
   fi
 
-<<<<<<< HEAD
-  detect_librdkafka
-  # librdkafka not installed ---> then install
-  if [ "${rdkafka_installed}" -eq 0 ]; then
-    local git_clone_rdkafka=1
-    if [ ! -d "${librdkafka_install_dir}" ]; then
-      git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_install_dir}"
-      git_clone_rdkafka="$?"
-    else
-      # assuming that the clone was already performed
-      git_clone_rdkafka=0
-    fi
-    cd "${librdkafka_install_dir}"
-    ./configure
-    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-    make install
-||||||| 62e9d47
-  local git_clone_rdkafka=1
-  if [ ! -d "${librdkafka_install_dir}" ]; then
-    git clone "${librdkafka_url}" "${librdkafka_install_dir}"
-    git_clone_rdkafka="$?"
-  else
-    # assuming that the clone was already performed
-    git_clone_rdkafka=0
-=======
   if [ "${librdkafka_dev}" -eq 0 ]; then
     detect_installed_librdkafka
   fi
@@ -577,23 +528,8 @@ grpc_collector_bin_install_rpm() {
     die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${err_librdkafka_ver_fail}"
   else
     librdkafka_install_from_src
->>>>>>> install
   fi
 
-<<<<<<< HEAD
-  # librdkafka installed && version number insuffcient ---> exit!
-  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt 160 ]; then
-    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${librdkafka_version_failure}"
-  fi
-
-||||||| 62e9d47
-  cd "${librdkafka_install_dir}"
-  ./configure
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-  make install
-
-=======
->>>>>>> install
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
     git clone "${mdt_url}" "${mdt_install_dir}"
@@ -693,36 +629,6 @@ grpc_collector_lib_install_rpm() {
     die "error - yum install failure" "${err_yum_failure}"
   fi
 
-<<<<<<< HEAD
-  detect_librdkafka
-  # librdkafka not installed ---> then install
-  if [ "${rdkafka_installed}" -eq 0 ]; then
-    local git_clone_rdkafka=1
-    if [ ! -d "${librdkafka_install_dir}" ]; then
-      git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_install_dir}"
-      git_clone_rdkafka="$?"
-     else
-      # assuming that the clone was already performed
-      git_clone_rdkafka=0
-    fi
-    cd "${librdkafka_install_dir}"
-    ./configure
-    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-    make install
-  fi
-
-  # librdkafka installed && version number insuffcient ---> exit!
-  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt 160 ]; then
-    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${librdkafka_version_failure}"
-||||||| 62e9d47
-  local git_clone_rdkafka=1
-  if [ ! -d "${librdkafka_install_dir}" ]; then
-    git clone "${librdkafka_url}" "${librdkafka_install_dir}"
-    git_clone_rdkafka="$?"
-  else
-    # assuming that the clone was already performed
-    git_clone_rdkafka=0
-=======
   if [ "${librdkafka_dev}" -eq 0 ]; then
     detect_installed_librdkafka
   fi
@@ -732,19 +638,8 @@ grpc_collector_lib_install_rpm() {
     die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${err_librdkafka_ver_fail}"
   else
     librdkafka_install_from_src
->>>>>>> install
   fi
 
-<<<<<<< HEAD
-
-||||||| 62e9d47
-  cd "${librdkafka_install_dir}"
-  ./configure
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-  make install
-
-=======
->>>>>>> install
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
     git clone "${mdt_url}" "${mdt_install_dir}"
@@ -784,25 +679,8 @@ grpc_collector_deploy() {
   command -v cut        >/dev/null 2>&1 || die "error - expected cut command"                   "${err_cmd_notfound}"
 
   case "${_os_info}" in
-  "Linux ubuntu 20.04")
-    #echo "grpc_collector_deploy_ubuntu2004()"
-    command -v apt-get >/dev/null 2>&1 || die "error - expected apt command"   "${error_cmd_notfound}"
-    check_if_root
-    grpc_framework_install
-    if [ "${b_option_flag}" -eq 1 ]; then
-      echo "grpc_collector_bin_install_ubuntu2004()"
-    fi
-    if [ "${l_option_flag}" -eq 1 ]; then
-      echo "grpc_collector_lib_install_ubuntu2004()"
-    fi
-    ;;
   "Linux debian 11"    | \
-<<<<<<< HEAD
-||||||| 62e9d47
-  #"Linux ubuntu 20.04" | \
-=======
   "Linux ubuntu 20.04" | \
->>>>>>> install
   "Linux ubuntu 22.04" | \
   "Linux ubuntu 22.10" | \
   "Linux pop 22.04")
@@ -862,32 +740,6 @@ grpc_collector_deploy() {
   esac
 }
 
-<<<<<<< HEAD
-command -v uname      >/dev/null 2>&1 || die "error - expected uname command"                   "${error_cmd_notfound}"
-command -v egrep      >/dev/null 2>&1 || die "error - expected egrep command"                   "${error_cmd_notfound}"
-command -v awk        >/dev/null 2>&1 || die "error - expected awk command"                     "${error_cmd_notfound}"
-command -v git        >/dev/null 2>&1 || die "error - expected git command"                     "${error_cmd_notfound}"
-command -v id         >/dev/null 2>&1 || die "error - expected id command"                      "${error_cmd_notfound}"
-command -v make       >/dev/null 2>&1 || die "error - expected make command"                    "${error_cmd_notfound}"
-command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                   "${error_cmd_notfound}"
-command -v gcc        >/dev/null 2>&1 || die "error - expected gcc command"                     "${error_cmd_notfound}"
-command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command"   "${error_cmd_notfound}"
-command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"    "${error_cmd_notfound}"
-
-||||||| 62e9d47
-command -v uname      >/dev/null 2>&1 || die "error - expected uname command"                   "${error_cmd_notfound}"
-command -v egrep      >/dev/null 2>&1 || die "error - expected egrep command"                   "${error_cmd_notfound}"
-command -v awk        >/dev/null 2>&1 || die "error - expected awk command"                     "${error_cmd_notfound}"
-command -v git        >/dev/null 2>&1 || die "error - expected git command"                     "${error_cmd_notfound}"
-command -v id         >/dev/null 2>&1 || die "error - expected id command"                      "${error_cmd_notfound}"
-command -v make       >/dev/null 2>&1 || die "error - expected make command"                    "${error_cmd_notfound}"
-command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                   "${error_cmd_notfound}"
-command -v g++        >/dev/null 2>&1 || die "error - expected g++ command"                     "${error_cmd_notfound}"
-command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command"   "${error_cmd_notfound}"
-command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"    "${error_cmd_notfound}"
-
-=======
->>>>>>> install
 parse_user_options "${@}"
 
 if [ "${h_option_flag}" -eq 1 ]; then
