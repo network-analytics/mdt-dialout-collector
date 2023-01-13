@@ -3,7 +3,7 @@
 
 
 # Minimum CMake required
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 
 # Set compiler options
 #set(CMAKE_C_FLAGS "-O2 -g -Werror -Wall -std=gnu89")
