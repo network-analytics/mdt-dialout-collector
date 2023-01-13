@@ -8,6 +8,15 @@ set -o errexit
 set -o nounset
 #set -o pipefail
 
+grpc_dev_min_version=145
+libjsoncpp_dev_min_version=184
+librdkafka_dev_min_version=160
+libconfig_dev_min_version=150
+libspdlog_dev_min_version=150
+libzmq3_dev_min_version=432
+
+sysdeb_install_list="libssl-dev libfmt-dev"
+
 # gRPC install parameters
 readonly grpc_url="https://github.com/grpc/grpc"
 readonly grpc_version="v1.45.2"
@@ -31,23 +40,24 @@ readonly libjsoncpp_install_dir="/opt/libjsoncpp"
 work_dir="$(dirname "$(readlink --canonicalize-existing "${0}" 2> /dev/null)")"
 
 readonly epoch=$(date +'%s')
-readonly libjsoncpp_version_failure=69
-readonly librdkafka_version_failure=70
-readonly error_yum_install_failure=71
-readonly error_apt_install_failure=72
-readonly error_run_as_root=73
-readonly error_git_clone_failure=74
-readonly error_ds_release_undetected=75
-readonly error_ds_undetected=76
-readonly error_os_undetected=77
-readonly error_cmd_notfound=78
-readonly error_validating_input=79
-readonly error_reading_file=80
-readonly error_parsing_options=81
-readonly error_missing_options=82
-readonly error_unknown_options=83
-readonly error_missing_options_arg=84
-readonly error_unimplemented_options=85
+readonly err_grpc_ver_fail=68
+readonly err_libjsoncpp_ver_fail=69
+readonly err_librdkafka_ver_fail=70
+readonly err_yum_failure=71
+readonly err_apt_failure=72
+readonly err_run_as_root=73
+readonly err_git_clone_failure=74
+readonly err_ds_release_undetected=75
+readonly err_ds_undetected=76
+readonly err_os_undetected=77
+readonly err_cmd_notfound=78
+readonly err_validating_input=79
+readonly err_reading_file=80
+readonly err_parsing_options=81
+readonly err_missing_options=82
+readonly err_unknown_options=83
+readonly err_missing_options_arg=84
+readonly err_unimplemented_options=85
 readonly script_name="${0##*/}"
 
 h_option_flag=0
@@ -87,13 +97,13 @@ parse_user_options() {
       h_option_flag=1
       ;;
     :)
-      die "error - mind your options/arguments - [ -h ] to know more" "${error_unknown_options}"
+      die "error - mind your options/arguments - [ -h ] to know more" "${err_unknown_options}"
       ;;
     \?)
-      die "error - mind your options/arguments - [ -h ] to know more" "${error_missing_options_arg}"
+      die "error - mind your options/arguments - [ -h ] to know more" "${err_missing_options_arg}"
       ;;
     *)
-      die "error - mind your options/arguments - [ -h ] to know more" "${error_unimplemented_options}"
+      die "error - mind your options/arguments - [ -h ] to know more" "${err_unimplemented_options}"
       ;;
     esac
   done
@@ -101,13 +111,17 @@ parse_user_options() {
 shift $((OPTIND -1))
 
 clean_up() {
-  echo "clean_up()"
-  if [ -d $HOME/grpc ]; then
-    rm -rf $HOME/grpc
-  fi
+  #echo "clean_up()"
+  #if [ -d $HOME/grpc ]; then
+  #  rm -rf $HOME/grpc
+  #fi
 
   if [ -d "${librdkafka_install_dir}" ]; then
     rm -rf "${librdkafka_install_dir}"
+  fi
+
+  if [ -d "${libjsoncpp_install_dir}" ]; then
+    rm -rf "${libjsoncpp_install_dir}"
   fi
 }
 
@@ -139,7 +153,7 @@ os_release_detect() {
     if [ "${item_found_flag}" -eq 1 ]; then
       echo "${operating_system}";
     else
-      die "error - undetected operating system" "${error_os_undetected}"
+      die "error - undetected operating system" "${err_os_undetected}"
     fi
     ;;
   flavor)
@@ -159,7 +173,7 @@ os_release_detect() {
     if [ "${item_found_flag}" -eq 1 ]; then
       echo "${linux_distribution}";
     else
-      die "error - undetected linux distribution" "${error_ds_undetected}"
+      die "error - undetected linux distribution" "${err_ds_undetected}"
     fi
     ;;
   release)
@@ -214,7 +228,7 @@ os_release_detect() {
         ;;
       *)
         # Should never see the sun
-        die "error - os_release_detect()" "${error_unimplemented_options}"
+        die "error - os_release_detect()" "${err_unimplemented_options}"
         ;;
       esac
     fi
@@ -226,14 +240,172 @@ os_release_helper() {
   if [ "${item_found_flag}" -eq 1 ]; then
     echo "${_os}" "${_flavor}" "${distro_release}";
   else
-    die "error - undetected os release" "${error_ds_release_undetected}"
+    die "error - undetected os release" "${err_ds_release_undetected}"
   fi
 }
 
 check_if_root() {
   local id_chk="$(id -u)"
   if [ ! "${id_chk}" -eq 0 ]; then
-    die "error - run as root" "${error_run_as_root}"
+    die "error - run as root" "${err_run_as_root}"
+  fi
+}
+
+detect_sysdeb_lib() {
+  local lib="${1}"
+  libjsoncpp_dev=0   # min 184
+  librdkafka_dev=0   # min 160
+  libconfig_dev=0    # min 150
+  libspdlog_dev=0    # min 150
+  libzmq3_dev=0      # min 434
+  #libssl_dev=0      #
+  #libfmt_dev=0      #
+  grpc_dev=0         # TBD
+
+  local apt_cache_show=1
+  local lib_generic_version=$(apt-cache show ${lib}   | \
+                              egrep Version           | \
+                              awk -F ":" '{print $2}' | \
+                              tr -d "\" \"|\.|\-"     | \
+                              cut -c1-3)
+  local lib_spdlog_version=$(apt-cache show libspdlog-dev | \
+                             egrep Version                | \
+                             awk -F " " '{print $2}'      | \
+                             tr -d "\" \"|\.|\-"          | \
+                             cut -c1-5                    | \
+                             awk -F ":" '{print $2}')
+  apt_cache_show="$?"
+
+  if [ ! "${apt_cache_show}" -eq 0 ]; then
+    die "error - apt-cache show failure" "${err_apt_failure}"
+  fi
+
+  if [ "${lib}" = "libjsoncpp-dev" ]; then
+    if [ "${lib_generic_version}" -ge "${libjsoncpp_dev_min_version}" ]; then
+      sysdeb_install_list="${sysdeb_install_list} ${lib}"
+      libjsoncpp_dev=1
+    fi
+  fi
+
+  if [ "${lib}" = "librdkafka-dev" ]; then
+    if [ "${lib_generic_version}" -ge "${librdkafka_dev_min_version}" ]; then
+      sysdeb_install_list="${sysdeb_install_list} ${lib}"
+      librdkafka_dev=1
+    fi
+  fi
+
+  if [ "${lib}" = "libconfig++-dev" ]; then
+    if [ "${lib_generic_version}" -ge "${libconfig_dev_min_version}" ]; then
+      sysdeb_install_list="${sysdeb_install_list} ${lib}"
+      libconfig_dev=1
+    fi
+  fi
+
+  if [ "${lib}" = "libspdlog-dev" ]; then
+    if [ "${lib_spdlog_version}" -ge "${libspdlog_dev_min_version}" ]; then
+      sysdeb_install_list="${sysdeb_install_list} ${lib}"
+      libspdlog_dev=1
+    fi
+  fi
+
+  if [ "${lib}" = "libzmq3-dev" ]; then
+    if [ "${lib_generic_version}" -ge "${libzmq3_dev_min_version}" ]; then
+      sysdeb_install_list="${sysdeb_install_list} ${lib}"
+      libzmq3_dev=1
+    fi
+  fi
+}
+
+# TBD
+# Additional development required
+detect_sysrpm_lib() {
+  #local lib="${1}"
+  libjsoncpp_dev=0   # min 184
+  librdkafka_dev=0   # min 160
+  libconfig_dev=0    # min 150
+  libspdlog_dev=0    # min 150
+  libzmq3_dev=0      # min 434
+  #libssl_dev=0      #
+  #libfmt_dev=0      #
+  grpc_dev=0
+}
+
+detect_installed_grpc() {
+  grpc_installed=0
+  local grpc_pkg_find=$(find /usr -name "grpc\+\+.pc")
+  if [ ! -z "${grpc_pkg_find}" ]; then
+    grpc_installed=1
+  fi
+  if [ "${grpc_installed}" -eq 1 ]; then
+    grpc_raw_version=$(egrep "Version" "${grpc_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
+    grpc_version=$(egrep "Version" "${grpc_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\." | cut -c1-3)
+  fi
+}
+
+detect_installed_librdkafka() {
+  rdkafka_installed=0
+  local rdkafka_pkg_find=$(find /usr -name "rdkafka\+\+.pc")
+  if [ ! -z "${rdkafka_pkg_find}" ]; then
+    rdkafka_installed=1
+  fi
+  if [ "${rdkafka_installed}" -eq 1 ]; then
+    rdkafka_raw_version=$(egrep "Version" "${rdkafka_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
+    rdkafka_version=$(egrep "Version" "${rdkafka_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\.")
+    rdkafka_pkg_find_root=$(echo "${rdkafka_pkg_find}" | sed 's/\/rdkafka++.pc$//g')
+  fi
+}
+
+librdkafka_install_from_src() {
+  # librdkafka not installed ---> then install
+  if [ "${rdkafka_installed}" -eq 0 ]; then
+    local git_clone_rdkafka=1
+    if [ ! -d "${librdkafka_install_dir}" ]; then
+      git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_install_dir}"
+      git_clone_rdkafka="$?"
+     else
+      # assuming that the clone was already performed
+      git_clone_rdkafka=0
+    fi
+    cd "${librdkafka_install_dir}"
+    ./configure
+    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+    make install
+  else
+    # inform about the installed *.pc
+    export PKG_CONFIG_PATH="$rdkafka_pkg_find_root"
+  fi
+}
+
+detect_installed_libjsoncpp() {
+  jsoncpp_installed=0
+  local jsoncpp_pkg_find=$(find /usr -name "jsoncpp.pc")
+  if [ ! -z "${jsoncpp_pkg_find}" ]; then
+    jsoncpp_installed=1
+  fi
+  if [ "${jsoncpp_installed}" -eq 1 ]; then
+    jsoncpp_raw_version=$(egrep "Version" "${jsoncpp_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
+    jsoncpp_version=$(egrep "Version" "${jsoncpp_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\.")
+    jsoncpp_pkg_find_root=$(echo "${jsoncpp_pkg_find}" | sed 's/\/jsoncpp.pc$//g')
+  fi
+}
+
+libjsoncpp_install_from_src() {
+  # libjsoncpp not installed ---> then install
+  if [ "${jsoncpp_installed}" -eq 0 ]; then
+    local git_clone_jsoncpp=1
+    if [ ! -d "${libjsoncpp_install_dir}" ]; then
+      git clone -b "${libjsoncpp_version}" "${libjsoncpp_url}" "${libjsoncpp_install_dir}"
+      git_clone_jsoncpp="$?"
+     else
+      # assuming that the clone was already performed
+      git_clone_jsoncpp=0
+    fi
+    mkdir -p "${libjsoncpp_install_dir}/build"
+    cd "${libjsoncpp_install_dir}/build"
+    cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../
+    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))` install
+  else
+    export PKG_CONFIG_PATH="$jsoncpp_pkg_find_root"
   fi
 }
 
@@ -262,8 +434,7 @@ detect_libjsoncpp() {
 }
 
 grpc_framework_install() {
-  export grpc_install_dir
-  export PATH="${grpc_install_dir}/bin:$PATH"
+  export PATH="$PATH:${grpc_install_dir}/bin"
 
   if [ ! -d "${grpc_install_dir}" ]; then
     mkdir -p "${grpc_install_dir}"
@@ -280,7 +451,7 @@ grpc_framework_install() {
   fi
 
   if [ ! "${git_clone}" -eq 0 ]; then
-    die "error - git clone failure" "${error_git_clone_failure}"
+    die "error - git clone failure" "${err_git_clone_failure}"
   fi
 
   cd "$HOME/grpc"
@@ -309,11 +480,31 @@ grpc_framework_install() {
 grpc_collector_bin_install_deb() {
   #echo "grpc_collector_bin_install_deb()"
   local apt_install=1
-  apt-get install -y libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev libzmq3-dev libssl-dev libfmt-dev
+  apt-get install -y $(echo "${sysdeb_install_list}")
   apt_install="$?"
 
   if [ ! "${apt_install}" -eq 0 ]; then
-    die "error - apt install failure" "${error_apt_install_failure}"
+    die "error - apt install failure" "${err_apt_failure}"
+  fi
+
+  if [ "${librdkafka_dev}" -eq 0 ]; then
+    detect_installed_librdkafka
+  fi
+
+  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt "${librdkafka_dev_min_version}" ]; then
+    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${err_librdkafka_ver_fail}"
+  else
+    librdkafka_install_from_src
+  fi
+
+  if [ "${libjsoncpp_dev}" -eq 0 ]; then
+    detect_installed_libjsoncpp
+  fi
+
+  if [ "${jsoncpp_installed}" -eq 1 ] && [ "${jsoncpp_version}" -lt "${libjsoncpp_dev_min_version}" ]; then
+    die "error - the installed version of libjsoncpp (${jsoncpp_raw_version}) is too old" "${err_libjsoncpp_ver_fail}"
+  else
+    libjsoncpp_install_from_src
   fi
 
   local git_clone=1
@@ -326,7 +517,7 @@ grpc_collector_bin_install_deb() {
   fi
 
   if [ ! "${git_clone}" -eq 0 ]; then
-    die "error - git clone failure" "${error_git_clone_failure}"
+    die "error - git clone failure" "${err_git_clone_failure}"
   fi
 
   if [ ! -d "${mdt_install_dir}/build" ]; then
@@ -342,9 +533,6 @@ grpc_collector_bin_install_deb() {
 
 grpc_collector_bin_install_rpm() {
   #echo "grpc_collector_bin_install_rpm()"
-  # Required by librdkafka
-  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
-
   local yum_install=1
   yum install -y jsoncpp-devel libconfig-devel spdlog-devel cppzmq-devel openssl-devel
   yum_install="$?"
@@ -352,9 +540,10 @@ grpc_collector_bin_install_rpm() {
   sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
 
   if [ ! "${yum_install}" -eq 0 ]; then
-    die "error - yum install failure" "${error_yum_install_failure}"
+    die "error - yum install failure" "${err_yum_failure}"
   fi
 
+<<<<<<< HEAD
   detect_librdkafka
   # librdkafka not installed ---> then install
   if [ "${rdkafka_installed}" -eq 0 ]; then
@@ -370,13 +559,41 @@ grpc_collector_bin_install_rpm() {
     ./configure
     make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
     make install
+||||||| 62e9d47
+  local git_clone_rdkafka=1
+  if [ ! -d "${librdkafka_install_dir}" ]; then
+    git clone "${librdkafka_url}" "${librdkafka_install_dir}"
+    git_clone_rdkafka="$?"
+  else
+    # assuming that the clone was already performed
+    git_clone_rdkafka=0
+=======
+  if [ "${librdkafka_dev}" -eq 0 ]; then
+    detect_installed_librdkafka
   fi
 
+  # librdkafka installed && version number insuffcient ---> exit!
+  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt "${librdkafka_dev_min_version}" ]; then
+    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${err_librdkafka_ver_fail}"
+  else
+    librdkafka_install_from_src
+>>>>>>> install
+  fi
+
+<<<<<<< HEAD
   # librdkafka installed && version number insuffcient ---> exit!
   if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt 160 ]; then
     die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${librdkafka_version_failure}"
   fi
 
+||||||| 62e9d47
+  cd "${librdkafka_install_dir}"
+  ./configure
+  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+  make install
+
+=======
+>>>>>>> install
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
     git clone "${mdt_url}" "${mdt_install_dir}"
@@ -387,7 +604,7 @@ grpc_collector_bin_install_rpm() {
   fi
 
   if [ ! "${git_clone}" -eq 0 ]; then
-    die "error - git clone failure" "${error_git_clone_failure}"
+    die "error - git clone failure" "${err_git_clone_failure}"
   fi
 
   if [ ! -d "${mdt_install_dir}/build" ]; then
@@ -403,18 +620,37 @@ grpc_collector_bin_install_rpm() {
 
 grpc_collector_lib_install_deb() {
   #echo "grpc_collector_lib_install_deb()"
-  export PKG_CONFIG_PATH=$grpc_install_dir/lib/pkgconfig
 
   if [ ! -f "/usr/local/bin/grpc_cpp_plugin" ]; then
     ln -s "${grpc_install_dir}/bin/grpc_cpp_plugin" "/usr/local/bin/grpc_cpp_plugin"
   fi
 
   local apt_install=1
-  apt-get install -y libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev libzmq3-dev libssl-dev libfmt-dev
+  apt-get install -y $(echo "${sysdeb_install_list}")
   apt_install="$?"
 
   if [ ! "${apt_install}" -eq 0 ]; then
-    die "error - apt install failure" "${error_apt_install_failure}"
+    die "error - apt install failure" "${err_apt_failure}"
+  fi
+
+  if [ "${librdkafka_dev}" -eq 0 ]; then
+    detect_installed_librdkafka
+  fi
+
+  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt "${librdkafka_dev_min_version}" ]; then
+    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${err_librdkafka_ver_fail}"
+  else
+    librdkafka_install_from_src
+  fi
+
+  if [ "${libjsoncpp_dev}" -eq 0 ]; then
+    detect_installed_libjsoncpp
+  fi
+
+  if [ "${jsoncpp_installed}" -eq 1 ] && [ "${jsoncpp_version}" -lt "${libjsoncpp_dev_min_version}" ]; then
+    die "error - the installed version of libjsoncpp (${jsoncpp_raw_version}) is too old" "${err_libjsoncpp_ver_fail}"
+  else
+    libjsoncpp_install_from_src
   fi
 
   local git_clone=1
@@ -427,12 +663,13 @@ grpc_collector_lib_install_deb() {
   fi
 
   if [ ! "${git_clone}" -eq 0 ]; then
-    die "error - git clone failure" "${error_git_clone_failure}"
+    die "error - git clone failure" "${err_git_clone_failure}"
   fi
 
   cd "${mdt_install_dir}"
   ./autogen.sh
-  CPPFLAGS="-I${grpc_install_dir}/include -I/usr/include/jsoncpp" ./configure
+  PKG_CONFIG_PATH="$grpc_install_dir/lib/pkgconfig:/usr/local/lib/pkgconfig" \
+    CPPFLAGS="-I${grpc_install_dir}/include -I/usr/include/jsoncpp" ./configure
   make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
   make install
 
@@ -441,7 +678,6 @@ grpc_collector_lib_install_deb() {
 
 grpc_collector_lib_install_rpm() {
   #echo "grpc_collector_lib_install_rpm()"
-  export PKG_CONFIG_PATH=$grpc_install_dir/lib/pkgconfig:$grpc_install_dir/lib64/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 
   if [ ! -f "/usr/local/bin/grpc_cpp_plugin" ]; then
     ln -s "${grpc_install_dir}/bin/grpc_cpp_plugin" "/usr/local/bin/grpc_cpp_plugin"
@@ -454,9 +690,10 @@ grpc_collector_lib_install_rpm() {
   sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
 
   if [ ! "${yum_install}" -eq 0 ]; then
-    die "error - yum install failure" "${error_yum_install_failure}"
+    die "error - yum install failure" "${err_yum_failure}"
   fi
 
+<<<<<<< HEAD
   detect_librdkafka
   # librdkafka not installed ---> then install
   if [ "${rdkafka_installed}" -eq 0 ]; then
@@ -477,9 +714,37 @@ grpc_collector_lib_install_rpm() {
   # librdkafka installed && version number insuffcient ---> exit!
   if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt 160 ]; then
     die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${librdkafka_version_failure}"
+||||||| 62e9d47
+  local git_clone_rdkafka=1
+  if [ ! -d "${librdkafka_install_dir}" ]; then
+    git clone "${librdkafka_url}" "${librdkafka_install_dir}"
+    git_clone_rdkafka="$?"
+  else
+    # assuming that the clone was already performed
+    git_clone_rdkafka=0
+=======
+  if [ "${librdkafka_dev}" -eq 0 ]; then
+    detect_installed_librdkafka
   fi
 
+  # librdkafka installed && version number insuffcient ---> exit!
+  if [ "${rdkafka_installed}" -eq 1 ] && [ "${rdkafka_version}" -lt "${librdkafka_dev_min_version}" ]; then
+    die "error - the installed version of librdkafka (${rdkafka_raw_version}) is too old" "${err_librdkafka_ver_fail}"
+  else
+    librdkafka_install_from_src
+>>>>>>> install
+  fi
 
+<<<<<<< HEAD
+
+||||||| 62e9d47
+  cd "${librdkafka_install_dir}"
+  ./configure
+  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+  make install
+
+=======
+>>>>>>> install
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
     git clone "${mdt_url}" "${mdt_install_dir}"
@@ -490,12 +755,13 @@ grpc_collector_lib_install_rpm() {
   fi
 
   if [ ! "${git_clone}" -eq 0 ]; then
-    die "error - git clone failure" "${error_git_clone_failure}"
+    die "error - git clone failure" "${err_git_clone_failure}"
   fi
 
   cd "${mdt_install_dir}"
   ./autogen.sh
-  CPPFLAGS="-I${grpc_install_dir}/include" ./configure
+  PKG_CONFIG_PATH="$grpc_install_dir/lib/pkgconfig:$grpc_install_dir/lib64/pkgconfig:/usr/local/lib/pkgconfig" \
+    CPPFLAGS="-I${grpc_install_dir}/include" ./configure
   make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
   make install
 
@@ -504,6 +770,18 @@ grpc_collector_lib_install_rpm() {
 
 grpc_collector_deploy() {
   _os_info="$(os_release_detect "release")"
+
+  command -v uname      >/dev/null 2>&1 || die "error - expected uname command"                 "${err_cmd_notfound}"
+  command -v egrep      >/dev/null 2>&1 || die "error - expected egrep command"                 "${err_cmd_notfound}"
+  command -v awk        >/dev/null 2>&1 || die "error - expected awk command"                   "${err_cmd_notfound}"
+  command -v git        >/dev/null 2>&1 || die "error - expected git command"                   "${err_cmd_notfound}"
+  command -v id         >/dev/null 2>&1 || die "error - expected id command"                    "${err_cmd_notfound}"
+  command -v make       >/dev/null 2>&1 || die "error - expected make command"                  "${err_cmd_notfound}"
+  command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                 "${err_cmd_notfound}"
+  command -v gcc        >/dev/null 2>&1 || die "error - expected gcc command"                   "${err_cmd_notfound}"
+  command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command" "${err_cmd_notfound}"
+  command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"  "${err_cmd_notfound}"
+  command -v cut        >/dev/null 2>&1 || die "error - expected cut command"                   "${err_cmd_notfound}"
 
   case "${_os_info}" in
   "Linux ubuntu 20.04")
@@ -519,13 +797,32 @@ grpc_collector_deploy() {
     fi
     ;;
   "Linux debian 11"    | \
+<<<<<<< HEAD
+||||||| 62e9d47
+  #"Linux ubuntu 20.04" | \
+=======
+  "Linux ubuntu 20.04" | \
+>>>>>>> install
   "Linux ubuntu 22.04" | \
   "Linux ubuntu 22.10" | \
   "Linux pop 22.04")
     #echo "grpc_collector_deploy_deb()"
-    command -v apt-get >/dev/null 2>&1 || die "error - expected apt command"   "${error_cmd_notfound}"
+    command -v apt-get >/dev/null 2>&1 || die "error - expected apt command" "${err_cmd_notfound}"
+    command -v g++     >/dev/null 2>&1 || die "error - expected g++ command" "${err_cmd_notfound}"
     check_if_root
-    grpc_framework_install
+    detect_sysdeb_lib "libjsoncpp-dev"
+    detect_sysdeb_lib "librdkafka-dev"
+    detect_sysdeb_lib "libconfig++-dev"
+    detect_sysdeb_lib "libspdlog-dev"
+    detect_sysdeb_lib "libzmq3-dev"
+    if [ "${grpc_dev}" -eq 0 ]; then
+      detect_installed_grpc
+    fi
+    if [ "${grpc_installed}" -eq 1 ] && [ "${grcp_version}" -lt "${grpc_dev_min_version}" ]; then
+      die "error - the installed version of gRPC (${grpc_raw_version}) is too old" "${err_grpc_ver_fail}"
+    else
+      grpc_framework_install
+    fi
     if [ "${b_option_flag}" -eq 1 ]; then
       grpc_collector_bin_install_deb
     fi
@@ -538,11 +835,19 @@ grpc_collector_deploy() {
   "Linux redhat 8" | \
   "Linux redhat 9")
     #echo "grpc_collector_deploy_rpm()"
-    command -v yum     >/dev/null 2>&1 || die "error - expected yum command"   "${error_cmd_notfound}"
+    command -v yum     >/dev/null 2>&1 || die "error - expected yum command" "${err_cmd_notfound}"
     check_if_root
     # Switch to a recent gcc version
     source /opt/rh/gcc-toolset-11/enable
-    grpc_framework_install
+    detect_sysrpm_lib
+    if [ "${grpc_dev}" -eq 0 ]; then
+      detect_installed_grpc
+    fi
+    if [ "${grpc_installed}" -eq 1 ] && [ "${grcp_version}" -lt "${grpc_dev_min_version}" ]; then
+      die "error - the installed version of gRPC (${grpc_raw_version}) is too old" "${err_grpc_ver_fail}"
+    else
+      grpc_framework_install
+    fi
     if [ "${b_option_flag}" -eq 1 ]; then
       grpc_collector_bin_install_rpm
     fi
@@ -552,11 +857,12 @@ grpc_collector_deploy() {
     ;;
   *)
     # Should never see the sun
-    die "error - grpc_collector_install(): ${_os_info} offcially not supported" "${error_unimplemented_options}"
+    die "error - grpc_collector_install(): ${_os_info} offcially not supported" "${err_unimplemented_options}"
     ;;
   esac
 }
 
+<<<<<<< HEAD
 command -v uname      >/dev/null 2>&1 || die "error - expected uname command"                   "${error_cmd_notfound}"
 command -v egrep      >/dev/null 2>&1 || die "error - expected egrep command"                   "${error_cmd_notfound}"
 command -v awk        >/dev/null 2>&1 || die "error - expected awk command"                     "${error_cmd_notfound}"
@@ -568,6 +874,20 @@ command -v gcc        >/dev/null 2>&1 || die "error - expected gcc command"     
 command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command"   "${error_cmd_notfound}"
 command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"    "${error_cmd_notfound}"
 
+||||||| 62e9d47
+command -v uname      >/dev/null 2>&1 || die "error - expected uname command"                   "${error_cmd_notfound}"
+command -v egrep      >/dev/null 2>&1 || die "error - expected egrep command"                   "${error_cmd_notfound}"
+command -v awk        >/dev/null 2>&1 || die "error - expected awk command"                     "${error_cmd_notfound}"
+command -v git        >/dev/null 2>&1 || die "error - expected git command"                     "${error_cmd_notfound}"
+command -v id         >/dev/null 2>&1 || die "error - expected id command"                      "${error_cmd_notfound}"
+command -v make       >/dev/null 2>&1 || die "error - expected make command"                    "${error_cmd_notfound}"
+command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                   "${error_cmd_notfound}"
+command -v g++        >/dev/null 2>&1 || die "error - expected g++ command"                     "${error_cmd_notfound}"
+command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command"   "${error_cmd_notfound}"
+command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"    "${error_cmd_notfound}"
+
+=======
+>>>>>>> install
 parse_user_options "${@}"
 
 if [ "${h_option_flag}" -eq 1 ]; then
@@ -577,12 +897,12 @@ fi
 
 # both bin & lib to 1: invalid
 if [ "${b_option_flag}" -eq 1 ] && [ "${l_option_flag}" -eq 1 ]; then
-  die "error - mind  your options/arguments - [ -h ] to know more" "${error_validating_input}"
+  die "error - mind  your options/arguments - [ -h ] to know more" "${err_validating_input}"
 fi
 
 # both bin & lib to 0: invalid
 if [ "${b_option_flag}" -eq 0 ] && [ "${l_option_flag}" -eq 0 ]; then
-  die "error - mind  your options/arguments - [ -h ] to know more" "${error_validating_input}"
+  die "error - mind  your options/arguments - [ -h ] to know more" "${err_validating_input}"
 fi
 
 if [ "${b_option_flag}" -eq 1 ] || [ "${l_option_flag}" -eq 1 ]; then
