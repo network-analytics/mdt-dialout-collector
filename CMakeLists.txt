@@ -106,7 +106,7 @@ message(STATUS "Using librdkafka ${RDKAFKA_VERSION}")
 # CPPZMQ (https://github.com/zeromq/cppzmq)
 set(CPPZMQ_INCLUDE_DIR /usr/include)
 include_directories("${CPPZMQ_INCLUDE_DIR}")
-pkg_check_modules(ZMQ_CPP REQUIRED libzmq>=4.3.4)
+pkg_check_modules(ZMQ_CPP REQUIRED libzmq>=4.3.2)
 link_libraries(${ZMQ_CPP_LIBRARIES})
 message(STATUS "Using cppzmq ${ZMQ_CPP_VERSION}")
 
