@@ -1,5 +1,17 @@
+Adopted versioning schema: vMAJOR.MINOR.PATCH:
+* MAJOR version is incremented when incompatible API changes are commited.
+* MINOR version is incremented when new functionalities are commited, however the new implementation is still backward-compatible.
+* PATCH version is incremented when backward-compatible bug fixes are commited.
+
 The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
+
+
+v1.1.0 -- 17-01.2023
+  + Documentation general review/update | adding CONFIG-KEYS | adding structured Changelog
+  + Introduced install.sh to automate the build/install process
+  + Introducing data delivery via ZMQ (PUSH/PULL). With this new data delivery option I enable the possibility to embed the gRPC dial-out collector
+    into pmtelemetryd
 
 v1.0.0 -- 29-09-2022
   + Introduced gRPC dial-out support for Cisco XR/XE (testing devices: Cisco-XR 7.4.1@NCS-540 | Cisco-XE 17.06.01prd7@C8000V)
@@ -14,3 +26,7 @@ v1.0.0 -- 29-09-2022
     (https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)
   + Introduced GPB (OpenConfig Interfaces) encoding capabilities for Huawei VRP (testing device: VRP V800R021C10SPC300T@NE40E)
     (https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)
+  + Introduced data manipulation options for Cisco GPB/GPB-KV encoded messages | adding enable_cisco_gpbkv2json | adding enable_cisco_message_to_json_string
+  + Introduced data enrichement  options | adding enable_label_encode_as_map | adding enable_label_encode_as_map_ptm
+  + Introducing data delivery via Kafka producer. The connection with Kafks can be secured with SSL or left unsecure using PLANTEXT
+  + Introducing logging capabilities. Both console and syslog logging are supported
