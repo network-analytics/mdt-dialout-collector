@@ -1,0 +1,10 @@
+# Dependencies
+
+*gRPC                 | (https://github.com/grpc/grpc)                      | BSD 3-Clause License      |
+*JsonCpp              | (https://github.com/open-source-parsers/jsoncpp)    | MIT License               |
+*librdkafka           | (https://github.com/edenhill/librdkafka)            | BSD 2-Clause License      |
+*cppzmq               | (https://github.com/zeromq/cppzmq)                  | MIT License               |
+*Modern C++ Kafka API | (https://github.com/morganstanley/modern-cpp-kafka) | Apache License Version 2.0|
+*libconfig            | (http://hyperrealm.github.io/libconfig/)            | LGPL v2.1                 |
+*rapidcsv             | (https://github.com/d99kris/rapidcsv)               | BSD-3-Clause license      |
+*spdlog               | (https://github.com/gabime/spdlog)                  | MIT License               |

@@ -1,0 +1,195 @@
+# SUPPORTED CONFIGURATION KEYS
+A configuration consists of key/value pairs, separated by the '=' char.
+The value should be enclosed with '"'. Starting a line with the '#' symbol,
+makes the whole line to be ignored by the interpreter, making it a comment.
+
+
+# Data Collection
+
+KEY:       iface
+DESC:      Defining the network interface receiving the gRPC data-stream. The logical name of the interface can be retrived using shell commads
+           like 'ip address'. No default value is set and a coherent value is mandatory.
+DEFAULT:   none
+
+KEY:       ipv4_socket_cisco
+DESC:      Defining the network end-point receiving the gRPC data-stream from Cisco devices. The end-point information must include both the
+           IPv4 and port separated by colon, for example "192.18.0.1:10001" is considered to be a valid end-point. No default
+           value is set and if the configuration key is specified its value can't be empty.
+DEFAULT:   none
+
+KEY:       ipv4_socket_juniper
+DESC:      Defining the network end-point receiving the gRPC data-stream from Juniper devices. The end-point information must include both the
+           IPv4 and port separated by colon, for example "192.18.0.2:10002" is considered to be a valid end-point. No default
+           value is set and if the configuration key is specified its value can't be empty.
+DEFAULT:   none
+
+KEY:       ipv4_socket_huawei
+DESC:      Defining the network end-point receiving the gRPC data-stream from Huawei devices. The end-point information must include both the
+           IPv4 and port separated by colon, for example "192.18.0.3:10003" is considered to be a valid end-point. No default
+           value is set and if the configuration key is specified its value can't be empty.
+DEFAULT:   none
+
+KEY:       replies_cisco
+VALUES:    [value >= "0" and value <= "1000"]
+DESC:      This is ment mainly for debugging. With this configuration key you can rate limit the amount of Cisco's gRPC messages processed within
+           a single receiving session. The default value is set to "0" which means unlimited.
+DEFAULT:   "0"
+
+KEY:       replies_juniper
+VALUES:    [value >= "0" and value <= "1000"]
+DESC:      This is ment mainly for debugging. With this configuration key you can rate limit the amount of Juniper's gRPC messages processed within
+           a single receiving session. The default value is set to "0" which means unlimited.
+DEFAULT:   "0"
+
+KEY:       replies_huawei
+VALUES:    [value >= "0" and value <= "1000"]
+DESC:      This is ment mainly for debugging. With this configuration key you can rate limit the amount of Huawei's gRPC messages processed within
+           a single receiving session. The default value is set to "0" which means unlimited.
+DEFAULT:   "0"
+
+KEY:       cisco_workers
+VALUES:    [value >= "1" and value <= "5"]
+DESC:      Defining the amount of running threads busy with processing incoming Cisco's gRPC messages.
+DEFAULT:   "1"
+
+KEY:       juniper_workers
+VALUES:    [value >= "1" and value <= "5"]
+DESC:      Defining the amount of running threads busy with processing incoming Juniper's gRPC messages.
+DEFAULT:   "1"
+
+KEY:       huawei_workers
+VALUES:    [value >= "1" and value <= "5"]
+DESC:      Defining the amount of running threads busy with processing incoming Huawei's gRPC messages.
+DEFAULT:   "1"
+
+KEY:       writer_id
+DESC:      adding meta data information to the data-stream. This could be helpful to identify the collector sourcing the data-stream.
+           Irrelevant when used in Library mode, pmtelemetryd will override this information.
+DEFAULT:   "mdt-dialout-collector"
+
+
+# Data Manipulation
+
+KEY:       enable_cisco_gpbkv2json
+VALUES:    ["true" or "false"]
+DESC:      Simplified JSON-string output after decoding from Cisco's GPB/GPB-KV.
+DEFAULT:   "true"
+
+KEY:       enable_cisco_message_to_json_string
+VALUES:    ["true" or "false"]
+DESC:      Standard JSON-string output after decoding from Cisco's GPB/GPB-KV.
+DEFAULT:   "false"
+
+KEY:       enable_label_encode_as_map
+VALUES:    ["true" or "false"]
+DESC:      If enabled the data-stream output is enriched with an additional field "label": { "key1": "value1", "key2":"value2" }".
+           The enrichement strategy is described here https://github.com/scuzzilla/mdt-dialout-collector/tree/main/csv.
+DEFAULT:   "false"
+
+KEY:       enable_label_encode_as_map_ptm
+VALUES:    ["true" or "false"]
+DESC:      If enabled the data-stream output is enriched with an additional field "label": { "key1": "value1", "key2":"value2" }".
+           The enrichement strategy is described here https://github.com/scuzzilla/mdt-dialout-collector/tree/main/ptm.
+DEFAULT:   "false"
+
+KEY:       label_map_csv_path
+DESC:      Defines from where the enrichement process will read the information, formatted as CSV, to be able to polulate
+           the "label" field accordingly.
+DEFAULT:   "/opt/mdt_dialout_collector/csv/label_map.csv"
+
+KEY:       label_map_ptm_path
+DESC:      Defines from where the enrichement process will read the information, formatted as pmacct's Pre-Tag-Map,
+           to be able to polulate the "label" field accordingly.
+DEFAULT:   "/opt/mdt_dialout_collector/ptm/label_map.ptm"
+
+
+# Data Delivery
+
+KEY:       data_delivery_method
+VALUES:    ["kafka" or "zmq"]
+DESC:      The available delivery mechanisms are mutually exclusive. Enabling ZMQ will automatically exclude KAFKA's configuration options.
+           Setting the data_delivery_method to "zmq" is mandatory when the collector is running embedded into pmtelemetryd, in this specific
+           use-case the data is delivered via "ipc:///tmp/grpc.sock" (ZMQ socket).
+DEFAULT:   "kafka"
+
+KEY:       bootstrap_servers
+DESC:      kafka brokers list, the format "<host>:<port>" is considered valid. If data_delivery_method is set to "zmq"
+           then bootstrap_servers is automatically set to "dummy_servers".
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   none
+
+KEY:       client_id
+DESC:      this option can be handful to better identify the collector responsible for sending to a specific Kafka's Topic.
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   "mdt-dialout-collector"
+
+KEY:       enable_idempotence
+VALUES:    ["true" or "false"]
+DESC:      When set to true, the producer will ensure that messages are successfully produced exactly once and in the original produce order.
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   "true"
+
+KEY:       log_level
+VALUES:    [value >= "0" and value <= "7"]
+DESC:      Logging level (syslog(3) levels)
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   "6"
+
+KEY:       security_protocol
+VALUES:    ["plaintext" or "ssl"]
+DESC:      Defines if the communication between the collector and the Kafka's brokers is going to be encrypted or not. This is
+           a Mandatory option and when the selected delivery method is "zmq" it's automatically set to "dummy_security_protocol".
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   none
+
+KEY:       ssl_ca_location
+DESC:      This is valid only when security_protocol is set to "ssl" and it's including the file or
+           directory path to CA certificate(s) for verifying the broker's key
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   none
+
+KEY:       ssl_certificate_location
+DESC:      This is valid only when security_protocol is set to "ssl" and it's including the path to
+           client's public key (PEM) used for authentication
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   none
+
+KEY:       ssl_key_location
+DESC:      This is valid only when security_protocol is set to "ssl" and it's including the path to
+           client's private key (PEM) used for authentication.
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   none
+
+KEY:       topic
+DESC:      Defines the Kafka's topic name where the processed gRPC messages are delivered. This is a mandatory option and
+           when the selected delivery method is "zmq" it's automatically set to "dummy_topic".
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   none
+
+
+# System
+
+KEY:       console_log
+VALUES:    ["true" or "false"]
+DESC:      Enabling/disabling console logging.
+DEFAULT:   "true"
+
+KEY:       syslog
+VALUES:    ["true" or "false"]
+DESC:      Enabling/disabling Syslog logging. If not specified the default facility is "LOG_USER".
+DEFAULT:   "flase"
+
+KEY:       syslog_facility
+VALUES:    ["LOG_DAEMON" or "LOG_USER" or "LOG_LOCAL(0..7)"]
+DESC:      if syslog is enabled allows you to specify the preferred logging facility, by default "LOG_USER" will be set.
+           In case the syslog's key is set to "false" the syslog_facility key will be set to "NONE".
+DEFAULT:   "LOG_USER"
+
+KEY:       syslog_ident
+DESC:      this option can be handful to better identify the collector responsible for generating some selected logging records.
+DEFAULT:   "mdt-dialout-collector"
+
+KEY:       spdlog_level
+VALUES:    ["debug" or "info" or "warn" or "error" or "off"]
+DESC:      Increase/Decrease the level of logging verbosity.
+DEFAULT:   "info"
