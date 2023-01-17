@@ -1,7 +1,7 @@
 The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
 
-v1.0.0 -- XX-XX-XXXX
+v1.0.0 -- 29-09-2022
   + Introduced gRPC dial-out support for Cisco XR/XE (testing devices: Cisco-XR 7.4.1@NCS-540 | Cisco-XE 17.06.01prd7@C8000V)
     (https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)
   + Introduced GPB-KV encoding capabilities for Cisco XR/XE (testing devices: Cisco-XR 7.4.1@NCS-540 | Cisco-XE 17.06.01prd7@C8000V)

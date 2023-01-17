@@ -3,7 +3,7 @@
 [![Build status](https://github.com/scuzzilla/mdt-dialout-collector/workflows/ci/badge.svg?branch=main)](https://github.com/scuzzilla/mdt-dialout-collector/actions)
 
 **mdt-dialout-collector** is leveraging the [**gRPC Framework**](https://grpc.io/) to implement a multi-vendor gRPC Dial-out collector.
-The [doc/Changelog](https://github.com/scuzzilla/mdt-dialout-collector/blob/reorgdoc/doc/Changelog) file is including additional details about the supported vendors.
+The [doc/Changelog](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/doc/Changelog) file is including additional details about the supported vendors.
 
 The collector functionalities can be logically grouped into three categories:
 
@@ -11,7 +11,7 @@ The collector functionalities can be logically grouped into three categories:
 2. **Data Manipulation** - they are conveniently transforming the in-transit data-stream.
 3. **Data Delivery**     - they are inter-connecting the collector with the next stage in the pipeline.
 
-The [doc/CONFIG-KEYS](https://github.com/scuzzilla/mdt-dialout-collector/blob/reorgdoc/doc/CONFIG-KEYS) file is including the description for each one of the available options.
+The [doc/CONFIG-KEYS](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/doc/CONFIG-KEYS) file is including the description for each one of the available options.
 
 ## Deployment
 
@@ -74,7 +74,7 @@ DEFAULT: none
 
 ## Build/Install
 
-[install.sh](https://github.com/scuzzilla/mdt-dialout-collector/blob/reorgdoc/install.sh) is automating the build/install process, taking care of all [dependencies](https://github.com/scuzzilla/mdt-dialout-collector/blob/reorgdoc/doc/Dependencies).
+[install.sh](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/install.sh) is automating the build/install process, taking care of all [dependencies](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/doc/Dependencies).
 
 - The Standalone binary can be deployed using:
 ```SHELL
