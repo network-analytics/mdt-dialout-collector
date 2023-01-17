@@ -13,4 +13,4 @@ v1.0.0 -- 29-09-2022
   + Introduced gRPC dial-out support for Huawei VRP (testing device: VRP V800R021C10SPC300T@NE40E)
     (https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)
   + Introduced GPB (OpenConfig Interfaces) encoding capabilities for Huawei VRP (testing device: VRP V800R021C10SPC300T@NE40E)
-    (https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                       |
+    (https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)
