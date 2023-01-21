@@ -24,8 +24,8 @@ readonly grpc_install_dir="$HOME/.local"
 
 # MDT install parameters
 readonly mdt_url="https://github.com/scuzzilla/mdt-dialout-collector.git"
-readonly mdt_version="v1.1.0"
-#readonly mdt_version="main"
+#readonly mdt_version="v1.1.0"
+readonly mdt_version="main"
 readonly mdt_install_dir="/opt/mdt-dialout-collector"
 
 # librdkafka parameters
@@ -410,7 +410,6 @@ libjsoncpp_install_from_src() {
     mkdir -p "${libjsoncpp_install_dir}/build"
     cd "${libjsoncpp_install_dir}/build"
     cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../
-    local available_vcpu=$(egrep 'processor' /proc/cpuinfo | wc -l)
     if [ "${available_vcpu}" -le 1 ]; then
         die "error - requires vcpu > 1)" "${err_vcpu_failure}"
     else
@@ -569,7 +568,6 @@ grpc_collector_bin_install_rpm() {
 
   cd "${mdt_install_dir}/build"
   cmake ../
-  local available_vcpu=$(egrep 'processor' /proc/cpuinfo | wc -l)
   if [ "${available_vcpu}" -le 1 ]; then
       die "error - requires vcpu > 1)" "${err_vcpu_failure}"
   else
