@@ -69,12 +69,12 @@ DEFAULT: none
 
 - The Standalone binary can be deployed using:
 ```SHELL
-$ sudo install.sh -b
+$ sudo sh install.sh -b
 ```
 
 - The Library/Header can be deployed using:
 ```SHELL
-$ sudo install.sh -l
+$ sudo sh install.sh -l
 ```
 
 ## References
