@@ -176,9 +176,10 @@ extern "C" {
         free(pload);
     }
 
-    void start_grpc_dialout_collector(const char *cfg_path)
+    void start_grpc_dialout_collector(const char *cfg_path,
+        const char *zmq_uri)
     {
-        LoadOptions(cfg_path);
+        LoadOptions(cfg_path, zmq_uri);
 
         if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
             main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
@@ -214,7 +215,7 @@ extern "C" {
         }
     }
 
-    void LoadOptions(const char *cfg_path)
+    void LoadOptions(const char *cfg_path, const char *zmq_uri)
     {
         // static log-sinks are configured within the constructor
         LogsHandler logs_handler;
@@ -262,6 +263,15 @@ extern "C" {
             std::exit(EXIT_FAILURE);
         } else {
             kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+        }
+
+        ZmqCfgHandler zmq_cfg_handler;
+        if (zmq_cfg_handler.lookup_zmq_parameters(
+            zmq_uri,
+            cfg_handler.get_zmq_parameters()) == false) {
+            std::exit(EXIT_FAILURE);
+        } else {
+            zmq_delivery_cfg_parameters = cfg_handler.get_zmq_parameters();
         }
     }
 

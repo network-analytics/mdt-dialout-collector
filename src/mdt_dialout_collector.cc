@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
         DataManipulationCfgHandler data_manipulation_cfg_handler;
         if (data_manipulation_cfg_handler.lookup_data_manipulation_parameters(
             cfg_handler.get_cfg_path(),
-            cfg_handler.get_data_manipulation_parameters()) ==false) {
+            cfg_handler.get_data_manipulation_parameters()) == false) {
             std::exit(EXIT_FAILURE);
         } else {
             data_manipulation_cfg_parameters =
@@ -119,6 +119,15 @@ int main(int argc, char *argv[])
             std::exit(EXIT_FAILURE);
         } else {
             kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+        }
+
+        ZmqCfgHandler zmq_cfg_handler;
+        if (zmq_cfg_handler.lookup_zmq_parameters(
+            "",
+            cfg_handler.get_zmq_parameters()) == false) {
+            std::exit(EXIT_FAILURE);
+        } else {
+            zmq_delivery_cfg_parameters = cfg_handler.get_zmq_parameters();
         }
     }
 

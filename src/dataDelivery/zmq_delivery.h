@@ -21,8 +21,8 @@ public:
     ZmqDelivery();
     ~ZmqDelivery() { spdlog::get("multi-logger")->
         debug("destructor: ~ZmqDelivery()"); };
-    void set_zmq_transport_uri(const std::string zmq_transport_uri) {
-        this->zmq_transport_uri = zmq_transport_uri; };
+    void set_zmq_transport_uri() {
+        this->zmq_transport_uri = zmq_delivery_cfg_parameters.at("zmq_uri"); };
     const std::string &get_zmq_transport_uri() {
         return this->zmq_transport_uri; };
 private:

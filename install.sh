@@ -24,7 +24,8 @@ readonly grpc_install_dir="$HOME/.local"
 
 # MDT install parameters
 readonly mdt_url="https://github.com/scuzzilla/mdt-dialout-collector.git"
-readonly mdt_version=""
+readonly mdt_version="v1.1.0"
+#readonly mdt_version="main"
 readonly mdt_install_dir="/opt/mdt-dialout-collector"
 
 # librdkafka parameters
@@ -40,6 +41,8 @@ readonly libjsoncpp_install_dir="/opt/libjsoncpp"
 work_dir="$(dirname "$(readlink --canonicalize-existing "${0}" 2> /dev/null)")"
 
 readonly epoch=$(date +'%s')
+readonly available_vcpu=$(egrep 'processor' /proc/cpuinfo | wc -l)
+readonly err_vcpu_failure=67
 readonly err_grpc_ver_fail=68
 readonly err_libjsoncpp_ver_fail=69
 readonly err_librdkafka_ver_fail=70
@@ -338,7 +341,7 @@ detect_installed_grpc() {
   fi
   if [ "${grpc_installed}" -eq 1 ]; then
     grpc_raw_version=$(egrep "Version" "${grpc_pkg_find}" | awk -F ":" '{print $2}' | tr -d "")
-    grpc_version=$(egrep "Version" "${grpc_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\." | cut -c1-3)
+    grpc_installed_version=$(egrep "Version" "${grpc_pkg_find}" | awk -F ":" '{print $2}' | tr -d "\" \"|\." | cut -c1-3)
   fi
 }
 
@@ -362,14 +365,18 @@ librdkafka_install_from_src() {
     if [ ! -d "${librdkafka_install_dir}" ]; then
       git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_install_dir}"
       git_clone_rdkafka="$?"
-     else
+    else
       # assuming that the clone was already performed
       git_clone_rdkafka=0
     fi
     cd "${librdkafka_install_dir}"
     ./configure
-    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-    make install
+    if [ "${available_vcpu}" -le 1 ]; then
+        die "error - requires vcpu > 1)" "${err_vcpu_failure}"
+    else
+      make -j`echo $((${available_vcpu} - 1))`
+      make install
+    fi
   else
     # inform about the installed *.pc
     export PKG_CONFIG_PATH="$rdkafka_pkg_find_root"
@@ -396,14 +403,20 @@ libjsoncpp_install_from_src() {
     if [ ! -d "${libjsoncpp_install_dir}" ]; then
       git clone -b "${libjsoncpp_version}" "${libjsoncpp_url}" "${libjsoncpp_install_dir}"
       git_clone_jsoncpp="$?"
-     else
+    else
       # assuming that the clone was already performed
       git_clone_jsoncpp=0
     fi
     mkdir -p "${libjsoncpp_install_dir}/build"
     cd "${libjsoncpp_install_dir}/build"
     cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../
-    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))` install
+    local available_vcpu=$(egrep 'processor' /proc/cpuinfo | wc -l)
+    if [ "${available_vcpu}" -le 1 ]; then
+        die "error - requires vcpu > 1)" "${err_vcpu_failure}"
+    else
+      make -j`echo $((${available_vcpu} - 1))`
+      make install
+    fi
   else
     export PKG_CONFIG_PATH="$jsoncpp_pkg_find_root"
   fi
@@ -431,7 +444,7 @@ grpc_framework_install() {
   fi
 
   cd "$HOME/grpc"
-  if [ ! -d "cmake/install" ]; then
+  if [ ! -d "cmake/build" ]; then
     mkdir -p cmake/build
     cd cmake/build
     cmake -DgRPC_INSTALL=ON \
@@ -447,9 +460,12 @@ grpc_framework_install() {
     -DgRPC_ZLIB_PROVIDER=module \
     ../..
 
-    make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-
-    make install
+    if [ "${available_vcpu}" -le 1 ]; then
+        die "error - requires vcpu > 1)" "${err_vcpu_failure}"
+    else
+      make -j`echo $((${available_vcpu} - 1))`
+      make install
+    fi
   fi
 }
 
@@ -485,7 +501,7 @@ grpc_collector_bin_install_deb() {
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
-    git clone "${mdt_url}" "${mdt_install_dir}"
+    git clone "${mdt_url}" -b "${mdt_version}" "${mdt_install_dir}"
     git_clone="$?"
   else
     # assuming that the clone was already performed
@@ -502,7 +518,11 @@ grpc_collector_bin_install_deb() {
 
   cd "${mdt_install_dir}/build"
   cmake ../
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+  if [ "${available_vcpu}" -le 1 ]; then
+      die "error - requires vcpu > 1)" "${err_vcpu_failure}"
+  else
+    make -j`echo $((${available_vcpu} - 1))`
+  fi
 
   # deploy a customizable configuration
 }
@@ -549,7 +569,12 @@ grpc_collector_bin_install_rpm() {
 
   cd "${mdt_install_dir}/build"
   cmake ../
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
+  local available_vcpu=$(egrep 'processor' /proc/cpuinfo | wc -l)
+  if [ "${available_vcpu}" -le 1 ]; then
+      die "error - requires vcpu > 1)" "${err_vcpu_failure}"
+  else
+    make -j`echo $((${available_vcpu} - 1))`
+  fi
 
   # deploy a customizable configuration
 }
@@ -591,7 +616,7 @@ grpc_collector_lib_install_deb() {
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
-    git clone "${mdt_url}" "${mdt_install_dir}"
+    git clone "${mdt_url}" -b "${mdt_version}" "${mdt_install_dir}"
     git_clone="$?"
   else
     # assuming that the clone was already performed
@@ -606,8 +631,12 @@ grpc_collector_lib_install_deb() {
   ./autogen.sh
   PKG_CONFIG_PATH="$grpc_install_dir/lib/pkgconfig:/usr/local/lib/pkgconfig" \
     CPPFLAGS="-I${grpc_install_dir}/include -I/usr/include/jsoncpp" ./configure
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-  make install
+  if [ "${available_vcpu}" -le 1 ]; then
+      die "error - requires vcpu > 1)" "${err_vcpu_failure}"
+  else
+    make -j`echo $((${available_vcpu} - 1))`
+    make install
+  fi
 
   # deploy a customizable configuration
 }
@@ -657,8 +686,12 @@ grpc_collector_lib_install_rpm() {
   ./autogen.sh
   PKG_CONFIG_PATH="$grpc_install_dir/lib/pkgconfig:$grpc_install_dir/lib64/pkgconfig:/usr/local/lib/pkgconfig" \
     CPPFLAGS="-I${grpc_install_dir}/include" ./configure
-  make -j`echo $(($(egrep 'processor' /proc/cpuinfo | wc -l) - 1))`
-  make install
+  if [ "${available_vcpu}" -le 1 ]; then
+      die "error - requires vcpu > 1)" "${err_vcpu_failure}"
+  else
+    make -j`echo $((${available_vcpu} - 1))`
+    make install
+  fi
 
   # deploy a customizable configuration
 }
@@ -696,7 +729,7 @@ grpc_collector_deploy() {
     if [ "${grpc_dev}" -eq 0 ]; then
       detect_installed_grpc
     fi
-    if [ "${grpc_installed}" -eq 1 ] && [ "${grcp_version}" -lt "${grpc_dev_min_version}" ]; then
+    if [ "${grpc_installed}" -eq 1 ] && [ "${grpc_installed_version}" -lt "${grpc_dev_min_version}" ]; then
       die "error - the installed version of gRPC (${grpc_raw_version}) is too old" "${err_grpc_ver_fail}"
     else
       grpc_framework_install
@@ -721,7 +754,7 @@ grpc_collector_deploy() {
     if [ "${grpc_dev}" -eq 0 ]; then
       detect_installed_grpc
     fi
-    if [ "${grpc_installed}" -eq 1 ] && [ "${grcp_version}" -lt "${grpc_dev_min_version}" ]; then
+    if [ "${grpc_installed}" -eq 1 ] && [ "${grpc_installed_version}" -lt "${grpc_dev_min_version}" ]; then
       die "error - the installed version of gRPC (${grpc_raw_version}) is too old" "${err_grpc_ver_fail}"
     else
       grpc_framework_install

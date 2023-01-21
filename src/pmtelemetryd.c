@@ -7,9 +7,11 @@
 
 int main(int argc, char *argv[])
 {
+    const char *zmq_uri = "ipc:///tmp/grpc.sock";
     grpc_payload *pload = NULL;
     start_grpc_dialout_collector(
-        "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf");
+        "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf",
+        zmq_uri);
 
     void *ctx = zmq_ctx_new();
     void *zmq_pull = zmq_socket(ctx, ZMQ_PULL);

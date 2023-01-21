@@ -11,8 +11,7 @@
 ZmqDelivery::ZmqDelivery()
 {
     spdlog::get("multi-logger")->debug("constructor: ZmqDelivery()");
-    this->set_zmq_transport_uri("ipc:///tmp/grpc.sock");
-    //this->set_zmq_transport_uri("inproc://grpc");
+    this->set_zmq_transport_uri();
 }
 
 bool ZmqPush::ZmqPusher(

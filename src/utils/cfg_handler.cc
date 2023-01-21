@@ -11,6 +11,7 @@ std::map<std::string, std::string> logs_cfg_parameters;
 std::map<std::string, std::string> main_cfg_parameters;
 std::map<std::string, std::string> data_manipulation_cfg_parameters;
 std::map<std::string, std::string> kafka_delivery_cfg_parameters;
+std::map<std::string, std::string> zmq_delivery_cfg_parameters;
 
 
 bool CfgHandler::set_parameters(libconfig::Config &params,
@@ -825,7 +826,7 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             return false;
         }
     } else if (
-        main_cfg_parameters.at("data_delivery_method").compare("kafka") !=0) {
+        main_cfg_parameters.at("data_delivery_method").compare("kafka") != 0) {
         params.insert({"topic", "dummy_topic"});
     } else {
         spdlog::get("multi-logger")->error("[topic] configuration issue: "
@@ -853,7 +854,7 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             return false;
         }
     } else if (
-        main_cfg_parameters.at("data_delivery_method").compare("kafka") !=0) {
+        main_cfg_parameters.at("data_delivery_method").compare("kafka") != 0) {
         params.insert({"bootstrap_servers", "dummy_servers"});
     } else {
         spdlog::get("multi-logger")->
@@ -954,7 +955,7 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
             return false;
         }
     } else if (
-        main_cfg_parameters.at("data_delivery_method").compare("kafka") !=0) {
+        main_cfg_parameters.at("data_delivery_method").compare("kafka") != 0) {
         params.insert({"security_protocol", "dummy_security_protocol"});
     } else {
         spdlog::get("multi-logger")->
@@ -1011,6 +1012,25 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         params.insert({"ssl_key_location", "NULL"});
         params.insert({"ssl_certificate_location", "NULL"});
         params.insert({"ssl_ca_location", "NULL"});
+    }
+
+    return true;
+}
+
+bool ZmqCfgHandler::lookup_zmq_parameters(const std::string &zmq_uri,
+    std::map<std::string, std::string> &params)
+{
+    // ZMQ parameters evaluation
+    if (main_cfg_parameters.at("data_delivery_method").compare("zmq") == 0) {
+        if (zmq_uri.empty() == true) {
+            params.insert({"zmq_uri", "ipc:///tmp/grpc.sock"});
+            spdlog::get("multi-logger")->info("[zmq_uri] set to "
+                "ipc:///tmp/grpc.sock");
+        } else {
+            params.insert({"zmq_uri", zmq_uri});
+            spdlog::get("multi-logger")->info("[zmq_uri] set to {}",
+                zmq_uri);
+        }
     }
 
     return true;

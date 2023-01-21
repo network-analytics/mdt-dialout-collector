@@ -54,17 +54,8 @@ the building process is generating both the library and the header file required
 
 /usr/local/include/grpc_collector_bridge/grpc_collector_bridge.h
 ```
-there are two main pmtelemetryd [CONFIG-KEYS](https://github.com/pmacct/pmacct/blob/master/CONFIG-KEYS) which are mandatory in order to enable the embedded gRPC dial-out collector:
+there is one main pmtelemetryd [CONFIG-KEYS](https://github.com/pmacct/pmacct/blob/master/CONFIG-KEYS) which is mandatory in order to enable the embedded gRPC dial-out collector:
 ```TEXT
-KEY:     telemetry_daemon_grpc_collector_socket
-DESC:    Enables Streaming Telemetry data collection via gRPC, mutual exclusive with other
-         telemetry collection methods. A value like "ipc:///tmp/grpc.sock" is expected, it
-         defines the internal ZMQ socket between the gRPC collector thread and pmtelemetryd
-         thread. Read more, including instructions on how to build the dependency stack,
-         here: https://github.com/scuzzilla/mdt-dialout-collector . This feature requires
-         to configure pmacct for compiling with --enable-zmq and --enable-grpc-collector flags.
-DEFAULT: none
-
 KEY:     telemetry_daemon_grpc_collector_conf
 DESC:    Points to a file containing the configuration of the gRPC collector thread. An
          example of the configuration plus all available config keys is available here:

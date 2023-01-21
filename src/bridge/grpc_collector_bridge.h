@@ -65,8 +65,10 @@ extern "C" {
     extern void FreeOptions(Options *opts);
     extern void free_grpc_payload(grpc_payload *pload);
 
-    extern void start_grpc_dialout_collector(const char *cfg_path);
-    extern void LoadOptions(const char *cfg_path);
+    extern void start_grpc_dialout_collector(const char *cfg_path,
+        const char *zmq_uri);
+    extern void LoadOptions(const char *cfg_path,
+        const char *zmq_uri);
     extern void *VendorThread(void *vendor);
     extern void LoadThreads(pthread_t *workers_vec, const char *ipv4_socket_str,
         const char *replies_str, const char *workers_str);
