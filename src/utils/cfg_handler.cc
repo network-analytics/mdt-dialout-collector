@@ -1031,6 +1031,9 @@ bool ZmqCfgHandler::lookup_zmq_parameters(const std::string &zmq_uri,
             spdlog::get("multi-logger")->info("[zmq_uri] set to {}",
                 zmq_uri);
         }
+    } else {
+        // dummy ZMQ sock
+        params.insert({"zmq_uri", "ipc:///tmp/dummy.sock"});
     }
 
     return true;
