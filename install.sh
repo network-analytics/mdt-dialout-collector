@@ -20,6 +20,7 @@ sysdeb_install_list="libssl-dev libfmt-dev"
 # gRPC install parameters
 readonly grpc_url="https://github.com/grpc/grpc"
 readonly grpc_version="v1.45.2"
+readonly grpc_clone_dir="$HOME/grpc"
 readonly grpc_install_dir="$HOME/.local"
 
 # MDT install parameters
@@ -31,12 +32,12 @@ readonly mdt_install_dir="/opt/mdt-dialout-collector"
 # librdkafka parameters
 readonly librdkafka_url="https://github.com/edenhill/librdkafka.git"
 readonly librdkafka_version="v1.6.0"
-readonly librdkafka_install_dir="/opt/librdkafka"
+readonly librdkafka_clone_dir="/opt/librdkafka"
 
 # libjsoncpp parameters
 readonly libjsoncpp_url="https://github.com/open-source-parsers/jsoncpp"
 readonly libjsoncpp_version="1.8.4"
-readonly libjsoncpp_install_dir="/opt/libjsoncpp"
+readonly libjsoncpp_clone_dir="/opt/libjsoncpp"
 
 work_dir="$(dirname "$(readlink --canonicalize-existing "${0}" 2> /dev/null)")"
 
@@ -115,16 +116,16 @@ shift $((OPTIND -1))
 
 clean_up() {
   #echo "clean_up()"
-  #if [ -d $HOME/grpc ]; then
-  #  rm -rf $HOME/grpc
+  #if [ -d ${grpc_clone_dir} ]; then
+  #  rm -rf ${grpc_clone_dir}
   #fi
 
-  if [ -d "${librdkafka_install_dir}" ]; then
-    rm -rf "${librdkafka_install_dir}"
+  if [ -d "${librdkafka_clone_dir}" ]; then
+    rm -rf "${librdkafka_clone_dir}"
   fi
 
-  if [ -d "${libjsoncpp_install_dir}" ]; then
-    rm -rf "${libjsoncpp_install_dir}"
+  if [ -d "${libjsoncpp_clone_dir}" ]; then
+    rm -rf "${libjsoncpp_clone_dir}"
   fi
 }
 
@@ -362,14 +363,14 @@ librdkafka_install_from_src() {
   # librdkafka not installed ---> then install
   if [ "${rdkafka_installed}" -eq 0 ]; then
     local git_clone_rdkafka=1
-    if [ ! -d "${librdkafka_install_dir}" ]; then
-      git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_install_dir}"
+    if [ ! -d "${librdkafka_clone_dir}" ]; then
+      git clone -b "${librdkafka_version}" "${librdkafka_url}" "${librdkafka_clone_dir}"
       git_clone_rdkafka="$?"
     else
       # assuming that the clone was already performed
       git_clone_rdkafka=0
     fi
-    cd "${librdkafka_install_dir}"
+    cd "${librdkafka_clone_dir}"
     ./configure
     if [ "${available_vcpu}" -le 1 ]; then
         die "error - requires vcpu > 1)" "${err_vcpu_failure}"
@@ -400,15 +401,15 @@ libjsoncpp_install_from_src() {
   # libjsoncpp not installed ---> then install
   if [ "${jsoncpp_installed}" -eq 0 ]; then
     local git_clone_jsoncpp=1
-    if [ ! -d "${libjsoncpp_install_dir}" ]; then
-      git clone -b "${libjsoncpp_version}" "${libjsoncpp_url}" "${libjsoncpp_install_dir}"
+    if [ ! -d "${libjsoncpp_clone_dir}" ]; then
+      git clone -b "${libjsoncpp_version}" "${libjsoncpp_url}" "${libjsoncpp_clone_dir}"
       git_clone_jsoncpp="$?"
     else
       # assuming that the clone was already performed
       git_clone_jsoncpp=0
     fi
-    mkdir -p "${libjsoncpp_install_dir}/build"
-    cd "${libjsoncpp_install_dir}/build"
+    mkdir -p "${libjsoncpp_clone_dir}/build"
+    cd "${libjsoncpp_clone_dir}/build"
     cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../
     if [ "${available_vcpu}" -le 1 ]; then
         die "error - requires vcpu > 1)" "${err_vcpu_failure}"
@@ -429,9 +430,9 @@ grpc_framework_install() {
   fi
 
   local git_clone=1
-  if [ ! -d "$HOME/grpc" ]; then
+  if [ ! -d "${grpc_clone_dir}" ]; then
     git clone --recurse-submodules -b "${grpc_version}" --depth 1 \
-      --shallow-submodules "${grpc_url}" "$HOME/grpc"
+      --shallow-submodules "${grpc_url}" "${grpc_clone_dir}"
     git_clone="$?"
   else
     # assuming that the clone was already performed
@@ -442,7 +443,7 @@ grpc_framework_install() {
     die "error - git clone failure" "${err_git_clone_failure}"
   fi
 
-  cd "$HOME/grpc"
+  cd "${grpc_clone_dir}"
   if [ ! -d "cmake/build" ]; then
     mkdir -p cmake/build
     cd cmake/build

@@ -7,6 +7,9 @@ The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
 
 
+current -- 25-01.2023
+  ! Minor, multiple, fixes on install.sh (install vs clone dir)
+
 v1.1.1 -- 21-01.2023
   + When running in "Library mode" the ZMQ uri is learned from pmtelemetryd. In "binary mode" the ZMQ uri is statically set to "ipc:///tmp/grpc.sock"
   ! Minor, multiple, fixes on install.sh
