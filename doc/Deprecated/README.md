@@ -14,7 +14,7 @@ Recently, I had a closer look to some of these technologies, specifically I've b
 application based on the gRPC framework to be able to collect data modeled via YANG from a multi-vendor network.
 
 In the next paragraphs, at first, I would like to shortly introduce you to some of these technologies and later on describe the core
-features of the [**gRPC dial-out collector**](https://github.com/scuzzilla/mdt-dialout-collector) I've developed.
+features of the [**gRPC dial-out collector**](https://github.com/network-analytics/mdt-dialout-collector) I've developed.
 
 ### Model-Driven Telemetry *(MDT)*
 
@@ -57,7 +57,7 @@ is that you're going to have a single channel usable for both telemetry & router
 
 ### MDT Dial-out collector
 
-After this quick & dirty ramp-up with Network Telemetry technologies, I'd like to focus on the [**mdt-dialout-collector**](https://github.com/scuzzilla/mdt-dialout-collector) main features.
+After this quick & dirty ramp-up with Network Telemetry technologies, I'd like to focus on the [**mdt-dialout-collector**](https://github.com/network-analytics/mdt-dialout-collector) main features.
 The application is using the  gRPC framework to implement a multi-vendor gRPC Dial-out collector and is supporting
 the [**Cisco's gRPC Dial-out .proto file**](https://github.com/ios-xr/model-driven-telemetry/blob/ebc059d77f813b63bb5a3139f5178ad11665d49f/protos/66x/mdt_grpc_dialout/mdt_grpc_dialout.proto)
 , the [**Juniper's gRPC Dial-out .proto file**](https://www.juniper.net/documentation/us/en/software/junos/interfaces-telemetry/topics/topic-map/telemetry-grpc-dialout-ta.html)
@@ -194,9 +194,9 @@ log_level = "0";
 The [gRPC's Quick start guide](https://grpc.io/docs/languages/cpp/quickstart/) is describing in detail the compile/install procedure. If
 you're running a Debian derived Linux distribution you can also refer to the [Alfanetti](https://www.alfanetti.org/grpc-compile-debian.html) documentation.
 
-- [Debian based systems](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/debian_INSTALL.md)
+- [Debian based systems](https://github.com/network-analytics/mdt-dialout-collector/blob/main/debian_INSTALL.md)
 
-- [CentOS based systems](https://github.com/scuzzilla/mdt-dialout-collector/blob/main/centos_INSTALL.md)
+- [CentOS based systems](https://github.com/network-analytics/mdt-dialout-collector/blob/main/centos_INSTALL.md)
 
 ---
 
@@ -217,4 +217,4 @@ you're running a Debian derived Linux distribution you can also refer to the [Al
 | [Junos Telemetry .proto (Download section)](https://www.juniper.net/documentation/us/en/software/junos/interfaces-telemetry/topics/topic-map/telemetry-grpc-dialout-ta.html)| Apache License Version 2.0|
 | [Huawei dial-out .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                           | N/A                       |
 | [Huawei telemetry .proto](https://support.huawei.com/enterprise/en/doc/EDOC1100139549/40577baf/common-proto-files)                                                          | N/A                       |
-| [mdt-dialout-collector](https://github.com/scuzzilla/mdt-dialout-collector)                                                                                                 | MIT License               |
+| [mdt-dialout-collector](https://github.com/network-analytics/mdt-dialout-collector)                                                                                                 | MIT License               |

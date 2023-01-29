@@ -59,7 +59,7 @@ there is one main pmtelemetryd [CONFIG-KEYS](https://github.com/pmacct/pmacct/bl
 KEY:     telemetry_daemon_grpc_collector_conf
 DESC:    Points to a file containing the configuration of the gRPC collector thread. An
          example of the configuration plus all available config keys is available here:
-         https://github.com/scuzzilla/mdt-dialout-collector
+         https://github.com/network-analytics/mdt-dialout-collector
 DEFAULT: none
 ```
 

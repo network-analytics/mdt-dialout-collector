@@ -9,7 +9,7 @@ set -o errexit
 set -o nounset
 
 cd /opt
-git clone https://github.com/scuzzilla/mdt-dialout-collector.git
+git clone https://github.com/network-analytics/mdt-dialout-collector.git
 
 export PATH="/root/.local/bin:$PATH"
 cd mdt-dialout-collector;

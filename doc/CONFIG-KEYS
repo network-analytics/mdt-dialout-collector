@@ -83,13 +83,13 @@ DEFAULT:   "false"
 KEY:       enable_label_encode_as_map
 VALUES:    ["true" or "false"]
 DESC:      If enabled the data-stream output is enriched with an additional field "label": { "key1": "value1", "key2":"value2" }".
-           The enrichement strategy is described here https://github.com/scuzzilla/mdt-dialout-collector/tree/main/csv.
+           The enrichement strategy is described here https://github.com/network-analytics/mdt-dialout-collector/tree/main/csv.
 DEFAULT:   "false"
 
 KEY:       enable_label_encode_as_map_ptm
 VALUES:    ["true" or "false"]
 DESC:      If enabled the data-stream output is enriched with an additional field "label": { "key1": "value1", "key2":"value2" }".
-           The enrichement strategy is described here https://github.com/scuzzilla/mdt-dialout-collector/tree/main/ptm.
+           The enrichement strategy is described here https://github.com/network-analytics/mdt-dialout-collector/tree/main/ptm.
 DEFAULT:   "false"
 
 KEY:       label_map_csv_path

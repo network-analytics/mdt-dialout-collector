@@ -5,7 +5,7 @@ AC_INIT(
   [m4_esyscmd_s(cat VERSION)],
   [salvatore@cuzzilla.org],
   [mdt-dialout-collector],
-  [http://github.com/scuzzilla/mdt-dialout-collector])
+  [http://github.com/network-analytics/mdt-dialout-collector])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])

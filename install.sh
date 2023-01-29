@@ -24,7 +24,7 @@ readonly grpc_clone_dir="$HOME/grpc"
 readonly grpc_install_dir="$HOME/.local"
 
 # MDT install parameters
-readonly mdt_url="https://github.com/scuzzilla/mdt-dialout-collector.git"
+readonly mdt_url="https://github.com/network-analytics/mdt-dialout-collector.git"
 readonly mdt_version="v1.1.1"
 #readonly mdt_version="main"
 readonly mdt_install_dir="/opt/mdt-dialout-collector"
