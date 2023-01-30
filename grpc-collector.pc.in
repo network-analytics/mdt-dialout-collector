@@ -5,7 +5,7 @@ libdir=@libdir@
 
 Name: mdt-dialout-collector
 Description: Model-Driven Telemetry - Collecting <multi-vendor> metrics via gRPC dialout
-URL: https://github.com/scuzzilla/mdt-dialout-collector
+URL: https://github.com/network-analytics/mdt-dialout-collector
 Version: @VERSION@
 Cflags: -I${includedir}/grpc_collector
 Libs: -L${libdir} -lgrpc_collector

@@ -60,7 +60,7 @@ make install
 sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
 
 cd /opt
-git clone https://github.com/scuzzilla/mdt-dialout-collector.git
+git clone https://github.com/network-analytics/mdt-dialout-collector.git
 
 cd mdt-dialout-collector
 mkdir build
@@ -91,7 +91,7 @@ make install
 sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
 
 cd /opt
-git clone https://github.com/scuzzilla/mdt-dialout-collector.git
+git clone https://github.com/network-analytics/mdt-dialout-collector.git
 
 cd /opt/mdt-dialout-collector
 ./autogen.sh

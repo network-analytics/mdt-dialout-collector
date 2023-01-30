@@ -48,7 +48,7 @@ export PATH="/root/.local/bin:$PATH"
 apt install -y libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev libzmq3-dev libssl-dev
 
 cd /opt
-git clone https://github.com/scuzzilla/mdt-dialout-collector.git
+git clone https://github.com/network-analytics/mdt-dialout-collector.git
 
 cd mdt-dialout-collector
 mkdir build
@@ -69,7 +69,7 @@ ln -s /root/.local/bin/grpc_cpp_plugin /usr/local/bin/grpc_cpp_plugin
 apt install -y libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev libzmq3-dev libssl-dev
 
 cd /opt
-git clone https://github.com/scuzzilla/mdt-dialout-collector.git
+git clone https://github.com/network-analytics/mdt-dialout-collector.git
 
 cd mdt-dialout-collector
 ./autogen.sh
