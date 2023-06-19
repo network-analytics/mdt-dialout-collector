@@ -69,12 +69,12 @@ DEFAULT: none
 
 - The Standalone binary can be deployed using:
 ```SHELL
-$ sudo sh install.sh -b
+$ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -b
 ```
 
 - The Library/Header can be deployed using:
 ```SHELL
-$ sudo sh install.sh -l
+$ $ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l
 ```
 
 ## References
