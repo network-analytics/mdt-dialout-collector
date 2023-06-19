@@ -1,5 +1,7 @@
+## Testing Environment
+
 ```SHELL
-$ doas cat /etc/os-release
+$ sudo cat /etc/os-release
 
 PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
 NAME="Debian GNU/Linux"
@@ -42,3 +44,26 @@ $ sudo ./configure --enable-debug --enable-zmq --enable-jansson --enable-kafka -
 $ sudo make -j
 $ sudo make install
 ```
+
+## pmtelemetryd's minimal configuration snippet
+
+```SHELL
+$ sudo cat /root/etc/pmtelemetryd.conf
+
+! ### Generic Settings
+core_proc_name: pmtelemetryd-grpc
+pidfile: /root/var/run/pmtelemetryd-grpc
+logfile: /root/var/log/pmacct/pmtelemetryd.log
+!
+! ### gRPC dial-out Settings
+telemetry_daemon_decoder: json
+telemetry_daemon_grpc_collector_conf: /root/etc/pmtelemetryd-grpc-dialout.conf
+!
+! ### Kafka Settings
+telemetry_daemon_msglog_output: json
+telemetry_daemon_msglog_kafka_topic: kafka.topic
+telemetry_daemon_msglog_kafka_config_file: /root/etc/kafka.conf
+```
+
+
+
