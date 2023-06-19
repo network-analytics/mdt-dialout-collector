@@ -80,4 +80,14 @@ global, metadata.broker.list, 192.168.100.1:9092
 ## gRPC's dial-out minimal configuration snippet
 
 ```SHELL
+$ cat /root/etc/pmtelemetryd-grpc-dialout.conf
+
+iface = "enp1s0";
+ipv4_socket_cisco = "192.168.100.254:10001";
+data_delivery_method = "zmq";
+
+spdlog_level = "debug";
+
+enable_cisco_gpbkv2json = "false";
+enable_cisco_message_to_json_string = "true";
 ```
