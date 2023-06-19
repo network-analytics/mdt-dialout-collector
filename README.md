@@ -3,7 +3,7 @@
 [![Build status](https://github.com/network-analytics/mdt-dialout-collector/workflows/ci/badge.svg?branch=main)](https://github.com/network-analytics/mdt-dialout-collector/actions)
 
 **mdt-dialout-collector** is leveraging the [**gRPC Framework**](https://grpc.io/) to implement a multi-vendor gRPC Dial-out collector.
-The [doc/Changelog](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/Changelog) file is including additional details about the supported vendors.
+The [doc/Changelog](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/Changelog) file is including additional details about the supported network devices.
 
 The collector functionalities can be logically grouped into three categories:
 
@@ -79,4 +79,5 @@ $ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout
 
 ## References
 
--  https://blog.apnic.net/2022/10/17/multivendor-async-grpc-dial-out-collector/
+- [Integration with PMACCT/pmtelemetryd](https://github.com/network-analytics/mdt-dialout-collector/blob/doku/README.md)
+- [APNIC Blog](https://blog.apnic.net/2022/10/17/multivendor-async-grpc-dial-out-collector/)
