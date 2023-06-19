@@ -74,7 +74,7 @@ $ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout
 
 - The Library/Header can be deployed using:
 ```SHELL
-$ $ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l
+$ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l
 ```
 
 ## References
