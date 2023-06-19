@@ -63,7 +63,21 @@ telemetry_daemon_grpc_collector_conf: /root/etc/pmtelemetryd-grpc-dialout.conf
 telemetry_daemon_msglog_output: json
 telemetry_daemon_msglog_kafka_topic: kafka.topic
 telemetry_daemon_msglog_kafka_config_file: /root/etc/kafka.conf
+
+
+$ sudo cat /root/etc/kafka.conf
+
+global, compression.type, snappy
+global, queue.buffering.max.messages, 10000000
+global, batch.size, 2147483647
+global, batch.num.messages, 1000000
+global, linger.ms, 200
+global, client.id, debian
+global, security.protocol, plaintext
+global, metadata.broker.list, 192.168.100.1:9092
 ```
 
+## gRPC's dial-out minimal configuration snippet
 
-
+```SHELL
+```
