@@ -39,7 +39,7 @@ Eventually, The default configuration file can be replaced via command line:
 /opt/mdt-dialout-collector/bin/mdt_dialout_collector -f <file.conf>
 ```
 
-### Embedded into pmtelemetryd
+### Library/Header: gRPC dial-out support for pmtelemetryd
 ```TEXT
               +---------------------------------------------------------+
 +---------+   | +------------+   +--------------+   +-----------------+ |   +------------+
