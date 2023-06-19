@@ -34,7 +34,7 @@ which, by default, is reading the running options from:
 ```TEXT
 /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
 ```
-Eventually, The default configuration file can be replaced via command line:
+Additionally, the default configuration file can be further specified via the following command line:
 ```TEXT
 /opt/mdt-dialout-collector/bin/mdt_dialout_collector -f <file.conf>
 ```
