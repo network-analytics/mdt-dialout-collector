@@ -1,8 +1,18 @@
-# mdt-dialout-collector
-
 [![Build status](https://github.com/network-analytics/mdt-dialout-collector/workflows/ci/badge.svg?branch=main)](https://github.com/network-analytics/mdt-dialout-collector/actions)
 
-**mdt-dialout-collector** is leveraging the [**gRPC Framework**](https://grpc.io/) to implement a multi-vendor gRPC Dial-out collector.
+## Table of Content
+
+<!--ts-->
+   * [Introduction](#introduction)
+   * [Deployment options](#deployment-options)
+      * [Standalone binary with mdt-dialout-collector](#standalone-binary-with-mdt-dialout-collector)
+      * [Library/Header integration with pmtelemetryd](#libraryheader-integration-with-pmtelemetryd)
+   * [Build/Install](#buildinstall)
+   * [References](#references)
+<!--te-->
+
+## Introduction
+**mdt-dialout-collector** & **gRPC dial-out libraries** are leveraging the [**gRPC Framework**](https://grpc.io/) to implement a multi-vendor gRPC Dial-out collector.
 The [doc/Changelog](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/Changelog) file is including additional details about the supported network devices.
 
 The collector functionalities can be logically grouped into three categories:
@@ -13,11 +23,11 @@ The collector functionalities can be logically grouped into three categories:
 
 The [doc/CONFIG-KEYS](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/CONFIG-KEYS) file is including the description for each one of the available options.
 
-## Deployment
+## Deployment options
 
-mdt-dialout-collector can be deployed in two ways:
+The gRPC dial-out data-collection functionality can be deployed in two ways:
 
-### Standalone binary
+### Standalone binary with mdt-dialout-collector
 ```TEXT
               +------------------------------------------------------+
 +---------+   | +------------+   +--------------+   +--------------+ |   +---------+
@@ -39,7 +49,7 @@ Additionally, the default configuration file can be further specified via the fo
 /opt/mdt-dialout-collector/bin/mdt_dialout_collector -f <file.conf>
 ```
 
-### Library/Header: gRPC dial-out support for pmtelemetryd
+### Library/Header integration with pmtelemetryd
 ```TEXT
               +---------------------------------------------------------+
 +---------+   | +------------+   +--------------+   +-----------------+ |   +------------+

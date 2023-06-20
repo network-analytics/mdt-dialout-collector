@@ -1,3 +1,19 @@
+## Table of Content
+
+<!--ts-->
+   * [Introduction](#introduction)
+   * [Testing Environment](#testing-environment)
+   * [Compile/Install gRPC dial-out library/Header for pmtelemetryd](#compileinstall-gRPC-dial-out-libraryheader-for-pmtelemetryd)
+   * [Compile/Install pmtelemetryd with gRPC dial-out support enabled](#compileinstall-pmtelemetryd-with-gRPC-dial-out-support-enabled)
+   * [pmtelemetryd's minimal configuration snippet](#pmtelemetryds-minimal-configuration-snippet)
+   * [gRPC's dial-out minimal configuration snippet](#gRPCs-dial-out-minimal-configuration-snippet)
+<!--te-->
+
+## Introduction
+
+The following paragraphs outline the steps necessary to integrate the gRPC dial-out data collection functionality into pmacct/pmtelemetryd.
+I've included a minimal set of configuration snippets that can serve to verify the installation as well as act as a starting point for more intricate scenarios.
+
 ## Testing Environment
 
 ```SHELL
