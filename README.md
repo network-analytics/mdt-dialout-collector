@@ -89,5 +89,6 @@ $ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout
 
 ## References
 
-- [Integration with PMACCT/pmtelemetryd](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/Integration-with-pmtelemetryd.md)
+- [Integration with PMACCT/pmtelemetryd](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/integration-with-pmtelemetryd.md)
+- [Network devices configuration snippets](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/network-devices-conf-snip.md)
 - [Multivendor (async) gRPC dial-out collector - APNIC Blog](https://blog.apnic.net/2022/10/17/multivendor-async-grpc-dial-out-collector/)
