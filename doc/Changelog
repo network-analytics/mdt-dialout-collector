@@ -12,7 +12,8 @@ current -- XX-XX.20XX
 v1.1.2 -- 26-06.2023
   + JunOS "sensor_path" formatted as JSON
   ! Testing gRPC dial-out support for Cisco NX-OS (testing device: NX-OS 10.2(2)@Nexus9000)
-  ! Documentation general review/update | adding integration-with-pmtelemetryd.md | adding network-devices-conf-snip.md  
+  ! Documentation general review/update | adding integration-with-pmtelemetryd.md | adding network-devices-conf-snip.md
+  ! Minor, multiple, fixes on install.sh (install vs clone dir)
 
 v1.1.1 -- 21-01.2023
   + When running in "Library mode" the ZMQ uri is learned from pmtelemetryd. In "binary mode" the ZMQ uri is statically set to "ipc:///tmp/grpc.sock"
