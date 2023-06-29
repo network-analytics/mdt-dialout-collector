@@ -33,7 +33,7 @@ BUG_REPORT_URL="https://bugs.debian.org/"
 ## Compile/Install gRPC dial-out library/Header for pmtelemetryd
 
 ```SHELL
-$ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l
+sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l
 ```
 
 #### *(sh install.sh -l)* explained
@@ -50,15 +50,15 @@ $ sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout
 ## Compile/Install pmtelemetryd with gRPC dial-out support enabled
 
 ```SHELL
-$ sudo apt install libzmq3-dev libjansson-dev librdkafka-dev
+sudo apt install libzmq3-dev libjansson-dev librdkafka-dev
 
-$ cd /opt
-$ sudo git clone https://github.com/pmacct/pmacct.git
-$ cd /opt/pmacct
-$ sudo ./autogen.sh
-$ sudo ./configure --enable-debug --enable-zmq --enable-jansson --enable-kafka --enable-grpc-collector
-$ sudo make -j
-$ sudo make install
+cd /opt
+sudo git clone https://github.com/pmacct/pmacct.git
+cd /opt/pmacct
+sudo ./autogen.sh
+sudo ./configure --enable-debug --enable-zmq --enable-jansson --enable-kafka --enable-grpc-collector
+sudo make -j
+sudo make install
 ```
 
 ## pmtelemetryd's minimal configuration snippet
