@@ -10,6 +10,50 @@
 // Global visibility to be able to signal the refresh --> CSV from main
 std::unordered_map<std::string, std::vector<std::string>> label_map;
 
+void CustomSocketMutator::log_socket_options(int fd) {
+    int type, keepalive, reuseport;
+    socklen_t len = sizeof(type);
+
+    // Log SO_TYPE
+    if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) == 0) {
+        std::string type_str;
+        switch (type) {
+            case SOCK_STREAM:
+                type_str = "SOCK_STREAM (TCP)";
+                break;
+            case SOCK_DGRAM:
+                type_str = "SOCK_DGRAM (UDP)";
+                break;
+            case SOCK_RAW:
+                type_str = "SOCK_RAW (Raw)";
+                break;
+            // Add more types if needed
+            default:
+                type_str = "Unknown Type";
+                break;
+        }
+        spdlog::get("multi-logger")->debug("Socket Type: {}", type_str);
+    } else {
+        spdlog::get("multi-logger")->error("getsockopt(SO_TYPE) failed");
+    }
+
+    // Log SO_KEEPALIVE
+    if (getsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &keepalive, &len) == 0) {
+        spdlog::get("multi-logger")->
+            debug("SO_KEEPALIVE: {}", keepalive ? "Enabled" : "Disabled");
+    } else {
+        spdlog::get("multi-logger")->error("getsockopt(SO_KEEPALIVE) failed");
+    }
+
+    // Log SO_REUSEPORT
+    if (getsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &reuseport, &len) == 0) {
+        spdlog::get("multi-logger")->
+            debug("SO_REUSEPORT: {}", reuseport ? "Enabled" : "Disabled");
+    } else {
+        spdlog::get("multi-logger")->error("getsockopt(SO_REUSEPORT) failed");
+    }
+}
+
 bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
 {
     int type;
@@ -31,6 +75,8 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
             "on the configured socket(s)", iface);
         std::abort();
     }
+
+    log_socket_options(fd);
 
     return true;
 }

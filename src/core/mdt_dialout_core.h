@@ -48,6 +48,7 @@ public:
         spdlog::get("multi-logger")->
             debug("destructor: ~CustomSocketMutator()"); };
     bool bindtodevice_socket_mutator(int fd);
+    void log_socket_options(int fd);
 };
 
 class Srv final {
