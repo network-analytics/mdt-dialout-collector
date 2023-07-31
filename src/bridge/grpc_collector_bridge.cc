@@ -228,15 +228,15 @@ extern "C" {
         std::vector<pthread_t> workers(MAX_WORKERS);
 
         // Cisco
-        LoadThreads(workers, "ipv4_socket_cisco", "replies_cisco",
+        LoadThreads(workers.data(), "ipv4_socket_cisco", "replies_cisco",
             "cisco_workers");
 
         // Juniper
-        LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
+        LoadThreads(workers.data(), "ipv4_socket_juniper", "replies_juniper",
             "juniper_workers");
 
         // Huawei
-        LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
+        LoadThreads(workers.data(), "ipv4_socket_huawei", "replies_huawei",
             "huawei_workers");
 
         size_t w;
