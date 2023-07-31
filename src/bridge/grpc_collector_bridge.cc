@@ -239,8 +239,7 @@ extern "C" {
         LoadThreads(workers.data(), "ipv4_socket_huawei", "replies_huawei",
             "huawei_workers");
 
-        size_t w;
-        for (w = 0; w < MAX_WORKERS; w++) {
+        for (size_t w = 0; w < MAX_WORKERS; w++) {
             pthread_detach(workers[w]);
         }
     }
@@ -341,11 +340,11 @@ extern "C" {
         const char *workers_str)
     {
         if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
-            int replies =
+            size_t replies =
                 std::stoi(main_cfg_parameters.at(replies_str));
             if (replies < 0 || replies > 1000) {
                 spdlog::get("multi-logger")->
-                    error("[{}] configuaration issue: the "
+                    error("[{}] configuration issue: the "
                     "allowed amount of replies per session is defined between 10 "
                     "and 1000. (default = 0 => unlimited)", replies_str);
                 std::exit(EXIT_FAILURE);
@@ -353,15 +352,20 @@ extern "C" {
             size_t workers = std::stoi(main_cfg_parameters.at(workers_str));
             if (workers < 1 || workers > 5) {
                 spdlog::get("multi-logger")->
-                    error("[{}] configuaration issue: the "
+                    error("[{}] configuration issue: the "
                     "allowed amount of workers is defined between 1 "
                     "and 5. (default = 1)", workers_str);
                 std::exit(EXIT_FAILURE);
             }
             size_t w;
             for (w = 0; w < workers; w++) {
-                pthread_create(&workers_vec[w], NULL, VendorThread,
-                    (void *) ipv4_socket_str);
+                int res = pthread_create(&workers_vec[w], NULL, VendorThread,
+                    (void *)ipv4_socket_str);
+                if (res != 0) {
+                    spdlog::get("multi-logger")->
+                        error("Failed to create thread: {}", strerror(res));
+                    continue; // Continue to attempt to create remaining threads
+                }
             }
             spdlog::get("multi-logger")->
                 info("mdt-dialout-collector listening on {} ",

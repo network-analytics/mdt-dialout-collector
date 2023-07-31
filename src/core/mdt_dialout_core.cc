@@ -438,6 +438,9 @@ void Srv::CiscoStream::Start(
 {
     const std::string ddm = main_cfg_parameters.at("data_delivery_method");
 
+    Srv::CiscoStream *cisco_sstream =
+        new Srv::CiscoStream(cisco_service_, cisco_cq_);
+
     // Initial stream_status set to START @constructor
     if (cisco_stream_status == START) {
         cisco_service_->RequestMdtDialout(
@@ -450,8 +453,6 @@ void Srv::CiscoStream::Start(
     } else if (cisco_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
             "new Srv::CiscoStream() {}", cisco_server_ctx.peer());
-        std::unique_ptr<Srv::CiscoStream> cisco_sstream(
-            new Srv::CiscoStream(cisco_service_, cisco_cq_));
         cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
             kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
             cisco_tlm);
@@ -464,6 +465,7 @@ void Srv::CiscoStream::Start(
                 "cisco_stream_status = END");
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
+            delete cisco_sstream;
         } else {
             auto tid = std::this_thread::get_id();
             std::stringstream stid;
@@ -805,6 +807,7 @@ void Srv::CiscoStream::Start(
             }
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
+            delete cisco_sstream;
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
@@ -827,6 +830,9 @@ void Srv::JuniperStream::Start(
 {
     const std::string ddm = main_cfg_parameters.at("data_delivery_method");
 
+    Srv::JuniperStream *juniper_sstream =
+        new Srv::JuniperStream(juniper_service_, juniper_cq_);
+
     // Initial stream_status set to START @constructor
     if (juniper_stream_status == START) {
         juniper_service_->RequestDialOutSubscriber(
@@ -839,8 +845,6 @@ void Srv::JuniperStream::Start(
     } else if (juniper_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
             "new Srv::JuniperStream() {}", juniper_server_ctx.peer());
-        std::unique_ptr<Srv::JuniperStream> juniper_sstream(
-            new Srv::JuniperStream(juniper_service_, juniper_cq_));
         juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
             kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
             juniper_tlm_hdr_ext);
@@ -853,6 +857,7 @@ void Srv::JuniperStream::Start(
                 "juniper_stream_status = END");
             juniper_stream_status = END;
             juniper_resp.Finish(grpc::Status::OK, this);
+            delete juniper_sstream;
         } else {
             auto tid = std::this_thread::get_id();
             std::stringstream stid;
@@ -957,6 +962,7 @@ void Srv::JuniperStream::Start(
             }
             juniper_stream_status = PROCESSING;
             juniper_replies_sent++;
+            delete juniper_sstream;
         }
     } else {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
@@ -980,6 +986,9 @@ void Srv::HuaweiStream::Start(
 {
     const std::string ddm = main_cfg_parameters.at("data_delivery_method");
 
+    Srv::HuaweiStream *huawei_sstream =
+        new Srv::HuaweiStream(huawei_service_, huawei_cq_);
+
     // Initial stream_status set to START @constructor
     if (huawei_stream_status == START) {
         huawei_service_->RequestdataPublish(
@@ -992,14 +1001,13 @@ void Srv::HuaweiStream::Start(
     } else if (huawei_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[HuaweiStream::Start()] "
             "new Srv::HuaweiStream()");
-        std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
-            new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
             kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
             huawei_tlm, oc_if);
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
         huawei_replies_sent++;
+        delete huawei_sstream;
     } else if (huawei_stream_status == PROCESSING) {
         if (huawei_replies_sent == kHuaweiMaxReplies) {
             spdlog::get("multi-logger")->debug("[HuaweiStream::Start()] "
@@ -1208,6 +1216,7 @@ void Srv::HuaweiStream::Start(
             }
             huawei_stream_status = PROCESSING;
             huawei_replies_sent++;
+            delete huawei_sstream;
         }
     } else {
         spdlog::get("multi-logger")->debug("[HuaweiStream::Start()] "

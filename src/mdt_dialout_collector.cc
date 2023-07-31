@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     }
 
     if ((v_option_flag == 1) and (argc == 2)) {
-        std::cout << "gRPC dial-out collector, mdt-dialout-collector v1.0.0\n";
+        std::cout << "gRPC dial-out collector, mdt-dialout-collector v1.1.3\n";
         return EXIT_SUCCESS;
     } else if ((v_option_flag == 1) and (argc > 2)) {
         std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-V]\n";
@@ -270,25 +270,24 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &workers_str)
 {
     if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
-        int replies =
+        size_t replies =
             std::stoi(main_cfg_parameters.at(replies_str));
         if (replies < 0 || replies > 1000) {
             spdlog::get("multi-logger")->
-                error("[{}] configuaration issue: the "
+                error("[{}] configuration issue: the "
                 "allowed amount of replies per session is defined between 10 "
                 "and 1000. (default = 0 => unlimited)", replies_str);
             std::exit(EXIT_FAILURE);
         }
-        int workers = std::stoi(main_cfg_parameters.at(workers_str));
+        size_t workers = std::stoi(main_cfg_parameters.at(workers_str));
         if (workers < 1 || workers > 5) {
             spdlog::get("multi-logger")->
-                error("[{}] configuaration issue: the "
+                error("[{}] configuration issue: the "
                 "allowed amount of workers is defined between 1 "
                 "and 5. (default = 1)", workers_str);
             std::exit(EXIT_FAILURE);
         }
-        int w;
-        for (w = 0; w < workers; w++) {
+        for (size_t w = 0; w < workers; w++) {
             workers_vec.push_back(std::thread(&VendorThread,
                 ipv4_socket_str));
         }
