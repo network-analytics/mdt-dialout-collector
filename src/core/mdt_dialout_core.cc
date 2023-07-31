@@ -450,8 +450,8 @@ void Srv::CiscoStream::Start(
     } else if (cisco_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
             "new Srv::CiscoStream() {}", cisco_server_ctx.peer());
-        Srv::CiscoStream *cisco_sstream =
-            new Srv::CiscoStream(cisco_service_, cisco_cq_);
+        std::unique_ptr<Srv::CiscoStream> cisco_sstream(
+            new Srv::CiscoStream(cisco_service_, cisco_cq_));
         cisco_sstream->Start(label_map, data_manipulation, data_wrapper,
             kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
             cisco_tlm);
@@ -839,8 +839,8 @@ void Srv::JuniperStream::Start(
     } else if (juniper_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
             "new Srv::JuniperStream() {}", juniper_server_ctx.peer());
-        Srv::JuniperStream *juniper_sstream =
-            new Srv::JuniperStream(juniper_service_, juniper_cq_);
+        std::unique_ptr<Srv::JuniperStream> juniper_sstream(
+            new Srv::JuniperStream(juniper_service_, juniper_cq_));
         juniper_sstream->Start(label_map, data_manipulation, data_wrapper,
             kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
             juniper_tlm_hdr_ext);
@@ -992,8 +992,8 @@ void Srv::HuaweiStream::Start(
     } else if (huawei_stream_status == FLOW) {
         spdlog::get("multi-logger")->debug("[HuaweiStream::Start()] "
             "new Srv::HuaweiStream()");
-        Srv::HuaweiStream *huawei_sstream =
-            new Srv::HuaweiStream(huawei_service_, huawei_cq_);
+        std::unique_ptr<Srv::HuaweiStream> huawei_sstream(
+            new Srv::HuaweiStream(huawei_service_, huawei_cq_));
         huawei_sstream->Start(label_map, data_manipulation, data_wrapper,
             kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri,
             huawei_tlm, oc_if);

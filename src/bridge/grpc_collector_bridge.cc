@@ -129,12 +129,29 @@ extern "C" {
     {
         grpc_payload *pload = (grpc_payload *) malloc(sizeof(grpc_payload));
 
+        // Check if memory was successfully allocated
+        if (pload == NULL) {
+            spdlog::get("multi-logger")->
+                error("Unable to allocate memory for grpc_payload");
+            std::exit(EXIT_FAILURE);
+        }
+
         pload->event_type = strndup(event_type, strlen(event_type));
         pload->serialization = strndup(serialization, strlen(serialization));
         pload->writer_id = strndup(writer_id, strlen(writer_id));
         pload->telemetry_node = strndup(telemetry_node, strlen(telemetry_node));
         pload->telemetry_port = strndup(telemetry_port, strlen(telemetry_port));
         pload->telemetry_data = strndup(telemetry_data, strlen(telemetry_data));
+
+        // Check if memory was successfully allocated for each member
+        if (pload->event_type == NULL || pload->serialization == NULL ||
+            pload->writer_id == NULL || pload->telemetry_node == NULL ||
+            pload->telemetry_port == NULL || pload->telemetry_data == NULL) {
+            spdlog::get("multi-logger")->
+                error("Unable to allocate memory for grpc_payload members");
+            free_grpc_payload(pload);
+            std::exit(EXIT_FAILURE);
+        }
 
         *pload_ = pload;
     }
@@ -167,12 +184,28 @@ extern "C" {
 
     void free_grpc_payload(grpc_payload *pload)
     {
+        if (pload == NULL) {
+            return;
+        }
+
         free(pload->event_type);
+        pload->event_type = NULL;
+
         free(pload->serialization);
+        pload->serialization = NULL;
+
         free(pload->writer_id);
+        pload->writer_id = NULL;
+
         free(pload->telemetry_node);
+        pload->telemetry_node = NULL;
+
         free(pload->telemetry_port);
+        pload->telemetry_port = NULL;
+
         free(pload->telemetry_data);
+        pload->telemetry_data = NULL;
+
         free(pload);
     }
 
@@ -191,9 +224,8 @@ extern "C" {
                 std::exit(EXIT_FAILURE);
         }
 
-        // Allocate MEM for MAX_WORKERS = 15
-        pthread_t *workers =
-            (pthread_t *) malloc(MAX_WORKERS * sizeof(pthread_t));
+        // Use a vector to store the worker threads
+        std::vector<pthread_t> workers(MAX_WORKERS);
 
         // Cisco
         LoadThreads(workers, "ipv4_socket_cisco", "replies_cisco",
@@ -207,10 +239,8 @@ extern "C" {
         LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
             "huawei_workers");
 
-        size_t workers_lenght = sizeof(&workers) / sizeof(pthread_t);
-
         size_t w;
-        for (w = 0; w < workers_lenght; w++) {
+        for (w = 0; w < MAX_WORKERS; w++) {
             pthread_detach(workers[w]);
         }
     }
