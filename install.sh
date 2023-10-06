@@ -16,6 +16,7 @@ libspdlog_dev_min_version=150
 libzmq3_dev_min_version=432
 
 sysdeb_install_list="libssl-dev libfmt-dev"
+sysrpm_install_list="jsoncpp-devel libconfig-devel spdlog-devel cppzmq-devel openssl-devel"
 
 # gRPC install parameters
 readonly grpc_url="https://github.com/grpc/grpc"
@@ -62,6 +63,7 @@ readonly err_missing_options=82
 readonly err_unknown_options=83
 readonly err_missing_options_arg=84
 readonly err_unimplemented_options=85
+readonly err_epel_failure=86
 readonly script_name="${0##*/}"
 
 h_option_flag=0
@@ -162,7 +164,7 @@ os_release_detect() {
     ;;
   flavor)
     # Supported distro
-    set -- debian ubuntu pop centos OpenBSD
+    set -- debian ubuntu pop centos rhel OpenBSD
     local linux_distribution="$(egrep '^ID=' /etc/os-release | awk -F "=" '{print $2}' | tr -d "\"")"
     local bsd_distribution="none"
 
@@ -190,7 +192,7 @@ os_release_detect() {
       case "${_flavor}" in
       debian)
         # Supported debian releases
-        set -- 11
+        set -- 11 12
 
         for item in "$@";
         do
@@ -204,7 +206,7 @@ os_release_detect() {
         ;;
       ubuntu|pop)
         # Supported ubuntu/pop releases
-        set -- 20.04 22.04 22.10
+        set -- 20.04 22.04 22.10 23.04
 
         for item in "$@";
         do
@@ -216,9 +218,9 @@ os_release_detect() {
 
         os_release_helper
         ;;
-      centos|redhat)
+      centos|rhel)
         # Supported centos releases
-        set -- 8 9
+        set -- 8 9 9.1 9.2
 
         for item in "$@";
         do
@@ -530,7 +532,7 @@ grpc_collector_bin_install_deb() {
 grpc_collector_bin_install_rpm() {
   #echo "grpc_collector_bin_install_rpm()"
   local yum_install=1
-  yum install -y jsoncpp-devel libconfig-devel spdlog-devel cppzmq-devel openssl-devel
+  yum install -y $(echo "${sysrpm_install_list}")
   yum_install="$?"
 
   sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
@@ -648,7 +650,7 @@ grpc_collector_lib_install_rpm() {
   fi
 
   local yum_install=1
-  yum install -y jsoncpp-devel libconfig-devel spdlog-devel cppzmq-devel openssl-devel
+  yum install -y $(echo "${sysrpm_install_list}")
   yum_install="$?"
 
   sed -i '/SPDLOG_FMT_EXTERNAL/s/^\/\/ //g' /usr/include/spdlog/tweakme.h
@@ -706,6 +708,7 @@ grpc_collector_deploy() {
   command -v make       >/dev/null 2>&1 || die "error - expected make command"                  "${err_cmd_notfound}"
   command -v cmake      >/dev/null 2>&1 || die "error - expected cmake command"                 "${err_cmd_notfound}"
   command -v gcc        >/dev/null 2>&1 || die "error - expected gcc command"                   "${err_cmd_notfound}"
+  command -v g++        >/dev/null 2>&1 || die "error - expected g++ command"                   "${err_cmd_notfound}"
   command -v autoreconf >/dev/null 2>&1 || die "error - expected autoreconf (autoconf) command" "${err_cmd_notfound}"
   command -v libtoolize >/dev/null 2>&1 || die "error - expected libtoolize (libtool) command"  "${err_cmd_notfound}"
   command -v cut        >/dev/null 2>&1 || die "error - expected cut command"                   "${err_cmd_notfound}"
@@ -715,10 +718,10 @@ grpc_collector_deploy() {
   "Linux ubuntu 20.04" | \
   "Linux ubuntu 22.04" | \
   "Linux ubuntu 22.10" | \
+  "Linux ubuntu 23.04" | \
   "Linux pop 22.04")
     #echo "grpc_collector_deploy_deb()"
     command -v apt-get >/dev/null 2>&1 || die "error - expected apt command" "${err_cmd_notfound}"
-    command -v g++     >/dev/null 2>&1 || die "error - expected g++ command" "${err_cmd_notfound}"
     check_if_root
     detect_sysdeb_lib "libjsoncpp-dev"
     detect_sysdeb_lib "librdkafka-dev"
@@ -742,13 +745,25 @@ grpc_collector_deploy() {
     ;;
   "Linux centos 8" | \
   "Linux centos 9" | \
-  "Linux redhat 8" | \
-  "Linux redhat 9")
+  "Linux rhel 8"   | \
+  "Linux rhel 9"   | \
+  "Linux rhel 9.1" | \
+  "Linux rhel 9.2")
     #echo "grpc_collector_deploy_rpm()"
-    command -v yum     >/dev/null 2>&1 || die "error - expected yum command" "${err_cmd_notfound}"
+    if [ "${_os_info}" = "Linux centos 8" ] || [ "${_os_info}" = "Linux centos 9" ]; then
+      command -v yum     >/dev/null 2>&1 || die "error - expected yum command" "${err_cmd_notfound}"
+    else
+      command -v dnf     >/dev/null 2>&1 || die "error - expected dnf command" "${err_cmd_notfound}"
+    fi
+
     check_if_root
-    # Switch to a recent gcc version
-    source /opt/rh/gcc-toolset-11/enable
+
+    yum install -y epel-release >/dev/null 2>&1 || die "error - epel-release install failure" "${err_epel_failure}"
+
+    # Switch to a recent gcc version (old centos/rhel release)
+    if [ "${_os_info}" = "Linux centos 8" ] || [ "${_os_info}" = "Linux rhel 8" ]; then
+      source /opt/rh/gcc-toolset-11/enable
+    fi
     detect_sysrpm_lib
     if [ "${grpc_dev}" -eq 0 ]; then
       detect_installed_grpc
