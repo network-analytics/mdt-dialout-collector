@@ -16,7 +16,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    #define MAX_WORKERS 15
+    #define MAX_WORKERS 5
 
     typedef struct {
         /* main */

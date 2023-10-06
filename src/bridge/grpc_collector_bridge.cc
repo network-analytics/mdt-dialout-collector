@@ -224,23 +224,33 @@ extern "C" {
                 std::exit(EXIT_FAILURE);
         }
 
-        // Use a vector to store the worker threads
-        std::vector<pthread_t> workers(MAX_WORKERS);
+        // Use arrays to store the worker threads per vendor
+        pthread_t cisco_workers[MAX_WORKERS] = {0};
+        pthread_t juniper_workers[MAX_WORKERS] = {0};
+        pthread_t huawei_workers[MAX_WORKERS] = {0};
 
         // Cisco
-        LoadThreads(workers.data(), "ipv4_socket_cisco", "replies_cisco",
+        LoadThreads(cisco_workers, "ipv4_socket_cisco", "replies_cisco",
             "cisco_workers");
 
         // Juniper
-        LoadThreads(workers.data(), "ipv4_socket_juniper", "replies_juniper",
+        LoadThreads(juniper_workers, "ipv4_socket_juniper", "replies_juniper",
             "juniper_workers");
 
         // Huawei
-        LoadThreads(workers.data(), "ipv4_socket_huawei", "replies_huawei",
+        LoadThreads(huawei_workers, "ipv4_socket_huawei", "replies_huawei",
             "huawei_workers");
 
-        for (size_t w = 0; w < MAX_WORKERS; w++) {
-            pthread_detach(workers[w]);
+        for (size_t w = 0; w < MAX_WORKERS && cisco_workers[w] != 0; w++) {
+            pthread_detach(cisco_workers[w]);
+        }
+
+        for (size_t w = 0; w < MAX_WORKERS && juniper_workers[w] != 0; w++) {
+            pthread_detach(juniper_workers[w]);
+        }
+
+        for (size_t w = 0; w < MAX_WORKERS && huawei_workers[w] != 0; w++) {
+            pthread_detach(huawei_workers[w]);
         }
     }
 
@@ -357,8 +367,7 @@ extern "C" {
                     "and 5. (default = 1)", workers_str);
                 std::exit(EXIT_FAILURE);
             }
-            size_t w;
-            for (w = 0; w < workers; w++) {
+            for (size_t w = 0; w < workers; w++) {
                 int res = pthread_create(&workers_vec[w], NULL, VendorThread,
                     (void *)ipv4_socket_str);
                 if (res != 0) {
