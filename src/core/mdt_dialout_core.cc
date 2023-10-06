@@ -465,7 +465,10 @@ void Srv::CiscoStream::Start(
                 "cisco_stream_status = END");
             cisco_stream_status = END;
             cisco_resp.Finish(grpc::Status::OK, this);
-            delete cisco_sstream;
+            if (cisco_sstream) {
+                delete cisco_sstream;
+                cisco_sstream = nullptr;
+            }
         } else {
             auto tid = std::this_thread::get_id();
             std::stringstream stid;
@@ -807,7 +810,10 @@ void Srv::CiscoStream::Start(
             }
             cisco_stream_status = PROCESSING;
             cisco_replies_sent++;
-            delete cisco_sstream;
+            if (cisco_sstream) {
+                delete cisco_sstream;
+                cisco_sstream = nullptr;
+            }
         }
     } else {
         spdlog::get("multi-logger")->debug("[CiscoStream::Start()] "
@@ -857,7 +863,10 @@ void Srv::JuniperStream::Start(
                 "juniper_stream_status = END");
             juniper_stream_status = END;
             juniper_resp.Finish(grpc::Status::OK, this);
-            delete juniper_sstream;
+            if (juniper_sstream) {
+                delete juniper_sstream;
+                juniper_sstream = nullptr;
+            }
         } else {
             auto tid = std::this_thread::get_id();
             std::stringstream stid;
@@ -962,7 +971,10 @@ void Srv::JuniperStream::Start(
             }
             juniper_stream_status = PROCESSING;
             juniper_replies_sent++;
-            delete juniper_sstream;
+            if (juniper_sstream) {
+                delete juniper_sstream;
+                juniper_sstream = nullptr;
+            }
         }
     } else {
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
@@ -1007,7 +1019,10 @@ void Srv::HuaweiStream::Start(
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
         huawei_replies_sent++;
-        delete huawei_sstream;
+        if (huawei_sstream) {
+             delete huawei_sstream;
+             huawei_sstream = nullptr;
+        }
     } else if (huawei_stream_status == PROCESSING) {
         if (huawei_replies_sent == kHuaweiMaxReplies) {
             spdlog::get("multi-logger")->debug("[HuaweiStream::Start()] "
@@ -1216,7 +1231,10 @@ void Srv::HuaweiStream::Start(
             }
             huawei_stream_status = PROCESSING;
             huawei_replies_sent++;
-            delete huawei_sstream;
+            if (huawei_sstream) {
+                 delete huawei_sstream;
+                 huawei_sstream = nullptr;
+            }
         }
     } else {
         spdlog::get("multi-logger")->debug("[HuaweiStream::Start()] "
