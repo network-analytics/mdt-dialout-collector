@@ -164,7 +164,7 @@ os_release_detect() {
     ;;
   flavor)
     # Supported distro
-    set -- debian ubuntu pop centos rhel OpenBSD
+    set -- debian ubuntu pop centos rocky rhel OpenBSD
     local linux_distribution="$(egrep '^ID=' /etc/os-release | awk -F "=" '{print $2}' | tr -d "\"")"
     local bsd_distribution="none"
 
@@ -218,9 +218,9 @@ os_release_detect() {
 
         os_release_helper
         ;;
-      centos|rhel)
-        # Supported centos releases
-        set -- 8 9 9.1 9.2
+      centos|rocky|rhel)
+        # Supported centos/rocky/rhel releases
+        set -- 8 8.8 9 9.1 9.2
 
         for item in "$@";
         do
@@ -503,7 +503,7 @@ grpc_collector_bin_install_deb() {
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
-    git clone "${mdt_url}" -b "${mdt_version}" "${mdt_install_dir}"
+    git clone -b "${mdt_version}" "${mdt_url}" "${mdt_install_dir}"
     git_clone="$?"
   else
     # assuming that the clone was already performed
@@ -554,7 +554,7 @@ grpc_collector_bin_install_rpm() {
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
-    git clone "${mdt_url}" "${mdt_install_dir}"
+    git clone -b "${mdt_version}" "${mdt_url}" "${mdt_install_dir}"
     git_clone="$?"
   else
     # assuming that the clone was already performed
@@ -617,7 +617,7 @@ grpc_collector_lib_install_deb() {
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
-    git clone "${mdt_url}" -b "${mdt_version}" "${mdt_install_dir}"
+    git clone -b "${mdt_version}" "${mdt_url}" "${mdt_install_dir}"
     git_clone="$?"
   else
     # assuming that the clone was already performed
@@ -672,7 +672,7 @@ grpc_collector_lib_install_rpm() {
 
   local git_clone=1
   if [ ! -d "${mdt_install_dir}" ]; then
-    git clone "${mdt_url}" "${mdt_install_dir}"
+    git clone -b "${mdt_version}" "${mdt_url}" "${mdt_install_dir}"
     git_clone="$?"
   else
     # assuming that the clone was already performed
@@ -743,11 +743,12 @@ grpc_collector_deploy() {
       grpc_collector_lib_install_deb
     fi
     ;;
-  "Linux centos 8" | \
-  "Linux centos 9" | \
-  "Linux rhel 8"   | \
-  "Linux rhel 9"   | \
-  "Linux rhel 9.1" | \
+  "Linux centos 8"  | \
+  "Linux centos 9"  | \
+  "Linux rocky 8.8" | \
+  "Linux rhel 8"    | \
+  "Linux rhel 9"    | \
+  "Linux rhel 9.1"  | \
   "Linux rhel 9.2")
     #echo "grpc_collector_deploy_rpm()"
     if [ "${_os_info}" = "Linux centos 8" ] || [ "${_os_info}" = "Linux centos 9" ]; then
@@ -760,8 +761,9 @@ grpc_collector_deploy() {
 
     yum install -y epel-release >/dev/null 2>&1 || die "error - epel-release install failure" "${err_epel_failure}"
 
-    # Switch to a recent gcc version (old centos/rhel release)
-    if [ "${_os_info}" = "Linux centos 8" ] || [ "${_os_info}" = "Linux rhel 8" ]; then
+    # Switch to a recent gcc version (old centos/rocky/rhel release)
+    if [ "${_os_info}" = "Linux centos 8" ] || [ "${_os_info}" = "Linux rhel 8" ] || [ "${_os_info}" = "Linux rocky 8.8" ]; then
+      yum -y install gcc-toolset-11 >/dev/null 2>&1
       source /opt/rh/gcc-toolset-11/enable
     fi
     detect_sysrpm_lib
