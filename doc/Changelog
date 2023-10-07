@@ -9,10 +9,11 @@ The keys used are:
 
 current -- XX-XX.20XX
 
-v1.1.3 -- 06-10.2023
-  + Adding support for certain releases of rhel & rocky Linux to the install.sh script
-  ! Adding simple checks before every "delete" statement to avoid double deletion
-  ! Fixing Segfault issue affecting start_grpc_dialout_collector() function
+v1.1.3 -- 07-10.2023
+  + Adding dedicated vector per vendor to handle threads, standalone collector
+  + Adding support for rhel & rocky Linux, install.sh script
+  ! Adding checks before every "delete" statement to avoid double deletion
+  ! Fixing Segfault issue affecting the start_grpc_dialout_collector() function
   ! Fixing memory leak affecting the Srv::*Stream::Start() functions
   ! Making the free_grpc_payload() and the InitGrpcPayload() function safer (pointers handling)
   ! Making start_grpc_dialout_collector() safer (vector to store the workers threads)

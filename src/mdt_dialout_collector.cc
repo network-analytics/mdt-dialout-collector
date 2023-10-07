@@ -193,25 +193,41 @@ int main(int argc, char *argv[])
     zmq_single_thread_poller.detach();
     // --- ZMQ - Poller ---
 
-    std::vector<std::thread> workers;
+    std::vector<std::thread> cisco_workers;
+    std::vector<std::thread> juniper_workers;
+    std::vector<std::thread> huawei_workers;
 
     // Cisco
-    LoadThreads(workers, "ipv4_socket_cisco", "replies_cisco",
+    LoadThreads(cisco_workers, "ipv4_socket_cisco", "replies_cisco",
         "cisco_workers");
 
     // Juniper
-    LoadThreads(workers, "ipv4_socket_juniper", "replies_juniper",
+    LoadThreads(juniper_workers, "ipv4_socket_juniper", "replies_juniper",
         "juniper_workers");
 
     // Huawei
-    LoadThreads(workers, "ipv4_socket_huawei", "replies_huawei",
+    LoadThreads(huawei_workers, "ipv4_socket_huawei", "replies_huawei",
         "huawei_workers");
 
     signal(SIGUSR1, SignalHandler);
 
-    //std::cout << "WORKERS: " << workers.size() << "\n";
+    //std::cout << "CISCO_WORKERS:   " << cisco_workers.size() << "\n";
+    //std::cout << "JUNIPER_WORKERS: " << juniper_workers.size() << "\n";
+    //std::cout << "HUAWEI_WORKERS:  " << huawei_workers.size() << "\n";
 
-    for (std::thread &w : workers) {
+    for (std::thread &w : cisco_workers) {
+        if(w.joinable()) {
+            w.join();
+        }
+    }
+
+    for (std::thread &w : juniper_workers) {
+        if(w.joinable()) {
+            w.join();
+        }
+    }
+
+    for (std::thread &w : huawei_workers) {
         if(w.joinable()) {
             w.join();
         }
@@ -270,7 +286,7 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
     const std::string &workers_str)
 {
     if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
-        size_t replies =
+        int replies =
             std::stoi(main_cfg_parameters.at(replies_str));
         if (replies < 0 || replies > 1000) {
             spdlog::get("multi-logger")->
@@ -279,7 +295,7 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
                 "and 1000. (default = 0 => unlimited)", replies_str);
             std::exit(EXIT_FAILURE);
         }
-        size_t workers = std::stoi(main_cfg_parameters.at(workers_str));
+        int workers = std::stoi(main_cfg_parameters.at(workers_str));
         if (workers < 1 || workers > 5) {
             spdlog::get("multi-logger")->
                 error("[{}] configuration issue: the "
@@ -287,7 +303,7 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
                 "and 5. (default = 1)", workers_str);
             std::exit(EXIT_FAILURE);
         }
-        for (size_t w = 0; w < workers; w++) {
+        for (int w = 0; w < workers; w++) {
             workers_vec.push_back(std::thread(&VendorThread,
                 ipv4_socket_str));
         }

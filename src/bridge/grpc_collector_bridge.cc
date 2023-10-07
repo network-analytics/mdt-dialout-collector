@@ -350,7 +350,7 @@ extern "C" {
         const char *workers_str)
     {
         if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
-            size_t replies =
+            int replies =
                 std::stoi(main_cfg_parameters.at(replies_str));
             if (replies < 0 || replies > 1000) {
                 spdlog::get("multi-logger")->
@@ -359,7 +359,7 @@ extern "C" {
                     "and 1000. (default = 0 => unlimited)", replies_str);
                 std::exit(EXIT_FAILURE);
             }
-            size_t workers = std::stoi(main_cfg_parameters.at(workers_str));
+            int workers = std::stoi(main_cfg_parameters.at(workers_str));
             if (workers < 1 || workers > 5) {
                 spdlog::get("multi-logger")->
                     error("[{}] configuration issue: the "
@@ -367,7 +367,7 @@ extern "C" {
                     "and 5. (default = 1)", workers_str);
                 std::exit(EXIT_FAILURE);
             }
-            for (size_t w = 0; w < workers; w++) {
+            for (int w = 0; w < workers; w++) {
                 int res = pthread_create(&workers_vec[w], NULL, VendorThread,
                     (void *)ipv4_socket_str);
                 if (res != 0) {
