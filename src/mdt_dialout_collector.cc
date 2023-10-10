@@ -30,6 +30,7 @@ void LoadLabelMapPreTagStyle(
     const std::string &label_map_csv);
 bool DumpCorePid(int &core_pid, const std::string &core_pid_path);
 void SignalHandler(int sig_num);
+std::string ReadVersionFromFile(const std::string &filePath);
 
 int main(int argc, char *argv[])
 {
@@ -65,7 +66,9 @@ int main(int argc, char *argv[])
     }
 
     if ((v_option_flag == 1) and (argc == 2)) {
-        std::cout << "gRPC dial-out collector, mdt-dialout-collector v1.1.3\n";
+        std::string version = ReadVersionFromFile("../VERSION");
+        std::cout << "gRPC dial-out collector, mdt-dialout-collector "
+                  << version << "\n";
         return EXIT_SUCCESS;
     } else if ((v_option_flag == 1) and (argc > 2)) {
         std::cout << "Usage: mdt_dialout_collector [-f cfg_path] | [-V]\n";
@@ -455,5 +458,18 @@ void SignalHandler(int sig_num)
         LoadLabelMapPreTagStyle(label_map,
             data_manipulation_cfg_parameters.at("label_map_ptm_path"));
     }
+}
+
+std::string ReadVersionFromFile(const std::string &filePath)
+{
+    std::ifstream versionFile(filePath);
+    std::string version;
+    if (versionFile.is_open()) {
+        std::getline(versionFile, version);
+        versionFile.close();
+    } else {
+        version = "UNKNOWN";
+    }
+    return version;
 }
 

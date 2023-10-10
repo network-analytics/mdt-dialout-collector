@@ -7,9 +7,10 @@ The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
 
 
-current -- XX-XX.20XX
+current -- 10-10-2023
+  + Adding automatic version number retrieval from the VERSION file
 
-v1.1.3 -- 07-10.2023
+v1.1.3 -- 07-10-2023
   + Adding dedicated vector per vendor to handle threads, standalone collector
   + Adding support for rhel & rocky Linux, install.sh script
   ! Adding checks before every "delete" statement to avoid double deletion
@@ -19,17 +20,17 @@ v1.1.3 -- 07-10.2023
   ! Making start_grpc_dialout_collector() safer (vector to store the workers threads)
   + Implemented log_socket_options() function to enable logging of the configured socket options for enhanced debugging and transparency
 
-v1.1.2 -- 26-06.2023
+v1.1.2 -- 26-06-2023
   + JunOS "sensor_path" formatted as JSON
   ! Testing gRPC dial-out support for Cisco NX-OS (testing device: NX-OS 10.2(2)@Nexus9000)
   ! Documentation general review/update | adding integration-with-pmtelemetryd.md | adding network-devices-conf-snip.md
   ! Minor, multiple, fixes on install.sh (install vs clone dir)
 
-v1.1.1 -- 21-01.2023
+v1.1.1 -- 21-01-2023
   + When running in "Library mode" the ZMQ uri is learned from pmtelemetryd. In "binary mode" the ZMQ uri is statically set to "ipc:///tmp/grpc.sock"
   ! Minor, multiple, fixes on install.sh
 
-v1.1.0 -- 17-01.2023
+v1.1.0 -- 17-01-2023
   + Documentation general review/update | adding CONFIG-KEYS | adding structured Changelog
   + Introduced install.sh to automate the build/install process
   + Introducing data delivery via ZMQ (PUSH/PULL). With this new data delivery option I enable the possibility to embed the gRPC dial-out collector
