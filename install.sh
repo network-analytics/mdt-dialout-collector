@@ -26,7 +26,6 @@ readonly grpc_install_dir="$HOME/.local"
 
 # MDT install parameters
 readonly mdt_url="https://github.com/network-analytics/mdt-dialout-collector.git"
-readonly mdt_version="main" # current
 readonly mdt_install_dir="/opt/mdt-dialout-collector"
 
 # librdkafka parameters
@@ -63,43 +62,60 @@ readonly err_unknown_options=83
 readonly err_missing_options_arg=84
 readonly err_unimplemented_options=85
 readonly err_epel_failure=86
+readonly err_mdt_ver_fail=87
 readonly script_name="${0##*/}"
 
 h_option_flag=0
 b_option_flag=0
 l_option_flag=0
+v_option_flag=0
+v_parame_flag=0
 
 trap clean_up EXIT INT HUP
 
 usage() {
   cat <<EOF
-  Usage: ${script_name} [-b] || [-l] || [-h]
+  Usage: ${script_name} [-h] | ([-b] | [-l]) && [-v <VERSION>]
 
   DESCRIPTION:
-    The install.sh script can be used to automate the install procces of the mdt-dialout-collector.
-    Both the binary & the library version are supported.
+    The install.sh script automates the install process of the mdt-dialout-collector.
+    Both the binary & the library versions are supported.
 
   OPTIONS:
     -h
       Print this help and exit.
+
     -b
       Install the standalone flavor of the mdt-dialout-collector (binary version).
+
     -l
-      Install the library flavor of the mdt-dialout-collector (can be used with pmacct, library version).
+      Install the library flavor of the mdt-dialout-collector (used with pmacct, library version).
+
+    -v <VERSION>
+      Specify the version of the mdt-dialout-collector to install. Use 'current' for the latest (potentially unstable) code.
+      Use release versions in the format 'vX.Y.Z' (e.g., 'v1.1.3') for stable code. Mandatory when using either -b or -l.
+
+  NOTE:
+    Either -b or -l must be chosen, but not both. Pairing with -v is required.
+
 EOF
 }
 
 parse_user_options() {
-  while getopts "blh" opts; do
+  while getopts "blhv:" opts; do
     case "${opts}" in
+    h)
+      h_option_flag=1
+      ;;
     b)
       b_option_flag=1
       ;;
     l)
       l_option_flag=1
       ;;
-    h)
-      h_option_flag=1
+    v)
+      v_option_flag=1
+      mdt_version="${OPTARG}"
       ;;
     :)
       die "error - mind your options/arguments - [ -h ] to know more" "${err_unknown_options}"
@@ -135,6 +151,20 @@ die() {
   local readonly code="${2:-90}"
   echo "${msg}" >&2
   exit "${code}"
+}
+
+is_valid_mdt_version() {
+  local detect="${1}"
+
+  # supported MDT versions
+  set -- current v1.1.3 v1.1.2 v1.1.1 v1.1.0 v1.0.0
+  for item in "$@";
+  do
+    if [ "${item}" = "${detect}" ]; then
+      v_parame_flag=1
+      break
+    fi
+  done
 }
 
 os_release_detect() {
@@ -793,6 +823,19 @@ parse_user_options "${@}"
 if [ "${h_option_flag}" -eq 1 ]; then
   usage
   exit 0
+fi
+
+if [ "${v_option_flag}" -eq 0 ]; then
+  die "error - mind  your options/arguments - [ -h ] to know more" "${err_validating_input}"
+fi
+
+is_valid_mdt_version "${mdt_version}"
+if [ "${v_parame_flag}" -eq 0 ]; then
+  die "error - invalid MDT release" "${err_mdt_ver_fail}"
+fi
+
+if [ "${mdt_version}" -eq "current" ]; then
+  mdt_version="main"
 fi
 
 # both bin & lib to 1: invalid
