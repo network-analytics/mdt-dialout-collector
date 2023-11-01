@@ -834,7 +834,7 @@ if [ "${v_parame_flag}" -eq 0 ]; then
   die "error - invalid MDT release" "${err_mdt_ver_fail}"
 fi
 
-if [ "${mdt_version}" -eq "current" ]; then
+if [ "${mdt_version}" = "current" ]; then
   mdt_version="main"
 fi
 
