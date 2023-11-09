@@ -1019,16 +1019,16 @@ void Srv::HuaweiStream::Start(
         huawei_resp.Read(&huawei_stream, this);
         huawei_stream_status = PROCESSING;
         huawei_replies_sent++;
-        if (huawei_sstream) {
-             delete huawei_sstream;
-             huawei_sstream = nullptr;
-        }
     } else if (huawei_stream_status == PROCESSING) {
         if (huawei_replies_sent == kHuaweiMaxReplies) {
             spdlog::get("multi-logger")->debug("[HuaweiStream::Start()] "
                 "huawei_stream_status = END");
             huawei_stream_status = END;
             huawei_resp.Finish(grpc::Status::OK, this);
+            if (huawei_sstream) {
+                 delete huawei_sstream;
+                 huawei_sstream = nullptr;
+            }
         } else {
             auto tid = std::this_thread::get_id();
             std::stringstream stid;

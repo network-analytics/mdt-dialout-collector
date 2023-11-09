@@ -7,10 +7,13 @@ The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
 
 
-current (main branch) -- 01-11-2023
+current (main branch) -- 09-11-2023
+
+v1.1.4 -- 09-11-2023
   + Adding automatic version number retrieval from the VERSION file
   + Adding the ability to specify the release version for installation via the `install.sh` parameter
   ! Fixing the Cflags path within the grpc-collector.pc.in file
+  ! Fixing the location where the huawei_sstream pointer is checked and (deleted)
 
 v1.1.3 -- 07-10-2023
   + Adding dedicated vector per vendor to handle threads, standalone collector
