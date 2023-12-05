@@ -33,7 +33,7 @@ BUG_REPORT_URL="https://bugs.debian.org/"
 ## Compile/Install gRPC dial-out library/Header for pmtelemetryd
 
 ```SHELL
-sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l
+sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l -v current
 ```
 
 #### *(sh install.sh -l)* explained
