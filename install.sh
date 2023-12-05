@@ -157,7 +157,7 @@ is_valid_mdt_version() {
   local detect="${1}"
 
   # supported MDT versions
-  set -- current v1.1.3 v1.1.2 v1.1.1 v1.1.0 v1.0.0
+  set -- current v1.1.4 v1.1.3 v1.1.2 v1.1.1 v1.1.0 v1.0.0
   for item in "$@";
   do
     if [ "${item}" = "${detect}" ]; then
