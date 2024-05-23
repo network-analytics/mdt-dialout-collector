@@ -59,7 +59,8 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
     int type;
     socklen_t len = sizeof(type);
 
-    std::string iface = main_cfg_parameters.at("iface");
+    const std::string iface = main_cfg_parameters.at("iface");
+    const std::string sbc = main_cfg_parameters.at("so_bindtodevice_check");
 
     if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) != 0) {
         spdlog::get("multi-logger")->
@@ -68,12 +69,18 @@ bool CustomSocketMutator::bindtodevice_socket_mutator(int fd)
         std::abort();
     }
 
-    if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
-        iface.c_str(), strlen(iface.c_str())) != 0) {
+    if (sbc.compare("true") == 0) {
+        if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
+            iface.c_str(), strlen(iface.c_str())) != 0) {
+            spdlog::get("multi-logger")->
+                error("[CustomSocketMutator()]: Unable to bind [{}] "
+                "on the configured socket(s)", iface);
+            std::abort();
+        }
+    } else {
         spdlog::get("multi-logger")->
-            error("[CustomSocketMutator()]: Unable to bind [{}] "
-            "on the configured socket(s)", iface);
-        std::abort();
+            warn("[CustomSocketMutator()]: SO_BINDTODEVICE "
+            "check disabled");
     }
 
     log_socket_options(fd);

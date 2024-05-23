@@ -142,6 +142,7 @@ private:
     const std::string juniper_workers;
     const std::string huawei_workers;
     const std::string data_delivery_method;
+    const std::string so_bindtodevice_check;
 };
 
 // Data manipulation configuration parameters
