@@ -287,6 +287,33 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         return false;
     }
 
+    bool so_bindtodevice_check = main_params.exists("so_bindtodevice_check");
+    if (so_bindtodevice_check == true) {
+        libconfig::Setting &so_bindtodevice_check =
+            main_params.lookup("so_bindtodevice_check");
+        try {
+            std::string so_bindtodevice_check_s = so_bindtodevice_check;
+            if (so_bindtodevice_check_s.empty()          == false &&
+               (so_bindtodevice_check_s.compare("true")  == 0 ||
+                so_bindtodevice_check_s.compare("false") == 0 )) {
+                params.insert({"so_bindtodevice_check", so_bindtodevice_check_s});
+            } else {
+                spdlog::get("multi-logger")->
+                    error("[so_bindtodevice_check] configuration "
+                    "issue: [ {} ] is an invalid value",
+                    so_bindtodevice_check_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger")->
+                error("[so_bindtodevice_check] configuration issue: "
+                "{}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"so_bindtodevice_check", "true"});
+    }
+
     std::string ipv4_socket_cisco_s;
     bool ipv4_socket_cisco = main_params.exists("ipv4_socket_cisco");
     if (ipv4_socket_cisco == true) {
