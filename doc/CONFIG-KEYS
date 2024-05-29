@@ -62,6 +62,11 @@ VALUES:    [value >= "1" and value <= "5"]
 DESC:      Defining the amount of running threads busy with processing incoming Huawei's gRPC messages.
 DEFAULT:   "1"
 
+KEY:       so_bindtodevice_check
+VALUES:    ["true" or "false"]
+DESC:      When set to "false", this disables the checks related to socket binding to a particular device.
+DEFAULT:   "true"
+
 KEY:       writer_id
 DESC:      adding meta data information to the data-stream. This could be helpful to identify the collector sourcing the data-stream.
            Irrelevant when used in Library mode, pmtelemetryd will override this information.
