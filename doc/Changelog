@@ -7,7 +7,8 @@ The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
 
 
-current (main branch) -- 05-12-2023
+current (main branch) -- 29-05-2024
+  + Adding the ability to disable the checks related to socket binding to a particular device
 
 v1.1.4 -- 05-12-2023
   + Adding automatic version number retrieval from the VERSION file
