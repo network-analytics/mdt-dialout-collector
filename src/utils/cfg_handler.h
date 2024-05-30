@@ -222,6 +222,7 @@ private:
     const std::string ssl_certificate_location;
     const std::string ssl_ca_location;
     const std::string log_level;
+    const std::string enable_ssl_certificate_verification;
 };
 
 // ZMQ configuration parameters

@@ -27,6 +27,8 @@ KafkaDelivery::KafkaDelivery()
         kafka_delivery_cfg_parameters.at("ssl_ca_location");
     this->log_level =
         kafka_delivery_cfg_parameters.at("log_level");
+    this->enable_ssl_certificate_verification =
+        kafka_delivery_cfg_parameters.at("enable_ssl_certificate_verification");
 
     set_kafka_properties(this->properties);
 }
@@ -41,6 +43,7 @@ void KafkaDelivery::set_kafka_properties(kafka::Properties &properties)
     properties.put("ssl.certificate.location", get_ssl_certificate_location());
     properties.put("ssl.ca.location", get_ssl_ca_location());
     properties.put("log_level", get_log_level());
+    properties.put("enable_ssl_certificate_verification", get_enable_ssl_certificate_verification());
 }
 
 bool KafkaDelivery::AsyncKafkaProducer(

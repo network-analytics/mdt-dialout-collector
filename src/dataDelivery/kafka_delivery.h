@@ -46,6 +46,8 @@ public:
         return ssl_ca_location; };
     std::string get_log_level() {
         return log_level; };
+    const std::string get_enable_ssl_certificate_verification() {
+        return enable_ssl_certificate_verification; };
 private:
     kafka::Properties properties;
     kafka::Topic topic;
@@ -57,6 +59,7 @@ private:
     std::string ssl_certificate_location;
     std::string ssl_ca_location;
     std::string log_level;
+    const std::string enable_ssl_certificate_verification;
 };
 
 #endif

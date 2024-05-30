@@ -996,28 +996,38 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         bool ssl_certificate_location =
             kafka_params.exists("ssl_certificate_location");
         bool ssl_ca_location = kafka_params.exists("ssl_ca_location");
+        bool enable_ssl_certificate_verification =
+            kafka_params.exists("enable_ssl_certificate_verification");
 
         if (ssl_key_location == true &&
             ssl_certificate_location == true &&
-            ssl_ca_location == true) {
+            ssl_ca_location == true &&
+            enable_ssl_certificate_verification == true) {
             libconfig::Setting &ssl_key_location =
                 kafka_params.lookup("ssl_key_location");
             libconfig::Setting &ssl_certificate_location =
                 kafka_params.lookup("ssl_certificate_location");
             libconfig::Setting &ssl_ca_location =
                 kafka_params.lookup("ssl_ca_location");
+            libconfig::Setting &enable_ssl_certificate_verification =
+                kafka_params.lookup("enable_ssl_certificate_verification");
             try {
                 std::string ssl_key_location_s = ssl_key_location.c_str();
                 std::string ssl_certificate_location_s =
                     ssl_certificate_location.c_str();
                 std::string ssl_ca_location_s = ssl_ca_location.c_str();
+                std::string enable_ssl_certificate_verification_s =
+                    enable_ssl_certificate_verification.c_str();
                 if (ssl_key_location_s.empty() == false &&
                     ssl_certificate_location_s.empty() == false &&
-                    ssl_ca_location_s.empty() == false) {
+                    ssl_ca_location_s.empty() == false &&
+                    enable_ssl_certificate_verification_s.empty() == false) {
                     params.insert({"ssl_key_location", ssl_key_location_s});
                     params.insert({"ssl_certificate_location",
                         ssl_certificate_location_s});
                     params.insert({"ssl_ca_location", ssl_ca_location_s});
+                    params.insert({"enable_ssl_certificate_verification",
+                        enable_ssl_certificate_verification_s});
                 } else {
                     spdlog::get("multi-logger")->
                         error("[security_protocol] "
@@ -1039,6 +1049,7 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         params.insert({"ssl_key_location", "NULL"});
         params.insert({"ssl_certificate_location", "NULL"});
         params.insert({"ssl_ca_location", "NULL"});
+        params.insert({"enable_ssl_certificate_verification", "NULL"});
     }
 
     return true;
