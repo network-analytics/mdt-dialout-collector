@@ -21,14 +21,16 @@ KafkaDelivery::KafkaDelivery()
         kafka_delivery_cfg_parameters.at("security_protocol");
     this->ssl_key_location =
         kafka_delivery_cfg_parameters.at("ssl_key_location");
+    this->ssl_key_password =
+        kafka_delivery_cfg_parameters.at("ssl_key_password");
     this->ssl_certificate_location =
         kafka_delivery_cfg_parameters.at("ssl_certificate_location");
     this->ssl_ca_location =
         kafka_delivery_cfg_parameters.at("ssl_ca_location");
-    this->log_level =
-        kafka_delivery_cfg_parameters.at("log_level");
     this->enable_ssl_certificate_verification =
         kafka_delivery_cfg_parameters.at("enable_ssl_certificate_verification");
+    this->log_level =
+        kafka_delivery_cfg_parameters.at("log_level");
 
     set_kafka_properties(this->properties);
 }
@@ -40,10 +42,11 @@ void KafkaDelivery::set_kafka_properties(kafka::Properties &properties)
     properties.put("client.id", get_client_id());
     properties.put("security.protocol", get_security_protocol());
     properties.put("ssl.key.location", get_ssl_key_location());
+    properties.put("ssl.key.password", get_ssl_key_password());
     properties.put("ssl.certificate.location", get_ssl_certificate_location());
     properties.put("ssl.ca.location", get_ssl_ca_location());
+    properties.put("enable.ssl.certificate.verification", get_enable_ssl_certificate_verification());
     properties.put("log_level", get_log_level());
-    properties.put("enable_ssl_certificate_verification", get_enable_ssl_certificate_verification());
 }
 
 bool KafkaDelivery::AsyncKafkaProducer(
