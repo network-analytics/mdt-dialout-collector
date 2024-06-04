@@ -40,10 +40,14 @@ public:
         return security_protocol; };
     std::string get_ssl_key_location() {
         return ssl_key_location; };
+    std::string get_ssl_key_password() {
+        return ssl_key_password; };
     std::string get_ssl_certificate_location() {
         return ssl_certificate_location; };
     std::string get_ssl_ca_location() {
         return ssl_ca_location; };
+    std::string get_enable_ssl_certificate_verification() {
+        return enable_ssl_certificate_verification; };
     std::string get_log_level() {
         return log_level; };
 private:
@@ -54,8 +58,10 @@ private:
     std::string client_id;
     std::string security_protocol;
     std::string ssl_key_location;
+    std::string ssl_key_password;
     std::string ssl_certificate_location;
     std::string ssl_ca_location;
+    std::string enable_ssl_certificate_verification;
     std::string log_level;
 };
 

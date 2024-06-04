@@ -993,9 +993,12 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
 
     if (params.at("security_protocol").compare("ssl") == 0) {
         bool ssl_key_location = kafka_params.exists("ssl_key_location");
+        bool ssl_key_password = kafka_params.exists("ssl_key_password");
         bool ssl_certificate_location =
             kafka_params.exists("ssl_certificate_location");
         bool ssl_ca_location = kafka_params.exists("ssl_ca_location");
+        bool enable_ssl_certificate_verification =
+            kafka_params.exists("enable_ssl_certificate_verification");
 
         if (ssl_key_location == true &&
             ssl_certificate_location == true &&
@@ -1032,8 +1035,54 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         } else {
             spdlog::get("multi-logger")->
                 error("[security_protocol] configuration issue: "
-                "a valid security_protocol is mandatory");
+                "one or more mandatory ssl params are missing");
             return false;
+        }
+
+        if (ssl_key_password == true) {
+            libconfig::Setting &ssl_key_password =
+                kafka_params.lookup("ssl_key_password");
+            try {
+                std::string ssl_key_password_s = ssl_key_password.c_str();
+                if (ssl_key_password_s.empty() == false) {
+                    params.insert({"ssl_key_password", ssl_key_password_s});
+                } else {
+                    spdlog::get("multi-logger")->
+                        error("[security_protocol] "
+                        "configuration issue: is invalid");
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger")->error("[security_protocol] "
+                    "configuration issue: {}", ste.what());
+                return false;
+            }
+        } else {
+            params.insert({"ssl_key_password", "NULL"});
+        }
+
+        if (enable_ssl_certificate_verification == true) {
+            libconfig::Setting &enable_ssl_certificate_verification =
+                kafka_params.lookup("enable_ssl_certificate_verification");
+            try {
+                std::string enable_ssl_certificate_verification_s =
+                    enable_ssl_certificate_verification.c_str();
+                if (enable_ssl_certificate_verification_s.empty() == false) {
+                    params.insert({"enable_ssl_certificate_verification",
+                        enable_ssl_certificate_verification_s});
+                } else {
+                    spdlog::get("multi-logger")->
+                        error("[security_protocol] "
+                        "configuration issue: is invalid");
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger")->error("[security_protocol] "
+                    "configuration issue: {}", ste.what());
+                return false;
+            }
+        } else {
+            params.insert({"enable_ssl_certificate_verification", "NULL"});
         }
     } else {
         params.insert({"ssl_key_location", "NULL"});

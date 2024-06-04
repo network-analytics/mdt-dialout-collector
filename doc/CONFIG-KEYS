@@ -8,7 +8,7 @@ makes the whole line to be ignored by the interpreter, making it a comment.
 
 KEY:       iface
 DESC:      Defining the network interface receiving the gRPC data-stream. The logical name of the interface can be retrived using shell commads
-           like 'ip address'. No default value is set and a coherent value is mandatory.
+           like "ip address". No default value is set and a coherent value is mandatory.
 DEFAULT:   none
 
 KEY:       ipv4_socket_cisco
@@ -134,6 +134,13 @@ DESC:      When set to true, the producer will ensure that messages are successf
            Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
 DEFAULT:   "true"
 
+KEY:       enable_ssl_certificate_verification
+VALUES:    ["true" or "false"]
+DESC:      This is valid only when security_protocol is set to "ssl" and it is enabling/disabling the OpenSSL's builtin broker (server)
+           certificate verification. 
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   "true"
+
 KEY:       log_level
 VALUES:    [value >= "0" and value <= "7"]
 DESC:      Logging level (syslog(3) levels)
@@ -148,20 +155,25 @@ DESC:      Defines if the communication between the collector and the Kafka's br
 DEFAULT:   none
 
 KEY:       ssl_ca_location
-DESC:      This is valid only when security_protocol is set to "ssl" and it's including the file or
+DESC:      This is valid and mandatory only when security_protocol is set to "ssl" and it's including the file or
            directory path to CA certificate(s) for verifying the broker's key
            Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
 DEFAULT:   none
 
 KEY:       ssl_certificate_location
-DESC:      This is valid only when security_protocol is set to "ssl" and it's including the path to
+DESC:      This is valid and mandatory only when security_protocol is set to "ssl" and it's including the path to
            client's public key (PEM) used for authentication
            Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
 DEFAULT:   none
 
 KEY:       ssl_key_location
-DESC:      This is valid only when security_protocol is set to "ssl" and it's including the path to
+DESC:      This is valid and mandatory only when security_protocol is set to "ssl" and it's including the path to
            client's private key (PEM) used for authentication.
+           Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
+DEFAULT:   none
+
+KEY:       ssl_key_password
+DESC:      This is valid only when security_protocol is set to "ssl" and it is including the client's private key passphrase
            Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md.
 DEFAULT:   none
 

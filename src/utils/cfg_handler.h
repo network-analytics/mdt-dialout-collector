@@ -206,10 +206,14 @@ public:
     //    return security_protocol; };
     //const std::string &get_kafka_ssl_key_location() const {
     //    return ssl_key_location; };
+    //const std::string &get_kafka_ssl_key_password() const {
+    //    return ssl_key_password; };
     //const std::string &get_kafka_ssl_certificate_location() const {
     //    return ssl_certificate_location; };
     //const std::string &get_kafka_ssl_ca_location() const {
     //    return ssl_ca_location; };
+    //const std::string &get_enable_ssl_certificate_verification() const {
+    //    return enable_ssl_certificate_verification; };
     //const std::string &get_kafka_log_level() const {
     //    return log_level; };
 private:
@@ -219,8 +223,10 @@ private:
     const std::string client_id;
     const std::string security_protocol;
     const std::string ssl_key_location;
+    const std::string ssl_key_password;
     const std::string ssl_certificate_location;
     const std::string ssl_ca_location;
+    const std::string enable_ssl_certificate_verification;
     const std::string log_level;
 };
 
