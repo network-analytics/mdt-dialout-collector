@@ -744,6 +744,7 @@ grpc_collector_deploy() {
 
   case "${_os_info}" in
   "Linux debian 11"    | \
+  "Linux debian 12"    | \
   "Linux ubuntu 20.04" | \
   "Linux ubuntu 22.04" | \
   "Linux ubuntu 22.10" | \
