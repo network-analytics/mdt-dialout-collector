@@ -1086,8 +1086,10 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         }
     } else {
         params.insert({"ssl_key_location", "NULL"});
+        params.insert({"ssl_key_password", "NULL"});
         params.insert({"ssl_certificate_location", "NULL"});
         params.insert({"ssl_ca_location", "NULL"});
+        params.insert({"enable_ssl_certificate_verification", "NULL"});
     }
 
     return true;
