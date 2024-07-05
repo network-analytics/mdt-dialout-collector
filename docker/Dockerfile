@@ -25,9 +25,9 @@ RUN apt-get update && apt-get -y full-upgrade && \
     libzmq3-dev
 
 WORKDIR /tmp/mdt-dialout-collector
-COPY docker/scripts/grpc.sh scripts/
-COPY docker/scripts/mdt_dialout_collector.sh scripts/
-COPY docker/scripts/mdt_dialout_collector.conf /etc/opt/mdt-dialout-collector/
+COPY scripts/grpc.sh scripts/
+COPY scripts/mdt_dialout_collector.sh scripts/
+COPY scripts/mdt_dialout_collector.conf /etc/opt/mdt-dialout-collector/
 
 RUN ./scripts/grpc.sh
 RUN rm -rf grpc
