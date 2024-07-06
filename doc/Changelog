@@ -12,7 +12,7 @@ current (main branch) -- 06-07-2024
   + Adding the ability to configure the Kafka option "enable.ssl.certificate.verification". Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
   + Adding the ability to configure the Kafka option "ssl.key.password". Reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
   + Adding support for rocky Linux v8.9, install.sh script (@ustorbeck)
-  ! Fixing Debian 12 detection, Debian 12 detection (@ustorbeck)
+  ! Fixing Debian v12 detection, install.sh script (@ustorbeck)
   ! Fixing script path names in the Dockerfile so that no additional options are required to build the docker image (@ustorbeck)
   ! Fixing a crash on startup in zmq delivery mode (@ustorbeck)
 
