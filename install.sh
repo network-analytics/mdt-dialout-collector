@@ -249,7 +249,7 @@ os_release_detect() {
         ;;
       centos|rocky|rhel)
         # Supported centos/rocky/rhel releases
-        set -- 8 8.8 9 9.1 9.2
+        set -- 8 8.8 8.9 9 9.1 9.2
 
         for item in "$@";
         do
@@ -776,6 +776,7 @@ grpc_collector_deploy() {
   "Linux centos 8"  | \
   "Linux centos 9"  | \
   "Linux rocky 8.8" | \
+  "Linux rocky 8.9" | \
   "Linux rhel 8"    | \
   "Linux rhel 9"    | \
   "Linux rhel 9.1"  | \
@@ -792,7 +793,7 @@ grpc_collector_deploy() {
     yum install -y epel-release >/dev/null 2>&1 || die "error - epel-release install failure" "${err_epel_failure}"
 
     # Switch to a recent gcc version (old centos/rocky/rhel release)
-    if [ "${_os_info}" = "Linux centos 8" ] || [ "${_os_info}" = "Linux rhel 8" ] || [ "${_os_info}" = "Linux rocky 8.8" ]; then
+    if [ "${_os_info}" = "Linux centos 8" ] || [ "${_os_info}" = "Linux rhel 8" ] || [ "${_os_info}" = "Linux rocky 8.8" ] || [ "${_os_info}" = "Linux rocky 8.9" ]; then
       yum -y install gcc-toolset-11 >/dev/null 2>&1
       source /opt/rh/gcc-toolset-11/enable
     fi
