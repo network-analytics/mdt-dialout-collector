@@ -14,7 +14,7 @@ current (main branch) -- 06-07-2024
   + Adding support for rocky Linux v8.9, install.sh script (@ustorbeck)
   ! Fixing Debian v12 detection, install.sh script (@ustorbeck)
   ! Fixing script path names in the Dockerfile so that no additional options are required to build the docker image (@ustorbeck)
-  ! Fixing a crash on startup in zmq delivery mode (@ustorbeck)
+  ! Fixing a crash on startup in zmq delivery mode (@ustorbeck).
 
 
 v1.1.4 -- 05-12-2023
