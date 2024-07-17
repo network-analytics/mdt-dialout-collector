@@ -828,7 +828,7 @@ if [ "${h_option_flag}" -eq 1 ]; then
 fi
 
 if [ "${v_option_flag}" -eq 0 ]; then
-  die "error - mind  your options/arguments - [ -h ] to know more" "${err_validating_input}"
+  die "error - mind your options/arguments - [ -h ] to know more" "${err_validating_input}"
 fi
 
 is_valid_mdt_version "${mdt_version}"
@@ -842,12 +842,12 @@ fi
 
 # both bin & lib to 1: invalid
 if [ "${b_option_flag}" -eq 1 ] && [ "${l_option_flag}" -eq 1 ]; then
-  die "error - mind  your options/arguments - [ -h ] to know more" "${err_validating_input}"
+  die "error - mind your options/arguments - [ -h ] to know more" "${err_validating_input}"
 fi
 
 # both bin & lib to 0: invalid
 if [ "${b_option_flag}" -eq 0 ] && [ "${l_option_flag}" -eq 0 ]; then
-  die "error - mind  your options/arguments - [ -h ] to know more" "${err_validating_input}"
+  die "error - mind your options/arguments - [ -h ] to know more" "${err_validating_input}"
 fi
 
 if [ "${b_option_flag}" -eq 1 ] || [ "${l_option_flag}" -eq 1 ]; then
