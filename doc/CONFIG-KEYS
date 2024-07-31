@@ -194,7 +194,7 @@ DEFAULT:   "true"
 KEY:       syslog
 VALUES:    ["true" or "false"]
 DESC:      Enabling/disabling Syslog logging. If not specified the default facility is "LOG_USER".
-DEFAULT:   "flase"
+DEFAULT:   "false"
 
 KEY:       syslog_facility
 VALUES:    ["LOG_DAEMON" or "LOG_USER" or "LOG_LOCAL(0..7)"]

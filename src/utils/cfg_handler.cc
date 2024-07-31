@@ -833,7 +833,7 @@ bool KafkaCfgHandler::lookup_kafka_parameters(const std::string &cfg_path,
         params.clear();
     }
 
-    // Kafka arameters evaluation
+    // Kafka parameters evaluation
     bool topic = kafka_params.exists("topic");
     if (topic == true) {
         libconfig::Setting &topic = kafka_params.lookup("topic");
