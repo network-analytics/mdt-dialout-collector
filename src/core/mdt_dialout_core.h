@@ -18,6 +18,8 @@
 #include "proto/Huawei/huawei_dialout.grpc.pb.h"
 #include "proto/Juniper/juniper_dialout.grpc.pb.h"
 #include "proto/Juniper/juniper_gnmi.pb.h"
+#include "proto/Nokia/nokia_dialout.grpc.pb.h"
+#include "proto/Nokia/nokia_gnmi.pb.h"
 #include "../dataManipulation/data_manipulation.h"
 #include "../dataWrapper/data_wrapper.h"
 #include "../dataDelivery/kafka_delivery.h"
@@ -58,28 +60,35 @@ public:
         spdlog::get("multi-logger")->debug("destructor: ~Srv()");
         cisco_server_->grpc::ServerInterface::Shutdown();
         juniper_server_->grpc::ServerInterface::Shutdown();
+        nokia_server_->grpc::ServerInterface::Shutdown();
         huawei_server_->grpc::ServerInterface::Shutdown();
         cisco_cq_->grpc::ServerCompletionQueue::Shutdown();
         juniper_cq_->grpc::ServerCompletionQueue::Shutdown();
+        nokia_cq_->grpc::ServerCompletionQueue::Shutdown();
         huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
     }
     Srv() { spdlog::get("multi-logger")->debug("constructor: Srv()"); };
     void CiscoBind(std::string cisco_srv_socket);
     void JuniperBind(std::string juniper_srv_socket);
+    void NokiaBind(std::string nokia_srv_socket);
     void HuaweiBind(std::string huawei_srv_socket);
 
 private:
     mdt_dialout::gRPCMdtDialout::AsyncService cisco_service_;
     Subscriber::AsyncService juniper_service_;
+    Nokia::SROS::DialoutTelemetry::AsyncService nokia_service_;
     huawei_dialout::gRPCDataservice::AsyncService huawei_service_;
     std::unique_ptr<grpc::ServerCompletionQueue> cisco_cq_;
     std::unique_ptr<grpc::ServerCompletionQueue> juniper_cq_;
+    std::unique_ptr<grpc::ServerCompletionQueue> nokia_cq_;
     std::unique_ptr<grpc::ServerCompletionQueue> huawei_cq_;
     std::unique_ptr<grpc::Server> cisco_server_;
     std::unique_ptr<grpc::Server> juniper_server_;
+    std::unique_ptr<grpc::Server> nokia_server_;
     std::unique_ptr<grpc::Server> huawei_server_;
     void CiscoFsmCtrl();
     void JuniperFsmCtrl();
+    void NokiaFsmCtrl();
     void HuaweiFsmCtrl();
 
     class CiscoStream {
@@ -138,13 +147,45 @@ private:
         Subscriber::AsyncService *juniper_service_;
         grpc::ServerCompletionQueue *juniper_cq_;
         grpc::ServerContext juniper_server_ctx;
-        gnmi::SubscribeResponse juniper_stream;
-        grpc::ServerAsyncReaderWriter<gnmi::SubscribeRequest,
-            gnmi::SubscribeResponse> juniper_resp;
+        juniper_gnmi::SubscribeResponse juniper_stream;
+        grpc::ServerAsyncReaderWriter<juniper_gnmi::SubscribeRequest,
+            juniper_gnmi::SubscribeResponse> juniper_resp;
         int juniper_replies_sent;
         const int kJuniperMaxReplies;
         enum StreamStatus { START, FLOW, PROCESSING, END };
         StreamStatus juniper_stream_status;
+    };
+
+    class NokiaStream {
+    public:
+        ~NokiaStream() {
+            spdlog::get("multi-logger")->
+                debug("destructor: ~NokiaStream()"); };
+        NokiaStream(
+            Nokia::SROS::DialoutTelemetry::AsyncService *nokia_service,
+            grpc::ServerCompletionQueue *nokia_cq);
+        void Start(
+            std::unordered_map<std::string,std::vector<std::string>>
+                &label_map,
+            DataManipulation &data_manipulation,
+            DataWrapper &data_wrapper,
+            KafkaDelivery &kafka_delivery,
+            kafka::clients::KafkaProducer &kafka_producer,
+            ZmqPush &zmq_pusher,
+            zmq::socket_t &zmq_sock,
+            const std::string &zmq_uri
+        );
+    private:
+        Nokia::SROS::DialoutTelemetry::AsyncService *nokia_service_;
+        grpc::ServerCompletionQueue *nokia_cq_;
+        grpc::ServerContext nokia_server_ctx;
+        nokia_gnmi::SubscribeResponse nokia_stream;
+        grpc::ServerAsyncReaderWriter<Nokia::SROS::PublishResponse,
+            nokia_gnmi::SubscribeResponse> nokia_resp;
+        int nokia_replies_sent;
+        const int kNokiaMaxReplies;
+        enum StreamStatus { START, FLOW, PROCESSING, END };
+        StreamStatus nokia_stream_status;
     };
 
     class HuaweiStream {

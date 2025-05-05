@@ -173,9 +173,16 @@ int main(int argc, char *argv[])
         LoadLabelMapPreTagStyle(label_map,
             data_manipulation_cfg_parameters.at("label_map_ptm_path"));
     }
-
+    spdlog::get("multi-logger")->debug(
+        "ipv4 sockets found in config:\n ipv4_socket_cisco: {},\n ipv4_socket_juniper: {},\n ipv4_socket_nokia: {},\n ipv4_socket_huawei: {}\n",
+        main_cfg_parameters.at("ipv4_socket_cisco"),
+        main_cfg_parameters.at("ipv4_socket_juniper"),
+        main_cfg_parameters.at("ipv4_socket_nokia"),
+        main_cfg_parameters.at("ipv4_socket_huawei")
+    );
     if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
         main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
+        main_cfg_parameters.at("ipv4_socket_nokia").empty() == true &&
         main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
             spdlog::get("multi-logger")->
                 error("[ipv4_socket_*] configuration issue: "
@@ -198,6 +205,7 @@ int main(int argc, char *argv[])
 
     std::vector<std::thread> cisco_workers;
     std::vector<std::thread> juniper_workers;
+    std::vector<std::thread> nokia_workers;
     std::vector<std::thread> huawei_workers;
 
     // Cisco
@@ -208,6 +216,10 @@ int main(int argc, char *argv[])
     LoadThreads(juniper_workers, "ipv4_socket_juniper", "replies_juniper",
         "juniper_workers");
 
+    // Nokia
+    LoadThreads(nokia_workers, "ipv4_socket_nokia", "replies_nokia",
+        "nokia_workers");
+
     // Huawei
     LoadThreads(huawei_workers, "ipv4_socket_huawei", "replies_huawei",
         "huawei_workers");
@@ -216,6 +228,7 @@ int main(int argc, char *argv[])
 
     //std::cout << "CISCO_WORKERS:   " << cisco_workers.size() << "\n";
     //std::cout << "JUNIPER_WORKERS: " << juniper_workers.size() << "\n";
+    //std::cout << "NOKIA_WORKERS: " << nokia_workers.size() << "\n";
     //std::cout << "HUAWEI_WORKERS:  " << huawei_workers.size() << "\n";
 
     for (std::thread &w : cisco_workers) {
@@ -225,6 +238,12 @@ int main(int argc, char *argv[])
     }
 
     for (std::thread &w : juniper_workers) {
+        if(w.joinable()) {
+            w.join();
+        }
+    }
+
+    for (std::thread &w : nokia_workers) {
         if(w.joinable()) {
             w.join();
         }
@@ -271,6 +290,13 @@ void *VendorThread(const std::string &ipv4_socket_str)
         std::string juniper_srv_socket {ipv4_socket_juniper};
         Srv juniper_mdt_dialout_collector;
         juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
+    } else if (ipv4_socket_str.find("nokia") != std::string::npos) {
+        std::string ipv4_socket_nokia =
+            main_cfg_parameters.at(ipv4_socket_str);
+
+        std::string nokia_srv_socket {ipv4_socket_nokia};
+        Srv nokia_mdt_dialout_collector;
+        nokia_mdt_dialout_collector.NokiaBind(nokia_srv_socket);
     } else if (ipv4_socket_str.find("huawei") != std::string::npos) {
         std::string ipv4_socket_huawei =
             main_cfg_parameters.at(ipv4_socket_str);

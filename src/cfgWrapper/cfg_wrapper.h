@@ -31,13 +31,16 @@ public:
         const std::string &iface,
         const std::string &ipv4_socket_cisco,
         const std::string &ipv4_socket_juniper,
+        const std::string &ipv4_socket_nokia,
         const std::string &ipv4_socket_huawei,
         //const std::string &core_pid_folder
         const std::string &cisco_workers,
         const std::string &juniper_workers,
+        const std::string &nokia_workers,
         const std::string &huawei_workers,
         const std::string &replies_cisco,
         const std::string &replies_juniper,
+        const std::string &replies_nokia,
         const std::string &replies_huawei,
         // logging
         const std::string &syslog,
@@ -65,6 +68,9 @@ public:
     void set_ipv4_socket_juniper(const std::string &ipv4_socket_juniper) {
         this->ipv4_socket_juniper = ipv4_socket_juniper;
     };
+    void set_ipv4_socket_nokia(const std::string &ipv4_socket_nokia) {
+        this->ipv4_socket_nokia = ipv4_socket_nokia;
+    };
     void set_ipv4_socket_huawei(const std::string &ipv4_socket_huawei) {
         this->ipv4_socket_huawei = ipv4_socket_huawei;
     };
@@ -77,6 +83,9 @@ public:
     void set_juniper_workers(const std::string &juniper_workers) {
         this->juniper_workers = juniper_workers;
     };
+    void set_nokia_workers(const std::string &nokia_workers) {
+        this->nokia_workers = nokia_workers;
+    };
     void set_huawei_workers(const std::string &huawei_workers) {
         this->huawei_workers = huawei_workers;
     };
@@ -85,6 +94,9 @@ public:
     };
     void set_replies_juniper(const std::string &replies_juniper) {
         this->replies_juniper = replies_juniper;
+    };
+    void set_replies_nokia(const std::string &replies_nokia) {
+        this->replies_nokia = replies_nokia;
     };
     void set_replies_huawei(const std::string &replies_huawei) {
         this->replies_huawei = replies_huawei;
@@ -128,13 +140,16 @@ public:
     std::string &get_ipv4_socket_cisco() { return this->ipv4_socket_cisco; };
     std::string &get_ipv4_socket_juniper() {
         return this->ipv4_socket_juniper; };
+    std::string &get_ipv4_socket_nokia() { return this->ipv4_socket_nokia; };
     std::string &get_ipv4_socket_huawei() { return this->ipv4_socket_huawei; };
     //std::string &get_core_pid_folder() { return this->core_pid_folder; };
     std::string &get_cisco_workers() { return this->cisco_workers; };
     std::string &get_juniper_workers() { return this->juniper_workers; };
+    std::string &get_nokia_workers() { return this->nokia_workers; };
     std::string &get_huawei_workers() { return this->huawei_workers; };
     std::string &get_replies_cisco() { return this->replies_cisco; };
     std::string &get_replies_juniper() { return this->replies_juniper; };
+    std::string &get_replies_nokia() { return this->replies_nokia; };
     std::string &get_replies_huawei() { return this->replies_huawei; };
     std::string &get_syslog() { return this->syslog; };
     std::string &get_syslog_facility() { return this->syslog_facility; };
@@ -155,13 +170,16 @@ private:
     std::string iface;
     std::string ipv4_socket_cisco;
     std::string ipv4_socket_juniper;
+    std::string ipv4_socket_nokia;
     std::string ipv4_socket_huawei;
     //std::string core_pid_folder;
     std::string cisco_workers;
     std::string juniper_workers;
+    std::string nokia_workers;
     std::string huawei_workers;
     std::string replies_cisco;
     std::string replies_juniper;
+    std::string replies_nokia;
     std::string replies_huawei;
     // logging
     std::string syslog;

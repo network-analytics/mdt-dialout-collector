@@ -365,6 +365,32 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
         params.insert({"ipv4_socket_juniper", ""});
     }
 
+    std::string ipv4_socket_nokia_s;
+    bool ipv4_socket_nokia = main_params.exists("ipv4_socket_nokia");
+    if (ipv4_socket_nokia == true) {
+        libconfig::Setting &ipv4_socket_nokia =
+            main_params.lookup("ipv4_socket_nokia");
+        try {
+            ipv4_socket_nokia_s = ipv4_socket_nokia.c_str();
+            if (ipv4_socket_nokia_s.empty() == false) {
+                params.insert({"ipv4_socket_nokia", ipv4_socket_nokia_s});
+            } else {
+                spdlog::get("multi-logger")->
+                    error("[ipv4_socket_nokia] configuration "
+                    "issue: [ {} ] is an invalid socket",
+                    ipv4_socket_nokia_s);
+                return false;
+            }
+        } catch (const libconfig::SettingTypeException &ste) {
+            spdlog::get("multi-logger")->
+                error("[ipv4_socket_nokia] configuration issue: "
+                "{}", ste.what());
+            return false;
+        }
+    } else {
+        params.insert({"ipv4_socket_nokia", ""});
+    }
+
     std::string ipv4_socket_huawei_s;
     bool ipv4_socket_huawei = main_params.exists("ipv4_socket_huawei");
     if (ipv4_socket_huawei == true) {
@@ -442,6 +468,33 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             }
         } else {
             params.insert({"replies_juniper", "0"});
+        }
+    }
+
+    if (ipv4_socket_nokia_s.empty() == false) {
+        bool replies_nokia = main_params.exists("replies_nokia");
+        if (replies_nokia == true) {
+            libconfig::Setting &replies_nokia =
+                main_params.lookup("replies_nokia");
+            try {
+                std::string replies_nokia_s = replies_nokia;
+                if (replies_nokia_s.empty() == false) {
+                    params.insert({"replies_nokia", replies_nokia_s});
+                } else {
+                    spdlog::get("multi-logger")->
+                        error("[replies_nokia] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        replies_nokia_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger")->
+                    error("[replies_nokia] configuration issue: "
+                    "{}", ste.what());
+                return false;
+            }
+        } else {
+            params.insert({"replies_nokia", "0"});
         }
     }
 
@@ -523,6 +576,33 @@ bool MainCfgHandler::lookup_main_parameters(const std::string &cfg_path,
             }
         } else {
             params.insert({"juniper_workers", "1"});
+        }
+    }
+
+    if (ipv4_socket_nokia_s.empty() == false) {
+        bool nokia_workers = main_params.exists("nokia_workers");
+        if (nokia_workers == true) {
+            libconfig::Setting &nokia_workers =
+                main_params.lookup("nokia_workers");
+            try {
+                std::string nokia_workers_s = nokia_workers;
+                if (nokia_workers_s.empty() == false) {
+                    params.insert({"nokia_workers", nokia_workers_s});
+                } else {
+                    spdlog::get("multi-logger")->
+                        error("[nokia_workers] configuration "
+                        "issue: [ {} ] is an invalid # of replies",
+                        nokia_workers_s);
+                    return false;
+                }
+            } catch (const libconfig::SettingTypeException &ste) {
+                spdlog::get("multi-logger")->
+                    error("[nokia_workers] configuration issue: "
+                    "{}", ste.what());
+                return false;
+            }
+        } else {
+            params.insert({"nokia_workers", "1"});
         }
     }
 

@@ -162,6 +162,23 @@ void Srv::JuniperBind(std::string juniper_srv_socket)
     Srv::JuniperFsmCtrl();
 }
 
+void Srv::NokiaBind(std::string nokia_srv_socket)
+{
+    grpc::ServerBuilder nokia_builder;
+    // --- Required for socket manipulation ---
+    std::unique_ptr<ServerBuilderOptionImpl>
+        jsbo(new ServerBuilderOptionImpl());
+    nokia_builder.SetOption(std::move(jsbo));
+    // --- Required for socket manipulation ---
+    nokia_builder.RegisterService(&nokia_service_);
+    nokia_builder.AddListeningPort(nokia_srv_socket,
+        grpc::InsecureServerCredentials());
+    nokia_cq_ = nokia_builder.AddCompletionQueue();
+    nokia_server_ = nokia_builder.BuildAndStart();
+
+    Srv::NokiaFsmCtrl();
+}
+
 void Srv::HuaweiBind(std::string huawei_srv_socket)
 {
     grpc::ServerBuilder huawei_builder;
@@ -283,7 +300,7 @@ void Srv::JuniperFsmCtrl()
         zmq_pusher.~ZmqPush();
     } else {
         spdlog::get("multi-logger")->
-            error("[Srv::CiscoFsmCtrl()]: Unable to set the "
+            error("[Srv::JuniperFsmCtrl()]: Unable to set the "
             "delivery function");
         std::abort();
     }
@@ -310,6 +327,74 @@ void Srv::JuniperFsmCtrl()
             label_map, data_manipulation, data_wrapper, kafka_delivery,
             kafka_producer, zmq_pusher, zmq_sock, zmq_uri, juniper_tlm_hdr_ext);
         //juniper_counter++;
+    }
+
+    if (ddm.compare("kafka") == 0) {
+        kafka_producer.close();
+    } else if (ddm.compare("zmq") == 0) {
+        zmq_sock.close();
+    }
+}
+
+void Srv::NokiaFsmCtrl()
+{
+    auto tid = std::this_thread::get_id();
+    std::stringstream stid;
+    stid << tid;
+    spdlog::get("multi-logger")->debug("Srv::NokiaFsmCtrl() - Thread-ID: {}",
+        stid.str());
+
+    const std::string ddm = main_cfg_parameters.at("data_delivery_method");
+
+    DataManipulation data_manipulation;
+    DataWrapper data_wrapper;
+
+    // Kafka producer
+    KafkaDelivery kafka_delivery;
+    const kafka::Properties kproperties = kafka_delivery.get_properties();
+    kafka::clients::KafkaProducer kafka_producer(kproperties);
+
+    // Zmq pusher
+    ZmqPush zmq_pusher;
+    const std::string zmq_uri = zmq_pusher.get_zmq_transport_uri();
+    zmq::socket_t zmq_sock(zmq_pusher.get_zmq_ctx(),
+        zmq::socket_type::push);
+    zmq_sock.connect(zmq_uri);
+
+    if (ddm.compare("kafka") != 0) {
+        kafka_producer.~KafkaProducer();
+        kafka_delivery.~KafkaDelivery();
+    } else if (ddm.compare("zmq") != 0) {
+        zmq_sock.~socket_t();
+        zmq_pusher.~ZmqPush();
+    } else {
+        spdlog::get("multi-logger")->
+            error("[Srv::NokiaFsmCtrl()]: Unable to set the "
+            "delivery function");
+        std::abort();
+    }
+
+    std::unique_ptr<Srv::NokiaStream> nokia_sstream(
+        new Srv::NokiaStream(&nokia_service_, nokia_cq_.get()));
+    nokia_sstream->Start(label_map, data_manipulation, data_wrapper,
+        kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri);
+    //int nokia_counter {0};
+    void *nokia_tag {nullptr};
+    bool nokia_ok {false};
+    while (true) {
+        //std::cout << "Nokia: " << nokia_counter << "\n";
+        GPR_ASSERT(nokia_cq_->Next(&nokia_tag, &nokia_ok));
+        //GPR_ASSERT(nokia_ok);
+        if (nokia_ok == false) {
+            spdlog::get("multi-logger")->
+                warn("[NokiaFsmCtrl][grpc::CompletionQueue] "
+                "unsuccessful event");
+            continue;
+        }
+        static_cast<NokiaStream *>(nokia_tag)->Srv::NokiaStream::Start(
+            label_map, data_manipulation, data_wrapper, kafka_delivery,
+            kafka_producer, zmq_pusher, zmq_sock, zmq_uri);
+        //nokia_counter++;
     }
 
     if (ddm.compare("kafka") == 0) {
@@ -416,6 +501,20 @@ Srv::JuniperStream::JuniperStream(
         juniper_stream_status {START}
 {
     spdlog::get("multi-logger")->debug("constructor: JuniperStream()");
+}
+
+Srv::NokiaStream::NokiaStream(
+    Nokia::SROS::DialoutTelemetry::AsyncService *nokia_service,
+    grpc::ServerCompletionQueue *nokia_cq) :
+        nokia_service_ {nokia_service},
+        nokia_cq_ {nokia_cq},
+        nokia_resp {&nokia_server_ctx},
+        nokia_replies_sent {0},
+        kNokiaMaxReplies
+            {std::stoi(main_cfg_parameters.at("replies_nokia"))},
+        nokia_stream_status {START}
+{
+    spdlog::get("multi-logger")->debug("constructor: NokiaStream()");
 }
 
 Srv::HuaweiStream::HuaweiStream(
@@ -987,6 +1086,163 @@ void Srv::JuniperStream::Start(
         spdlog::get("multi-logger")->debug("[JuniperStream::Start()] "
             "GPR_ASSERT(juniper_stream_status == END)");
         GPR_ASSERT(juniper_stream_status == END);
+        delete this;
+    }
+}
+
+void Srv::NokiaStream::Start(
+    std::unordered_map<std::string,std::vector<std::string>> &label_map,
+    DataManipulation &data_manipulation,
+    DataWrapper &data_wrapper,
+    KafkaDelivery &kafka_delivery,
+    kafka::clients::KafkaProducer &kafka_producer,
+    ZmqPush &zmq_pusher,
+    zmq::socket_t &zmq_sock,
+    const std::string &zmq_uri)
+{
+    const std::string ddm = main_cfg_parameters.at("data_delivery_method");
+
+    Srv::NokiaStream *nokia_sstream =
+        new Srv::NokiaStream(nokia_service_, nokia_cq_);
+
+    // Initial stream_status set to START @constructor
+    if (nokia_stream_status == START) {
+        nokia_service_->RequestPublish(
+            &nokia_server_ctx,
+            &nokia_resp,
+            nokia_cq_,
+            nokia_cq_,
+            this);
+        nokia_stream_status = FLOW;
+    } else if (nokia_stream_status == FLOW) {
+        spdlog::get("multi-logger")->debug("[NokiaStream::Start()] "
+            "new Srv::NokiaStream() {}", nokia_server_ctx.peer());
+        nokia_sstream->Start(label_map, data_manipulation, data_wrapper,
+            kafka_delivery, kafka_producer, zmq_pusher, zmq_sock, zmq_uri);
+        nokia_resp.Read(&nokia_stream, this);
+        nokia_stream_status = PROCESSING;
+        nokia_replies_sent++;
+    } else if (nokia_stream_status == PROCESSING) {
+        if (nokia_replies_sent == kNokiaMaxReplies) {
+            spdlog::get("multi-logger")->debug("[NokiaStream::Start()] "
+                "nokia_stream_status = END");
+            nokia_stream_status = END;
+            nokia_resp.Finish(grpc::Status::OK, this);
+            if (nokia_sstream) {
+                delete nokia_sstream;
+                nokia_sstream = nullptr;
+            }
+        } else {
+            auto tid = std::this_thread::get_id();
+            std::stringstream stid;
+            stid << tid;
+            spdlog::get("multi-logger")->debug(
+                "Srv::NokiaStream::Start() - Thread-ID: {}",
+                stid.str());
+            // From the network
+            std::string stream_data_in;
+            // After meta-data
+            std::string stream_data_out_meta;
+            // After data enrichment
+            std::string stream_data_out;
+            std::string json_str_out;
+            const std::string _peer = nokia_server_ctx.peer();
+            // select exclusively the IP addr/port from peer
+            int d1 = (_peer.find_first_of(":") + 1);
+            int d2 = _peer.find_last_of(":");
+            const std::string peer_ip = _peer.substr(d1, (d2 - d1));
+            const std::string peer_port = _peer.substr(
+                (d2 + 1), ((_peer.npos - 1) - (d2 + 1)));
+
+            Json::Value root;
+
+            // the key-word "this" is used as a unique TAG
+            nokia_resp.Read(&nokia_stream, this);
+
+            if (data_manipulation.NokiaUpdate(nokia_stream, json_str_out,
+                    root) == true) {
+                    spdlog::get("multi-logger")->
+                        info("[NokiaStream::Start()] {} "
+                        "NokiaExtension, parsing successful", peer_ip);
+            } else {
+                    spdlog::get("multi-logger")->
+                        error("[NokiaStream::Start()] {} "
+                        "NokiaExtension, parsing failure", peer_ip);
+            }
+
+            stream_data_in = json_str_out;
+
+            // Data enrichment with label (node_id/platform_id)
+            if (data_manipulation_cfg_parameters.at(
+                "enable_label_encode_as_map").compare("true") == 0 ||
+                data_manipulation_cfg_parameters.at(
+                "enable_label_encode_as_map_ptm").compare("true") == 0) {
+                if (data_manipulation.MetaData(
+                        stream_data_in,
+                        peer_ip,
+                        peer_port,
+                        stream_data_out_meta) == true &&
+                    data_manipulation.AppendLabelMap(
+                        label_map,
+                        peer_ip,
+                        stream_data_out_meta,
+                        stream_data_out) == true) {
+                    if (ddm.compare("kafka") == 0) {
+                        kafka_delivery.AsyncKafkaProducer(
+                            kafka_producer,
+                            peer_ip,
+                            stream_data_out);
+                    } else if (ddm.compare("zmq") == 0) {
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        zmq_pusher.ZmqPusher(
+                            data_wrapper,
+                            zmq_sock,
+                            zmq_pusher.get_zmq_transport_uri());
+                    }
+                }
+            } else {
+                if (data_manipulation.MetaData(
+                        stream_data_in,
+                        peer_ip,
+                        peer_port,
+                        stream_data_out_meta) == true) {
+                    if (ddm.compare("kafka") == 0) {
+                        kafka_delivery.AsyncKafkaProducer(
+                            kafka_producer,
+                            peer_ip,
+                            stream_data_out_meta);
+                    } else if (ddm.compare("zmq") == 0) {
+                        data_wrapper.BuildDataWrapper (
+                            "gRPC",
+                            "json_string",
+                            main_cfg_parameters.at("writer_id"),
+                            peer_ip,
+                            peer_port,
+                            stream_data_in);
+                        zmq_pusher.ZmqPusher(
+                            data_wrapper,
+                            zmq_sock,
+                            zmq_pusher.get_zmq_transport_uri());
+                    }
+                }
+            }
+            nokia_stream_status = PROCESSING;
+            nokia_replies_sent++;
+            if (nokia_sstream) {
+                delete nokia_sstream;
+                nokia_sstream = nullptr;
+            }
+        }
+    } else {
+        spdlog::get("multi-logger")->debug("[NokiaStream::Start()] "
+            "GPR_ASSERT(nokia_stream_status == END)");
+        GPR_ASSERT(nokia_stream_status == END);
         delete this;
     }
 }
