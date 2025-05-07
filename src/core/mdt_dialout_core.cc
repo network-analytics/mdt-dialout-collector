@@ -439,7 +439,7 @@ void Srv::HuaweiFsmCtrl()
         zmq_pusher.~ZmqPush();
     } else {
         spdlog::get("multi-logger")->
-            error("[Srv::CiscoFsmCtrl()]: Unable to set the "
+            error("[Srv::HuaweiFsmCtrl()]: Unable to set the "
             "delivery function");
         std::abort();
     }
