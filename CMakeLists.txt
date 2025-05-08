@@ -204,7 +204,10 @@ add_custom_command(
 )
 
 # Protobuf generated "gRPC dial-out" - Nokia
-message(STATUS "Generating gRPC files for Nokia")
+set(nokia_gnmi_ext_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi_ext.pb.cc")
+set(nokia_gnmi_ext_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi_ext.pb.h")
 set(nokia_gnmi_pb_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi.pb.cc")
 set(nokia_gnmi_pb_h
@@ -221,9 +224,10 @@ set(nokia_gnmi_dialout_pb_grpc_cc
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_dialout.grpc.pb.cc")
 set(nokia_gnmi_dialout_pb_grpc_h
   "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_dialout.grpc.pb.h")
-message(STATUS "add_custom_command files for Nokia")
 add_custom_command(
     OUTPUT
+    "${nokia_gnmi_ext_pb_cc}"
+    "${nokia_gnmi_ext_pb_h}"
     "${nokia_gnmi_pb_cc}"
     "${nokia_gnmi_pb_h}"
     "${nokia_gnmi_pb_grpc_cc}"
@@ -235,14 +239,17 @@ add_custom_command(
     COMMAND
     ${_PROTOBUF_PROTOC}
     ARGS
+    -I "${nokia_gnmi_ext_proto_path}"
     -I "${nokia_gnmi_proto_path}"
     -I "${nokia_gnmi_dialout_proto_path}"
     --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia"
+    "${nokia_gnmi_ext_proto}"
     "${nokia_gnmi_proto}"
     "${nokia_gnmi_dialout_proto}"
     --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia"
     --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
     DEPENDS
+    "${nokia_gnmi_ext_proto}"
     "${nokia_gnmi_proto}"
     "${nokia_gnmi_dialout_proto}"
 )
