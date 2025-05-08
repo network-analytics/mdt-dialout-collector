@@ -21,6 +21,12 @@ libgrpc_collector_proto_la_SOURCES = \
 			Juniper/juniper_telemetry_header_extension.grpc.pb.cc \
 			Juniper/juniper_gnmi.grpc.pb.cc \
 			Juniper/juniper_dialout.grpc.pb.cc \
+			Nokia/nokia_dialout.pb.cc \
+			Nokia/nokia_gnmi.pb.cc \
+			Nokia/nokia_gnmi_ext.pb.cc \
+			Nokia/nokia_gnmi_ext.grpc.pb.cc \
+			Nokia/nokia_gnmi.grpc.pb.cc \
+			Nokia/nokia_dialout.grpc.pb.cc \
 			OpenConfig/openconfig_interfaces.pb.cc \
 			OpenConfig/openconfig_interfaces.grpc.pb.cc
 

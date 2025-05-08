@@ -17,7 +17,10 @@ syntax = "proto3";
 
 import "google/protobuf/any.proto";
 import "google/protobuf/descriptor.proto";
-import "juniper_gnmi_ext.proto";
+import  public "nokia_gnmi_ext.proto";
+//import "github.com/openconfig/gnmi/proto/gnmi_ext/gnmi_ext.proto";
+//import "github.com/openconfig/gnmi/proto/gnmi_ext/gnmi_ext.proto";
+//import "gnmi_ext.proto";
 
 // Package gNMI defines a service specification for the gRPC Network Management
 // Interface. This interface is defined to be a standard interface via which
@@ -27,17 +30,17 @@ import "juniper_gnmi_ext.proto";
 //
 // This document references the gNMI Specification which can be found at
 // http://github.com/openconfig/reference/blob/master/rpc/gnmi
-package juniper_gnmi;
+package nokia_gnmi;
 
-// Define a protobuf FileOption that defines the gNMI service version.
-extend google.protobuf.FileOptions {
-  // The gNMI service semantic version.
-  string gnmi_service = 1001;
-}
 
 // gNMI_service is the current version of the gNMI service, returned through
 // the Capabilities RPC.
-option (gnmi_service) = "0.8.0";
+
+option go_package = "github.com/openconfig/gnmi/proto/gnmi";
+option java_multiple_files = true;
+option java_outer_classname = "GnmiProto";
+option java_package = "com.github.gnmi.proto";
+
 
 service gNMI {
   // Capabilities allows the client to retrieve the set of capabilities that
@@ -111,8 +114,9 @@ message TypedValue {
     uint64 uint_val = 3;              // Unsigned integer value.
     bool bool_val = 4;                // Bool value.
     bytes bytes_val = 5;              // Arbitrary byte sequence value.
-    float float_val = 6;              // Floating point value.
-    Decimal64 decimal_val = 7;        // Decimal64 encoded value.
+    float float_val = 6 [deprecated=true]; // Deprecated - use double_val.
+    double double_val = 14;           // Floating point value.
+    Decimal64 decimal_val = 7 [deprecated=true]; // Deprecated - use double_val.
     ScalarArray leaflist_val = 8;     // Mixed type scalar array value.
     google.protobuf.Any any_val = 9;  // protobuf.Any encoded bytes.
     bytes json_val = 10;              // JSON-encoded text.
@@ -121,7 +125,7 @@ message TypedValue {
     // Protobuf binary encoded bytes. The message type is not included.
     // See the specification at
     // github.com/openconfig/reference/blob/master/rpc/gnmi/protobuf-vals.md
-    // for a complete specification.
+    // for a complete specification. [Experimental]
     bytes proto_bytes = 13;
   }
 }
@@ -137,10 +141,10 @@ message Path {
   string origin = 2;                              // Label to disambiguate path.
   repeated PathElem elem = 3;                     // Elements of the path.
   string target = 4;                              // The name of the target
-                                                  // (Sec. 2.2.2.1)
+  // (Sec. 2.2.2.1)
 }
 
-// PathElem encodes an element of a gNMI path, along ith any attributes (keys)
+// PathElem encodes an element of a gNMI path, along with any attributes (keys)
 // that may be associated with it.
 // Reference: gNMI Specification Section 2.2.2.
 message PathElem {
@@ -165,7 +169,7 @@ message Value {
 enum Encoding {
   JSON = 0;           // JSON encoded text.
   BYTES = 1;          // Arbitrarily encoded bytes.
-  PROTO = 2;          // Encoded according to out-of-band agreed Protobuf.
+  PROTO = 2;          // Encoded according to scalar values of TypedValue.
   ASCII = 3;          // ASCII text of an out-of-band agreed format.
   JSON_IETF = 4;      // JSON encoded text as per RFC7951.
 }
@@ -211,7 +215,7 @@ message SubscribeRequest {
   }
   // Extension messages associated with the SubscribeRequest. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 5;
+  repeated nokia_gnmi_ext.Extension extension = 5;
 }
 
 // Poll is sent within a SubscribeRequest to trigger the device to
@@ -238,7 +242,7 @@ message SubscribeResponse {
   }
   // Extension messages associated with the SubscribeResponse. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 5;
+  repeated nokia_gnmi_ext.Extension extension = 5;
 }
 
 // SubscriptionList is used within a Subscribe message to specify the list of
@@ -285,7 +289,7 @@ message Subscription {
   Path path = 1;                    // The data tree path.
   SubscriptionMode mode = 2;        // Subscription mode to be used.
   uint64 sample_interval = 3;       // ns between samples in SAMPLE mode.
-  // Indicates whether values that not changed should be sent in a SAMPLE
+  // Indicates whether values that have not changed should be sent in a SAMPLE
   // subscription.
   bool suppress_redundant = 4;
   // Specifies the maximum allowable silent period in nanoseconds when
@@ -341,7 +345,7 @@ message SetRequest {
   repeated Update update = 4;     // Updates specifying elements to updated.
   // Extension messages associated with the SetRequest. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 5;
+  repeated nokia_gnmi_ext.Extension extension = 5;
 }
 
 // SetResponse is the response to a SetRequest, sent from the target to the
@@ -360,7 +364,7 @@ message SetResponse {
   int64 timestamp = 4;                 // Timestamp of transaction (ns since epoch).
   // Extension messages associated with the SetResponse. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 5;
+  repeated nokia_gnmi_ext.Extension extension = 5;
 }
 
 // UpdateResult is used within the SetResponse message to communicate the
@@ -408,7 +412,7 @@ message GetRequest {
   repeated ModelData use_models = 6;    // The schema models to be used.
   // Extension messages associated with the GetRequest. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 7;
+  repeated nokia_gnmi_ext.Extension extension = 7;
 }
 
 // GetResponse is used by the target to respond to a GetRequest from a client.
@@ -420,7 +424,7 @@ message GetResponse {
   Error error = 2 [deprecated=true];        // Errors that occurred in the Get.
   // Extension messages associated with the GetResponse. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 3;
+  repeated nokia_gnmi_ext.Extension extension = 3;
 }
 
 // CapabilityRequest is sent by the client in the Capabilities RPC to request
@@ -429,7 +433,7 @@ message GetResponse {
 message CapabilityRequest {
   // Extension messages associated with the CapabilityRequest. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 1;
+  repeated nokia_gnmi_ext.Extension extension = 1;
 }
 
 // CapabilityResponse is used by the target to report its capabilities to the
@@ -441,7 +445,7 @@ message CapabilityResponse {
   string gNMI_version = 3;                    // Supported gNMI version.
   // Extension messages associated with the CapabilityResponse. See the
   // gNMI extension specification for further definition.
-  repeated juniper_gnmi_ext.Extension extension = 4;
+  repeated nokia_gnmi_ext.Extension extension = 4;
 }
 
 // ModelData is used to describe a set of schema modules. It can be used in a
@@ -455,3 +459,37 @@ message ModelData {
   string version = 3;         // Semantic version of the model.
 }
 
+service gNMIDialOut {
+  // Publish allows the target to send telemetry updates (in the form of
+  // SubscribeResponse messages, which have the same semantics as in the
+  // gNMI Subscribe RPC, to a client. The client may optionally return the
+  // PublishResponse message in response to the dial-out connection from the
+  // target. In this case, the client may modify the set of subscriptions
+  // that are to be published by the target by:
+  //   - Specifying a client_id within the PublishResponse message. In this
+  //     case the target should match pre-configured subscriptions the specified
+  //	   client_id, and send data only for the paths associated with the
+  //     specified client_id.
+  //	 - Specifying a SubscribeRequest message within the subscriptions field of
+  //	   the PublishResponse message. This message has the same semantics as
+  //     in the Subscribe gNMI RPC.
+  // In the case that the client specifies neither option, a default set of
+  // subscriptions (which should be configurable on the target) should be
+  // published to the client (collector).
+  //
+  // The configuration of subscriptions associated with the publish RPC may
+  // be through the OpenConfig telemetry configuration and operational state
+  // model:
+  // https://github.com/openconfig/public/blob/master/release/models/telemetry/openconfig-telemetry.yang
+  rpc Publish(stream SubscribeResponse) returns (stream PublishResponse);
+}
+
+// PublishResponse is the message sent within the Publish RPC of the gNMI
+// dial-out service by the client (collector) to the target. It is used to
+// modify the set of paths that are to be sent by the target to the collector.
+message PublishResponse {
+  oneof request {
+    string client_id = 1;                                    // A string identifying the client to the target.
+    SubscribeRequest subscriptions = 2;	   // Optional specification of the subscriptions.
+  }
+}

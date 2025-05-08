@@ -1,0 +1,9 @@
+syntax = "proto3";
+import "nokia_gnmi.proto";
+
+package Nokia.SROS;
+
+service DialoutTelemetry {
+  rpc Publish(stream nokia_gnmi.SubscribeResponse) returns (stream PublishResponse);
+}
+message PublishResponse {}

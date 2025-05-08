@@ -134,12 +134,15 @@ private:
     const std::string iface;
     const std::string ipv4_socket_cisco;
     const std::string ipv4_socket_juniper;
+    const std::string ipv4_socket_nokia;
     const std::string ipv4_socket_huawei;
     const std::string replies_cisco;
     const std::string replies_juniper;
+    const std::string replies_nokia;
     const std::string replies_huawei;
     const std::string cisco_workers;
     const std::string juniper_workers;
+    const std::string nokia_workers;
     const std::string huawei_workers;
     const std::string data_delivery_method;
     const std::string so_bindtodevice_check;

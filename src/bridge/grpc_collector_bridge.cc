@@ -16,13 +16,16 @@ extern "C" {
             main_cfg_parameters.at("iface"),
             main_cfg_parameters.at("ipv4_socket_cisco"),
             main_cfg_parameters.at("ipv4_socket_juniper"),
+            main_cfg_parameters.at("ipv4_socket_nokia"),
             main_cfg_parameters.at("ipv4_socket_huawei"),
             /*main_cfg_parameters.at("core_pid_folder"),*/
             main_cfg_parameters.at("cisco_workers"),
             main_cfg_parameters.at("juniper_workers"),
+            main_cfg_parameters.at("nokia_workers"),
             main_cfg_parameters.at("huawei_workers"),
             main_cfg_parameters.at("replies_cisco"),
             main_cfg_parameters.at("replies_juniper"),
+            main_cfg_parameters.at("replies_nokia"),
             main_cfg_parameters.at("replies_huawei"),
             logs_cfg_parameters.at("syslog"),
             logs_cfg_parameters.at("syslog_facility"),
@@ -53,6 +56,11 @@ extern "C" {
         opts->ipv4_socket_juniper =
             strndup(ipv4_socket_juniper, strlen(ipv4_socket_juniper));
 
+        const char *ipv4_socket_nokia =
+            cfg_wrapper.get_ipv4_socket_nokia().c_str();
+        opts->ipv4_socket_nokia =
+            strndup(ipv4_socket_nokia, strlen(ipv4_socket_nokia));
+
         const char *ipv4_socket_huawei =
             cfg_wrapper.get_ipv4_socket_huawei().c_str();
         opts->ipv4_socket_huawei =
@@ -69,6 +77,9 @@ extern "C" {
         const char *juniper_workers = cfg_wrapper.get_juniper_workers().c_str();
         opts->juniper_workers = strndup(juniper_workers, strlen(juniper_workers));
 
+        const char *nokia_workers = cfg_wrapper.get_nokia_workers().c_str();
+        opts->nokia_workers = strndup(nokia_workers, strlen(nokia_workers));
+
         const char *huawei_workers = cfg_wrapper.get_huawei_workers().c_str();
         opts->huawei_workers = strndup(huawei_workers, strlen(huawei_workers));
 
@@ -77,6 +88,9 @@ extern "C" {
 
         const char *replies_juniper = cfg_wrapper.get_replies_juniper().c_str();
         opts->replies_juniper = strndup(replies_juniper, strlen(replies_juniper));
+
+        const char *replies_nokia = cfg_wrapper.get_replies_nokia().c_str();
+        opts->replies_nokia = strndup(replies_nokia, strlen(replies_nokia));
 
         const char *replies_huawei = cfg_wrapper.get_replies_huawei().c_str();
         opts->replies_huawei = strndup(replies_huawei, strlen(replies_huawei));
@@ -162,13 +176,16 @@ extern "C" {
         free(opts->iface);
         free(opts->ipv4_socket_cisco);
         free(opts->ipv4_socket_juniper);
+        free(opts->ipv4_socket_nokia);
         free(opts->ipv4_socket_huawei);
         //free(opts->core_pid_folder);
         free(opts->cisco_workers);
         free(opts->juniper_workers);
+        free(opts->nokia_workers);
         free(opts->huawei_workers);
         free(opts->replies_cisco);
         free(opts->replies_juniper);
+        free(opts->replies_nokia);
         free(opts->replies_huawei);
         free(opts->syslog);
         free(opts->syslog_facility);
@@ -213,9 +230,16 @@ extern "C" {
         const char *zmq_uri)
     {
         LoadOptions(cfg_path, zmq_uri);
-
+        spdlog::get("multi-logger")->debug(
+            "ipv4 sockets found in config:\n ipv4_socket_cisco: {},\n ipv4_socket_juniper: {},\n ipv4_socket_nokia: {},\n ipv4_socket_huawei: {}\n",
+            main_cfg_parameters.at("ipv4_socket_cisco"),
+            main_cfg_parameters.at("ipv4_socket_juniper"),
+            main_cfg_parameters.at("ipv4_socket_nokia"),
+            main_cfg_parameters.at("ipv4_socket_huawei")
+        );
         if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
             main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
+            main_cfg_parameters.at("ipv4_socket_nokia").empty() == true &&
             main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
                 spdlog::get("multi-logger")->
                     error("[ipv4_socket_*] configuration issue: "
@@ -227,6 +251,7 @@ extern "C" {
         // Use arrays to store the worker threads per vendor
         pthread_t cisco_workers[MAX_WORKERS] = {0};
         pthread_t juniper_workers[MAX_WORKERS] = {0};
+        pthread_t nokia_workers[MAX_WORKERS] = {0};
         pthread_t huawei_workers[MAX_WORKERS] = {0};
 
         // Cisco
@@ -236,6 +261,10 @@ extern "C" {
         // Juniper
         LoadThreads(juniper_workers, "ipv4_socket_juniper", "replies_juniper",
             "juniper_workers");
+
+        // Nokia
+        LoadThreads(nokia_workers, "ipv4_socket_nokia", "replies_nokia",
+            "nokia_workers");
 
         // Huawei
         LoadThreads(huawei_workers, "ipv4_socket_huawei", "replies_huawei",
@@ -247,6 +276,10 @@ extern "C" {
 
         for (size_t w = 0; w < MAX_WORKERS && juniper_workers[w] != 0; w++) {
             pthread_detach(juniper_workers[w]);
+        }
+
+        for (size_t w = 0; w < MAX_WORKERS && nokia_workers[w] != 0; w++) {
+            pthread_detach(nokia_workers[w]);
         }
 
         for (size_t w = 0; w < MAX_WORKERS && huawei_workers[w] != 0; w++) {
@@ -332,6 +365,13 @@ extern "C" {
             std::string juniper_srv_socket {ipv4_socket_juniper};
             Srv juniper_mdt_dialout_collector;
             juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
+        } else if (strstr(ipv4_socket_str, "nokia") != NULL) {
+            std::string ipv4_socket_nokia =
+                main_cfg_parameters.at(ipv4_socket_str);
+
+            std::string nokia_srv_socket {ipv4_socket_nokia};
+            Srv nokia_mdt_dialout_collector;
+            nokia_mdt_dialout_collector.NokiaBind(nokia_srv_socket);
         } else if (strstr(ipv4_socket_str, "huawei") != NULL) {
             std::string ipv4_socket_huawei =
                 main_cfg_parameters.at(ipv4_socket_str);

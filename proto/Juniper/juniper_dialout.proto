@@ -20,7 +20,7 @@ service Subscriber {
   https://github.com/openconfig/public/blob/master/release/models/telemetry/openconfig-telemetry.yang
   */
 
-  rpc DialOutSubscriber(stream gnmi.SubscribeResponse) returns (stream gnmi.SubscribeRequest);
+  rpc DialOutSubscriber(stream juniper_gnmi.SubscribeResponse) returns (stream juniper_gnmi.SubscribeRequest);
 
 }
 

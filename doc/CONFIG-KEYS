@@ -23,6 +23,12 @@ DESC:      Defining the network end-point receiving the gRPC data-stream from Ju
            value is set and if the configuration key is specified its value can't be empty.
 DEFAULT:   none
 
+KEY:       ipv4_socket_nokia
+DESC:      Defining the network end-point receiving the gRPC data-stream from Nokia devices. The end-point information must include both the
+           IPv4 and port separated by colon, for example "192.18.0.2:10002" is considered to be a valid end-point. No default
+           value is set and if the configuration key is specified its value can't be empty.
+DEFAULT:   none
+
 KEY:       ipv4_socket_huawei
 DESC:      Defining the network end-point receiving the gRPC data-stream from Huawei devices. The end-point information must include both the
            IPv4 and port separated by colon, for example "192.18.0.3:10003" is considered to be a valid end-point. No default
@@ -41,6 +47,12 @@ DESC:      This is ment mainly for debugging. With this configuration key you ca
            a single receiving session. The default value is set to "0" which means unlimited.
 DEFAULT:   "0"
 
+KEY:       replies_nokia
+VALUES:    [value >= "0" and value <= "1000"]
+DESC:      This is ment mainly for debugging. With this configuration key you can rate limit the amount of Nokia's gRPC messages processed within
+           a single receiving session. The default value is set to "0" which means unlimited.
+DEFAULT:   "0"
+
 KEY:       replies_huawei
 VALUES:    [value >= "0" and value <= "1000"]
 DESC:      This is ment mainly for debugging. With this configuration key you can rate limit the amount of Huawei's gRPC messages processed within
@@ -55,6 +67,11 @@ DEFAULT:   "1"
 KEY:       juniper_workers
 VALUES:    [value >= "1" and value <= "5"]
 DESC:      Defining the amount of running threads busy with processing incoming Juniper's gRPC messages.
+DEFAULT:   "1"
+
+KEY:       nokia_workers
+VALUES:    [value >= "1" and value <= "5"]
+DESC:      Defining the amount of running threads busy with processing incoming Nokia's gRPC messages.
 DEFAULT:   "1"
 
 KEY:       huawei_workers

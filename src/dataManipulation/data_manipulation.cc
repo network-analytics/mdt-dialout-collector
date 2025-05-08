@@ -214,7 +214,7 @@ Json::Value DataManipulation::CiscoGpbkvField2Json(
 // 1. Decode & Extract mata-data & Add to JSON-Obj (juniper_tlm_header_ext)
 // 2. From JSON-Obj to JSON-Str
 bool DataManipulation::JuniperExtension(
-    gnmi::SubscribeResponse &juniper_stream,
+    juniper_gnmi::SubscribeResponse &juniper_stream,
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_header_ext,
     Json::Value &root)
 {
@@ -224,7 +224,7 @@ bool DataManipulation::JuniperExtension(
     for (const auto &ext : juniper_stream.extension()) {
         if (ext.has_registered_ext() &&
             ext.registered_ext().id() ==
-                gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
+                juniper_gnmi_ext::ExtensionID::EID_JUNIPER_TELEMETRY_HEADER) {
             parsing_str = juniper_tlm_header_ext.ParseFromString(
                 ext.registered_ext().msg());
 
@@ -253,7 +253,7 @@ bool DataManipulation::JuniperExtension(
 }
 
 // Generate the JSON-Str from the upadate msg
-bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
+bool DataManipulation::JuniperUpdate(juniper_gnmi::SubscribeResponse &juniper_stream,
     std::string &json_str_out,
     Json::Value &root)
 {
@@ -491,6 +491,134 @@ bool DataManipulation::JuniperUpdate(gnmi::SubscribeResponse &juniper_stream,
             root[path] = value;
         }
     }
+
+    // Serialize the JSON value into a string
+    Json::StreamWriterBuilder builder_w;
+    builder_w["emitUTF8"] = true;
+    builder_w["indentation"] = "";
+    const std::unique_ptr<Json::StreamWriter> writer(
+        builder_w.newStreamWriter());
+    json_str_out = Json::writeString(builder_w, root);
+
+    return true;
+}
+
+
+// Generate the JSON-Str from the upadate msg
+bool DataManipulation::NokiaUpdate(nokia_gnmi::SubscribeResponse &nokia_stream,
+    std::string &json_str_out,
+    Json::Value &root)
+{
+    // From the first update() generate the sensor_path
+    //SubscribeResponse
+    //---> bool sync_response = 3;
+    //---> Notification update = 1;
+    //     ---> (        ) bool  atomic = 6;
+    //     ---> (        ) int64 timestamp = 1
+    //     ---> (        ) Path  prefix = 2;
+    //          ---> (        ) string origin = 2;
+    //          ---> (        ) string target = 4;
+    //          ---> (repeated) PathElem elem = 3;
+    //                          ---> string name = 1;
+    //                          ---> map<string, string> key = 2;
+
+    // sensor_path as JSON
+    if (nokia_stream.has_update()) {
+        const auto &nup = nokia_stream.update();
+        std::uint64_t notification_timestamp = nup.timestamp();
+
+        // Log the full contents of the nup object using DebugString() if it's a protobuf object.
+        spdlog::get("multi-logger")->info("[NokiaDebug] Full nup object: {}", nup.DebugString());
+        if (nokia_stream.extension_size() > 0) {
+            for (const auto& ext : nokia_stream.extension()) {
+                spdlog::get("multi-logger")->info("[NokiaDebug] Nokia extension object: {}", ext.DebugString());
+            }
+        } else {
+            spdlog::get("multi-logger")->info("[NokiaDebug] No extensions found in the SubscribeResponse.");
+        }
+        int path_idx = 0;
+        Json::Value sensor_path(Json::arrayValue);
+        spdlog::get("multi-logger")->info("[NokiaDebug] Full nup.prefix() object: {}", nup.prefix().DebugString());
+
+        while (path_idx < nup.prefix().elem_size()) {
+            Json::Value path_element;
+            path_element["name"] = nup.prefix().elem().at(path_idx).name();
+
+            // handling paths with filters
+            if (nup.prefix().elem().at(path_idx).key_size() > 0) {
+                Json::Value filters;
+                for (const auto &[key, value] :
+                nup.prefix().elem().at(path_idx).key()) {
+                    filters[key] = value;
+                }
+                path_element["filters"] = filters;
+            }
+            sensor_path.append(path_element);
+            path_idx++;
+        }
+        std::string collected_path;
+
+        for (const auto& element : sensor_path) {
+            // Access the "name" field from the JSON object
+            if (element.isMember("name")) {
+                collected_path += "/" + element["name"].asString();
+            }
+            // Check if "filters" exist and append them in square brackets. Uncomment to enable this logic.
+            /*
+            if (element.isMember("filters")) {
+                const Json::Value& filters = element["filters"];
+                if (!filters.empty()) {
+                    collected_path += "[";
+                    // Assuming we can have multiple filters for one field in a sensor_path, we can remove the loop if that's not an existing scenario
+                    bool first = true;
+                    for (const auto& key : filters.getMemberNames()) {
+                        if (!first) {
+                            collected_path += ",";
+                        }
+                        collected_path += key + "=" + filters[key].asString();
+                        first = false;
+                    }
+                    collected_path += "]";
+                }
+            }*/
+        }
+        root["collected_path"] = collected_path;
+        root["sensor_path"] = sensor_path;
+        root["notification_timestamp"] = notification_timestamp;
+
+
+        std::string path;
+        Json::Value value;
+        for (const auto &_nup : nup.update()) {
+            //std::cout << "DebugString: " << _jup.path().Utf8DebugString()
+            //    << "\n";
+            int path_idx = 0;
+            path.clear();
+            spdlog::get("multi-logger")->info("[NokiaDebug] Full nup.path() object: {}", _nup.path().DebugString());
+            while (path_idx < _nup.path().elem_size()) {
+                //std::cout << _jup.path().elem().at(path_idx).name()
+                //    << " ---> ";
+                path.append("/");
+                path.append(_nup.path().elem().at(path_idx).name());
+                path_idx++;
+            }
+
+            value = _nup.val().json_ietf_val();
+            //std::cout << value << "\n";
+            root[path] = value;
+        }
+    }
+
+    std::string raw_data;
+    google::protobuf::util::JsonPrintOptions opt;
+    opt.add_whitespace = false;
+    auto status = google::protobuf::util::MessageToJsonString(nokia_stream, &raw_data, opt);
+    if (!status.ok()) {
+    spdlog::get("multi-logger")->error("[NokiaDebug] Failed to convert protobuf to JSON: {}", status.ToString());
+    }
+    // Log raw_data for debugging
+    spdlog::get("multi-logger")->debug("[NokiaDebug] raw_data: {}", raw_data);
+    // root["raw_data"] = raw_data;
 
     // Serialize the JSON value into a string
     Json::StreamWriterBuilder builder_w;

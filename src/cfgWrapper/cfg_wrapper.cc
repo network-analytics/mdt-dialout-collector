@@ -12,13 +12,16 @@ bool CfgWrapper::BuildCfgWrapper(
     const std::string &iface,
     const std::string &ipv4_socket_cisco,
     const std::string &ipv4_socket_juniper,
+    const std::string &ipv4_socket_nokia,
     const std::string &ipv4_socket_huawei,
     //const std::string &core_pid_folder
     const std::string &cisco_workers,
     const std::string &juniper_workers,
+    const std::string &nokia_workers,
     const std::string &huawei_workers,
     const std::string &replies_cisco,
     const std::string &replies_juniper,
+    const std::string &replies_nokia,
     const std::string &replies_huawei,
     // logging
     const std::string &syslog,
@@ -36,13 +39,16 @@ bool CfgWrapper::BuildCfgWrapper(
     set_iface(iface);
     set_ipv4_socket_cisco(ipv4_socket_cisco);
     set_ipv4_socket_juniper(ipv4_socket_juniper);
+    set_ipv4_socket_nokia(ipv4_socket_nokia);
     set_ipv4_socket_huawei(ipv4_socket_huawei);
     //set_core_pid_folder(core_pid_folder);
     set_cisco_workers(cisco_workers);
-    set_juniper_workers(cisco_workers);
+    set_juniper_workers(juniper_workers);
+    set_nokia_workers(nokia_workers);
     set_huawei_workers(huawei_workers);
     set_replies_cisco(replies_cisco);
     set_replies_juniper(replies_juniper);
+    set_replies_nokia(replies_nokia);
     set_replies_huawei(replies_huawei);
     set_syslog(syslog);
     set_syslog_facility(syslog_facility);

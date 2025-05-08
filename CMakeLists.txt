@@ -46,6 +46,16 @@ get_filename_component(juniper_gnmi_proto_path "${juniper_gnmi_proto}" PATH)
 get_filename_component(juniper_gnmi_ext_proto "proto/Juniper/juniper_gnmi_ext.proto" ABSOLUTE)
 get_filename_component(juniper_gnmi_ext_proto_path "${juniper_gnmi_ext_proto}" PATH)
 
+# Proto file gRPC dial-out / gnmi / gnmi extensions - Nokia
+get_filename_component(nokia_gnmi_dialout_proto "proto/Nokia/nokia_dialout.proto" ABSOLUTE)
+get_filename_component(nokia_gnmi_dialout_proto_path "${nokia_gnmi_dialout_proto}" PATH)
+
+get_filename_component(nokia_gnmi_proto "proto/Nokia/nokia_gnmi.proto" ABSOLUTE)
+get_filename_component(nokia_gnmi_proto_path "${nokia_gnmi_proto}" PATH)
+
+get_filename_component(nokia_gnmi_ext_proto "proto/Nokia/nokia_gnmi_ext.proto" ABSOLUTE)
+get_filename_component(nokia_gnmi_ext_proto_path "${nokia_gnmi_ext_proto}" PATH)
+
 # Proto file gRPC dial-out - Huawei
 get_filename_component(huawei_dialout_proto "proto/Huawei/huawei_dialout.proto" ABSOLUTE)
 get_filename_component(huawei_dialout_proto_path "${huawei_dialout_proto}" PATH)
@@ -191,6 +201,57 @@ add_custom_command(
     DEPENDS
     "${juniper_gnmi_proto}"
     "${juniper_gnmi_dialout_proto}"
+)
+
+# Protobuf generated "gRPC dial-out" - Nokia
+set(nokia_gnmi_ext_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi_ext.pb.cc")
+set(nokia_gnmi_ext_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi_ext.pb.h")
+set(nokia_gnmi_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi.pb.cc")
+set(nokia_gnmi_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi.pb.h")
+set(nokia_gnmi_pb_grpc_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi.grpc.pb.cc")
+set(nokia_gnmi_pb_grpc_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_gnmi.grpc.pb.h")
+set(nokia_gnmi_dialout_pb_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_dialout.pb.cc")
+set(nokia_gnmi_dialout_pb_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_dialout.pb.h")
+set(nokia_gnmi_dialout_pb_grpc_cc
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_dialout.grpc.pb.cc")
+set(nokia_gnmi_dialout_pb_grpc_h
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia/nokia_dialout.grpc.pb.h")
+add_custom_command(
+    OUTPUT
+    "${nokia_gnmi_ext_pb_cc}"
+    "${nokia_gnmi_ext_pb_h}"
+    "${nokia_gnmi_pb_cc}"
+    "${nokia_gnmi_pb_h}"
+    "${nokia_gnmi_pb_grpc_cc}"
+    "${nokia_gnmi_pb_grpc_h}"
+    "${nokia_gnmi_dialout_pb_cc}"
+    "${nokia_gnmi_dialout_pb_h}"
+    "${nokia_gnmi_dialout_pb_grpc_cc}"
+    "${nokia_gnmi_dialout_pb_grpc_h}"
+    COMMAND
+    ${_PROTOBUF_PROTOC}
+    ARGS
+    -I "${nokia_gnmi_ext_proto_path}"
+    -I "${nokia_gnmi_proto_path}"
+    -I "${nokia_gnmi_dialout_proto_path}"
+    --cpp_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia"
+    "${nokia_gnmi_ext_proto}"
+    "${nokia_gnmi_proto}"
+    "${nokia_gnmi_dialout_proto}"
+    --grpc_out "${CMAKE_CURRENT_SOURCE_DIR}/src/proto/Nokia"
+    --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+    DEPENDS
+    "${nokia_gnmi_ext_proto}"
+    "${nokia_gnmi_proto}"
+    "${nokia_gnmi_dialout_proto}"
 )
 
 # Protobuf generated "gRPC dial-out" - Huawei
@@ -368,6 +429,10 @@ foreach(sourcefile ${APP_SOURCES})
         ${juniper_telemetry_pb_cc}
         ${juniper_telemetry_header_pb_cc}
         ${juniper_telemetry_header_extension_pb_cc}
+        ${nokia_gnmi_pb_cc}
+        ${nokia_gnmi_ext_pb_cc}
+        ${nokia_gnmi_dialout_pb_cc}
+        ${nokia_gnmi_dialout_pb_grpc_cc}
         ${huawei_dialout_pb_cc}
         ${huawei_dialout_pb_grpc_cc}
         ${huawei_telemetry_pb_cc}
