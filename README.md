@@ -1,4 +1,4 @@
-[![Build status](https://github.com/network-analytics/mdt-dialout-collector/workflows/ci/badge.svg?branch=main)](https://github.com/network-analytics/mdt-dialout-collector/actions)
+[![Build status](https://github.com/network-analytics/mdt-dialout-collector/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/network-analytics/mdt-dialout-collector/actions/workflows/ci.yaml)
 
 ## Table of Content
 
