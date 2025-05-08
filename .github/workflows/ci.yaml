@@ -28,11 +28,14 @@ jobs:
       - name: Log into registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          if [ -z "${{ secrets.GHCR_PAT }}" ]; then
-            echo "GHCR_PAT is not set or unavailable in this context"
+          TOKEN="$GHCR_PAT"
+          if [ -z "$TOKEN" ]; then
+            echo "GHCR_PAT is not available"
             exit 1
           fi
-          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo "$TOKEN" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        env:
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
 
       - name: Push image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
