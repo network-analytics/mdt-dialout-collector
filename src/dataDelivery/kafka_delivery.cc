@@ -65,9 +65,10 @@ bool KafkaDelivery::AsyncKafkaProducer(
         kafka::Topic topic = get_topic();
         kafka::Properties properties = get_properties();
 
+	spdlog::get("multi-logger")->debug("[AsyncKafkaProducer] Attempting to send with key: '{}'", peer);
         auto record = kafka::clients::producer::ProducerRecord(
             topic,
-            kafka::Key(peer.c_str()),
+            kafka::Key(peer.c_str(), peer.size()),
             kafka::Value(json_str.c_str(), json_str.size())
             );
 
