@@ -108,3 +108,34 @@ telemetry
   destination-group TLM
 #
 ```
+
+## Nokia 7750 SR TiMOS-C-21.10.R4 cpm/hops64
+```SHELL
+# Reference documentation: https://infocenter.nokia.com/public/7750SR222R1A/index.jsp?topic=%2Fcom.nokia.System_Mgmt_Guide%2Fconfiguring_dia-d1206e2295.html
+
+system telemetry
+    destination-group "GROUP_1" { }
+    destination-group "GROUP_1" { allow-unsecure-connection }
+    destination-group "GROUP_1" { destination COLLECTOR_IP_ADDRESS port COLLECTOR_PORT_NUMBER }
+    destination-group "GROUP_1" { destination COLLECTOR_IP_ADDRESS port COLLECTOR_PORT_NUMBER router-instance "Base" }
+    persistent-subscriptions { }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" admin-state enable }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" sensor-group "SENSOR_GROUP_1" }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" mode sample }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" sample-interval 60000 }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" destination-group "GROUP_1" }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" local-source-address ROUTER_MANAGEMENT_IP_ADDRESS }
+    persistent-subscriptions { subscription "SUNSCRIPTION_1" encoding json-ietf }
+    sensor-groups { }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" description "Sensor group for testing dial-out telemetry" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/configure/card" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/configure/lag" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/configure/port" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/lag" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/port" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/port/transceiver" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/router[router-name=Base]/interface[interface-name=INTERFACE_1]" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/system" }
+```
