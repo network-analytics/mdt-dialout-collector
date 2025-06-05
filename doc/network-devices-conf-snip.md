@@ -6,7 +6,7 @@
    * [Cisco-NX-OS 10.2(2)@Nexus9000](#cisco-nx-os-1022nexus9000)
    * [JunOS 20.4R3-S2.6@mx10003](#junos-204r3-s26mx10003)
    * [Huawei VRP V800R021C10SPC300T@NE40E](#huawei-vrp-v800r021c10spc300tne40e)
-   * [Nokia TiMOS-C-21.10.R4 7750 SR](#nokia-timos-c-2110r4-7750-sr)
+   * [Nokia TiMOS-C-21.10.R4@7750-SR](#nokia-7750-sr-timos-c-2110r4-cpmhops64)
 <!--te-->
 
 ## Cisco-XR 7.4.1@NCS-540
