@@ -6,6 +6,7 @@
    * [Cisco-NX-OS 10.2(2)@Nexus9000](#cisco-nx-os-1022nexus9000)
    * [JunOS 20.4R3-S2.6@mx10003](#junos-204r3-s26mx10003)
    * [Huawei VRP V800R021C10SPC300T@NE40E](#huawei-vrp-v800r021c10spc300tne40e)
+   * [Nokia TiMOS-C-21.10.R4@7750-SR](#nokia-7750-sr-timos-c-2110r4-cpmhops64)
 <!--te-->
 
 ## Cisco-XR 7.4.1@NCS-540
@@ -107,4 +108,35 @@ telemetry
   sensor-group SENSOR
   destination-group TLM
 #
+```
+
+## Nokia 7750 SR TiMOS-C-21.10.R4 cpm/hops64
+```SHELL
+# Reference documentation: https://infocenter.nokia.com/public/7750SR222R1A/index.jsp?topic=%2Fcom.nokia.System_Mgmt_Guide%2Fconfiguring_dia-d1206e2295.html
+
+system telemetry
+    destination-group "GROUP_1" { }
+    destination-group "GROUP_1" { allow-unsecure-connection }
+    destination-group "GROUP_1" { destination <COLLECTOR_IP_ADDRESS> port <COLLECTOR_PORT_NUMBER> }
+    destination-group "GROUP_1" { destination <COLLECTOR_IP_ADDRESS> port <COLLECTOR_PORT_NUMBER> router-instance "Base" }
+    persistent-subscriptions { }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" admin-state enable }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" sensor-group "SENSOR_GROUP_1" }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" mode sample }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" sample-interval 60000 }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" destination-group "GROUP_1" }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" local-source-address <ROUTER_MANAGEMENT_IP_ADDRESS> }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" encoding json-ietf }
+    sensor-groups { }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" description "Sensor group for testing dial-out telemetry" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/configure/card" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/configure/lag" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/configure/port" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/lag" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/port" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/port/transceiver" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/router[router-name=Base]/interface[interface-name=INTERFACE_1]" }
+    sensor-groups { sensor-group "SENSOR_GROUP_1" path "/state/system" }
 ```
