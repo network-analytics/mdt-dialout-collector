@@ -218,6 +218,16 @@ bool DataManipulation::JuniperExtension(
     GnmiJuniperTelemetryHeaderExtension &juniper_tlm_header_ext,
     Json::Value &root)
 {
+    // Debug logs
+    std::string raw_data;
+    google::protobuf::util::JsonPrintOptions opt;
+    opt.add_whitespace = false;
+    auto status = google::protobuf::util::MessageToJsonString(juniper_stream, &raw_data, opt);
+    if (!status.ok()) {
+    spdlog::get("multi-logger")->error("[JuniperDebug] Failed to convert protobuf to JSON: {}", status.ToString());
+    }
+    spdlog::get("multi-logger")->debug("[JuniperDebug] pre-JuniperExtension raw_data: {}", raw_data);
+
     bool parsing_str {false};
     std::string stream_data_in;
 
@@ -257,6 +267,16 @@ bool DataManipulation::JuniperUpdate(juniper_gnmi::SubscribeResponse &juniper_st
     std::string &json_str_out,
     Json::Value &root)
 {
+    // Debug logs
+    std::string raw_data;
+    google::protobuf::util::JsonPrintOptions opt;
+    opt.add_whitespace = false;
+    auto status = google::protobuf::util::MessageToJsonString(juniper_stream, &raw_data, opt);
+    if (!status.ok()) {
+    spdlog::get("multi-logger")->error("[JuniperDebug] Failed to convert protobuf to JSON: {}", status.ToString());
+    }
+    spdlog::get("multi-logger")->debug("[JuniperDebug] pre-JuniperUpdate data: {}", raw_data);
+
     // From the first update() generate the sensor_path
     //SubscribeResponse
     //---> bool sync_response = 3;
@@ -509,6 +529,15 @@ bool DataManipulation::NokiaUpdate(nokia_gnmi::SubscribeResponse &nokia_stream,
     std::string &json_str_out,
     Json::Value &root)
 {
+    // Debug logs
+    std::string raw_data;
+    google::protobuf::util::JsonPrintOptions opt;
+    opt.add_whitespace = false;
+    auto status = google::protobuf::util::MessageToJsonString(nokia_stream, &raw_data, opt);
+    if (!status.ok()) {
+    spdlog::get("multi-logger")->error("[NokiaDebug] Failed to convert protobuf to JSON: {}", status.ToString());
+    }
+    spdlog::get("multi-logger")->debug("[NokiaDebug] raw_data: {}", raw_data);
     // From the first update() generate the sensor_path
     //SubscribeResponse
     //---> bool sync_response = 3;
@@ -528,17 +557,8 @@ bool DataManipulation::NokiaUpdate(nokia_gnmi::SubscribeResponse &nokia_stream,
         std::uint64_t notification_timestamp = nup.timestamp();
 
         // Log the full contents of the nup object using DebugString() if it's a protobuf object.
-        spdlog::get("multi-logger")->info("[NokiaDebug] Full nup object: {}", nup.DebugString());
-        if (nokia_stream.extension_size() > 0) {
-            for (const auto& ext : nokia_stream.extension()) {
-                spdlog::get("multi-logger")->info("[NokiaDebug] Nokia extension object: {}", ext.DebugString());
-            }
-        } else {
-            spdlog::get("multi-logger")->info("[NokiaDebug] No extensions found in the SubscribeResponse.");
-        }
         int path_idx = 0;
         Json::Value sensor_path(Json::arrayValue);
-        spdlog::get("multi-logger")->info("[NokiaDebug] Full nup.prefix() object: {}", nup.prefix().DebugString());
 
         while (path_idx < nup.prefix().elem_size()) {
             Json::Value path_element;
@@ -608,17 +628,6 @@ bool DataManipulation::NokiaUpdate(nokia_gnmi::SubscribeResponse &nokia_stream,
             root[path] = value;
         }
     }
-
-    std::string raw_data;
-    google::protobuf::util::JsonPrintOptions opt;
-    opt.add_whitespace = false;
-    auto status = google::protobuf::util::MessageToJsonString(nokia_stream, &raw_data, opt);
-    if (!status.ok()) {
-    spdlog::get("multi-logger")->error("[NokiaDebug] Failed to convert protobuf to JSON: {}", status.ToString());
-    }
-    // Log raw_data for debugging
-    spdlog::get("multi-logger")->debug("[NokiaDebug] raw_data: {}", raw_data);
-    // root["raw_data"] = raw_data;
 
     // Serialize the JSON value into a string
     Json::StreamWriterBuilder builder_w;
