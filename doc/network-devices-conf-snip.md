@@ -6,6 +6,7 @@
    * [Cisco-NX-OS 10.2(2)@Nexus9000](#cisco-nx-os-1022nexus9000)
    * [JunOS 20.4R3-S2.6@mx10003](#junos-204r3-s26mx10003)
    * [Huawei VRP V800R021C10SPC300T@NE40E](#huawei-vrp-v800r021c10spc300tne40e)
+   * [Nokia TiMOS-C-21.10.R4 7750 SR](#nokia-timos-c-2110r4-7750-sr)
 <!--te-->
 
 ## Cisco-XR 7.4.1@NCS-540
@@ -116,17 +117,17 @@ telemetry
 system telemetry
     destination-group "GROUP_1" { }
     destination-group "GROUP_1" { allow-unsecure-connection }
-    destination-group "GROUP_1" { destination COLLECTOR_IP_ADDRESS port COLLECTOR_PORT_NUMBER }
-    destination-group "GROUP_1" { destination COLLECTOR_IP_ADDRESS port COLLECTOR_PORT_NUMBER router-instance "Base" }
+    destination-group "GROUP_1" { destination <COLLECTOR_IP_ADDRESS> port <COLLECTOR_PORT_NUMBER> }
+    destination-group "GROUP_1" { destination <COLLECTOR_IP_ADDRESS> port <COLLECTOR_PORT_NUMBER> router-instance "Base" }
     persistent-subscriptions { }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" admin-state enable }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" sensor-group "SENSOR_GROUP_1" }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" mode sample }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" sample-interval 60000 }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" destination-group "GROUP_1" }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" local-source-address ROUTER_MANAGEMENT_IP_ADDRESS }
-    persistent-subscriptions { subscription "SUNSCRIPTION_1" encoding json-ietf }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" admin-state enable }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" sensor-group "SENSOR_GROUP_1" }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" mode sample }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" sample-interval 60000 }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" destination-group "GROUP_1" }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" local-source-address <ROUTER_MANAGEMENT_IP_ADDRESS> }
+    persistent-subscriptions { subscription "SUBSCRIPTION_1" encoding json-ietf }
     sensor-groups { }
     sensor-groups { sensor-group "SENSOR_GROUP_1" }
     sensor-groups { sensor-group "SENSOR_GROUP_1" description "Sensor group for testing dial-out telemetry" }
