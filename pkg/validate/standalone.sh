@@ -15,6 +15,9 @@ set -eu
 PKG_FILE="${1:?usage: $0 <package-file>}"
 . /etc/os-release
 
+# apt-get treats foo/bar.deb as "release/package"; local file install needs ./
+case "${PKG_FILE}" in /*|./*) ;; *) PKG_FILE="./${PKG_FILE}" ;; esac
+
 case "${ID}" in
     debian|ubuntu)
         export DEBIAN_FRONTEND=noninteractive

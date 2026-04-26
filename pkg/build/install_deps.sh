@@ -56,7 +56,8 @@ case "${ID}" in
             spdlog-devel \
             >/dev/null
         PKG_FORMAT=rpm
-        DISTRO_TAG="fc${VERSION_ID}"
+        # 'fc' (no version) so it matches the validate matrix tag in release.yml
+        DISTRO_TAG="fc"
         GRPC_RUNTIME=grpc-cpp
         PROTOBUF_RUNTIME=protobuf
         ;;
