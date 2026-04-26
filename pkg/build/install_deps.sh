@@ -33,15 +33,10 @@ case "${ID}" in
                 GRPC_RUNTIME=libgrpc++1.51
                 PROTOBUF_RUNTIME=libprotobuf32
                 ;;
-            trixie|forky)
+            trixie|forky|noble|jammy|oracular|plucky)
+                # All t64-ABI distros currently ship libgrpc++1.51t64 + libprotobuf32t64.
                 DISTRO_TAG="${VERSION_CODENAME}"
-                # trixie: gRPC 1.66 with t64 ABI rename
-                GRPC_RUNTIME="libgrpc++1.66t64 | libgrpc++1.66"
-                PROTOBUF_RUNTIME="libprotobuf32t64 | libprotobuf32"
-                ;;
-            noble|jammy|oracular|plucky)
-                DISTRO_TAG="${VERSION_CODENAME}"
-                GRPC_RUNTIME="libgrpc++1.51t64 | libgrpc++1.66t64 | libgrpc++1.66"
+                GRPC_RUNTIME="libgrpc++1.51t64 | libgrpc++1.66t64"
                 PROTOBUF_RUNTIME="libprotobuf32t64 | libprotobuf32"
                 ;;
             *)
