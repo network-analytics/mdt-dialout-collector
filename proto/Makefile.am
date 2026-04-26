@@ -33,59 +33,59 @@ grpc_cisco:
 	$(PROTOC) -I ${top_srcdir}/proto/Cisco/      \
 			--cpp_out  ${top_builddir}/src/proto/Cisco      \
 			--grpc_out ${top_builddir}/src/proto/Cisco      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" cisco_dialout.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" cisco_dialout.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Cisco/      \
 			--cpp_out  ${top_builddir}/src/proto/Cisco      \
 			--grpc_out ${top_builddir}/src/proto/Cisco      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" cisco_telemetry.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" cisco_telemetry.proto
 grpc_huawei:
 	$(PROTOC) -I ${top_srcdir}/proto/Huawei/      \
 			--cpp_out  ${top_builddir}/src/proto/Huawei      \
 			--grpc_out ${top_builddir}/src/proto/Huawei      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" huawei_dialout.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" huawei_dialout.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Huawei/      \
 			--cpp_out  ${top_builddir}/src/proto/Huawei      \
 			--grpc_out ${top_builddir}/src/proto/Huawei      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" huawei_telemetry.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" huawei_telemetry.proto
 
 grpc_juniper:
 	$(PROTOC) -I ${top_srcdir}/proto/Juniper/      \
 			--cpp_out  ${top_builddir}/src/proto/Juniper      \
 			--grpc_out ${top_builddir}/src/proto/Juniper      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" juniper_dialout.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" juniper_dialout.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Juniper/      \
 			--cpp_out  ${top_builddir}/src/proto/Juniper      \
 			--grpc_out ${top_builddir}/src/proto/Juniper      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" juniper_gnmi.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" juniper_gnmi.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Juniper/      \
 			--cpp_out  ${top_builddir}/src/proto/Juniper      \
 			--grpc_out ${top_builddir}/src/proto/Juniper      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" juniper_telemetry.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" juniper_telemetry.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Juniper/      \
 			--cpp_out  ${top_builddir}/src/proto/Juniper      \
 			--grpc_out ${top_builddir}/src/proto/Juniper      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" juniper_telemetry_header_extension.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" juniper_telemetry_header_extension.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Juniper/      \
 			--cpp_out  ${top_builddir}/src/proto/Juniper      \
 			--grpc_out ${top_builddir}/src/proto/Juniper      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" juniper_gnmi_ext.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" juniper_gnmi_ext.proto
 
 grpc_nokia:
 	$(PROTOC) -I ${top_srcdir}/proto/Nokia/      \
 			--cpp_out  ${top_builddir}/src/proto/Nokia      \
 			--grpc_out ${top_builddir}/src/proto/Nokia      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" nokia_dialout.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" nokia_dialout.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Nokia/      \
 			--cpp_out  ${top_builddir}/src/proto/Nokia      \
 			--grpc_out ${top_builddir}/src/proto/Nokia      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" nokia_gnmi.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" nokia_gnmi.proto
 	$(PROTOC) -I ${top_srcdir}/proto/Nokia/      \
 			--cpp_out  ${top_builddir}/src/proto/Nokia      \
 			--grpc_out ${top_builddir}/src/proto/Nokia      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" nokia_gnmi_ext.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" nokia_gnmi_ext.proto
 
 openconfig:
 	$(PROTOC) -I ${top_srcdir}/proto/OpenConfig/      \
 			--cpp_out  ${top_builddir}/src/proto/OpenConfig      \
 			--grpc_out ${top_builddir}/src/proto/OpenConfig      \
-			--plugin=protoc-gen-grpc="/usr/local/bin/grpc_cpp_plugin" openconfig_interfaces.proto
+			--plugin=protoc-gen-grpc="@GRPC_CPP_PLUGIN@" openconfig_interfaces.proto

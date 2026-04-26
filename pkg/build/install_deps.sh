@@ -64,8 +64,11 @@ case "${ID}" in
         PROTOBUF_RUNTIME=protobuf
         ;;
     rocky|rhel|centos|almalinux)
+        # CRB hosts protobuf-devel/libconfig-devel/librdkafka-devel; EPEL hosts grpc.
+        dnf install -y -q dnf-plugins-core >/dev/null
+        dnf config-manager --set-enabled crb >/dev/null 2>&1 \
+            || dnf config-manager --set-enabled powertools >/dev/null 2>&1 || true
         dnf install -y -q epel-release >/dev/null
-        # gRPC for EL9 lives in EPEL.
         dnf install -y -q \
             gcc-c++ cmake pkgconf-pkg-config git \
             grpc-devel grpc-plugins protobuf-devel protobuf-compiler \

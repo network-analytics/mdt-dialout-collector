@@ -30,4 +30,4 @@ libgrpc_collector_proto_la_SOURCES = \
 			OpenConfig/openconfig_interfaces.pb.cc \
 			OpenConfig/openconfig_interfaces.grpc.pb.cc
 
-libgrpc_collector_proto_la_CPPFLAGS = -I$(top_builddir)/src/include/ -I$(top_srcdir)/src/include/
+libgrpc_collector_proto_la_CPPFLAGS = -I$(top_builddir)/src/include/ -I$(top_srcdir)/src/include/ $(COLLECTOR_PKG_CFLAGS)

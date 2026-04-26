@@ -77,6 +77,16 @@ PKG_CHECK_MODULES([GRPC], [grpc], [],
 PKG_CHECK_MODULES([GRPCCPP], [grpc++], [],
   [AC_MSG_ERROR([Please install libgrpc++ ])])
 
+# Discover grpc_cpp_plugin in PATH (system pkgs land it under /usr/bin); fall
+# back to the legacy install.sh location if PATH lookup fails.
+AC_PATH_PROG([GRPC_CPP_PLUGIN], [grpc_cpp_plugin], [/usr/local/bin/grpc_cpp_plugin])
+AC_SUBST([GRPC_CPP_PLUGIN])
+
+# Aggregate pkg-config CFLAGS for every per-module Makefile (system jsoncpp on
+# Debian lives under /usr/include/jsoncpp, etc — absent from default CPATH).
+COLLECTOR_PKG_CFLAGS="$JSONCPP_CFLAGS $KAFKA_CFLAGS $KAFKACPP_CFLAGS $SPDLOG_CFLAGS $PROTOBUF_CFLAGS $GRPC_CFLAGS $GRPCCPP_CFLAGS"
+AC_SUBST([COLLECTOR_PKG_CFLAGS])
+
 # Output files
 AC_CONFIG_FILES([
   Makefile
