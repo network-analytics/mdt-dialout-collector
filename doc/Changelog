@@ -7,6 +7,10 @@ The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
 
 
+current (main branch) -- 26-04-2026
+  ! Bumping actions/checkout from v3 to v4 in .github/workflows/ci.yaml; the v3 release runs on Node.js 20, which is being deprecated on GitHub-hosted runners (forced to Node.js 24 from 2026-06-02, removed 2026-09-16). All other workflows (coverage.yml, release.yml) were already on v4.
+
+
 v1.2.0 -- 26-04-2026
   + Adding .github/workflows/coverage.yml — builds the unit tests with --coverage, runs ctest, runs gcovr filtered to src/utils/, uploads the report to Codecov on every push to main and every PR. Dynamic Codecov badge in README.md alongside the existing CI status badge and a new Release badge (all three on a single row). Local dry-run reports 80.8% line coverage / 100% function coverage on src/utils/{cfg_handler.cc,logs_handler.cc,peer_parser.cc}. .gitignore extended to swallow *.gcno/*.gcda/coverage.xml/build-cov/ artifacts.
   + Adding a `validate-package` CI job downstream of the package build. Fires per-distro in a CLEAN target-distro container (no build deps), apt/dnf-installs the freshly-built .deb/.rpm — catching missing or wrong runtime depends, which the build-container smoke step is blind to because all -dev/-devel pkgs are already present there. Standalone validation: assert the man page lands gzipped, /usr/bin symlink in place, systemd unit + example config installed; launch the daemon in foreground with a minimal zmq-delivery config; assert all four vendor sockets bind on 127.0.0.1:2000{7..10}; SIGTERM and assert clean exit. Library validation: assert the .so + header + .pc file are present; compile a tiny C dlopen probe that resolves every public bridge symbol (catches transitive runtime dep breakage on system gRPC). The release job (GitHub Release creation) now needs both `packages` and `validate` — broken packages cannot ship.
