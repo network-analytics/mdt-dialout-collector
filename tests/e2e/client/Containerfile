@@ -1,0 +1,37 @@
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3 python3-pip python3-grpc-tools python3-grpcio python3-protobuf \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Stage all vendor protos into a single -I directory so cross-imports
+# resolve (e.g. juniper_dialout imports juniper_gnmi).
+COPY proto/Cisco/cisco_dialout.proto       /tmp/proto/
+COPY proto/Cisco/cisco_telemetry.proto     /tmp/proto/
+COPY proto/Juniper/juniper_dialout.proto   /tmp/proto/
+COPY proto/Juniper/juniper_gnmi.proto      /tmp/proto/
+COPY proto/Juniper/juniper_gnmi_ext.proto  /tmp/proto/
+COPY proto/Nokia/nokia_dialout.proto       /tmp/proto/
+COPY proto/Nokia/nokia_gnmi.proto          /tmp/proto/
+COPY proto/Nokia/nokia_gnmi_ext.proto      /tmp/proto/
+COPY proto/Huawei/huawei_dialout.proto     /tmp/proto/
+COPY proto/Huawei/huawei_telemetry.proto   /tmp/proto/
+
+RUN python3 -m grpc_tools.protoc -I/tmp/proto \
+        --python_out=. --grpc_python_out=. \
+        /tmp/proto/cisco_dialout.proto    /tmp/proto/cisco_telemetry.proto \
+        /tmp/proto/juniper_dialout.proto  /tmp/proto/juniper_gnmi.proto \
+        /tmp/proto/juniper_gnmi_ext.proto \
+        /tmp/proto/nokia_dialout.proto    /tmp/proto/nokia_gnmi.proto \
+        /tmp/proto/nokia_gnmi_ext.proto \
+        /tmp/proto/huawei_dialout.proto   /tmp/proto/huawei_telemetry.proto
+
+COPY tests/e2e/client/send_cisco.py   .
+COPY tests/e2e/client/send_juniper.py .
+COPY tests/e2e/client/send_nokia.py   .
+COPY tests/e2e/client/send_huawei.py  .
+
+# Default to Cisco; run.sh overrides via `--entrypoint` per vendor.
+ENTRYPOINT ["python3", "send_cisco.py"]

@@ -1,4 +1,5 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 

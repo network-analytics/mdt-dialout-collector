@@ -1,8 +1,8 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-// mdt-dialout-collector Library headers
 #include "zmq_delivery.h"
 #include "../bridge/grpc_collector_bridge.h"
 #include <zmq.hpp>
@@ -30,18 +30,26 @@ bool ZmqPush::ZmqPusher(
         data_wrapper.get_telemetry_port().c_str(),
         data_wrapper.get_telemetry_data().c_str());
 
-    // Message Buff preparation
-    // PUSH-ing only the pointer to the data-struct
+    // Push only the pointer; the consumer owns the underlying alloc.
     const size_t size = sizeof(grpc_payload *);
     zmq::message_t message(&pload, size);
 
     try {
-        zmq_sock.send(message, zmq::send_flags::dontwait);
+        auto sent = zmq_sock.send(message, zmq::send_flags::dontwait);
+        if (!sent.has_value()) {
+            // EAGAIN under dontwait: consumer can't keep up. Free here —
+            // the consumer never received the pointer.
+            free_grpc_payload(pload);
+            spdlog::get("multi-logger")->
+                warn("[ZmqPusher] data-delivery: dropped "
+                "(consumer not ready)");
+            return false;
+        }
         spdlog::get("multi-logger")->
             info("[ZmqPusher] data-delivery: "
                 "message successfully sent");
-        //std::this_thread::sleep_for(std::chrono::milliseconds(300));
     } catch(const zmq::error_t &zex) {
+        free_grpc_payload(pload);
         spdlog::get("multi-logger")->
             error("[ZmqPusher] data-delivery issue: "
             "{}", zex.what());
@@ -55,8 +63,6 @@ void ZmqPull::ZmqPoller(
     zmq::socket_t &zmq_sock,
     const std::string &zmq_transport_uri)
 {
-    // Message Buff preparation
-    // POLL-ing only the pointer to the data-struct
     const size_t size = sizeof(grpc_payload *);
     zmq::message_t message(size);
 
@@ -81,13 +87,17 @@ void ZmqPull::ZmqPoller(
                 << pload->telemetry_data
                 << "\n";
             free_grpc_payload(pload);
-            //std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     } catch(const zmq::error_t &zex) {
+        // ETERM = parent ctx shut down; re-throw so the thread can exit.
+        if (zex.num() == ETERM) {
+            throw;
+        }
+        // Transient zmq errors: log and continue rather than killing the
+        // entire daemon — the outer poller loop will retry.
         spdlog::get("multi-logger")->
             error("[ZmqPoller] data-delivery issue: "
             "{}", zex.what());
-        std::exit(EXIT_FAILURE);
     }
 }
 

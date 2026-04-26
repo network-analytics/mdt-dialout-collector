@@ -1,0 +1,28 @@
+[Unit]
+Description=Multi-vendor gRPC MDT Dial-out Collector
+Documentation=https://github.com/network-analytics/mdt-dialout-collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mdt-dialout-collector
+Group=mdt-dialout-collector
+ExecStart=/opt/mdt-dialout-collector/bin/mdt_dialout_collector \
+    -f /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
+Restart=on-failure
+RestartSec=5s
+LimitNOFILE=65535
+
+# SO_BINDTODEVICE needs CAP_NET_RAW; uncomment if so_bindtodevice_check=true.
+#AmbientCapabilities=CAP_NET_RAW
+
+# Hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/run/mdt-dialout-collector
+
+[Install]
+WantedBy=multi-user.target

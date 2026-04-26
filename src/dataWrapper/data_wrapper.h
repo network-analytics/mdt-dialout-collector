@@ -1,20 +1,16 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 #ifndef _DATA_WRAPPER_H_
 #define _DATA_WRAPPER_H_
 
-// C++ Standard Library headers
 #include <ctime>
 #include <iostream>
-// External Library headers
-
-// mdt-dialout-collector Library headers
 #include "../utils/logs_handler.h"
 
 
-// C++ Class
 class DataWrapper {
 public:
     DataWrapper() {
@@ -35,7 +31,6 @@ public:
 
     void DisplayDataWrapper();
 
-    // Setters
     void set_sequence_number() {
         this->sequence_number++;
     };
@@ -61,7 +56,6 @@ public:
         this->telemetry_data = telemetry_data;
     }
 
-    // Getters
     uint64_t &get_sequence_number() { return this->sequence_number; };
     std::string &get_event_type() { return this->event_type; };
     std::string &get_serialization() { return this->serialization; };

@@ -1,5 +1,10 @@
 # Dependencies
 
+The packaged install (.deb / .rpm — see doc/INSTALL.md) pulls every
+runtime dep from the distro's own repositories. The list below is
+relevant for from-source builds (see doc/INSTALL-FROM-SOURCE.md) and
+for license attribution.
+
 *gRPC                 | (https://github.com/grpc/grpc)                      | BSD 3-Clause License      |
 *JsonCpp              | (https://github.com/open-source-parsers/jsoncpp)    | MIT License               |
 *librdkafka           | (https://github.com/edenhill/librdkafka)            | BSD 2-Clause License      |
@@ -8,3 +13,5 @@
 *libconfig            | (http://hyperrealm.github.io/libconfig/)            | LGPL v2.1                 |
 *rapidcsv             | (https://github.com/d99kris/rapidcsv)               | BSD-3-Clause license      |
 *spdlog               | (https://github.com/gabime/spdlog)                  | MIT License               |
+*gtest                | (https://github.com/google/googletest)              | BSD 3-Clause License      |  (build-time, BUILD_TESTING=ON only)
+*nfpm                 | (https://nfpm.goreleaser.com)                       | MIT License               |  (CI-only, .deb/.rpm packaging)

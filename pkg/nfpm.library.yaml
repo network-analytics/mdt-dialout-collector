@@ -1,0 +1,60 @@
+# nfpm config — library variant.
+# Ships libgrpc_collector.so + the C bridge header + a pkg-config file
+# under /opt/mdt-dialout-collector/. Used by pmacct/pmtelemetryd integrators.
+
+name: mdt-dialout-collector-lib
+arch: ${ARCH}
+platform: linux
+version: ${VERSION}
+section: libs
+priority: optional
+maintainer: "Salvatore Cuzzilla <salvatore.cuzzilla@gmail.com>"
+description: |
+    Multi-vendor gRPC MDT Dial-out collector — library variant.
+    Provides libgrpc_collector.so + C bridge header + grpc_collector.pc
+    for embedding into pmacct/pmtelemetryd or other host processes.
+vendor: "Avaloq (an NEC Company)"
+homepage: https://github.com/network-analytics/mdt-dialout-collector
+license: MIT
+
+contents:
+  - src: build-pkg/lib/libgrpc_collector.so
+    dst: /opt/mdt-dialout-collector/lib/libgrpc_collector.so
+    file_info:
+      mode: 0755
+
+  - src: src/bridge/grpc_collector_bridge.h
+    dst: /opt/mdt-dialout-collector/include/grpc_collector_bridge/grpc_collector_bridge.h
+
+  - src: build-pkg/grpc_collector.pc
+    dst: /opt/mdt-dialout-collector/lib/pkgconfig/grpc_collector.pc
+
+  - src: doc/CONFIG-KEYS
+    dst: /usr/share/doc/mdt-dialout-collector-lib/CONFIG-KEYS
+
+  - src: doc/Changelog
+    dst: /usr/share/doc/mdt-dialout-collector-lib/Changelog
+
+overrides:
+  deb:
+    depends:
+      - ${GRPC_RUNTIME}
+      - ${PROTOBUF_RUNTIME}
+      - libssl3
+      - libconfig++9v5
+      - libfmt-dev
+      - librdkafka1
+      - libjsoncpp25
+      - libzmq5
+      - libspdlog-dev
+  rpm:
+    depends:
+      - grpc-cpp
+      - protobuf
+      - openssl-libs
+      - libconfig
+      - fmt
+      - librdkafka
+      - jsoncpp
+      - zeromq
+      - spdlog

@@ -1,138 +1,59 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 #include "grpc_collector_bridge.h"
 #include "../core/mdt_dialout_core.h"
-#include "../cfgWrapper/cfg_wrapper.h"
+#include "../utils/cfg_handler.h"
 
+#include <mutex>
+#include <string>
+#include <vector>
+
+
+namespace {
+std::mutex             g_workers_mutex;
+std::vector<pthread_t> g_active_workers;
+}  // namespace
 
 extern "C" {
     Options *InitOptions()
     {
-        CfgWrapper cfg_wrapper;
-        cfg_wrapper.BuildCfgWrapper(
-            main_cfg_parameters.at("writer_id"),
-            main_cfg_parameters.at("iface"),
-            main_cfg_parameters.at("ipv4_socket_cisco"),
-            main_cfg_parameters.at("ipv4_socket_juniper"),
-            main_cfg_parameters.at("ipv4_socket_nokia"),
-            main_cfg_parameters.at("ipv4_socket_huawei"),
-            /*main_cfg_parameters.at("core_pid_folder"),*/
-            main_cfg_parameters.at("cisco_workers"),
-            main_cfg_parameters.at("juniper_workers"),
-            main_cfg_parameters.at("nokia_workers"),
-            main_cfg_parameters.at("huawei_workers"),
-            main_cfg_parameters.at("replies_cisco"),
-            main_cfg_parameters.at("replies_juniper"),
-            main_cfg_parameters.at("replies_nokia"),
-            main_cfg_parameters.at("replies_huawei"),
-            logs_cfg_parameters.at("syslog"),
-            logs_cfg_parameters.at("syslog_facility"),
-            logs_cfg_parameters.at("syslog_ident"),
-            logs_cfg_parameters.at("console_log"),
-            logs_cfg_parameters.at("spdlog_level"),
-            data_manipulation_cfg_parameters.at("enable_cisco_gpbkv2json"),
-            data_manipulation_cfg_parameters.at(
-                "enable_cisco_message_to_json_string"),
-            data_manipulation_cfg_parameters.at("enable_label_encode_as_map"),
-            data_manipulation_cfg_parameters.at("enable_label_encode_as_map_ptm"));
-
+        // Options field names keep the legacy ipv4_socket_* form for
+        // pmacct ABI compat — the cfg key was renamed to socket_<vendor>
+        // in PR H, hence the asymmetric mapping for the four sockets.
+        auto dup = [](const std::string &s) -> char * {
+            return strndup(s.c_str(), s.size());
+        };
         Options *opts = (Options *) malloc(sizeof(Options));
-
-        const char *writer_id = cfg_wrapper.get_writer_id().c_str();
-        opts->writer_id = strndup(writer_id, strlen(writer_id));
-
-        const char *iface = cfg_wrapper.get_iface().c_str();
-        opts->iface = strndup(iface, strlen(iface));
-
-        const char *ipv4_socket_cisco =
-            cfg_wrapper.get_ipv4_socket_cisco().c_str();
-        opts->ipv4_socket_cisco =
-            strndup(ipv4_socket_cisco, strlen(ipv4_socket_cisco));
-
-        const char *ipv4_socket_juniper =
-            cfg_wrapper.get_ipv4_socket_juniper().c_str();
-        opts->ipv4_socket_juniper =
-            strndup(ipv4_socket_juniper, strlen(ipv4_socket_juniper));
-
-        const char *ipv4_socket_nokia =
-            cfg_wrapper.get_ipv4_socket_nokia().c_str();
-        opts->ipv4_socket_nokia =
-            strndup(ipv4_socket_nokia, strlen(ipv4_socket_nokia));
-
-        const char *ipv4_socket_huawei =
-            cfg_wrapper.get_ipv4_socket_huawei().c_str();
-        opts->ipv4_socket_huawei =
-            strndup(ipv4_socket_huawei, strlen(ipv4_socket_huawei));
-
-        /*const char *core_pid_folder =
-         * cfg_wrapper.get_core_pid_folder().c_str();
-        opts->core_pid_folder =
-            strndup(core_pid_folder, strlen(core_pid_folder));*/
-
-        const char *cisco_workers = cfg_wrapper.get_cisco_workers().c_str();
-        opts->cisco_workers = strndup(cisco_workers, strlen(cisco_workers));
-
-        const char *juniper_workers = cfg_wrapper.get_juniper_workers().c_str();
-        opts->juniper_workers = strndup(juniper_workers, strlen(juniper_workers));
-
-        const char *nokia_workers = cfg_wrapper.get_nokia_workers().c_str();
-        opts->nokia_workers = strndup(nokia_workers, strlen(nokia_workers));
-
-        const char *huawei_workers = cfg_wrapper.get_huawei_workers().c_str();
-        opts->huawei_workers = strndup(huawei_workers, strlen(huawei_workers));
-
-        const char *replies_cisco = cfg_wrapper.get_replies_cisco().c_str();
-        opts->replies_cisco = strndup(replies_cisco, strlen(replies_cisco));
-
-        const char *replies_juniper = cfg_wrapper.get_replies_juniper().c_str();
-        opts->replies_juniper = strndup(replies_juniper, strlen(replies_juniper));
-
-        const char *replies_nokia = cfg_wrapper.get_replies_nokia().c_str();
-        opts->replies_nokia = strndup(replies_nokia, strlen(replies_nokia));
-
-        const char *replies_huawei = cfg_wrapper.get_replies_huawei().c_str();
-        opts->replies_huawei = strndup(replies_huawei, strlen(replies_huawei));
-
-        const char *syslog = cfg_wrapper.get_syslog().c_str();
-        opts->syslog = strndup(syslog, strlen(syslog));
-
-        const char *syslog_facility = cfg_wrapper.get_syslog_facility().c_str();
-        opts->syslog_facility = strndup(syslog_facility, strlen(syslog_facility));
-
-        const char *syslog_ident = cfg_wrapper.get_syslog_ident().c_str();
-        opts->syslog_ident = strndup(syslog_ident, strlen(syslog_ident));
-
-        const char *console_log = cfg_wrapper.get_console_log().c_str();
-        opts->console_log = strndup(console_log, strlen(console_log));
-
-        const char *spdlog_level = cfg_wrapper.get_spdlog_level().c_str();
-        opts->spdlog_level = strndup(spdlog_level, strlen(spdlog_level));
-
-        const char *enable_cisco_gpbkv2json =
-            cfg_wrapper.get_enable_cisco_gpbkv2json().c_str();
+        opts->writer_id           = dup(main_cfg_parameters.at("writer_id"));
+        opts->iface               = dup(main_cfg_parameters.at("iface"));
+        opts->ipv4_socket_cisco   = dup(main_cfg_parameters.at("socket_cisco"));
+        opts->ipv4_socket_juniper = dup(main_cfg_parameters.at("socket_juniper"));
+        opts->ipv4_socket_nokia   = dup(main_cfg_parameters.at("socket_nokia"));
+        opts->ipv4_socket_huawei  = dup(main_cfg_parameters.at("socket_huawei"));
+        opts->cisco_workers       = dup(main_cfg_parameters.at("cisco_workers"));
+        opts->juniper_workers     = dup(main_cfg_parameters.at("juniper_workers"));
+        opts->nokia_workers       = dup(main_cfg_parameters.at("nokia_workers"));
+        opts->huawei_workers      = dup(main_cfg_parameters.at("huawei_workers"));
+        opts->replies_cisco       = dup(main_cfg_parameters.at("replies_cisco"));
+        opts->replies_juniper     = dup(main_cfg_parameters.at("replies_juniper"));
+        opts->replies_nokia       = dup(main_cfg_parameters.at("replies_nokia"));
+        opts->replies_huawei      = dup(main_cfg_parameters.at("replies_huawei"));
+        opts->syslog              = dup(logs_cfg_parameters.at("syslog"));
+        opts->syslog_facility     = dup(logs_cfg_parameters.at("syslog_facility"));
+        opts->syslog_ident        = dup(logs_cfg_parameters.at("syslog_ident"));
+        opts->console_log         = dup(logs_cfg_parameters.at("console_log"));
+        opts->spdlog_level        = dup(logs_cfg_parameters.at("spdlog_level"));
         opts->enable_cisco_gpbkv2json =
-            strndup(enable_cisco_gpbkv2json, strlen(enable_cisco_gpbkv2json));
-
-        const char *enable_cisco_message_to_json_string =
-            cfg_wrapper.get_enable_cisco_message_to_json_string().c_str();
-        opts->enable_cisco_message_to_json_string =
-            strndup(enable_cisco_message_to_json_string,
-                strlen(enable_cisco_message_to_json_string));
-
-        const char *enable_label_encode_as_map =
-            cfg_wrapper.get_enable_label_encode_as_map().c_str();
+            dup(data_manipulation_cfg_parameters.at("enable_cisco_gpbkv2json"));
+        opts->enable_cisco_message_to_json_string = dup(
+            data_manipulation_cfg_parameters.at("enable_cisco_message_to_json_string"));
         opts->enable_label_encode_as_map =
-            strndup(enable_label_encode_as_map,
-                strlen(enable_label_encode_as_map));
-
-        const char *enable_label_encode_as_map_ptm =
-            cfg_wrapper.get_enable_label_encode_as_map_ptm().c_str();
-        opts->enable_label_encode_as_map_ptm =
-            strndup(enable_label_encode_as_map_ptm,
-                strlen(enable_label_encode_as_map_ptm));
-
+            dup(data_manipulation_cfg_parameters.at("enable_label_encode_as_map"));
+        opts->enable_label_encode_as_map_ptm = dup(
+            data_manipulation_cfg_parameters.at("enable_label_encode_as_map_ptm"));
         return opts;
     }
 
@@ -143,7 +64,6 @@ extern "C" {
     {
         grpc_payload *pload = (grpc_payload *) malloc(sizeof(grpc_payload));
 
-        // Check if memory was successfully allocated
         if (pload == NULL) {
             spdlog::get("multi-logger")->
                 error("Unable to allocate memory for grpc_payload");
@@ -157,7 +77,6 @@ extern "C" {
         pload->telemetry_port = strndup(telemetry_port, strlen(telemetry_port));
         pload->telemetry_data = strndup(telemetry_data, strlen(telemetry_data));
 
-        // Check if memory was successfully allocated for each member
         if (pload->event_type == NULL || pload->serialization == NULL ||
             pload->writer_id == NULL || pload->telemetry_node == NULL ||
             pload->telemetry_port == NULL || pload->telemetry_data == NULL) {
@@ -178,7 +97,6 @@ extern "C" {
         free(opts->ipv4_socket_juniper);
         free(opts->ipv4_socket_nokia);
         free(opts->ipv4_socket_huawei);
-        //free(opts->core_pid_folder);
         free(opts->cisco_workers);
         free(opts->juniper_workers);
         free(opts->nokia_workers);
@@ -229,67 +147,68 @@ extern "C" {
     void start_grpc_dialout_collector(const char *cfg_path,
         const char *zmq_uri)
     {
-        LoadOptions(cfg_path, zmq_uri);
+        if (!LoadOptions(cfg_path, zmq_uri)) {
+            // logs_handler logged the specifics; bail without spawning
+            // workers so the host process keeps running.
+            spdlog::get("multi-logger")->
+                error("[start_grpc_dialout_collector] cfg load failed; "
+                "no workers started");
+            return;
+        }
         spdlog::get("multi-logger")->debug(
-            "ipv4 sockets found in config:\n ipv4_socket_cisco: {},\n ipv4_socket_juniper: {},\n ipv4_socket_nokia: {},\n ipv4_socket_huawei: {}\n",
-            main_cfg_parameters.at("ipv4_socket_cisco"),
-            main_cfg_parameters.at("ipv4_socket_juniper"),
-            main_cfg_parameters.at("ipv4_socket_nokia"),
-            main_cfg_parameters.at("ipv4_socket_huawei")
+            "sockets found in config:\n socket_cisco: {},\n socket_juniper: {},\n socket_nokia: {},\n socket_huawei: {}\n",
+            main_cfg_parameters.at("socket_cisco"),
+            main_cfg_parameters.at("socket_juniper"),
+            main_cfg_parameters.at("socket_nokia"),
+            main_cfg_parameters.at("socket_huawei")
         );
-        if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
-            main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
-            main_cfg_parameters.at("ipv4_socket_nokia").empty() == true &&
-            main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
+        if (main_cfg_parameters.at("socket_cisco").empty() == true &&
+            main_cfg_parameters.at("socket_juniper").empty() == true &&
+            main_cfg_parameters.at("socket_nokia").empty() == true &&
+            main_cfg_parameters.at("socket_huawei").empty() == true) {
                 spdlog::get("multi-logger")->
-                    error("[ipv4_socket_*] configuration issue: "
+                    error("[socket_*] configuration issue: "
                     "unable to find at least one valid IPv4 socket where to bind "
                     "the daemon");
-                std::exit(EXIT_FAILURE);
+                return;
         }
 
-        // Use arrays to store the worker threads per vendor
         pthread_t cisco_workers[MAX_WORKERS] = {0};
         pthread_t juniper_workers[MAX_WORKERS] = {0};
         pthread_t nokia_workers[MAX_WORKERS] = {0};
         pthread_t huawei_workers[MAX_WORKERS] = {0};
 
-        // Cisco
-        LoadThreads(cisco_workers, "ipv4_socket_cisco", "replies_cisco",
+        LoadThreads(cisco_workers, "socket_cisco", "replies_cisco",
             "cisco_workers");
-
-        // Juniper
-        LoadThreads(juniper_workers, "ipv4_socket_juniper", "replies_juniper",
+        LoadThreads(juniper_workers, "socket_juniper", "replies_juniper",
             "juniper_workers");
-
-        // Nokia
-        LoadThreads(nokia_workers, "ipv4_socket_nokia", "replies_nokia",
+        LoadThreads(nokia_workers, "socket_nokia", "replies_nokia",
             "nokia_workers");
-
-        // Huawei
-        LoadThreads(huawei_workers, "ipv4_socket_huawei", "replies_huawei",
+        LoadThreads(huawei_workers, "socket_huawei", "replies_huawei",
             "huawei_workers");
 
-        for (size_t w = 0; w < MAX_WORKERS && cisco_workers[w] != 0; w++) {
-            pthread_detach(cisco_workers[w]);
-        }
-
-        for (size_t w = 0; w < MAX_WORKERS && juniper_workers[w] != 0; w++) {
-            pthread_detach(juniper_workers[w]);
-        }
-
-        for (size_t w = 0; w < MAX_WORKERS && nokia_workers[w] != 0; w++) {
-            pthread_detach(nokia_workers[w]);
-        }
-
-        for (size_t w = 0; w < MAX_WORKERS && huawei_workers[w] != 0; w++) {
-            pthread_detach(huawei_workers[w]);
-        }
+        // Workers are joinable and tracked in g_active_workers (registered
+        // by LoadThreads). Caller can stop them with stop_grpc_dialout_collector().
     }
 
-    void LoadOptions(const char *cfg_path, const char *zmq_uri)
+    int stop_grpc_dialout_collector(void)
     {
-        // static log-sinks are configured within the constructor
+        // Drain all live Srv instances (idempotent) and join every worker.
+        initiate_shutdown();
+
+        std::vector<pthread_t> snapshot;
+        {
+            std::lock_guard<std::mutex> lk(g_workers_mutex);
+            snapshot.swap(g_active_workers);
+        }
+        for (pthread_t t : snapshot) {
+            pthread_join(t, nullptr);
+        }
+        return 1;
+    }
+
+    int LoadOptions(const char *cfg_path, const char *zmq_uri)
+    {
         LogsHandler logs_handler;
         spdlog::get("multi-logger-boot")->debug("main: main()");
 
@@ -297,128 +216,118 @@ extern "C" {
         cfg_handler.set_cfg_path(cfg_path);
 
         LogsCfgHandler logs_cfg_handler;
-        if (logs_cfg_handler.lookup_logs_parameters(
-            cfg_handler.get_cfg_path(),
-            cfg_handler.get_logs_parameters()) == false) {
-            // can't read the logs cfg params the destructor logging won't
-            // be possible (segmentation fault)
-            std::exit(EXIT_FAILURE);
-        } else {
-            logs_cfg_parameters = cfg_handler.get_logs_parameters();
-            // set the log-sinks after reading from the configuration file
-            logs_handler.set_spdlog_sinks();
+        if (!logs_cfg_handler.lookup_logs_parameters(
+                cfg_handler.get_cfg_path(),
+                cfg_handler.get_logs_parameters())) {
+            return 0;
         }
+        logs_cfg_parameters = cfg_handler.get_logs_parameters();
+        logs_handler.set_spdlog_sinks();
 
         MainCfgHandler main_cfg_handler;
         if (main_cfg_handler.lookup_main_parameters(
             cfg_handler.get_cfg_path(),
             cfg_handler.get_main_parameters()) == false) {
-            std::exit(EXIT_FAILURE);
-        } else {
-            main_cfg_parameters = cfg_handler.get_main_parameters();
+            return 0;
         }
+        main_cfg_parameters = cfg_handler.get_main_parameters();
 
         DataManipulationCfgHandler data_manipulation_cfg_handler;
         if (data_manipulation_cfg_handler.lookup_data_manipulation_parameters(
             cfg_handler.get_cfg_path(),
-            cfg_handler.get_data_manipulation_parameters()) ==false) {
-            std::exit(EXIT_FAILURE);
-        } else {
-            data_manipulation_cfg_parameters =
-                cfg_handler.get_data_manipulation_parameters();
+            cfg_handler.get_data_manipulation_parameters()) == false) {
+            return 0;
         }
+        data_manipulation_cfg_parameters =
+            cfg_handler.get_data_manipulation_parameters();
 
         KafkaCfgHandler kafka_cfg_handler;
         if (kafka_cfg_handler.lookup_kafka_parameters(
             cfg_handler.get_cfg_path(),
             cfg_handler.get_kafka_parameters()) == false) {
-            std::exit(EXIT_FAILURE);
-        } else {
-            kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
+            return 0;
         }
+        kafka_delivery_cfg_parameters = cfg_handler.get_kafka_parameters();
 
         ZmqCfgHandler zmq_cfg_handler;
         if (zmq_cfg_handler.lookup_zmq_parameters(
             zmq_uri,
             cfg_handler.get_zmq_parameters()) == false) {
-            std::exit(EXIT_FAILURE);
-        } else {
-            zmq_delivery_cfg_parameters = cfg_handler.get_zmq_parameters();
+            return 0;
         }
+        zmq_delivery_cfg_parameters = cfg_handler.get_zmq_parameters();
+
+        return 1;
     }
 
-    void *VendorThread(void *ipv4_socket_str_)
+    void *VendorThread(void *socket_str_)
     {
-        const char *ipv4_socket_str = (char *) ipv4_socket_str_;
+        const char *socket_str = (char *) socket_str_;
+        const std::string srv_socket = main_cfg_parameters.at(socket_str);
 
-        if (strstr(ipv4_socket_str, "cisco") != NULL) {
-            std::string ipv4_socket_cisco =
-                main_cfg_parameters.at(ipv4_socket_str);
-
-            std::string cisco_srv_socket {ipv4_socket_cisco};
+        if (strstr(socket_str, "cisco") != NULL) {
             Srv cisco_mdt_dialout_collector;
-            cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
-        } else if (strstr(ipv4_socket_str, "juniper") != NULL) {
-            std::string ipv4_socket_juniper =
-                main_cfg_parameters.at(ipv4_socket_str);
-
-            std::string juniper_srv_socket {ipv4_socket_juniper};
+            cisco_mdt_dialout_collector.CiscoBind(srv_socket);
+        } else if (strstr(socket_str, "juniper") != NULL) {
             Srv juniper_mdt_dialout_collector;
-            juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
-        } else if (strstr(ipv4_socket_str, "nokia") != NULL) {
-            std::string ipv4_socket_nokia =
-                main_cfg_parameters.at(ipv4_socket_str);
-
-            std::string nokia_srv_socket {ipv4_socket_nokia};
+            juniper_mdt_dialout_collector.JuniperBind(srv_socket);
+        } else if (strstr(socket_str, "nokia") != NULL) {
             Srv nokia_mdt_dialout_collector;
-            nokia_mdt_dialout_collector.NokiaBind(nokia_srv_socket);
-        } else if (strstr(ipv4_socket_str, "huawei") != NULL) {
-            std::string ipv4_socket_huawei =
-                main_cfg_parameters.at(ipv4_socket_str);
-
-            std::string huawei_srv_socket {ipv4_socket_huawei};
+            nokia_mdt_dialout_collector.NokiaBind(srv_socket);
+        } else if (strstr(socket_str, "huawei") != NULL) {
             Srv huawei_mdt_dialout_collector;
-            huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
+            huawei_mdt_dialout_collector.HuaweiBind(srv_socket);
         }
 
         return (NULL);
     }
 
     void LoadThreads(pthread_t *workers_vec,
-        const char *ipv4_socket_str,
+        const char *socket_str,
         const char *replies_str,
         const char *workers_str)
     {
-        if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
-            int replies =
-                std::stoi(main_cfg_parameters.at(replies_str));
+        if (main_cfg_parameters.at(socket_str).empty() == false) {
+            int replies = 0;
+            int workers = 0;
+            try {
+                replies = std::stoi(main_cfg_parameters.at(replies_str));
+                workers = std::stoi(main_cfg_parameters.at(workers_str));
+            } catch (const std::exception &e) {
+                spdlog::get("multi-logger")->
+                    error("[{}/{}] configuration issue: non-numeric value: "
+                    "{} — skipping vendor", replies_str, workers_str, e.what());
+                return;
+            }
             if (replies < 0 || replies > 1000) {
                 spdlog::get("multi-logger")->
                     error("[{}] configuration issue: the "
                     "allowed amount of replies per session is defined between 10 "
-                    "and 1000. (default = 0 => unlimited)", replies_str);
-                std::exit(EXIT_FAILURE);
+                    "and 1000. (default = 0 => unlimited) — skipping vendor",
+                    replies_str);
+                return;
             }
-            int workers = std::stoi(main_cfg_parameters.at(workers_str));
             if (workers < 1 || workers > 5) {
                 spdlog::get("multi-logger")->
                     error("[{}] configuration issue: the "
                     "allowed amount of workers is defined between 1 "
-                    "and 5. (default = 1)", workers_str);
-                std::exit(EXIT_FAILURE);
+                    "and 5. (default = 1) — skipping vendor", workers_str);
+                return;
             }
             for (int w = 0; w < workers; w++) {
                 int res = pthread_create(&workers_vec[w], NULL, VendorThread,
-                    (void *)ipv4_socket_str);
+                    (void *)socket_str);
                 if (res != 0) {
                     spdlog::get("multi-logger")->
                         error("Failed to create thread: {}", strerror(res));
-                    continue; // Continue to attempt to create remaining threads
+                    continue;
                 }
+                std::lock_guard<std::mutex> lk(g_workers_mutex);
+                g_active_workers.push_back(workers_vec[w]);
             }
             spdlog::get("multi-logger")->
                 info("mdt-dialout-collector listening on {} ",
-                main_cfg_parameters.at(ipv4_socket_str));
+                main_cfg_parameters.at(socket_str));
         }
     }
 }

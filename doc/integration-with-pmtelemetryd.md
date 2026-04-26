@@ -30,22 +30,31 @@ SUPPORT_URL="https://www.debian.org/support"
 BUG_REPORT_URL="https://bugs.debian.org/"
 ```
 
-## Compile/Install gRPC dial-out library/Header for pmtelemetryd
+## Install the gRPC dial-out library/Header for pmtelemetryd
+
+The recommended path is the `mdt-dialout-collector-lib` package (see [doc/INSTALL.md](INSTALL.md) for the full matrix):
 
 ```SHELL
-sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l -v current
+# Debian / Ubuntu
+sudo apt install ./mdt-dialout-collector-lib_<version>_<distro>_amd64.deb
+
+# Rocky / RHEL (gRPC lives in EPEL)
+sudo dnf install epel-release
+sudo dnf install ./mdt-dialout-collector-lib-<version>-1.<distro>.x86_64.rpm
+
+# Fedora
+sudo dnf install ./mdt-dialout-collector-lib-<version>-1.fc<release>.x86_64.rpm
 ```
 
-#### *(sh install.sh -l)* explained
+The library variant ships:
 
-- The gRPC framework source code is cloned by default under the "/root" folder:
-- The gRPC framework is compiled and installed under the "/root/.local/{bin,include,lib,share}" folders:
-- The gRPC dial-out source code is cloned/compiled under the "/opt/mdt-dialout-collector" folder:
-- The building process is generating both the library and the header file required to build pmtelemetryd with gRPC dial-out support:
 ```SHELL
-/usr/local/lib/libgrpc_collector.la
-/usr/local/include/grpc_collector_bridge/grpc_collector_bridge.h
+/opt/mdt-dialout-collector/lib/libgrpc_collector.so
+/opt/mdt-dialout-collector/lib/pkgconfig/grpc_collector.pc
+/opt/mdt-dialout-collector/include/grpc_collector_bridge/grpc_collector_bridge.h
 ```
+
+For developers wanting to build the library from source, see [doc/INSTALL-FROM-SOURCE.md](INSTALL-FROM-SOURCE.md). The legacy `install.sh -l` flow is preserved but no longer the recommended path.
 
 ## Compile/Install pmtelemetryd with gRPC dial-out support enabled
 
@@ -56,7 +65,8 @@ cd /opt
 sudo git clone https://github.com/pmacct/pmacct.git
 cd /opt/pmacct
 sudo ./autogen.sh
-sudo ./configure --enable-debug --enable-zmq --enable-jansson --enable-kafka --enable-grpc-collector
+sudo PKG_CONFIG_PATH="/opt/mdt-dialout-collector/lib/pkgconfig:${PKG_CONFIG_PATH:-}" \
+    ./configure --enable-debug --enable-zmq --enable-jansson --enable-kafka --enable-grpc-collector
 sudo make -j
 sudo make install
 ```
@@ -99,7 +109,7 @@ global, metadata.broker.list, 192.168.100.1:9092
 $ cat /root/etc/pmtelemetryd-grpc-dialout.conf
 
 iface = "enp1s0";
-ipv4_socket_cisco = "192.168.100.254:10001";
+socket_cisco = "192.168.100.254:10001";
 data_delivery_method = "zmq";
 
 spdlog_level = "debug";

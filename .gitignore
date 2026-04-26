@@ -95,6 +95,19 @@ grpc-collector.pc
 /build-*
 /build/*
 
+# CMake out-of-tree / IDE / editor artifacts
+bin/CMakeCache.txt
+bin/CMakeFiles/
+bin/cmake_install.cmake
+cmake-build-*/
+build-cov/
+*.gcno
+*.gcda
+*.gcov
+coverage.xml
+.idea/
+tags
+
 proto/.proto_mark
 
 !.gitignore

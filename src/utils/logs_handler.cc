@@ -1,8 +1,8 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-// mdt-dialout-collector Library headers
 #include "logs_handler.h"
 #include "cfg_handler.h"
 #include <spdlog/spdlog.h>
@@ -23,7 +23,6 @@ bool LogsHandler::set_boot_spdlog_sinks()
     std::vector<spdlog::sink_ptr> spdlog_sinks;
     std::string spdlog_level = "debug";
 
-    // Syslog
     const std::string ident = "mdt-dialout-collector";
     try {
         auto spdlog_syslog =
@@ -35,7 +34,6 @@ bool LogsHandler::set_boot_spdlog_sinks()
         return false;
     }
 
-    // ConsoleLog
     try {
         auto spdlog_console =
             std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -58,8 +56,7 @@ bool LogsHandler::set_spdlog_sinks()
     std::vector<spdlog::sink_ptr> spdlog_sinks;
     std::string spdlog_level = logs_cfg_parameters.at("spdlog_level");
 
-    // Mapping syslog facility strings to codified integers.
-    // https://www.rfc-editor.org/rfc/rfc5424
+    // RFC 5424 facility codes; spdlog wants them shifted left 3 bits.
     std::map<std::string, int> syslog_facility {
         {"LOG_DAEMON",3},
         {"LOG_USER"  ,8},
@@ -73,14 +70,12 @@ bool LogsHandler::set_spdlog_sinks()
         {"LOG_LOCAL7",23},
     };
 
-    // Syslog
     if (logs_cfg_parameters.at("syslog").compare("true") == 0) {
         const std::string ident = logs_cfg_parameters.at("syslog_ident");
         try {
             auto spdlog_syslog =
                 std::make_shared<spdlog::sinks::syslog_sink_mt>(
                     ident, 0,
-                    // syslog facility codified integers are multiplied by 8
                     syslog_facility[
                         logs_cfg_parameters.at("syslog_facility")] * 8,
                     true);
@@ -91,7 +86,6 @@ bool LogsHandler::set_spdlog_sinks()
         }
     }
 
-    // ConsoleLog
     if (logs_cfg_parameters.at("console_log").compare("true") == 0){
         try {
             auto spdlog_console =

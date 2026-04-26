@@ -1,0 +1,78 @@
+# nfpm config — standalone daemon variant.
+# Built per-distro in CI (.github/workflows/release.yml). The runtime
+# depends are tagged with each distro's library SOVER via overrides.
+
+name: mdt-dialout-collector
+arch: ${ARCH}
+platform: linux
+version: ${VERSION}
+section: net
+priority: optional
+maintainer: "Salvatore Cuzzilla <salvatore.cuzzilla@gmail.com>"
+description: |
+    Multi-vendor gRPC MDT Dial-out collector — standalone daemon.
+    Receives YANG-modeled telemetry over gRPC dial-out from
+    Cisco / Juniper / Nokia / Huawei devices and forwards to Kafka or ZMQ.
+vendor: "Avaloq (an NEC Company)"
+homepage: https://github.com/network-analytics/mdt-dialout-collector
+license: MIT
+
+# Files placed inside the package payload.
+contents:
+  - src: bin/mdt_dialout_collector
+    dst: /opt/mdt-dialout-collector/bin/mdt_dialout_collector
+    file_info:
+      mode: 0755
+
+  - src: doc/CONFIG-KEYS
+    dst: /usr/share/doc/mdt-dialout-collector/CONFIG-KEYS
+
+  - src: doc/Changelog
+    dst: /usr/share/doc/mdt-dialout-collector/Changelog
+
+  - src: build-pkg/man/mdt_dialout_collector.1.gz
+    dst: /usr/share/man/man1/mdt_dialout_collector.1.gz
+
+  - src: pkg/mdt_dialout_collector.conf.example
+    dst: /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
+    type: config|noreplace
+
+  - src: pkg/mdt-dialout-collector.service
+    dst: /lib/systemd/system/mdt-dialout-collector.service
+
+  # /usr/bin symlink so the binary is on PATH out of the box.
+  - dst: /usr/bin/mdt_dialout_collector
+    src: /opt/mdt-dialout-collector/bin/mdt_dialout_collector
+    type: symlink
+
+scripts:
+  postinstall: pkg/scripts/postinstall.sh
+  preremove:   pkg/scripts/preremove.sh
+  postremove:  pkg/scripts/postremove.sh
+
+# Per-format runtime dependencies. CI sets the GRPC_RUNTIME / PROTOBUF_RUNTIME
+# env vars to the SOVER-correct package name for the build distro
+# (e.g. libgrpc++1.51 vs libgrpc++1.66t64).
+overrides:
+  deb:
+    depends:
+      - ${GRPC_RUNTIME}
+      - ${PROTOBUF_RUNTIME}
+      - libssl3
+      - libconfig++9v5
+      - libfmt-dev
+      - librdkafka1
+      - libjsoncpp25
+      - libzmq5
+      - libspdlog-dev
+  rpm:
+    depends:
+      - grpc-cpp
+      - protobuf
+      - openssl-libs
+      - libconfig
+      - fmt
+      - librdkafka
+      - jsoncpp
+      - zeromq
+      - spdlog

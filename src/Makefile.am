@@ -2,7 +2,6 @@ MAINTAINERCLEANFILES = Makefile.in
 
 SUBDIRS =          \
   bridge           \
-  cfgWrapper       \
   core             \
   dataDelivery     \
   dataManipulation \
@@ -19,7 +18,6 @@ libgrpc_collector_la_SOURCES =
 
 libgrpc_collector_la_LIBADD =                             \
   bridge/libgrpc_collector_bridge.la                      \
-  cfgWrapper/libgrpc_collector_cfg_wrapper.la             \
   core/libgrpc_collector_core.la                          \
   dataDelivery/libgrpc_collector_data_delivery.la         \
   dataManipulation/libgrpc_collector_data_manipulation.la \

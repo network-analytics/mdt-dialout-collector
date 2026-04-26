@@ -11,28 +11,26 @@ DESC:      Defining the network interface receiving the gRPC data-stream. The lo
            like "ip address". No default value is set and a coherent value is mandatory.
 DEFAULT:   none
 
-KEY:       ipv4_socket_cisco
-DESC:      Defining the network end-point receiving the gRPC data-stream from Cisco devices. The end-point information must include both the
-           IPv4 and port separated by colon, for example "192.18.0.1:10001" is considered to be a valid end-point. No default
-           value is set and if the configuration key is specified its value can't be empty.
+KEY:       socket_cisco
+DESC:      Defining the network end-point receiving the gRPC data-stream from Cisco devices. Accepts both IPv4 and IPv6:
+           "192.18.0.1:10001" (any IPv4) or "[::]:10001" (any IPv6 — Linux dual-stack accepts v4-mapped too) or
+           "[2001:db8::1]:10001" (specific IPv6). No default; if the key is specified its value can't be empty.
+           The legacy "ipv4_socket_cisco" key is still honored as a deprecated alias.
 DEFAULT:   none
 
-KEY:       ipv4_socket_juniper
-DESC:      Defining the network end-point receiving the gRPC data-stream from Juniper devices. The end-point information must include both the
-           IPv4 and port separated by colon, for example "192.18.0.2:10002" is considered to be a valid end-point. No default
-           value is set and if the configuration key is specified its value can't be empty.
+KEY:       socket_juniper
+DESC:      Defining the network end-point receiving the gRPC data-stream from Juniper devices. Same syntax as socket_cisco;
+           accepts both IPv4 and IPv6. Legacy "ipv4_socket_juniper" alias honored.
 DEFAULT:   none
 
-KEY:       ipv4_socket_nokia
-DESC:      Defining the network end-point receiving the gRPC data-stream from Nokia devices. The end-point information must include both the
-           IPv4 and port separated by colon, for example "192.18.0.2:10002" is considered to be a valid end-point. No default
-           value is set and if the configuration key is specified its value can't be empty.
+KEY:       socket_nokia
+DESC:      Defining the network end-point receiving the gRPC data-stream from Nokia devices. Same syntax as socket_cisco;
+           accepts both IPv4 and IPv6. Legacy "ipv4_socket_nokia" alias honored.
 DEFAULT:   none
 
-KEY:       ipv4_socket_huawei
-DESC:      Defining the network end-point receiving the gRPC data-stream from Huawei devices. The end-point information must include both the
-           IPv4 and port separated by colon, for example "192.18.0.3:10003" is considered to be a valid end-point. No default
-           value is set and if the configuration key is specified its value can't be empty.
+KEY:       socket_huawei
+DESC:      Defining the network end-point receiving the gRPC data-stream from Huawei devices. Same syntax as socket_cisco;
+           accepts both IPv4 and IPv6. Legacy "ipv4_socket_huawei" alias honored.
 DEFAULT:   none
 
 KEY:       replies_cisco
@@ -88,6 +86,28 @@ KEY:       writer_id
 DESC:      adding meta data information to the data-stream. This could be helpful to identify the collector sourcing the data-stream.
            Irrelevant when used in Library mode, pmtelemetryd will override this information.
 DEFAULT:   "mdt-dialout-collector"
+
+KEY:       core_pid_folder
+DESC:      Folder where the daemon writes its PID file (the file name is taken from "writer_id"). The folder must exist
+           and be writable. Used by the SIGUSR1 label-map reload workflow described in csv/README.md and ptm/README.md.
+DEFAULT:   "/var/run/"
+
+KEY:       enable_tls
+VALUES:    ["true" or "false"]
+DESC:      Enables server-side TLS on every configured vendor gRPC endpoint (cisco/juniper/nokia/huawei). When "true",
+           tls_cert_path and tls_key_path become mandatory and are validated to exist at config load. mTLS / client-cert
+           verification is intentionally out of scope here — server-only TLS is the common deployment first step and lets
+           operators encrypt the wire without provisioning per-router client certs first.
+DEFAULT:   "false"
+
+KEY:       tls_cert_path
+DESC:      Path to the server's PEM-encoded certificate. Mandatory when enable_tls = "true". The same certificate is
+           presented on every vendor's gRPC port — TLS sits below the dial-out RPC, no per-vendor diff.
+DEFAULT:   none
+
+KEY:       tls_key_path
+DESC:      Path to the server's PEM-encoded private key. Mandatory when enable_tls = "true".
+DEFAULT:   none
 
 
 # Data Manipulation

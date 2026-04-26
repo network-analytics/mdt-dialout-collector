@@ -1,4 +1,4 @@
-[![Build status](https://github.com/network-analytics/mdt-dialout-collector/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/network-analytics/mdt-dialout-collector/actions/workflows/ci.yaml)
+[![Build status](https://github.com/network-analytics/mdt-dialout-collector/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/network-analytics/mdt-dialout-collector/actions/workflows/ci.yaml) [![Coverage](https://codecov.io/gh/network-analytics/mdt-dialout-collector/branch/main/graph/badge.svg?flag=unit)](https://codecov.io/gh/network-analytics/mdt-dialout-collector) [![Release](https://img.shields.io/github/v/release/network-analytics/mdt-dialout-collector?sort=semver)](https://github.com/network-analytics/mdt-dialout-collector/releases)
 
 ## Table of Content
 
@@ -22,6 +22,13 @@ The collector functionalities can be logically grouped into three categories:
 3. **Data Delivery**     - they are inter-connecting the collector with the next stage in the pipeline.
 
 The [doc/CONFIG-KEYS](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/CONFIG-KEYS) file is including the description for each one of the available options.
+
+Additional capabilities:
+
+- **IPv4 and IPv6** listening sockets (`socket_<vendor>` keys accept both `0.0.0.0:port` and `[::]:port` / `[2001:db8::1]:port`). The legacy `ipv4_socket_<vendor>` keys remain honored as deprecated aliases.
+- **Server-side TLS** on every vendor's gRPC port (`enable_tls`, `tls_cert_path`, `tls_key_path`). Off by default — existing configs keep working unchanged.
+- **Graceful shutdown** in library mode via the `stop_grpc_dialout_collector(void)` C symbol exported by `libgrpc_collector` — drains in-flight RPCs and joins all worker threads.
+- **End-to-end test harness** under [tests/e2e/](https://github.com/network-analytics/mdt-dialout-collector/tree/main/tests/e2e) (synthetic per-vendor gRPC clients + redpanda + the collector under podman). `bash tests/e2e/run.sh` runs the standalone path; `--pmtelemetryd` runs the library path; `--tls` runs the TLS path; `--ipv6` runs against an IPv6 listening socket; `--next` runs against the latest gRPC/Protobuf stack.
 
 ## Deployment options
 
@@ -73,19 +80,35 @@ DESC:    Points to a file containing the configuration of the gRPC collector thr
 DEFAULT: none
 ```
 
-## Build/Install
+## Install
 
-[install.sh](https://github.com/network-analytics/mdt-dialout-collector/blob/main/install.sh) is automating the build/install process, taking care of all [dependencies](https://github.com/network-analytics/mdt-dialout-collector/blob/main/doc/Dependencies).
+Native packages (`.deb` for Debian / Ubuntu, `.rpm` for Fedora / Rocky / RHEL) are built per release by the [release.yml](https://github.com/network-analytics/mdt-dialout-collector/blob/main/.github/workflows/release.yml) GitHub Actions workflow and attached to each [GitHub Release](https://github.com/network-analytics/mdt-dialout-collector/releases). Two flavors per distro:
 
-- The Standalone binary can be deployed using:
+- `mdt-dialout-collector` — standalone daemon (binary, systemd unit, example config, man page).
+- `mdt-dialout-collector-lib` — library variant for [pmacct/pmtelemetryd](https://github.com/pmacct/pmacct) integration (`libgrpc_collector.so` + C bridge header + pkg-config file).
+
+Both link against the distro's own gRPC; `apt`/`dnf` resolves the rest of the runtime deps automatically.
+
 ```SHELL
-sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -b -v current
+# Debian / Ubuntu
+sudo apt install ./mdt-dialout-collector_<version>_<distro>_amd64.deb
+
+# Rocky / RHEL (gRPC lives in EPEL)
+sudo dnf install epel-release
+sudo dnf install ./mdt-dialout-collector-<version>-1.<distro>.x86_64.rpm
+
+# Fedora
+sudo dnf install ./mdt-dialout-collector-<version>-1.fc<release>.x86_64.rpm
+
+sudo $EDITOR /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
+sudo systemctl enable --now mdt-dialout-collector
 ```
 
-- The Library/Header can be deployed using:
-```SHELL
-sudo /bin/sh -c "$(curl -fsSL https://github.com/network-analytics/mdt-dialout-collector/raw/main/install.sh)" -- -l -v current
-```
+Full install matrix and post-install steps: [doc/INSTALL.md](doc/INSTALL.md). On-line reference: `man mdt_dialout_collector` after install.
+
+### Building from source
+
+For developers and for distros not in the release matrix, see [doc/INSTALL-FROM-SOURCE.md](doc/INSTALL-FROM-SOURCE.md). The legacy [`install.sh`](install.sh) is preserved as a developer convenience but is no longer the recommended install path.
 
 ## References
 

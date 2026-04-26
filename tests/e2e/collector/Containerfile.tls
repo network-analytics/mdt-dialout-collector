@@ -1,0 +1,52 @@
+# TLS-enabled variant of the standalone collector image. Same build as
+# Containerfile, but generates a self-signed cert at image build and ships
+# it under /etc/mdt-tls/. The TLS-aware mdt_dialout_collector.tls.conf
+# (mounted at run time) points at these files.
+ARG VERSION=bookworm-slim
+FROM debian:${VERSION}
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        bash git ca-certificates cmake build-essential autoconf libtool \
+        pkg-config openssl \
+        libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev \
+        libzmq3-dev cppzmq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV INSTALL_DIR=/opt/grpc-install
+ENV PATH=${INSTALL_DIR}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${INSTALL_DIR}/lib64
+
+RUN git clone --recurse-submodules -b v1.45.2 --depth 1 --shallow-submodules \
+        https://github.com/grpc/grpc /tmp/grpc \
+    && cmake -S /tmp/grpc -B /tmp/grpc/build \
+        -DgRPC_INSTALL=ON -DCMAKE_BUILD_TYPE=Release -DgRPC_BUILD_TESTS=OFF \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+        -DABSL_PROPAGATE_CXX_STD=ON \
+        -DgRPC_ABSL_PROVIDER=module -DgRPC_CARES_PROVIDER=module \
+        -DgRPC_PROTOBUF_PROVIDER=module -DgRPC_RE2_PROVIDER=module \
+        -DgRPC_SSL_PROVIDER=module -DgRPC_ZLIB_PROVIDER=module \
+    && cmake --build /tmp/grpc/build -j"$(nproc)" \
+    && cmake --install /tmp/grpc/build \
+    && rm -rf /tmp/grpc
+
+WORKDIR /src
+COPY CMakeLists.txt VERSION ./
+COPY proto ./proto
+COPY src ./src
+
+RUN cmake -S /src -B /src/build -DCMAKE_PREFIX_PATH=${INSTALL_DIR} \
+    && cmake --build /src/build -j"$(nproc)" \
+    && cp /src/bin/mdt_dialout_collector /usr/local/bin/
+
+# Self-signed cert for the test. CN=collector matches the SNI the python
+# clients use when connecting to "collector" inside the podman network.
+RUN mkdir -p /etc/mdt-tls /etc/opt/mdt-dialout-collector \
+    && openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
+        -keyout /etc/mdt-tls/server.key \
+        -out    /etc/mdt-tls/server.crt \
+        -subj "/CN=collector" \
+        -addext "subjectAltName=DNS:collector,DNS:localhost,IP:127.0.0.1" \
+    && chmod 644 /etc/mdt-tls/server.crt /etc/mdt-tls/server.key
+
+ENTRYPOINT ["/usr/local/bin/mdt_dialout_collector"]
+CMD ["-f", "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf"]

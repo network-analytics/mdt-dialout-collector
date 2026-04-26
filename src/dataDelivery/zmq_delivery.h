@@ -1,16 +1,13 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 #ifndef _ZMQ_DELIVERY_H_
 #define _ZMQ_DELIVERY_H_
 
-// C++ Standard Library headers
-
-// External Library headers
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
-// mdt-dialout-collector Library headers
 #include "../dataWrapper/data_wrapper.h"
 #include "../utils/cfg_handler.h"
 #include "../utils/logs_handler.h"

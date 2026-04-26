@@ -1,17 +1,16 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-// C++ Standard Library headers
 #include <exception>
 #include <memory>
 #include <thread>
 #include <csignal>
 #include <fstream>
+#include <unistd.h>
 #include <zmq.hpp>
-// External Library headers
 #include "csv/rapidcsv.h"
-// mdt-dialout-collector Library headers
 #include "core/mdt_dialout_core.h"
 
 
@@ -19,7 +18,7 @@ void *ZmqSingleThreadPoller(ZmqPull &zmq_poller,
     zmq::socket_t &zmq_sock);
 void *VendorThread(const std::string &vendor);
 void LoadThreads(std::vector<std::thread> &workers_vec,
-    const std::string &ipv4_socket_str,
+    const std::string &socket_str,
     const std::string &replies_str,
     const std::string &workers_str);
 void LoadLabelMap(
@@ -29,7 +28,7 @@ void LoadLabelMapPreTagStyle(
     std::unordered_map<std::string,std::vector<std::string>> &label_map,
     const std::string &label_map_csv);
 bool DumpCorePid(int &core_pid, const std::string &core_pid_path);
-void SignalHandler(int sig_num);
+void ReloadLabelMaps();
 std::string ReadVersionFromFile(const std::string &filePath);
 
 int main(int argc, char *argv[])
@@ -56,7 +55,6 @@ int main(int argc, char *argv[])
     }
 
     if (cfg_path.empty() == true) {
-        // default configuration file
         cfg_path = "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf";
     }
 
@@ -75,7 +73,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // static log-sinks are configured within the constructor
     LogsHandler logs_handler;
     spdlog::get("multi-logger-boot")->debug("main: main()");
 
@@ -87,12 +84,10 @@ int main(int argc, char *argv[])
         if (logs_cfg_handler.lookup_logs_parameters(
             cfg_handler.get_cfg_path(),
             cfg_handler.get_logs_parameters()) == false) {
-            // can't read the logs cfg params the destructor logging won't
-            // be possible (segmentation fault)
+            // failing here means the destructor logger isn't ready (segfault)
             std::exit(EXIT_FAILURE);
         } else {
             logs_cfg_parameters = cfg_handler.get_logs_parameters();
-            // set the log-sinks after reading from the configuration file
             logs_handler.set_spdlog_sinks();
         }
 
@@ -134,21 +129,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    // --- DEBUG ---
-    //for (auto &lp : logs_cfg_parameters) {
-    //    std::cout << lp.first << " ---> " << lp.second << "\n";
-    //}
-    //for (auto &mp : main_cfg_parameters) {
-    //    std::cout << mp.first << " ---> " << mp.second << "\n";
-    //}
-    //for (auto &dm : data_manipulation_cfg_parameters) {
-    //    std::cout << dm.first << " ---> " << dm.second << "\n";
-    //}
-    //for (auto &dd : kafka_delivery_cfg_parameters) {
-    //    std::cout << dd.first << " ---> " << dd.second << "\n";
-    //}
-    // --- DEBUG ---
-
     int core_pid = getpid();
     const std::string core_pid_folder =
         main_cfg_parameters.at("core_pid_folder");
@@ -174,24 +154,23 @@ int main(int argc, char *argv[])
             data_manipulation_cfg_parameters.at("label_map_ptm_path"));
     }
     spdlog::get("multi-logger")->debug(
-        "ipv4 sockets found in config:\n ipv4_socket_cisco: {},\n ipv4_socket_juniper: {},\n ipv4_socket_nokia: {},\n ipv4_socket_huawei: {}\n",
-        main_cfg_parameters.at("ipv4_socket_cisco"),
-        main_cfg_parameters.at("ipv4_socket_juniper"),
-        main_cfg_parameters.at("ipv4_socket_nokia"),
-        main_cfg_parameters.at("ipv4_socket_huawei")
+        "sockets found in config:\n socket_cisco: {},\n socket_juniper: {},\n socket_nokia: {},\n socket_huawei: {}\n",
+        main_cfg_parameters.at("socket_cisco"),
+        main_cfg_parameters.at("socket_juniper"),
+        main_cfg_parameters.at("socket_nokia"),
+        main_cfg_parameters.at("socket_huawei")
     );
-    if (main_cfg_parameters.at("ipv4_socket_cisco").empty() == true &&
-        main_cfg_parameters.at("ipv4_socket_juniper").empty() == true &&
-        main_cfg_parameters.at("ipv4_socket_nokia").empty() == true &&
-        main_cfg_parameters.at("ipv4_socket_huawei").empty() == true) {
+    if (main_cfg_parameters.at("socket_cisco").empty() == true &&
+        main_cfg_parameters.at("socket_juniper").empty() == true &&
+        main_cfg_parameters.at("socket_nokia").empty() == true &&
+        main_cfg_parameters.at("socket_huawei").empty() == true) {
             spdlog::get("multi-logger")->
-                error("[ipv4_socket_*] configuration issue: "
+                error("[socket_*] configuration issue: "
                 "unable to find at least one valid IPv4 socket where to bind "
                 "the daemon");
             return EXIT_FAILURE;
     }
 
-    // --- ZMQ - Poller ---
     ZmqPull zmq_poller;
     zmq::socket_t sock_pull(zmq_poller.get_zmq_ctx(),
         zmq::socket_type::pull);
@@ -200,36 +179,63 @@ int main(int argc, char *argv[])
         &ZmqSingleThreadPoller,
         std::ref(zmq_poller),
         std::ref(sock_pull));
-    zmq_single_thread_poller.detach();
-    // --- ZMQ - Poller ---
+
+    // pthread_sigmask is unreliable here: gRPC spawns threads with reset
+    // masks. Self-pipe + watcher is the only portable option.
+    static int shutdown_pipe[2];
+    if (pipe(shutdown_pipe) != 0) {
+        spdlog::get("multi-logger")->error("pipe() for shutdown failed");
+        return EXIT_FAILURE;
+    }
+    auto signal_pipe_handler = [](int sig) {
+        // async-signal-safe: only write() — watcher dispatches in normal context.
+        unsigned char c = static_cast<unsigned char>(sig);
+        ssize_t n = write(shutdown_pipe[1], &c, 1);
+        (void)n;
+    };
+    struct sigaction sa = {};
+    sa.sa_handler = signal_pipe_handler;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGTERM, &sa, nullptr);
+    sigaction(SIGINT,  &sa, nullptr);
+    sigaction(SIGUSR1, &sa, nullptr);
 
     std::vector<std::thread> cisco_workers;
     std::vector<std::thread> juniper_workers;
     std::vector<std::thread> nokia_workers;
     std::vector<std::thread> huawei_workers;
 
-    // Cisco
-    LoadThreads(cisco_workers, "ipv4_socket_cisco", "replies_cisco",
+    LoadThreads(cisco_workers, "socket_cisco", "replies_cisco",
         "cisco_workers");
-
-    // Juniper
-    LoadThreads(juniper_workers, "ipv4_socket_juniper", "replies_juniper",
+    LoadThreads(juniper_workers, "socket_juniper", "replies_juniper",
         "juniper_workers");
-
-    // Nokia
-    LoadThreads(nokia_workers, "ipv4_socket_nokia", "replies_nokia",
+    LoadThreads(nokia_workers, "socket_nokia", "replies_nokia",
         "nokia_workers");
-
-    // Huawei
-    LoadThreads(huawei_workers, "ipv4_socket_huawei", "replies_huawei",
+    LoadThreads(huawei_workers, "socket_huawei", "replies_huawei",
         "huawei_workers");
 
-    signal(SIGUSR1, SignalHandler);
-
-    //std::cout << "CISCO_WORKERS:   " << cisco_workers.size() << "\n";
-    //std::cout << "JUNIPER_WORKERS: " << juniper_workers.size() << "\n";
-    //std::cout << "NOKIA_WORKERS: " << nokia_workers.size() << "\n";
-    //std::cout << "HUAWEI_WORKERS:  " << huawei_workers.size() << "\n";
+    std::thread signal_watcher([&zmq_poller]() {
+        while (true) {
+            unsigned char buf;
+            ssize_t n = read(shutdown_pipe[0], &buf, 1);
+            if (n != 1) {
+                return;
+            }
+            int sig = static_cast<int>(buf);
+            if (sig == SIGUSR1) {
+                spdlog::get("multi-logger")->info(
+                    "received SIGUSR1, reloading label map");
+                ReloadLabelMaps();
+                continue;
+            }
+            spdlog::get("multi-logger")->info(
+                "received signal {}, initiating graceful shutdown", sig);
+            spdlog::get("multi-logger")->flush();
+            initiate_shutdown();
+            zmq_poller.get_zmq_ctx().shutdown();
+            return;
+        }
+    });
 
     for (std::thread &w : cisco_workers) {
         if(w.joinable()) {
@@ -255,6 +261,14 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (zmq_single_thread_poller.joinable()) {
+        zmq_single_thread_poller.join();
+    }
+
+    if (signal_watcher.joinable()) {
+        signal_watcher.join();
+    }
+
     return EXIT_SUCCESS;
 }
 
@@ -262,61 +276,54 @@ void *ZmqSingleThreadPoller(ZmqPull &zmq_poller, zmq::socket_t &sock_pull)
 {
     const std::string zmq_uri = zmq_poller.get_zmq_transport_uri();
 
-    //size_t counter = 0;
     while(true) {
-        //std::cout << counter++ << "\n";
-        zmq_poller.ZmqPoller(
-            sock_pull,
-            zmq_uri);
-        //std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        try {
+            zmq_poller.ZmqPoller(sock_pull, zmq_uri);
+        } catch (const zmq::error_t &e) {
+            // ETERM = parent ctx destroyed during shutdown; exit cleanly.
+            return (NULL);
+        }
     }
 
     return (NULL);
 }
 
-void *VendorThread(const std::string &ipv4_socket_str)
+void *VendorThread(const std::string &socket_str)
 {
-    if (ipv4_socket_str.find("cisco") != std::string::npos) {
-        std::string ipv4_socket_cisco =
-            main_cfg_parameters.at(ipv4_socket_str);
-
-        std::string cisco_srv_socket {ipv4_socket_cisco};
+    const std::string srv_socket = main_cfg_parameters.at(socket_str);
+    if (socket_str.find("cisco") != std::string::npos) {
         Srv cisco_mdt_dialout_collector;
-        cisco_mdt_dialout_collector.CiscoBind(cisco_srv_socket);
-    } else if (ipv4_socket_str.find("juniper") != std::string::npos) {
-        std::string ipv4_socket_juniper =
-            main_cfg_parameters.at(ipv4_socket_str);
-
-        std::string juniper_srv_socket {ipv4_socket_juniper};
+        cisco_mdt_dialout_collector.CiscoBind(srv_socket);
+    } else if (socket_str.find("juniper") != std::string::npos) {
         Srv juniper_mdt_dialout_collector;
-        juniper_mdt_dialout_collector.JuniperBind(juniper_srv_socket);
-    } else if (ipv4_socket_str.find("nokia") != std::string::npos) {
-        std::string ipv4_socket_nokia =
-            main_cfg_parameters.at(ipv4_socket_str);
-
-        std::string nokia_srv_socket {ipv4_socket_nokia};
+        juniper_mdt_dialout_collector.JuniperBind(srv_socket);
+    } else if (socket_str.find("nokia") != std::string::npos) {
         Srv nokia_mdt_dialout_collector;
-        nokia_mdt_dialout_collector.NokiaBind(nokia_srv_socket);
-    } else if (ipv4_socket_str.find("huawei") != std::string::npos) {
-        std::string ipv4_socket_huawei =
-            main_cfg_parameters.at(ipv4_socket_str);
-
-        std::string huawei_srv_socket {ipv4_socket_huawei};
+        nokia_mdt_dialout_collector.NokiaBind(srv_socket);
+    } else if (socket_str.find("huawei") != std::string::npos) {
         Srv huawei_mdt_dialout_collector;
-        huawei_mdt_dialout_collector.HuaweiBind(huawei_srv_socket);
+        huawei_mdt_dialout_collector.HuaweiBind(srv_socket);
     }
-
     return (NULL);
 }
 
 void LoadThreads(std::vector<std::thread> &workers_vec,
-    const std::string &ipv4_socket_str,
+    const std::string &socket_str,
     const std::string &replies_str,
     const std::string &workers_str)
 {
-    if (main_cfg_parameters.at(ipv4_socket_str).empty() == false) {
-        int replies =
-            std::stoi(main_cfg_parameters.at(replies_str));
+    if (main_cfg_parameters.at(socket_str).empty() == false) {
+        int replies = 0;
+        int workers = 0;
+        try {
+            replies = std::stoi(main_cfg_parameters.at(replies_str));
+            workers = std::stoi(main_cfg_parameters.at(workers_str));
+        } catch (const std::exception &e) {
+            spdlog::get("multi-logger")->
+                error("[{}/{}] configuration issue: non-numeric value: {}",
+                replies_str, workers_str, e.what());
+            std::exit(EXIT_FAILURE);
+        }
         if (replies < 0 || replies > 1000) {
             spdlog::get("multi-logger")->
                 error("[{}] configuration issue: the "
@@ -324,7 +331,6 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
                 "and 1000. (default = 0 => unlimited)", replies_str);
             std::exit(EXIT_FAILURE);
         }
-        int workers = std::stoi(main_cfg_parameters.at(workers_str));
         if (workers < 1 || workers > 5) {
             spdlog::get("multi-logger")->
                 error("[{}] configuration issue: the "
@@ -334,11 +340,11 @@ void LoadThreads(std::vector<std::thread> &workers_vec,
         }
         for (int w = 0; w < workers; w++) {
             workers_vec.push_back(std::thread(&VendorThread,
-                ipv4_socket_str));
+                socket_str));
         }
         spdlog::get("multi-logger")->
             info("mdt-dialout-collector listening on {} ",
-            main_cfg_parameters.at(ipv4_socket_str));
+            main_cfg_parameters.at(socket_str));
     }
 }
 
@@ -372,13 +378,6 @@ void LoadLabelMap(
         label_map[ipaddrs[idx_0]] = vtmp;
         vtmp.clear();
     }
-    // --- DEBUG ---
-    //for (auto &lm : label_map) {
-    //    spdlog::get("multi-logger")->
-    //      info("{} ---> [ {} , {} ]", lm.first, lm.second.at(0),
-    //        lm.second.at(1));
-    //}
-    // --- DEBUG ---
 }
 
 void LoadLabelMapPreTagStyle(
@@ -398,7 +397,7 @@ void LoadLabelMapPreTagStyle(
         rapidcsv::Document label_map_doc(label_map_ptm_path,
             rapidcsv::LabelParams(-1, -1), rapidcsv::SeparatorParams(' '));
 
-        // Delete last row: set_label=nkey%unknown%pkey%unknown
+        // Drop trailing sentinel row: set_label=nkey%unknown%pkey%unknown
         label_map_doc.RemoveRow(label_map_doc.GetRowCount());
         _labels = label_map_doc.GetColumn<std::string>(0);
         _ipaddrs = label_map_doc.GetColumn<std::string>(1);
@@ -446,13 +445,6 @@ void LoadLabelMapPreTagStyle(
         label_map[ipaddrs[idx_0]] = vtmp;
         vtmp.clear();
     }
-    // --- DEBUG ---
-    //for (auto &lm : label_map) {
-    //    spdlog::get("multi-logger")->
-    //      info("{} ---> [ {} , {} ]", lm.first, lm.second.at(0),
-    //        lm.second.at(1));
-    //}
-    // --- DEBUG ---
 }
 
 bool DumpCorePid(int &core_pid, const std::string &core_pid_path)
@@ -468,19 +460,19 @@ bool DumpCorePid(int &core_pid, const std::string &core_pid_path)
     return true;
 }
 
-void SignalHandler(int sig_num)
+void ReloadLabelMaps()
 {
+    // Holds unique_lock for the whole reload; readers stall briefly.
+    std::unique_lock<std::shared_mutex> lock(label_map_mutex);
     if (data_manipulation_cfg_parameters.at(
             "enable_label_encode_as_map").compare("true") == 0) {
-        spdlog::get("multi-logger")->info(
-            "siganl {} received, re-freshing label-map-csv data ...", sig_num);
+        spdlog::get("multi-logger")->info("re-freshing label-map-csv data");
         LoadLabelMap(label_map,
             data_manipulation_cfg_parameters.at("label_map_csv_path"));
     }
     if (data_manipulation_cfg_parameters.at(
             "enable_label_encode_as_map_ptm").compare("true") == 0) {
-        spdlog::get("multi-logger")->info(
-            "siganl {} received, re-freshing label-map-ptm data ...", sig_num);
+        spdlog::get("multi-logger")->info("re-freshing label-map-ptm data");
         LoadLabelMapPreTagStyle(label_map,
             data_manipulation_cfg_parameters.at("label_map_ptm_path"));
     }

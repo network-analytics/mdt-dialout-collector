@@ -1,19 +1,20 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 #ifndef _SRV_H_
 #define _SRV_H_
 
-// C++ Standard Library headers
+#include <atomic>
+#include <shared_mutex>
 #include <typeinfo>
-// External Library headers & System headers
+#include <vector>
 #include <sys/socket.h>
 #include <grpcpp/grpcpp.h>
 #include <grpc/support/alloc.h>
 
 #include "grpc/socket_mutator.h"
-// mdt-dialout-collector Library headers
 #include "proto/Cisco/cisco_dialout.grpc.pb.h"
 #include "proto/Huawei/huawei_dialout.grpc.pb.h"
 #include "proto/Juniper/juniper_dialout.grpc.pb.h"
@@ -27,8 +28,14 @@
 #include "../utils/logs_handler.h"
 
 
-// Global visibility to be able to signal the refresh --> CSV/PTM from main
+// label_map: reader = vendor HandleMessage (shared_lock); writer = signal
+// watcher on SIGUSR1 (unique_lock). The handler only flips the flag —
+// file I/O and allocation are not async-signal-safe.
 extern std::unordered_map<std::string,std::vector<std::string>> label_map;
+extern std::shared_mutex label_map_mutex;
+extern std::atomic<bool> label_map_reload_pending;
+
+enum class DeliveryMethod { Kafka, Zmq };
 
 class ServerBuilderOptionImpl: public grpc::ServerBuilderOption {
 public:
@@ -55,17 +62,12 @@ public:
 
 class Srv final {
 public:
+    enum class Vendor { Unset, Cisco, Juniper, Nokia, Huawei };
+
     ~Srv()
     {
         spdlog::get("multi-logger")->debug("destructor: ~Srv()");
-        cisco_server_->grpc::ServerInterface::Shutdown();
-        juniper_server_->grpc::ServerInterface::Shutdown();
-        nokia_server_->grpc::ServerInterface::Shutdown();
-        huawei_server_->grpc::ServerInterface::Shutdown();
-        cisco_cq_->grpc::ServerCompletionQueue::Shutdown();
-        juniper_cq_->grpc::ServerCompletionQueue::Shutdown();
-        nokia_cq_->grpc::ServerCompletionQueue::Shutdown();
-        huawei_cq_->grpc::ServerCompletionQueue::Shutdown();
+        Shutdown();
     }
     Srv() { spdlog::get("multi-logger")->debug("constructor: Srv()"); };
     void CiscoBind(std::string cisco_srv_socket);
@@ -73,7 +75,13 @@ public:
     void NokiaBind(std::string nokia_srv_socket);
     void HuaweiBind(std::string huawei_srv_socket);
 
+    // Idempotent; drains up to 5s, then shuts the active CQ.
+    void Shutdown();
+
 private:
+    Vendor            active_vendor_ {Vendor::Unset};
+    std::atomic<bool> shutdown_done_ {false};
+
     mdt_dialout::gRPCMdtDialout::AsyncService cisco_service_;
     Subscriber::AsyncService juniper_service_;
     Nokia::SROS::DialoutTelemetry::AsyncService nokia_service_;
@@ -93,135 +101,215 @@ private:
 
     class CiscoStream {
     public:
+        // Shared by every CiscoStream of one FsmCtrl; lives on its stack.
+        struct Context {
+            std::unordered_map<std::string, std::vector<std::string>>
+                                            *label_map;
+            DataManipulation                *data_manipulation;
+            DataWrapper                     *data_wrapper;
+            KafkaDelivery                   *kafka_delivery;
+            kafka::clients::KafkaProducer   *kafka_producer;  // null in zmq mode
+            ZmqPush                         *zmq_pusher;
+            zmq::socket_t                   *zmq_sock;        // null in kafka mode
+            std::string                      zmq_uri;
+            int                              max_replies;     // 0 = unlimited
+            DeliveryMethod                   delivery;
+            std::string                      writer_id;
+            bool                             label_encode;
+            bool                             cisco_gpbkv2json;
+            bool                             cisco_msg_to_json;
+        };
+
+        static void Spawn(
+            mdt_dialout::gRPCMdtDialout::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void Proceed(bool ok);
+
         ~CiscoStream() { spdlog::get("multi-logger")->
             debug("destructor: ~CiscoStream()"); };
-        CiscoStream(
-            mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service,
-            grpc::ServerCompletionQueue *cisco_cq);
-        void Start(
-            std::unordered_map<std::string,std::vector<std::string>>
-                &label_map,
-            DataManipulation &data_manipulation,
-            DataWrapper &data_wrapper,
-            KafkaDelivery &kafka_delivery,
-            kafka::clients::KafkaProducer &kafka_producer,
-            ZmqPush &zmq_pusher,
-            zmq::socket_t &zmq_sock_ptr,
-            const std::string &zmq_uri,
-            cisco_telemetry::Telemetry &cisco_tlm
-        );
     private:
-        mdt_dialout::gRPCMdtDialout::AsyncService *cisco_service_;
-        grpc::ServerCompletionQueue *cisco_cq_;
-        grpc::ServerContext cisco_server_ctx;
-        mdt_dialout::MdtDialoutArgs cisco_stream;
+        enum class State { Create, Read, Finishing, Done };
+
+        CiscoStream(
+            mdt_dialout::gRPCMdtDialout::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void HandleMessage();
+
+        mdt_dialout::gRPCMdtDialout::AsyncService *svc_;
+        grpc::ServerCompletionQueue               *cq_;
+        Context                                   *ctx_;
+        grpc::ServerContext                        server_ctx_;
+        mdt_dialout::MdtDialoutArgs                request_;
         grpc::ServerAsyncReaderWriter<mdt_dialout::MdtDialoutArgs,
-            mdt_dialout::MdtDialoutArgs> cisco_resp;
-        int cisco_replies_sent;
-        const int kCiscoMaxReplies;
-        enum StreamStatus { START, FLOW, PROCESSING, END };
-        StreamStatus cisco_stream_status;
+            mdt_dialout::MdtDialoutArgs>           resp_;
+        cisco_telemetry::Telemetry                 tlm_;
+        State                                      state_;
+        int                                        replies_;
     };
 
     class JuniperStream {
     public:
+        struct Context {
+            std::unordered_map<std::string, std::vector<std::string>>
+                                            *label_map;
+            DataManipulation                *data_manipulation;
+            DataWrapper                     *data_wrapper;
+            KafkaDelivery                   *kafka_delivery;
+            kafka::clients::KafkaProducer   *kafka_producer;
+            ZmqPush                         *zmq_pusher;
+            zmq::socket_t                   *zmq_sock;
+            std::string                      zmq_uri;
+            int                              max_replies;
+            DeliveryMethod                   delivery;
+            std::string                      writer_id;
+            bool                             label_encode;
+        };
+
+        static void Spawn(
+            Subscriber::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void Proceed(bool ok);
+
         ~JuniperStream() {
             spdlog::get("multi-logger")->
                 debug("destructor: ~JuniperStream()"); };
-        JuniperStream(
-            Subscriber::AsyncService *juniper_service,
-            grpc::ServerCompletionQueue *juniper_cq);
-        void Start(
-            std::unordered_map<std::string,std::vector<std::string>>
-                &label_map,
-            DataManipulation &data_manipulation,
-            DataWrapper &data_wrapper,
-            KafkaDelivery &kafka_delivery,
-            kafka::clients::KafkaProducer &kafka_producer,
-            ZmqPush &zmq_pusher,
-            zmq::socket_t &zmq_sock,
-            const std::string &zmq_uri,
-            GnmiJuniperTelemetryHeaderExtension &juniper_tlm_hdr_ext
-        );
     private:
-        Subscriber::AsyncService *juniper_service_;
-        grpc::ServerCompletionQueue *juniper_cq_;
-        grpc::ServerContext juniper_server_ctx;
-        juniper_gnmi::SubscribeResponse juniper_stream;
-        grpc::ServerAsyncReaderWriter<juniper_gnmi::SubscribeRequest,
-            juniper_gnmi::SubscribeResponse> juniper_resp;
-        int juniper_replies_sent;
-        const int kJuniperMaxReplies;
-        enum StreamStatus { START, FLOW, PROCESSING, END };
-        StreamStatus juniper_stream_status;
+        enum class State { Create, Read, Finishing, Done };
+
+        JuniperStream(
+            Subscriber::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void HandleMessage();
+
+        Subscriber::AsyncService                     *svc_;
+        grpc::ServerCompletionQueue                  *cq_;
+        Context                                      *ctx_;
+        grpc::ServerContext                           server_ctx_;
+        juniper_gnmi::SubscribeResponse               request_;
+        grpc::ServerAsyncReaderWriter<
+            juniper_gnmi::SubscribeRequest,
+            juniper_gnmi::SubscribeResponse>          resp_;
+        GnmiJuniperTelemetryHeaderExtension           tlm_hdr_ext_;
+        State                                         state_;
+        int                                           replies_;
     };
 
     class NokiaStream {
     public:
+        struct Context {
+            std::unordered_map<std::string, std::vector<std::string>>
+                                            *label_map;
+            DataManipulation                *data_manipulation;
+            DataWrapper                     *data_wrapper;
+            KafkaDelivery                   *kafka_delivery;
+            kafka::clients::KafkaProducer   *kafka_producer;
+            ZmqPush                         *zmq_pusher;
+            zmq::socket_t                   *zmq_sock;
+            std::string                      zmq_uri;
+            int                              max_replies;
+            DeliveryMethod                   delivery;
+            std::string                      writer_id;
+            bool                             label_encode;
+        };
+
+        static void Spawn(
+            Nokia::SROS::DialoutTelemetry::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void Proceed(bool ok);
+
         ~NokiaStream() {
             spdlog::get("multi-logger")->
                 debug("destructor: ~NokiaStream()"); };
-        NokiaStream(
-            Nokia::SROS::DialoutTelemetry::AsyncService *nokia_service,
-            grpc::ServerCompletionQueue *nokia_cq);
-        void Start(
-            std::unordered_map<std::string,std::vector<std::string>>
-                &label_map,
-            DataManipulation &data_manipulation,
-            DataWrapper &data_wrapper,
-            KafkaDelivery &kafka_delivery,
-            kafka::clients::KafkaProducer &kafka_producer,
-            ZmqPush &zmq_pusher,
-            zmq::socket_t &zmq_sock,
-            const std::string &zmq_uri
-        );
     private:
-        Nokia::SROS::DialoutTelemetry::AsyncService *nokia_service_;
-        grpc::ServerCompletionQueue *nokia_cq_;
-        grpc::ServerContext nokia_server_ctx;
-        nokia_gnmi::SubscribeResponse nokia_stream;
-        grpc::ServerAsyncReaderWriter<Nokia::SROS::PublishResponse,
-            nokia_gnmi::SubscribeResponse> nokia_resp;
-        int nokia_replies_sent;
-        const int kNokiaMaxReplies;
-        enum StreamStatus { START, FLOW, PROCESSING, END };
-        StreamStatus nokia_stream_status;
+        enum class State { Create, Read, Finishing, Done };
+
+        NokiaStream(
+            Nokia::SROS::DialoutTelemetry::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void HandleMessage();
+
+        Nokia::SROS::DialoutTelemetry::AsyncService  *svc_;
+        grpc::ServerCompletionQueue                  *cq_;
+        Context                                      *ctx_;
+        grpc::ServerContext                           server_ctx_;
+        nokia_gnmi::SubscribeResponse                 request_;
+        grpc::ServerAsyncReaderWriter<
+            Nokia::SROS::PublishResponse,
+            nokia_gnmi::SubscribeResponse>            resp_;
+        State                                         state_;
+        int                                           replies_;
     };
 
     class HuaweiStream {
     public:
+        struct Context {
+            std::unordered_map<std::string, std::vector<std::string>>
+                                            *label_map;
+            DataManipulation                *data_manipulation;
+            DataWrapper                     *data_wrapper;
+            KafkaDelivery                   *kafka_delivery;
+            kafka::clients::KafkaProducer   *kafka_producer;
+            ZmqPush                         *zmq_pusher;
+            zmq::socket_t                   *zmq_sock;
+            std::string                      zmq_uri;
+            int                              max_replies;
+            DeliveryMethod                   delivery;
+            std::string                      writer_id;
+            bool                             label_encode;
+        };
+
+        static void Spawn(
+            huawei_dialout::gRPCDataservice::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void Proceed(bool ok);
+
         ~HuaweiStream() {
             spdlog::get("multi-logger")->
                 debug("destructor: ~HuaweiStream()"); };
-        HuaweiStream(
-            huawei_dialout::gRPCDataservice::AsyncService *huawei_service,
-            grpc::ServerCompletionQueue *huawei_cq);
-        void Start(
-            std::unordered_map<std::string,std::vector<std::string>>
-                &label_map,
-            DataManipulation &data_manipulation,
-            DataWrapper &data_wrapper,
-            KafkaDelivery &kafka_delivery,
-            kafka::clients::KafkaProducer &kafka_producer,
-            ZmqPush &zmq_pusher,
-            zmq::socket_t &zmq_sock,
-            const std::string &zmq_uri,
-            huawei_telemetry::Telemetry &huawei_tlm,
-            openconfig_interfaces::Interfaces &oc_if
-        );
     private:
-        huawei_dialout::gRPCDataservice::AsyncService *huawei_service_;
-        grpc::ServerCompletionQueue *huawei_cq_;
-        grpc::ServerContext huawei_server_ctx;
-        huawei_dialout::serviceArgs huawei_stream;
-        grpc::ServerAsyncReaderWriter<huawei_dialout::serviceArgs,
-            huawei_dialout::serviceArgs> huawei_resp;
-        int huawei_replies_sent;
-        const int kHuaweiMaxReplies;
-        enum StreamStatus { START, FLOW, PROCESSING, END };
-        StreamStatus huawei_stream_status;
+        enum class State { Create, Read, Finishing, Done };
+
+        HuaweiStream(
+            huawei_dialout::gRPCDataservice::AsyncService *svc,
+            grpc::ServerCompletionQueue *cq,
+            Context *ctx);
+
+        void HandleMessage();
+
+        huawei_dialout::gRPCDataservice::AsyncService *svc_;
+        grpc::ServerCompletionQueue                   *cq_;
+        Context                                       *ctx_;
+        grpc::ServerContext                            server_ctx_;
+        huawei_dialout::serviceArgs                    request_;
+        grpc::ServerAsyncReaderWriter<
+            huawei_dialout::serviceArgs,
+            huawei_dialout::serviceArgs>               resp_;
+        huawei_telemetry::Telemetry                    tlm_;
+        openconfig_interfaces::Interfaces              oc_if_;
+        State                                          state_;
+        int                                            replies_;
     };
 };
+
+// Shutdown registry: each Srv self-registers; signal-watcher calls
+// initiate_shutdown() to drain all live servers on SIGTERM/SIGINT.
+void register_server(Srv *srv);
+void unregister_server(Srv *srv);
+void initiate_shutdown();
 
 #endif
 

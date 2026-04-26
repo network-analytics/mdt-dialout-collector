@@ -1,16 +1,14 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 #ifndef _DATA_MANIPULATION_H_
 #define _DATA_MANIPULATION_H_
 
-// C++ Standard Library headers
 #include <unordered_map>
 #include <ctime>
-// External Library headers
 #include <json/json.h>
-// mdt-dialout-collector Library headers
 #include "proto/Cisco/cisco_telemetry.pb.h"
 #include "proto/Juniper/juniper_gnmi.pb.h"
 #include "proto/Juniper/juniper_telemetry_header_extension.pb.h"
@@ -41,6 +39,17 @@ public:
         std::unordered_map<std::string,std::vector<std::string>> &label_map,
         const std::string &peer_ip,
         const std::string &json_str,
+        std::string &json_str_out);
+    // Builds the kafka envelope JSON in a single Json::Value pass.
+    // Folds the previous MetaData + AppendLabelMap two-parse pipeline.
+    // Pass label_map=nullptr to skip the "label" field.
+    bool BuildEnvelope(
+        const std::string &telemetry_body,
+        const std::string &peer_ip,
+        const std::string &peer_port,
+        const std::unordered_map<std::string, std::vector<std::string>>
+            *label_map,
+        const std::string &writer_id,
         std::string &json_str_out);
     bool CiscoGpbkv2Json(
         const cisco_telemetry::Telemetry &cisco_tlm,

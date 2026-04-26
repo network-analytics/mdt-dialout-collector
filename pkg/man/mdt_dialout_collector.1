@@ -1,0 +1,162 @@
+.\" Man page for mdt_dialout_collector(1)
+.\" Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+.\" Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
+.\" Distributed under the MIT License.
+.TH MDT_DIALOUT_COLLECTOR 1 "April 2026" "mdt-dialout-collector" "User Commands"
+.SH NAME
+mdt_dialout_collector \- multi-vendor gRPC MDT dial-out collector
+.SH SYNOPSIS
+.B mdt_dialout_collector
+[\fB\-f\fR \fIcfg_path\fR]
+.br
+.B mdt_dialout_collector
+\fB\-V\fR
+.SH DESCRIPTION
+.B mdt_dialout_collector
+is a multi-vendor gRPC dial-out collector that receives YANG-modeled
+network telemetry from Cisco, Juniper, Nokia and Huawei devices over the
+gRPC framework and forwards the normalized stream to either Apache Kafka
+or ZeroMQ for downstream consumption.
+.PP
+The daemon spawns one listening socket per supported vendor (each on its
+own port) and one or more worker threads per vendor. Each incoming gRPC
+call drives a small async state machine until the device closes the
+stream. Per-vendor data manipulation routines decode the wire payload
+(GPB-KV, GPB, JSON, gNMI) into a uniform JSON envelope, optionally
+enriched with operator-supplied label-map data.
+.PP
+TLS server-side termination is supported on every vendor's port (see
+.B enable_tls
+in the config); IPv4 and IPv6 listening sockets are both accepted via
+the
+.B socket_<vendor>
+keys.
+.PP
+The same code is also distributed as a shared library
+.RB ( libgrpc_collector.so ),
+allowing the gRPC dial-out path to be embedded directly into
+.BR pmtelemetryd (1)
+via the C bridge declared in
+.IR /opt/mdt-dialout-collector/include/grpc_collector_bridge/grpc_collector_bridge.h .
+.SH OPTIONS
+.TP
+.BR \-f " " \fIcfg_path\fR
+Path to the configuration file. When omitted, the daemon reads
+.IR /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf .
+.TP
+.B \-V
+Print the daemon version and exit.
+.SH CONFIGURATION
+The configuration file uses libconfig syntax — one
+.IR key " = " value\fR;
+per line, comments start with
+.BR # .
+A typical minimal configuration:
+.PP
+.RS
+.nf
+iface           = "eth0";
+writer_id       = "mdt-collector-01";
+core_pid_folder = "/var/run/mdt-dialout-collector/";
+
+socket_cisco   = "0.0.0.0:10007";
+socket_juniper = "0.0.0.0:10008";
+socket_nokia   = "0.0.0.0:10009";
+socket_huawei  = "0.0.0.0:10010";
+
+data_delivery_method = "kafka";
+bootstrap_servers    = "kafka.example.org:9092";
+topic                = "mdt-collector";
+security_protocol    = "plaintext";
+.fi
+.RE
+.PP
+The full list of supported keys with descriptions and defaults is in
+.IR /usr/share/doc/mdt-dialout-collector/CONFIG-KEYS .
+.SH SIGNALS
+.TP
+.B SIGTERM, SIGINT
+Graceful shutdown. Drains in-flight RPCs (5\ s deadline), shuts down
+each vendor's gRPC completion queue, joins all worker threads.
+.TP
+.B SIGUSR1
+Reloads the label-map data from the configured CSV / pretag-map file
+without restarting the daemon. Read locks on the map are taken by every
+vendor's HandleMessage path; the reload thread takes a brief write lock.
+.SH FILES
+.TP
+.I /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
+Default configuration file (overridable via \fB\-f\fR).
+.TP
+.I /opt/mdt-dialout-collector/bin/mdt_dialout_collector
+Daemon binary (with a symlink at
+.IR /usr/bin/mdt_dialout_collector ).
+.TP
+.I /lib/systemd/system/mdt-dialout-collector.service
+systemd unit file shipped by the package.
+.TP
+.I /var/run/mdt-dialout-collector/<writer_id>
+PID file. Path is the value of the
+.B core_pid_folder
+config key joined with
+.BR writer_id .
+.TP
+.I /usr/share/doc/mdt-dialout-collector/CONFIG-KEYS
+Full configuration-key reference.
+.SH EXIT STATUS
+The daemon returns
+.B 0
+on graceful shutdown and a non-zero value on configuration / startup
+failure. Specific failure modes are logged to
+.B syslog
+or to the console (controlled by the
+.B syslog
+and
+.B console_log
+config keys).
+.SH ENVIRONMENT
+The daemon reads no environment variables directly.
+.B systemd
+typically sets
+.BR LISTEN_FDS / LISTEN_PID
+when socket-activated, but the daemon binds its own sockets and ignores
+them.
+.SH EXAMPLES
+Run the daemon with the default configuration:
+.PP
+.RS
+.nf
+systemctl enable --now mdt-dialout-collector
+.fi
+.RE
+.PP
+Run with a custom configuration file:
+.PP
+.RS
+.nf
+mdt_dialout_collector -f /etc/mdt-dialout-collector-staging.conf
+.fi
+.RE
+.PP
+Reload the label-map without restarting:
+.PP
+.RS
+.nf
+kill -USR1 $(cat /var/run/mdt-dialout-collector/mdt-collector-01)
+.fi
+.RE
+.SH SEE ALSO
+.BR pmtelemetryd (1),
+.BR systemd.service (5)
+.PP
+Project documentation:
+.UR https://github.com/network-analytics/mdt-dialout-collector
+.UE .
+.SH AUTHORS
+Salvatore Cuzzilla <salvatore.cuzzilla@gmail.com> and contributors.
+.SH COPYRIGHT
+Copyright \(co 2022\-2025 Salvatore Cuzzilla (Swisscom AG).
+.br
+Copyright \(co 2026\-present Salvatore Cuzzilla (Avaloq, an NEC Company).
+.br
+Distributed under the MIT License.

@@ -1,7 +1,24 @@
 #!/bin/sh
 
-# Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+# Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+# Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 # Distributed under the MIT License (http://opensource.org/licenses/MIT)
+
+# ============================================================================
+# DEPRECATED — preserved as a developer convenience only.
+#
+# The supported install path is now native packages (.deb / .rpm) produced
+# by the .github/workflows/release.yml CI pipeline and attached to every
+# GitHub Release.
+#
+# See doc/INSTALL.md for the recommended flow and doc/INSTALL-FROM-SOURCE.md
+# for from-source builds.
+#
+# This script pins gRPC to v1.45.2 (May 2022) and maintains a hand-curated
+# distro-detection matrix that gets stale with every new Debian / Ubuntu /
+# Rocky / RHEL release. Use it only if the packaged install does not work
+# for your environment.
+# ============================================================================
 
 
 set -o errexit
@@ -157,7 +174,7 @@ is_valid_mdt_version() {
   local detect="${1}"
 
   # supported MDT versions
-  set -- current v1.1.4 v1.1.3 v1.1.2 v1.1.1 v1.1.0 v1.0.0
+  set -- current v1.2.0 v1.1.4 v1.1.3 v1.1.2 v1.1.1 v1.1.0 v1.0.0
   for item in "$@";
   do
     if [ "${item}" = "${detect}" ]; then

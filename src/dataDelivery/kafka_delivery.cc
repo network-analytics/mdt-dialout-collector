@@ -1,8 +1,8 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
-// mdt-dialout-collector Library headers
 #include "kafka_delivery.h"
 
 
@@ -62,10 +62,9 @@ bool KafkaDelivery::AsyncKafkaProducer(
     }
 
     try {
-        kafka::Topic topic = get_topic();
-        kafka::Properties properties = get_properties();
+        const kafka::Topic &topic = get_topic();
 
-	spdlog::get("multi-logger")->debug("[AsyncKafkaProducer] Attempting to send with key: '{}'", peer);
+        spdlog::get("multi-logger")->debug("[AsyncKafkaProducer] Attempting to send with key: '{}'", peer);
         auto record = kafka::clients::producer::ProducerRecord(
             topic,
             kafka::Key(peer.c_str(), peer.size()),

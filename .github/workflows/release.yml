@@ -1,0 +1,177 @@
+name: release
+
+# Triggers:
+#   * tag push (vX.Y.Z) — full release: builds packages for every distro
+#     in the matrix, then attaches them to a GitHub Release.
+#   * manual dispatch  — same matrix, but artifacts go to the workflow run
+#     only (no Release object created). Useful for testing the pipeline
+#     between proper releases.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # creates the GitHub Release on tag push.
+  packages: write   # for the optional ghcr.io image push.
+
+jobs:
+  packages:
+    name: ${{ matrix.distro.name }}
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.distro.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - { name: "debian-12 (bookworm)", image: "debian:12" }
+          - { name: "debian-13 (trixie)",   image: "debian:13" }
+          - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04" }
+          - { name: "rocky-9",              image: "rockylinux:9" }
+          - { name: "fedora",               image: "fedora:latest" }
+
+    steps:
+      # actions/checkout v4 needs `git` inside the container; install it
+      # first on the rpm distros where the base image is minimal.
+      - name: bootstrap git (rpm distros)
+        if: contains(matrix.distro.image, 'rocky') || contains(matrix.distro.image, 'fedora')
+        run: |
+          dnf install -y -q git tar gzip >/dev/null
+
+      - name: bootstrap git (deb distros)
+        if: contains(matrix.distro.image, 'debian') || contains(matrix.distro.image, 'ubuntu')
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y --no-install-recommends git ca-certificates >/dev/null
+
+      - uses: actions/checkout@v4
+
+      - name: install build deps
+        run: bash pkg/build/install_deps.sh
+
+      - name: install nfpm
+        run: |
+          NFPM_VERSION=v2.41.3
+          NFPM_ARCH=x86_64
+          curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/${NFPM_VERSION}/nfpm_${NFPM_VERSION#v}_Linux_${NFPM_ARCH}.tar.gz" \
+            | tar -xz -C /usr/local/bin nfpm
+          nfpm --version
+
+      - name: derive version
+        id: version
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+              VERSION="${GITHUB_REF_NAME#v}"
+          else
+              VERSION="0.0.0-dev+${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=${VERSION}" >> "${GITHUB_ENV}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
+      - name: build collector + library
+        run: bash pkg/build/build_collector.sh
+
+      - name: nfpm pack (standalone + library)
+        run: bash pkg/build/make_packages.sh
+
+      - name: smoke-test the package
+        run: |
+          # Install the freshly built standalone .deb/.rpm into the same
+          # container; verify the binary loads and prints --help/-V.
+          set -e
+          if [ "${PKG_FORMAT}" = "deb" ]; then
+              apt-get install -y -qq ./dist/mdt-dialout-collector_${VERSION}_${DISTRO_TAG}_amd64.deb
+          else
+              dnf install -y -q ./dist/mdt-dialout-collector_${VERSION}_${DISTRO_TAG}_amd64.rpm
+          fi
+          /opt/mdt-dialout-collector/bin/mdt_dialout_collector -V || true
+          ls -l /lib/systemd/system/mdt-dialout-collector.service
+          ls -l /etc/opt/mdt-dialout-collector/
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ env.DISTRO_TAG }}
+          path: dist/*
+
+  validate:
+    # Install the freshly built packages in a CLEAN container of the
+    # target distro (no build deps). Catches missing/wrong runtime
+    # depends and unresolved transitive deps on system gRPC — neither
+    # of which the build-container smoke step can see.
+    name: validate ${{ matrix.distro.name }}
+    needs: packages
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.distro.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - { name: "debian-12 (bookworm)", image: "debian:12",      tag: "bookworm" }
+          - { name: "debian-13 (trixie)",   image: "debian:13",      tag: "trixie"   }
+          - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04",   tag: "noble"    }
+          - { name: "rocky-9",              image: "rockylinux:9",   tag: "el9"      }
+          - { name: "fedora",               image: "fedora:latest",  tag: "fc"       }
+
+    steps:
+      - name: bootstrap (rpm distros)
+        if: contains(matrix.distro.image, 'rocky') || contains(matrix.distro.image, 'fedora')
+        run: dnf install -y -q git tar gzip iproute >/dev/null
+
+      - name: bootstrap (deb distros)
+        if: contains(matrix.distro.image, 'debian') || contains(matrix.distro.image, 'ubuntu')
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y --no-install-recommends \
+            git ca-certificates iproute2 >/dev/null
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages-${{ matrix.distro.tag }}*
+          path: dist
+          merge-multiple: true
+
+      - name: locate packages
+        id: pkgs
+        run: |
+          STANDALONE=$(ls dist/mdt-dialout-collector_*_*.{deb,rpm} 2>/dev/null \
+              | grep -v -- '-lib' | head -1)
+          LIBRARY=$(ls dist/mdt-dialout-collector-lib_*_*.{deb,rpm} 2>/dev/null | head -1)
+          test -n "${STANDALONE}" && test -n "${LIBRARY}"
+          echo "standalone=${STANDALONE}" >> "${GITHUB_OUTPUT}"
+          echo "library=${LIBRARY}"       >> "${GITHUB_OUTPUT}"
+          ls -lh dist/
+
+      - name: validate standalone package
+        run: bash pkg/validate/standalone.sh "${{ steps.pkgs.outputs.standalone }}"
+
+      - name: validate library package
+        run: bash pkg/validate/library.sh "${{ steps.pkgs.outputs.library }}"
+
+  release:
+    name: GitHub Release
+    needs: [packages, validate]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: list artifacts
+        run: ls -lh dist/
+
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true

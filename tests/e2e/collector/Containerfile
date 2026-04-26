@@ -1,0 +1,49 @@
+# Single-stage on purpose: keeps the build and runtime libs identical so we
+# don't have to chase Debian's libfoo<version> package names. The first build
+# takes ~10–20 min (gRPC + Protobuf from source). After that the gRPC layer
+# is cached and source-only changes rebuild in seconds.
+ARG VERSION=bookworm-slim
+FROM debian:${VERSION}
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        bash git ca-certificates cmake build-essential autoconf libtool \
+        pkg-config \
+        libjsoncpp-dev librdkafka-dev libconfig++-dev libspdlog-dev \
+        libzmq3-dev cppzmq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV INSTALL_DIR=/opt/grpc-install
+ENV PATH=${INSTALL_DIR}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${INSTALL_DIR}/lib64
+
+RUN git clone --recurse-submodules -b v1.45.2 --depth 1 --shallow-submodules \
+        https://github.com/grpc/grpc /tmp/grpc \
+    && cmake -S /tmp/grpc -B /tmp/grpc/build \
+        -DgRPC_INSTALL=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DgRPC_BUILD_TESTS=OFF \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+        -DABSL_PROPAGATE_CXX_STD=ON \
+        -DgRPC_ABSL_PROVIDER=module \
+        -DgRPC_CARES_PROVIDER=module \
+        -DgRPC_PROTOBUF_PROVIDER=module \
+        -DgRPC_RE2_PROVIDER=module \
+        -DgRPC_SSL_PROVIDER=module \
+        -DgRPC_ZLIB_PROVIDER=module \
+    && cmake --build /tmp/grpc/build -j"$(nproc)" \
+    && cmake --install /tmp/grpc/build \
+    && rm -rf /tmp/grpc
+
+WORKDIR /src
+COPY CMakeLists.txt VERSION ./
+COPY proto ./proto
+COPY src ./src
+
+RUN cmake -S /src -B /src/build -DCMAKE_PREFIX_PATH=${INSTALL_DIR} \
+    && cmake --build /src/build -j"$(nproc)" \
+    && cp /src/bin/mdt_dialout_collector /usr/local/bin/
+
+RUN mkdir -p /etc/opt/mdt-dialout-collector
+
+ENTRYPOINT ["/usr/local/bin/mdt_dialout_collector"]
+CMD ["-f", "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf"]

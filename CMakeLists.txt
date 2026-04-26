@@ -1,4 +1,5 @@
-# Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+# Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+# Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 # Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
@@ -413,9 +414,9 @@ foreach(sourcefile ${APP_SOURCES})
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/mdt_dialout_core.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/cfg_handler.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/logs_handler.cc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/peer_parser.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataManipulation/data_manipulation.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataWrapper/data_wrapper.cc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/cfgWrapper/cfg_wrapper.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/kafka_delivery.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/dataDelivery/zmq_delivery.cc"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/bridge/grpc_collector_bridge.cc"
@@ -453,6 +454,13 @@ foreach(sourcefile ${APP_SOURCES})
         ${LIBCONFIG_CPP_LIBRARIES}
     )
 endforeach(sourcefile ${APP_SOURCES})
+
+# Tests (gated on -DBUILD_TESTING=ON; default OFF to keep packagers' default build untouched)
+option(BUILD_TESTING "Build the unit tests under tests/" OFF)
+if (BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 # Compile C
 #file(GLOB APP_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)

@@ -1,4 +1,5 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
@@ -19,31 +20,25 @@ extern "C" {
     #define MAX_WORKERS 5
 
     typedef struct {
-        /* main */
         char *writer_id;
         char *iface;
         char *ipv4_socket_cisco;
         char *ipv4_socket_juniper;
         char *ipv4_socket_nokia;
         char *ipv4_socket_huawei;
-        /* char *core_pid_folder; */
-        /* workers */
         char *cisco_workers;
         char *juniper_workers;
         char *nokia_workers;
         char *huawei_workers;
-        /* replies */
         char *replies_cisco;
         char *replies_juniper;
         char *replies_nokia;
         char *replies_huawei;
-        /* logging */
         char *syslog;
         char *syslog_facility;
         char *syslog_ident;
         char *console_log;
         char *spdlog_level;
-        /* data-flow manipulation */
         char *enable_cisco_gpbkv2json;
         char *enable_cisco_message_to_json_string;
         char *enable_label_encode_as_map;
@@ -70,10 +65,14 @@ extern "C" {
 
     extern void start_grpc_dialout_collector(const char *cfg_path,
         const char *zmq_uri);
-    extern void LoadOptions(const char *cfg_path,
+    /* graceful shutdown: drains live Srv instances, joins all workers.
+     * safe to call at any point; idempotent; returns 1. */
+    extern int stop_grpc_dialout_collector(void);
+    /* returns 1 on success, 0 on cfg validation failure */
+    extern int LoadOptions(const char *cfg_path,
         const char *zmq_uri);
     extern void *VendorThread(void *vendor);
-    extern void LoadThreads(pthread_t *workers_vec, const char *ipv4_socket_str,
+    extern void LoadThreads(pthread_t *workers_vec, const char *socket_str,
         const char *replies_str, const char *workers_str);
 
 #ifdef __cplusplus

@@ -30,9 +30,13 @@ AUTOCONF_ENV="SHELL=/bin/sh"
 LT_INIT
 AC_ENABLE_STATIC
 
-# Some useful default flags
-CFLAGS="-Werror -Wall -std=gnu89 $CFLAGS"
-CXXFLAGS="-Werror -Wall -std=c++17 $CXXFLAGS"
+# Some useful default flags. -Werror was previously enabled here, but a
+# pre-existing -Wuninitialized false-positive on std::atomic<bool>::load
+# in the vendored src/include/kafka/Log.h fires on gcc 11+ and breaks the
+# library build on every modern distro. CMake's branch never set -Werror,
+# so this only ever bit autotools (-l). Warnings still print; act on them.
+CFLAGS="-Wall -std=gnu89 $CFLAGS"
+CXXFLAGS="-Wall -std=c++17 $CXXFLAGS"
 
 AC_ARG_WITH(
   [pkgconfigdir],
@@ -79,7 +83,6 @@ AC_CONFIG_FILES([
   proto/Makefile
   src/Makefile
   src/bridge/Makefile
-  src/cfgWrapper/Makefile
   src/core/Makefile
   src/dataDelivery/Makefile
   src/dataManipulation/Makefile

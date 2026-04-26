@@ -1,18 +1,15 @@
-// Copyright(c) 2022-present, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2022-2025, Salvatore Cuzzilla (Swisscom AG)
+// Copyright(c) 2026-present, Salvatore Cuzzilla (Avaloq, an NEC Company)
 // Distributed under the MIT License (http://opensource.org/licenses/MIT)
 
 
 #ifndef _KAFKA_DELIVERY_H_
 #define _KAFKA_DELIVERY_H_
 
-// C++ Standard Library headers
-
-// External Library headers
 #include "kafka/KafkaProducer.h"
-// mdt-dialout-collector Library headers
-#include "../utils/cfg_handler.h"
 #include "kafka/Properties.h"
 #include "kafka/Types.h"
+#include "../utils/cfg_handler.h"
 #include "../utils/logs_handler.h"
 
 
@@ -28,7 +25,7 @@ public:
     void set_kafka_properties(kafka::Properties &properties);
     kafka::Properties get_properties() {
         return properties; };
-    kafka::Topic get_topic() {
+    const kafka::Topic &get_topic() {
         return topic; }
     std::string get_bootstrap_servers() {
         return bootstrap_servers; };
