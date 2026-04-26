@@ -82,7 +82,7 @@ DEFAULT: none
 
 ## Install
 
-Native packages (`.deb` for Debian / Ubuntu, `.rpm` for Fedora / Rocky / RHEL) are built per release by the [release.yml](https://github.com/network-analytics/mdt-dialout-collector/blob/main/.github/workflows/release.yml) GitHub Actions workflow and attached to each [GitHub Release](https://github.com/network-analytics/mdt-dialout-collector/releases). Two flavors per distro:
+Native packages (`.deb` for Debian / Ubuntu, `.rpm` for Fedora) are built per release by the [release.yml](https://github.com/network-analytics/mdt-dialout-collector/blob/main/.github/workflows/release.yml) GitHub Actions workflow and attached to each [GitHub Release](https://github.com/network-analytics/mdt-dialout-collector/releases). Two flavors per distro:
 
 - `mdt-dialout-collector` — standalone daemon (binary, systemd unit, example config, man page).
 - `mdt-dialout-collector-lib` — library variant for [pmacct/pmtelemetryd](https://github.com/pmacct/pmacct) integration (`libgrpc_collector.so` + C bridge header + pkg-config file).
@@ -92,10 +92,6 @@ Both link against the distro's own gRPC; `apt`/`dnf` resolves the rest of the ru
 ```SHELL
 # Debian / Ubuntu
 sudo apt install ./mdt-dialout-collector_<version>_<distro>_amd64.deb
-
-# Rocky / RHEL (gRPC lives in EPEL)
-sudo dnf install epel-release
-sudo dnf install ./mdt-dialout-collector-<version>-1.<distro>.x86_64.rpm
 
 # Fedora
 sudo dnf install ./mdt-dialout-collector-<version>-1.fc<release>.x86_64.rpm

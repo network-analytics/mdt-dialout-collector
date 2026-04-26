@@ -29,7 +29,6 @@ jobs:
           - { name: "debian-12 (bookworm)", image: "debian:12" }
           - { name: "debian-13 (trixie)",   image: "debian:13" }
           - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04" }
-          - { name: "rocky-9",              image: "rockylinux:9" }
           - { name: "fedora",               image: "fedora:latest" }
 
     steps:
@@ -115,7 +114,6 @@ jobs:
           - { name: "debian-12 (bookworm)", image: "debian:12",      tag: "bookworm" }
           - { name: "debian-13 (trixie)",   image: "debian:13",      tag: "trixie"   }
           - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04",   tag: "noble"    }
-          - { name: "rocky-9",              image: "rockylinux:9",   tag: "el9"      }
           - { name: "fedora",               image: "fedora:latest",  tag: "fc"       }
 
     steps:

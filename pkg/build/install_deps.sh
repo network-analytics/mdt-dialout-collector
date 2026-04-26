@@ -19,6 +19,7 @@ case "${ID}" in
         apt-get update -qq
         apt-get install -y --no-install-recommends \
             build-essential cmake pkg-config git \
+            autoconf automake libtool \
             libgrpc++-dev protobuf-compiler-grpc \
             libprotobuf-dev protobuf-compiler \
             libssl-dev libfmt-dev libconfig++-dev \
@@ -53,6 +54,7 @@ case "${ID}" in
     fedora)
         dnf install -y -q \
             gcc-c++ cmake pkgconf-pkg-config git \
+            autoconf automake libtool \
             grpc-devel grpc-plugins protobuf-devel protobuf-compiler \
             openssl-devel fmt-devel libconfig-devel \
             librdkafka-devel jsoncpp-devel zeromq-devel cppzmq-devel \
@@ -71,6 +73,7 @@ case "${ID}" in
         dnf install -y -q epel-release >/dev/null
         dnf install -y -q \
             gcc-c++ cmake pkgconf-pkg-config git \
+            autoconf automake libtool \
             grpc-devel grpc-plugins protobuf-devel protobuf-compiler \
             openssl-devel fmt-devel libconfig-devel \
             librdkafka-devel jsoncpp-devel zeromq-devel cppzmq-devel \

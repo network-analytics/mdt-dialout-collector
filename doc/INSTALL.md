@@ -23,8 +23,13 @@ gRPC security updates alongside the rest of the system.
 | Debian 12 (bookworm) | distro repo (gRPC 1.51) | |
 | Debian 13 (trixie)   | distro repo (gRPC 1.66) | |
 | Ubuntu 24.04 (noble) | distro repo (gRPC 1.51) | |
-| Rocky Linux 9 / RHEL 9 | EPEL (gRPC 1.46+)     | enable EPEL first (`dnf install epel-release`) |
 | Fedora (current)     | distro repo (gRPC 1.62+) | |
+
+**Rocky Linux 9 / RHEL 9** packages are not produced for v1.2.0 — EL9's
+stock protobuf (3.14) lacks `has_*()` accessors for `oneof` members
+(added in protobuf 3.15) which the Cisco telemetry path uses. EL9 builds
+from source still work via [INSTALL-FROM-SOURCE.md](INSTALL-FROM-SOURCE.md);
+binary packages are tracked for v1.3.
 
 Earlier Ubuntu LTSes (22.04 and older) ship a gRPC version below the
 project's minimum (1.45) and are intentionally not packaged for.
@@ -46,12 +51,9 @@ sudo apt install ./mdt-dialout-collector-lib_<version>_<distro>_amd64.deb
 `apt` resolves the gRPC + protobuf + libssl + libconfig++ + librdkafka +
 libjsoncpp + libzmq + libspdlog runtime deps automatically.
 
-## Install (Fedora / Rocky / RHEL)
+## Install (Fedora)
 
 ```sh
-# Rocky / RHEL only — gRPC lives in EPEL.
-sudo dnf install epel-release
-
 # Standalone daemon
 sudo dnf install ./mdt-dialout-collector-<version>-1.<distro>.x86_64.rpm
 

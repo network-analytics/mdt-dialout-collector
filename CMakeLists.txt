@@ -131,10 +131,11 @@ pkg_check_modules(LIBCONFIG_CPP libconfig++>=1.5)
 link_libraries(${LIBCONFIG_CPP_LIBRARIES})
 message(STATUS "Using libconfig++ ${LIBCONFIG_CPP_VERSION}")
 
-# spdlog
-set(SPDLOG_INCLUDE_DIR /usr/include/spdlog)
-include_directories("${SPDLOG_INCLUDE_DIR}")
-pkg_check_modules(SPDLOG spdlog>=1.5.0)
+# spdlog — must propagate SPDLOG_CFLAGS_OTHER so -DSPDLOG_FMT_EXTERNAL reaches
+# the compiler on Fedora/EL where spdlog-devel is built against external fmt.
+pkg_check_modules(SPDLOG REQUIRED spdlog>=1.5.0)
+include_directories(${SPDLOG_INCLUDE_DIRS})
+add_compile_options(${SPDLOG_CFLAGS_OTHER})
 link_libraries(${SPDLOG_LIBRARIES})
 message(STATUS "Using spdlog ${SPDLOG_VERSION}")
 
