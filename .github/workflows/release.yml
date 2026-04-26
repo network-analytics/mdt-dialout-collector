@@ -38,7 +38,8 @@ jobs:
       - name: bootstrap git (rpm distros)
         if: contains(matrix.distro.image, 'rocky') || contains(matrix.distro.image, 'fedora')
         run: |
-          dnf install -y -q git tar gzip curl >/dev/null
+          # --allowerasing lets dnf swap curl-minimal for curl on rocky:9
+          dnf install -y -q --allowerasing git tar gzip curl >/dev/null
 
       - name: bootstrap git (deb distros)
         if: contains(matrix.distro.image, 'debian') || contains(matrix.distro.image, 'ubuntu')

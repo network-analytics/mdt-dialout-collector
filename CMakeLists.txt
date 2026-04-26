@@ -19,10 +19,13 @@ find_package(PkgConfig REQUIRED)
 # Project
 project(mdt_dialout_collector)
 
-# Protobuf
+# Protobuf — CONFIG when available; system pkgs ship only FindProtobuf MODULE.
 set(protobuf_MODULE_COMPATIBLE TRUE)
-find_package(Protobuf CONFIG REQUIRED)
-message(STATUS "Using protobuf ${protobuf_VERSION}")
+find_package(Protobuf CONFIG QUIET)
+if(NOT Protobuf_FOUND)
+    find_package(Protobuf REQUIRED)
+endif()
+message(STATUS "Using protobuf ${Protobuf_VERSION}")
 
 # Protobuf compiler
 set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
