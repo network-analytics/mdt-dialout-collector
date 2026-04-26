@@ -59,12 +59,13 @@ overrides:
       - ${GRPC_RUNTIME}
       - ${PROTOBUF_RUNTIME}
       - libssl3
-      - libconfig++9v5
-      - libfmt-dev
+      - libconfig++9v5 | libconfig++11
+      - libfmt9 | libfmt10
       - librdkafka1
-      - libjsoncpp25
+      - librdkafka++1
+      - libjsoncpp25 | libjsoncpp26
       - libzmq5
-      - libspdlog-dev
+      - libspdlog1.10 | libspdlog1.12 | libspdlog1.15
   rpm:
     depends:
       - grpc-cpp
