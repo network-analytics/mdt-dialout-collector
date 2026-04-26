@@ -8,7 +8,9 @@ The keys used are:
 
 
 current (main branch) -- 26-04-2026
-  ! Bumping actions/checkout from v3 to v4 in .github/workflows/ci.yaml; the v3 release runs on Node.js 20, which is being deprecated on GitHub-hosted runners (forced to Node.js 24 from 2026-06-02, removed 2026-09-16). All other workflows (coverage.yml, release.yml) were already on v4.
+  ! Bumping every third-party GitHub Action to its first Node.js 24 major across all workflows: actions/checkout v3/v4 → v5, actions/upload-artifact v4 → v6, actions/download-artifact v4 → v7, codecov/codecov-action v4 → v5, softprops/action-gh-release v2 → v3. All five were running on Node.js 20, which GitHub is forcing to Node.js 24 from 2026-06-02 and removing entirely on 2026-09-16. Pinned at the smallest major that switched to Node.js 24 to minimize behavior drift.
+  ! Fixing release.yml validate job: actions/download-artifact `name:` no longer accepts wildcards in v5+ — the trailing `*` in `packages-${{ matrix.distro.tag }}*` was always a bug, ignored by v4. Each per-distro upload uses a literal artifact name, so the download now matches exactly (and merge-multiple is dropped — only needed when downloading several artifacts at once).
+  ! Fixing release.yml packages job: the `install nfpm` step uses curl, but the minimal debian:12/13, ubuntu:24.04, rocky:9 and fedora base images don't ship curl. Added curl (and tar on the deb side) to the bootstrap step so nfpm download succeeds across the whole matrix.
 
 
 v1.2.0 -- 26-04-2026

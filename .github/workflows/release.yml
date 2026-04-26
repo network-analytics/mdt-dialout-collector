@@ -33,21 +33,21 @@ jobs:
           - { name: "fedora",               image: "fedora:latest" }
 
     steps:
-      # actions/checkout v4 needs `git` inside the container; install it
+      # actions/checkout needs `git` inside the container; install it
       # first on the rpm distros where the base image is minimal.
       - name: bootstrap git (rpm distros)
         if: contains(matrix.distro.image, 'rocky') || contains(matrix.distro.image, 'fedora')
         run: |
-          dnf install -y -q git tar gzip >/dev/null
+          dnf install -y -q git tar gzip curl >/dev/null
 
       - name: bootstrap git (deb distros)
         if: contains(matrix.distro.image, 'debian') || contains(matrix.distro.image, 'ubuntu')
         run: |
           export DEBIAN_FRONTEND=noninteractive
           apt-get update -qq
-          apt-get install -y --no-install-recommends git ca-certificates >/dev/null
+          apt-get install -y --no-install-recommends git ca-certificates curl tar >/dev/null
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: install build deps
         run: bash pkg/build/install_deps.sh
@@ -92,7 +92,7 @@ jobs:
           ls -l /etc/opt/mdt-dialout-collector/
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: packages-${{ env.DISTRO_TAG }}
           path: dist/*
@@ -130,13 +130,12 @@ jobs:
           apt-get install -y --no-install-recommends \
             git ca-certificates iproute2 >/dev/null
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
-          name: packages-${{ matrix.distro.tag }}*
+          name: packages-${{ matrix.distro.tag }}
           path: dist
-          merge-multiple: true
 
       - name: locate packages
         id: pkgs
@@ -161,7 +160,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           path: dist
           merge-multiple: true
@@ -170,7 +169,7 @@ jobs:
         run: ls -lh dist/
 
       - name: create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/*
           generate_release_notes: true

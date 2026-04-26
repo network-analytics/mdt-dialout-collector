@@ -31,7 +31,7 @@ jobs:
             libspdlog-dev libfmt-dev libconfig++-dev libgtest-dev \
             curl >/dev/null
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: configure with --coverage
         run: |
@@ -63,7 +63,7 @@ jobs:
                 build-cov
 
       - name: upload to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: coverage.xml
           flags: unit
