@@ -138,9 +138,19 @@ jobs:
 
       - name: locate packages
         id: pkgs
+        # Force bash explicitly: container default may be sh, which lacks shopt.
+        shell: bash
         run: |
-          # Recursive glob: download-artifact@v7 may place files at dist/ root
-          # OR at dist/<artifact-name>/ depending on action version & options.
+          # Diagnostic ALWAYS prints, even if locate later fails or skips.
+          echo "::warning title=shell::$(readlink -f "$0" 2>/dev/null || echo unknown) BASH_VERSION=${BASH_VERSION:-NONE}"
+          echo "::group::dist tree"
+          ls -laR dist/ 2>&1 || echo "(dist/ missing)"
+          echo "::endgroup::"
+          # Surface the layout as an annotation so future debug rounds don't
+          # require another commit cycle.
+          tree_summary=$(ls -mR dist/ 2>&1 | tr '\n' '|')
+          echo "::warning title=dist layout::${tree_summary}"
+          # Recursive glob — handles both dist/foo.deb and dist/<name>/foo.deb.
           shopt -s nullglob globstar
           all=( dist/**/mdt-dialout-collector_*.deb dist/**/mdt-dialout-collector_*.rpm \
                 dist/**/mdt-dialout-collector-lib_*.deb dist/**/mdt-dialout-collector-lib_*.rpm )
@@ -152,17 +162,10 @@ jobs:
                   mdt-dialout-collector_*)     STANDALONE="$f" ;;
               esac
           done
-          echo "::group::dist tree"
-          ls -laR dist/ 2>&1 || true
-          echo "::endgroup::"
           echo "STANDALONE=${STANDALONE}"
           echo "LIBRARY=${LIBRARY}"
-          # Surface the layout as an annotation (readable via GH check-runs API
-          # even without log access) so a future debug round can identify any
-          # unexpected layout without needing to round-trip another commit.
-          echo "::warning title=dist layout::standalone=${STANDALONE} library=${LIBRARY} | tree: $(ls -mR dist/ 2>&1 | tr '\n' '|')"
-          test -n "${STANDALONE}" || { echo "::error::standalone .deb/.rpm not found in dist/"; exit 1; }
-          test -n "${LIBRARY}"    || { echo "::error::library .deb/.rpm not found in dist/";    exit 1; }
+          test -n "${STANDALONE}" || { echo "::error::standalone .deb/.rpm not found"; exit 1; }
+          test -n "${LIBRARY}"    || { echo "::error::library .deb/.rpm not found";    exit 1; }
           echo "standalone=${STANDALONE}" >> "${GITHUB_OUTPUT}"
           echo "library=${LIBRARY}"       >> "${GITHUB_OUTPUT}"
 
