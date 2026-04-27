@@ -139,10 +139,12 @@ jobs:
       - name: locate packages
         id: pkgs
         run: |
-          shopt -s nullglob
-          all=( dist/mdt-dialout-collector_*.deb dist/mdt-dialout-collector_*.rpm \
-                dist/mdt-dialout-collector-lib_*.deb dist/mdt-dialout-collector-lib_*.rpm )
-          shopt -u nullglob
+          # Recursive glob: download-artifact@v7 may place files at dist/ root
+          # OR at dist/<artifact-name>/ depending on action version & options.
+          shopt -s nullglob globstar
+          all=( dist/**/mdt-dialout-collector_*.deb dist/**/mdt-dialout-collector_*.rpm \
+                dist/**/mdt-dialout-collector-lib_*.deb dist/**/mdt-dialout-collector-lib_*.rpm )
+          shopt -u nullglob globstar
           STANDALONE= ; LIBRARY=
           for f in "${all[@]}"; do
               case "$(basename "$f")" in
@@ -150,11 +152,17 @@ jobs:
                   mdt-dialout-collector_*)     STANDALONE="$f" ;;
               esac
           done
-          echo "dist contents:"; ls -lh dist/
+          echo "::group::dist tree"
+          ls -laR dist/ 2>&1 || true
+          echo "::endgroup::"
           echo "STANDALONE=${STANDALONE}"
           echo "LIBRARY=${LIBRARY}"
-          test -n "${STANDALONE}" || { echo "standalone .deb/.rpm not found"; exit 1; }
-          test -n "${LIBRARY}"    || { echo "library .deb/.rpm not found";    exit 1; }
+          # Surface the layout as an annotation (readable via GH check-runs API
+          # even without log access) so a future debug round can identify any
+          # unexpected layout without needing to round-trip another commit.
+          echo "::warning title=dist layout::standalone=${STANDALONE} library=${LIBRARY} | tree: $(ls -mR dist/ 2>&1 | tr '\n' '|')"
+          test -n "${STANDALONE}" || { echo "::error::standalone .deb/.rpm not found in dist/"; exit 1; }
+          test -n "${LIBRARY}"    || { echo "::error::library .deb/.rpm not found in dist/";    exit 1; }
           echo "standalone=${STANDALONE}" >> "${GITHUB_OUTPUT}"
           echo "library=${LIBRARY}"       >> "${GITHUB_OUTPUT}"
 
@@ -219,13 +227,14 @@ jobs:
         run: |
           PID="$(cat /tmp/mdt-validate.pid)"
           kill -TERM "${PID}" 2>/dev/null || true
-          # Give it 5 s to drain
-          for i in $(seq 1 20); do
+          # Each of the 4 vendor Srvs drains up to 5 s on shutdown — give
+          # the daemon up to 30 s before declaring the shutdown stuck.
+          for i in $(seq 1 120); do
               kill -0 "${PID}" 2>/dev/null || break
               sleep 0.25
           done
           if kill -0 "${PID}" 2>/dev/null; then
-              echo "daemon did not exit after SIGTERM"
+              echo "::error::daemon did not exit within 30s of SIGTERM"
               cat /tmp/mdt-validate.log
               kill -KILL "${PID}" 2>/dev/null || true
               exit 1
