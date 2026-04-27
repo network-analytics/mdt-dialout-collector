@@ -15,6 +15,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write   # publish-badge step force-pushes to the `badges` branch.
+
 jobs:
   unit-coverage:
     runs-on: ubuntu-latest
@@ -73,3 +76,38 @@ jobs:
           # Public OSS repos work without a token; for private repos set
           # CODECOV_TOKEN as a repo secret.
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: publish coverage badge to `badges` branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -eu
+          # Extract overall line-rate from gcovr's Cobertura XML.
+          line_rate=$(grep -oE 'line-rate="[0-9.]+"' coverage.xml | head -1 | grep -oE '[0-9.]+')
+          pct=$(awk -v r="${line_rate}" 'BEGIN{printf "%.1f", r*100}')
+          if   awk -v p="${pct}" 'BEGIN{exit !(p>=90)}'; then color=brightgreen
+          elif awk -v p="${pct}" 'BEGIN{exit !(p>=80)}'; then color=green
+          elif awk -v p="${pct}" 'BEGIN{exit !(p>=70)}'; then color=yellowgreen
+          elif awk -v p="${pct}" 'BEGIN{exit !(p>=50)}'; then color=yellow
+          else                                                color=red
+          fi
+          tmp=$(mktemp -d)
+          cat > "${tmp}/coverage.json" <<EOF
+          {"schemaVersion":1,"label":"coverage","message":"${pct}%","color":"${color}"}
+          EOF
+          # Force-push a single-commit orphan `badges` branch — keeps it tiny
+          # and decoupled from main history; only `coverage.json` lives there.
+          cd "${tmp}"
+          git init -q -b badges
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              add coverage.json
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "coverage: ${pct}%"
+          git remote add origin \
+              "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push -q --force origin badges
+          echo "::notice title=coverage badge::${pct}% (${color})"
