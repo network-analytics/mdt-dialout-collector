@@ -66,10 +66,9 @@ jobs:
                 build-cov
 
       - name: upload to Codecov
-        # No-op when CODECOV_TOKEN secret isn't set — codecov-action v5
-        # requires a token even for OSS repos. continue-on-error so a missing
-        # token doesn't abort the publish-badge step that follows.
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        # codecov-action v5 requires a token even for OSS repos; without one
+        # this step fails. continue-on-error so it doesn't abort the rest of
+        # the job (the publish-badge step has to run regardless).
         continue-on-error: true
         uses: codecov/codecov-action@v5
         with:
