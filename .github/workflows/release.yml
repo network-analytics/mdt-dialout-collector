@@ -192,33 +192,54 @@ jobs:
           esac
 
       - name: validate — file layout
+        shell: bash
         run: |
-          test -f /usr/share/man/man1/mdt_dialout_collector.1.gz
-          test -x /opt/mdt-dialout-collector/bin/mdt_dialout_collector
-          test -L /usr/bin/mdt_dialout_collector
-          test -f /lib/systemd/system/mdt-dialout-collector.service
-          test -f /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
+          # Enumerate so the failure annotation names the missing file.
+          ok=1
+          for path in \
+              /usr/share/man/man1/mdt_dialout_collector.1.gz \
+              /opt/mdt-dialout-collector/bin/mdt_dialout_collector \
+              /usr/bin/mdt_dialout_collector \
+              /lib/systemd/system/mdt-dialout-collector.service \
+              /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
+          do
+              # -e follows symlinks; -L succeeds only on symlinks.
+              if [ -e "${path}" ] || [ -L "${path}" ]; then
+                  echo "  OK  ${path}"
+              else
+                  echo "::error title=missing file::${path}"
+                  ok=0
+              fi
+          done
+          [ "${ok}" = 1 ] || exit 1
 
       - name: validate — launch daemon
+        shell: bash
         run: |
           cp pkg/validate/minimal.conf /tmp/mdt-validate.conf
-          # setsid so the daemon survives this step's shell exit
-          setsid /opt/mdt-dialout-collector/bin/mdt_dialout_collector \
+          # Plain `&` + disown — `$!` reliably captures the daemon PID. (setsid
+          # forks-then-execs when the shell is a process-group leader, which
+          # makes `$!` the dead parent's PID — see network-analytics/mdt-dialout-collector#issue.)
+          /opt/mdt-dialout-collector/bin/mdt_dialout_collector \
               -f /tmp/mdt-validate.conf > /tmp/mdt-validate.log 2>&1 &
           echo $! > /tmp/mdt-validate.pid
+          disown
           sleep 3
-          if ! kill -0 "$(cat /tmp/mdt-validate.pid)" 2>/dev/null; then
-              echo "daemon exited prematurely"
+          PID="$(cat /tmp/mdt-validate.pid)"
+          if ! kill -0 "${PID}" 2>/dev/null; then
+              echo "::error::daemon exited prematurely (pid was ${PID})"
               cat /tmp/mdt-validate.log
               exit 1
           fi
+          echo "daemon running, pid=${PID}"
 
       - name: validate — vendor sockets listening
+        shell: bash
         run: |
           set -e
           for port in 20007 20008 20009 20010; do
               if ! ss -lnt | grep -q ":${port}\b"; then
-                  echo "port ${port} not listening"
+                  echo "::error::port ${port} not listening"
                   ss -lntp || true
                   echo "--- daemon log ---"
                   cat /tmp/mdt-validate.log || true
@@ -227,11 +248,13 @@ jobs:
           done
 
       - name: validate — graceful shutdown
+        shell: bash
         run: |
           PID="$(cat /tmp/mdt-validate.pid)"
-          kill -TERM "${PID}" 2>/dev/null || true
-          # Each of the 4 vendor Srvs drains up to 5 s on shutdown — give
-          # the daemon up to 30 s before declaring the shutdown stuck.
+          kill -TERM "${PID}" 2>/dev/null || {
+              echo "::warning::no process at pid ${PID} to signal"
+          }
+          # 4 vendor Srvs drain up to 5 s each — 30 s wait covers worst case.
           for i in $(seq 1 120); do
               kill -0 "${PID}" 2>/dev/null || break
               sleep 0.25
