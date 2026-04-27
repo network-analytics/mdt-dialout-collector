@@ -66,6 +66,11 @@ jobs:
                 build-cov
 
       - name: upload to Codecov
+        # No-op when CODECOV_TOKEN secret isn't set — codecov-action v5
+        # requires a token even for OSS repos. continue-on-error so a missing
+        # token doesn't abort the publish-badge step that follows.
+        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        continue-on-error: true
         uses: codecov/codecov-action@v5
         with:
           files: coverage.xml
@@ -73,8 +78,6 @@ jobs:
           fail_ci_if_error: false
           verbose: true
         env:
-          # Public OSS repos work without a token; for private repos set
-          # CODECOV_TOKEN as a repo secret.
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: publish coverage badge to `badges` branch
