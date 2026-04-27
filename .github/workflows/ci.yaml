@@ -1,13 +1,12 @@
 name: ci
 
-# Builds the GHCR docker image on every push to main.
+# Build + push two GHCR images on every push to main:
+#   ghcr.io/<owner>/mdt-dialout-collector       — standalone daemon
+#   ghcr.io/<owner>/mdt-dialout-collector-lib   — library variant (.so + header + .pc)
 on:
   push:
     branches:
       - main
-
-#tags:
-#  - v*
 
 env:
   IMAGE_NAME: mdt-dialout-collector
@@ -22,25 +21,35 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Build image
-        run: docker build docker --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+      - name: Build standalone image
+        # Repo root as build context so the multi-stage Dockerfile can
+        # COPY CMakeLists.txt / proto / src from the checkout.
+        run: |
+          docker build . -f docker/Dockerfile \
+              --target standalone \
+              --tag $IMAGE_NAME \
+              --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Build library image
+        run: |
+          docker build . -f docker/Dockerfile \
+              --target library \
+              --tag $IMAGE_NAME-lib \
+              --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log into registry
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push image
+      - name: Push images
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[A-Z]' '[a-z]')
+          # Tag = "latest" on main pushes; for tag pushes (currently disabled
+          # via the `on:` filter) it would mirror the git tag.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          #[[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          [ "$VERSION" = "main" ] && VERSION=latest
+          for variant in "$IMAGE_NAME" "$IMAGE_NAME-lib"; do
+              IMAGE_ID="ghcr.io/${OWNER}/${variant}"
+              echo "tagging ${variant} → ${IMAGE_ID}:${VERSION}"
+              docker tag "${variant}" "${IMAGE_ID}:${VERSION}"
+              docker push "${IMAGE_ID}:${VERSION}"
+          done

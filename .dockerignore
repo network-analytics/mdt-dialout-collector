@@ -1,0 +1,68 @@
+# Keep the docker build context lean and reproducible: don't ship CMake/build
+# artifacts, IDE state, generated proto files, autotools-generated files, or
+# package-staging dirs into the build. The Dockerfile regenerates everything
+# from the .proto + source tree it COPYs in.
+
+# build artifacts
+build/
+build-*/
+bin/
+src/.libs/
+src/.deps/
+src/**/.libs/
+src/**/.deps/
+**/*.o
+**/*.lo
+**/*.la
+**/*.gcno
+**/*.gcda
+
+# generated proto/grpc sources (Dockerfile regenerates via the system protoc)
+src/proto/Cisco/*.pb.cc
+src/proto/Cisco/*.pb.h
+src/proto/Cisco/*.grpc.pb.cc
+src/proto/Cisco/*.grpc.pb.h
+src/proto/Huawei/*.pb.cc
+src/proto/Huawei/*.pb.h
+src/proto/Huawei/*.grpc.pb.cc
+src/proto/Huawei/*.grpc.pb.h
+src/proto/Juniper/*.pb.cc
+src/proto/Juniper/*.pb.h
+src/proto/Juniper/*.grpc.pb.cc
+src/proto/Juniper/*.grpc.pb.h
+src/proto/Nokia/*.pb.cc
+src/proto/Nokia/*.pb.h
+src/proto/Nokia/*.grpc.pb.cc
+src/proto/Nokia/*.grpc.pb.h
+src/proto/OpenConfig/*.pb.cc
+src/proto/OpenConfig/*.pb.h
+src/proto/OpenConfig/*.grpc.pb.cc
+src/proto/OpenConfig/*.grpc.pb.h
+proto/.proto_mark
+
+# autotools generated (autogen.sh recreates from configure.ac inside the image)
+Makefile.in
+**/Makefile.in
+configure
+config.*
+autom4te.cache/
+build-aux/
+m4/
+.deps/
+.libs/
+
+# IDE / editor / VCS noise
+.git/
+.github/
+.idea/
+.vscode/
+.cache/
+cmake-build-*/
+tags
+compile_commands.json
+*.swp
+*~
+
+# packaging / e2e staging
+dist/
+tests/e2e/.pkg-stage/
