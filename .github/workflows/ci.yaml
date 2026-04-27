@@ -1,5 +1,6 @@
 name: ci
 
+# Builds the GHCR docker image on every push to main.
 on:
   push:
     branches:
