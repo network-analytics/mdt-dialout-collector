@@ -139,16 +139,99 @@ jobs:
       - name: locate packages
         id: pkgs
         run: |
-          STANDALONE=$(ls dist/mdt-dialout-collector_*_*.{deb,rpm} 2>/dev/null \
-              | grep -v -- '-lib' | head -1)
-          LIBRARY=$(ls dist/mdt-dialout-collector-lib_*_*.{deb,rpm} 2>/dev/null | head -1)
-          test -n "${STANDALONE}" && test -n "${LIBRARY}"
+          shopt -s nullglob
+          all=( dist/mdt-dialout-collector_*.deb dist/mdt-dialout-collector_*.rpm \
+                dist/mdt-dialout-collector-lib_*.deb dist/mdt-dialout-collector-lib_*.rpm )
+          shopt -u nullglob
+          STANDALONE= ; LIBRARY=
+          for f in "${all[@]}"; do
+              case "$(basename "$f")" in
+                  mdt-dialout-collector-lib_*) LIBRARY="$f" ;;
+                  mdt-dialout-collector_*)     STANDALONE="$f" ;;
+              esac
+          done
+          echo "dist contents:"; ls -lh dist/
+          echo "STANDALONE=${STANDALONE}"
+          echo "LIBRARY=${LIBRARY}"
+          test -n "${STANDALONE}" || { echo "standalone .deb/.rpm not found"; exit 1; }
+          test -n "${LIBRARY}"    || { echo "library .deb/.rpm not found";    exit 1; }
           echo "standalone=${STANDALONE}" >> "${GITHUB_OUTPUT}"
           echo "library=${LIBRARY}"       >> "${GITHUB_OUTPUT}"
-          ls -lh dist/
 
-      - name: validate standalone package
-        run: bash pkg/validate/standalone.sh "${{ steps.pkgs.outputs.standalone }}"
+      # Split the standalone validation into individually-named steps so
+      # which one fails is visible from the workflow API/UI even without
+      # access to the per-step log body.
+      - name: validate — install standalone package
+        run: |
+          PKG="${{ steps.pkgs.outputs.standalone }}"
+          case "${PKG}" in /*|./*) ;; *) PKG="./${PKG}" ;; esac
+          . /etc/os-release
+          case "${ID}" in
+              debian|ubuntu)
+                  export DEBIAN_FRONTEND=noninteractive
+                  apt-get update -qq
+                  apt-get install -y -qq "${PKG}"
+                  ;;
+              fedora|rocky|rhel|centos|almalinux)
+                  if [ "${ID}" != "fedora" ]; then
+                      dnf install -y -q epel-release >/dev/null
+                  fi
+                  dnf install -y -q "${PKG}"
+                  ;;
+          esac
+
+      - name: validate — file layout
+        run: |
+          test -f /usr/share/man/man1/mdt_dialout_collector.1.gz
+          test -x /opt/mdt-dialout-collector/bin/mdt_dialout_collector
+          test -L /usr/bin/mdt_dialout_collector
+          test -f /lib/systemd/system/mdt-dialout-collector.service
+          test -f /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
+
+      - name: validate — launch daemon
+        run: |
+          cp pkg/validate/minimal.conf /tmp/mdt-validate.conf
+          # setsid so the daemon survives this step's shell exit
+          setsid /opt/mdt-dialout-collector/bin/mdt_dialout_collector \
+              -f /tmp/mdt-validate.conf > /tmp/mdt-validate.log 2>&1 &
+          echo $! > /tmp/mdt-validate.pid
+          sleep 3
+          if ! kill -0 "$(cat /tmp/mdt-validate.pid)" 2>/dev/null; then
+              echo "daemon exited prematurely"
+              cat /tmp/mdt-validate.log
+              exit 1
+          fi
+
+      - name: validate — vendor sockets listening
+        run: |
+          set -e
+          for port in 20007 20008 20009 20010; do
+              if ! ss -lnt | grep -q ":${port}\b"; then
+                  echo "port ${port} not listening"
+                  ss -lntp || true
+                  echo "--- daemon log ---"
+                  cat /tmp/mdt-validate.log || true
+                  exit 1
+              fi
+          done
+
+      - name: validate — graceful shutdown
+        run: |
+          PID="$(cat /tmp/mdt-validate.pid)"
+          kill -TERM "${PID}" 2>/dev/null || true
+          # Give it 5 s to drain
+          for i in $(seq 1 20); do
+              kill -0 "${PID}" 2>/dev/null || break
+              sleep 0.25
+          done
+          if kill -0 "${PID}" 2>/dev/null; then
+              echo "daemon did not exit after SIGTERM"
+              cat /tmp/mdt-validate.log
+              kill -KILL "${PID}" 2>/dev/null || true
+              exit 1
+          fi
+          echo "--- daemon log ---"
+          cat /tmp/mdt-validate.log
 
       - name: validate library package
         run: bash pkg/validate/library.sh "${{ steps.pkgs.outputs.library }}"
