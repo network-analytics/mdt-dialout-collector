@@ -1,0 +1,33 @@
+# Installed-package e2e variant: takes the freshly-built .deb/.rpm and installs
+# it in a clean container of the matching distro — exactly how an operator would.
+# Catches regressions the source-build path can't see (postinst scripts, runtime
+# dep gaps, /usr/bin symlink, /etc/opt/ default config landing, etc.).
+#
+# Build args:
+#   DISTRO   — base image (debian:12 / debian:13 / ubuntu:24.04 / fedora:latest)
+#   PKG_FILE — path (relative to build context) to the standalone .deb or .rpm
+ARG DISTRO=debian:12
+FROM ${DISTRO}
+
+ARG PKG_FILE
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Trailing slash preserves the source filename (apt/dnf need the extension).
+COPY ${PKG_FILE} /tmp/install/
+
+RUN set -eu; \
+    if ls /tmp/install/*.deb >/dev/null 2>&1; then \
+        apt-get update -qq; \
+        apt-get install -y -qq /tmp/install/*.deb; \
+        rm -rf /var/lib/apt/lists/*; \
+    elif ls /tmp/install/*.rpm >/dev/null 2>&1; then \
+        dnf install -y -q /tmp/install/*.rpm; \
+        dnf clean all; \
+    else \
+        echo "no .deb or .rpm in /tmp/install/" >&2; exit 1; \
+    fi; \
+    rm -rf /tmp/install
+
+# The package installs the binary at /opt/.../bin/ and a /usr/bin symlink.
+ENTRYPOINT ["/opt/mdt-dialout-collector/bin/mdt_dialout_collector"]
+CMD ["-f", "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf"]

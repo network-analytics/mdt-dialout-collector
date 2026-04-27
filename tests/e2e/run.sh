@@ -22,8 +22,12 @@ COLLECTOR_MODE="standalone"  # standalone | pmtelemetryd
 COLLECTOR_CONF="${REPO_ROOT}/tests/e2e/collector/mdt_dialout_collector.conf"
 TLS=0
 TLS_CA_HOST=""
+PKG_PATH=""              # --package PATH
+PKG_DISTRO_OVERRIDE=""   # --distro IMAGE (overrides filename auto-detect)
+PKG_STAGE_DIR=""         # set later when --package is used
 
-for arg in "$@"; do
+while [ $# -gt 0 ]; do
+    arg="$1"
     case "$arg" in
         --keep) KEEP=1 ;;
         --next)
@@ -56,8 +60,25 @@ for arg in "$@"; do
             # the IPv6 branch of ParsePeer().
             COLLECTOR_CONF="${REPO_ROOT}/tests/e2e/collector/mdt_dialout_collector.ipv6.conf"
             ;;
+        --package)
+            # Installed-package variant: take a prebuilt .deb/.rpm and
+            # apt/dnf-install it in a clean container of the matching distro.
+            # Catches postinst / runtime-dep / file-layout regressions the
+            # source-build path can't see. Argument is a path to the standalone
+            # .deb/.rpm (NOT the -lib variant). Distro auto-detected from the
+            # filename (_bookworm_/_trixie_/_noble_/_fc_); --distro overrides.
+            shift
+            PKG_PATH="${1:?--package needs a path to .deb/.rpm}"
+            COLLECTOR_CF="${REPO_ROOT}/tests/e2e/collector/Containerfile.pkg"
+            COLLECTOR_TAG="mdt-e2e-collector-pkg"
+            ;;
+        --distro)
+            shift
+            PKG_DISTRO_OVERRIDE="${1:?--distro needs an image name}"
+            ;;
         *) echo "unknown arg: $arg" >&2; exit 2 ;;
     esac
+    shift
 done
 
 VENDORS=(
@@ -83,11 +104,43 @@ cleanup() {
     if [ -n "${TLS_CA_HOST}" ] && [ -d "$(dirname "${TLS_CA_HOST}")" ]; then
         rm -rf "$(dirname "${TLS_CA_HOST}")"
     fi
+    if [ -n "${PKG_STAGE_DIR}" ] && [ -d "${PKG_STAGE_DIR}" ]; then
+        rm -rf "${PKG_STAGE_DIR}"
+    fi
 }
 trap cleanup EXIT
 
+# --package staging: copy the .deb/.rpm into the build context (podman build
+# COPY needs the source under the context root) and pick a base image.
+PKG_BUILD_ARGS=()
+if [ -n "${PKG_PATH}" ]; then
+    test -f "${PKG_PATH}" \
+        || { echo "--package: file not found: ${PKG_PATH}" >&2; exit 2; }
+    PKG_BASENAME="$(basename "${PKG_PATH}")"
+    PKG_STAGE_DIR="${REPO_ROOT}/tests/e2e/.pkg-stage"
+    mkdir -p "${PKG_STAGE_DIR}"
+    cp "${PKG_PATH}" "${PKG_STAGE_DIR}/${PKG_BASENAME}"
+    PKG_REL="tests/e2e/.pkg-stage/${PKG_BASENAME}"
+    if [ -n "${PKG_DISTRO_OVERRIDE}" ]; then
+        PKG_DISTRO="${PKG_DISTRO_OVERRIDE}"
+    else
+        case "${PKG_BASENAME}" in
+            *_bookworm_*)  PKG_DISTRO="debian:12" ;;
+            *_trixie_*)    PKG_DISTRO="debian:13" ;;
+            *_noble_*)     PKG_DISTRO="ubuntu:24.04" ;;
+            *_fc_*|*.rpm)  PKG_DISTRO="fedora:latest" ;;
+            *)             PKG_DISTRO="debian:12" ;;
+        esac
+    fi
+    echo "=== package: ${PKG_BASENAME} → ${PKG_DISTRO} ==="
+    PKG_BUILD_ARGS=(
+        --build-arg "DISTRO=${PKG_DISTRO}"
+        --build-arg "PKG_FILE=${PKG_REL}"
+    )
+fi
+
 echo "=== build images (collector tag=${COLLECTOR_TAG}) ==="
-podman build -t "${COLLECTOR_TAG}" -f "${COLLECTOR_CF}" "${REPO_ROOT}"
+podman build "${PKG_BUILD_ARGS[@]}" -t "${COLLECTOR_TAG}" -f "${COLLECTOR_CF}" "${REPO_ROOT}"
 podman build -t mdt-e2e-client \
     -f "${REPO_ROOT}/tests/e2e/client/Containerfile" "${REPO_ROOT}"
 

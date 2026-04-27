@@ -110,5 +110,8 @@ tags
 
 proto/.proto_mark
 
+# e2e --package staging dir (run.sh copies the .deb here for podman build)
+tests/e2e/.pkg-stage/
+
 !.gitignore
 !.travis.yml

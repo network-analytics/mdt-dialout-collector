@@ -293,9 +293,55 @@ jobs:
       - name: validate library package
         run: bash pkg/validate/library.sh "${{ steps.pkgs.outputs.library }}"
 
+  e2e-package:
+    # Real-traffic e2e against the freshly-built package: podman spins up
+    # redpanda + per-vendor synthetic gRPC clients + a clean-distro container
+    # that apt/dnf-installs the .deb/.rpm. Catches regressions the static
+    # validate-package job can't see (postinst behavior + actual data path
+    # under load).
+    name: e2e ${{ matrix.distro.name }}
+    needs: packages
+    runs-on: ubuntu-latest    # host runner: needs podman (pre-installed on ubuntu-latest)
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - { name: "debian-12 (bookworm)", tag: "bookworm" }
+          - { name: "debian-13 (trixie)",   tag: "trixie"   }
+          - { name: "ubuntu-24.04 (noble)", tag: "noble"    }
+          - { name: "fedora",               tag: "fc"       }
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: packages-${{ matrix.distro.tag }}
+          path: dist
+
+      - name: locate standalone package
+        id: pkg
+        shell: bash
+        run: |
+          shopt -s nullglob globstar
+          files=( dist/**/mdt-dialout-collector_*.deb dist/**/mdt-dialout-collector_*.rpm )
+          shopt -u nullglob globstar
+          STANDALONE=
+          for f in "${files[@]}"; do
+              case "$(basename "$f")" in
+                  mdt-dialout-collector-lib_*) ;;
+                  mdt-dialout-collector_*) STANDALONE="$f" ;;
+              esac
+          done
+          test -n "${STANDALONE}" \
+              || { echo "::error::no standalone .deb/.rpm in dist/"; ls -laR dist/; exit 1; }
+          echo "path=${STANDALONE}" >> "${GITHUB_OUTPUT}"
+
+      - name: run e2e against installed package
+        run: bash tests/e2e/run.sh --package "${{ steps.pkg.outputs.path }}"
+
   release:
     name: GitHub Release
-    needs: [packages, validate]
+    needs: [packages, validate, e2e-package]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
