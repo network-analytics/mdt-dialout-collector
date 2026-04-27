@@ -125,6 +125,9 @@ jobs:
         if: contains(matrix.distro.image, 'debian') || contains(matrix.distro.image, 'ubuntu')
         run: |
           export DEBIAN_FRONTEND=noninteractive
+          # Ubuntu's minimal image excludes man pages via dpkg-cfg path-exclude;
+          # un-exclude them so the validate file-layout check can find them.
+          rm -f /etc/dpkg/dpkg.cfg.d/excludes
           apt-get update -qq
           apt-get install -y --no-install-recommends \
             git ca-certificates iproute2 >/dev/null
@@ -251,22 +254,39 @@ jobs:
         shell: bash
         run: |
           PID="$(cat /tmp/mdt-validate.pid)"
-          kill -TERM "${PID}" 2>/dev/null || {
-              echo "::warning::no process at pid ${PID} to signal"
-          }
+          echo "PID from file: '${PID}'"
+          # Verify what's at that PID before we signal.
+          if [ -r /proc/${PID}/comm ]; then
+              echo "comm: $(cat /proc/${PID}/comm)"
+              echo "state: $(grep '^State' /proc/${PID}/status || true)"
+          else
+              echo "::warning::no /proc/${PID}/comm — process may not exist"
+          fi
+          if kill -TERM "${PID}" 2>/dev/null; then
+              echo "kill -TERM ${PID} returned 0"
+          else
+              echo "::error::kill -TERM failed for pid ${PID}"
+              echo "ps snapshot:"; ps -ef 2>/dev/null | head -20 || true
+              exit 1
+          fi
           # 4 vendor Srvs drain up to 5 s each — 30 s wait covers worst case.
           for i in $(seq 1 120); do
               kill -0 "${PID}" 2>/dev/null || break
               sleep 0.25
           done
           if kill -0 "${PID}" 2>/dev/null; then
-              echo "::error::daemon did not exit within 30s of SIGTERM"
+              # Surface daemon log via annotation (visible without log access).
+              tail_log=$(tail -20 /tmp/mdt-validate.log 2>/dev/null | tr '\n' '|')
+              echo "::error title=shutdown stuck::pid=${PID} state=$(grep ^State /proc/${PID}/status 2>/dev/null) | log tail: ${tail_log}"
               cat /tmp/mdt-validate.log
               kill -KILL "${PID}" 2>/dev/null || true
               exit 1
           fi
           echo "--- daemon log ---"
           cat /tmp/mdt-validate.log
+          # Surface log success too in case useful for next round.
+          tail_log=$(tail -10 /tmp/mdt-validate.log 2>/dev/null | tr '\n' '|')
+          echo "::warning title=shutdown ok::log tail: ${tail_log}"
 
       - name: validate library package
         run: bash pkg/validate/library.sh "${{ steps.pkgs.outputs.library }}"
