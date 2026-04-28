@@ -7,7 +7,9 @@ name: ci
 #   docker.io/<dh-user>/mdt-dialout-collector        — same, public mirror
 #   docker.io/<dh-user>/mdt-dialout-collector-lib    — same, public mirror
 #
-# Docker Hub credentials live in repo secrets DOCKERHUB_USERNAME / DOCKERHUB_TOKEN.
+# Docker Hub: username sits in repo variables (vars.DOCKERHUB_USERNAME — not
+# sensitive, it's part of the public image path); PAT lives in repo secrets
+# (secrets.DOCKERHUB_TOKEN).
 on:
   push:
     branches:
@@ -63,16 +65,16 @@ jobs:
 
       # Docker Hub mirror — GHCR copies stay private (org policy disallows public
       # container packages on network-analytics). Skipped silently if either
-      # secret is unset, so the GHCR push above isn't gated on Docker Hub being
+      # input is unset, so the GHCR push above isn't gated on Docker Hub being
       # configured. Login + push live in the same step so the secret is consumed
       # and forgotten in one shell.
       - name: Push images to Docker Hub
         env:
-          DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DH_USER: ${{ vars.DOCKERHUB_USERNAME }}
           DH_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           if [ -z "${DH_USER}" ] || [ -z "${DH_TOKEN}" ]; then
-              echo "::warning::DOCKERHUB_USERNAME or DOCKERHUB_TOKEN unset — skipping Docker Hub mirror"
+              echo "::warning::vars.DOCKERHUB_USERNAME or secrets.DOCKERHUB_TOKEN unset — skipping Docker Hub mirror"
               exit 0
           fi
           echo "${DH_TOKEN}" | docker login docker.io -u "${DH_USER}" --password-stdin
