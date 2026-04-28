@@ -1,8 +1,13 @@
 name: ci
 
-# Build + push two GHCR images on every push to main:
-#   ghcr.io/<owner>/mdt-dialout-collector       — standalone daemon
-#   ghcr.io/<owner>/mdt-dialout-collector-lib   — library variant (.so + header + .pc)
+# Build + push two image variants on every push to main, mirrored to GHCR
+# and Docker Hub:
+#   ghcr.io/<owner>/mdt-dialout-collector            — standalone daemon
+#   ghcr.io/<owner>/mdt-dialout-collector-lib        — library (.so + header + .pc)
+#   docker.io/<dh-user>/mdt-dialout-collector        — same, public mirror
+#   docker.io/<dh-user>/mdt-dialout-collector-lib    — same, public mirror
+#
+# Docker Hub credentials live in repo secrets DOCKERHUB_USERNAME / DOCKERHUB_TOKEN.
 on:
   push:
     branches:
@@ -37,12 +42,12 @@ jobs:
               --tag $IMAGE_NAME-lib \
               --label "runnumber=${GITHUB_RUN_ID}"
 
-      - name: Log into registry
+      - name: Log into GHCR
         # Auto-provided GITHUB_TOKEN works because the job has
         # `permissions: packages: write` above. No manually-managed PAT needed.
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push images
+      - name: Push images to GHCR
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[A-Z]' '[a-z]')
           # Tag = "latest" on main pushes; for tag pushes (currently disabled
@@ -51,7 +56,31 @@ jobs:
           [ "$VERSION" = "main" ] && VERSION=latest
           for variant in "$IMAGE_NAME" "$IMAGE_NAME-lib"; do
               IMAGE_ID="ghcr.io/${OWNER}/${variant}"
-              echo "tagging ${variant} → ${IMAGE_ID}:${VERSION}"
+              echo "pushing ${IMAGE_ID}:${VERSION}"
+              docker tag "${variant}" "${IMAGE_ID}:${VERSION}"
+              docker push "${IMAGE_ID}:${VERSION}"
+          done
+
+      # Docker Hub mirror — GHCR copies stay private (org policy disallows public
+      # container packages on network-analytics). Skipped silently if either
+      # secret is unset, so the GHCR push above isn't gated on Docker Hub being
+      # configured. Login + push live in the same step so the secret is consumed
+      # and forgotten in one shell.
+      - name: Push images to Docker Hub
+        env:
+          DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DH_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -z "${DH_USER}" ] || [ -z "${DH_TOKEN}" ]; then
+              echo "::warning::DOCKERHUB_USERNAME or DOCKERHUB_TOKEN unset — skipping Docker Hub mirror"
+              exit 0
+          fi
+          echo "${DH_TOKEN}" | docker login docker.io -u "${DH_USER}" --password-stdin
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [ "$VERSION" = "main" ] && VERSION=latest
+          for variant in "$IMAGE_NAME" "$IMAGE_NAME-lib"; do
+              IMAGE_ID="docker.io/${DH_USER}/${variant}"
+              echo "pushing ${IMAGE_ID}:${VERSION}"
               docker tag "${variant}" "${IMAGE_ID}:${VERSION}"
               docker push "${IMAGE_ID}:${VERSION}"
           done
