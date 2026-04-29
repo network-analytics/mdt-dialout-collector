@@ -8,6 +8,7 @@ The keys used are:
 
 
 current (main branch) -- 29-04-2026
+  ! Fixing the broken `Build/Install` anchor in the README.md table of contents — the section heading is `## Install` (not `## Build/Install`), so the existing `#buildinstall` link 404'd. Renamed the entry to `Install` (matching the heading), corrected the anchor to `#install`, and added a sub-entry for `Building from source` which already existed as an H3 but wasn't surfaced in the TOC.
   + Documenting the Docker Hub container install path: new `## Container images` section in doc/INSTALL.md (between Fedora install and post-install) covering the two pulls (scuzzilla/mdt-dialout-collector and -lib), a `docker run` recipe for the standalone variant with a config-file bind mount + the four vendor port mappings, an explanation of the library image's intended FROM-base usage for pmtelemetryd-style container builds, and a note on pinning to an immutable digest for reproducible deploys. Short pointer block added to README.md right under the apt/dnf snippet so the container path is visible from the entry page without bloating the install section.
 
 

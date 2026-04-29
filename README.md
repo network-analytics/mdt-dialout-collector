@@ -7,7 +7,8 @@
    * [Deployment options](#deployment-options)
       * [Standalone binary with mdt-dialout-collector](#standalone-binary-with-mdt-dialout-collector)
       * [Library/Header integration with pmtelemetryd](#libraryheader-integration-with-pmtelemetryd)
-   * [Build/Install](#buildinstall)
+   * [Install](#install)
+      * [Building from source](#building-from-source)
    * [References](#references)
 <!--te-->
 
