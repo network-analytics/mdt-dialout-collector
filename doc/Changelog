@@ -7,6 +7,10 @@ The keys used are:
   !: fixed/modified feature, -: deleted feature, +: new feature
 
 
+current (main branch) -- 29-04-2026
+  + Documenting the Docker Hub container install path: new `## Container images` section in doc/INSTALL.md (between Fedora install and post-install) covering the two pulls (scuzzilla/mdt-dialout-collector and -lib), a `docker run` recipe for the standalone variant with a config-file bind mount + the four vendor port mappings, an explanation of the library image's intended FROM-base usage for pmtelemetryd-style container builds, and a note on pinning to an immutable digest for reproducible deploys. Short pointer block added to README.md right under the apt/dnf snippet so the container path is visible from the entry page without bloating the install section.
+
+
 current (main branch) -- 28-04-2026
   + Adding Docker Hub as a public mirror for both image variants in ci.yaml. The GHCR copies are blocked from going public by the network-analytics org policy on container packages, so each push to main now also tags + pushes to docker.io/<DOCKERHUB_USERNAME>/{mdt-dialout-collector,mdt-dialout-collector-lib}. Driven by one repo variable + one repo secret: vars.DOCKERHUB_USERNAME (the username — also = namespace in the public image path, so not actually sensitive) and secrets.DOCKERHUB_TOKEN (Docker Hub PAT, Read+Write scope). Push step is split: GHCR push runs unconditionally so the workflow keeps emitting an authoritative copy regardless of Docker Hub state; the Docker Hub mirror step skips itself with a `::warning::` annotation when either input is unset, so missing/rotated credentials degrade to a no-op instead of failing the run. Login + push for Docker Hub live in the same step (secret consumed in one shell). Operators get a public docker pull from docker.io.
 

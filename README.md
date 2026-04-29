@@ -100,7 +100,14 @@ sudo $EDITOR /etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf
 sudo systemctl enable --now mdt-dialout-collector
 ```
 
-Full install matrix and post-install steps: [doc/INSTALL.md](doc/INSTALL.md). On-line reference: `man mdt_dialout_collector` after install.
+Prefer a container? Pull the latest image from Docker Hub:
+
+```SHELL
+docker pull scuzzilla/mdt-dialout-collector:latest        # standalone daemon
+docker pull scuzzilla/mdt-dialout-collector-lib:latest    # library variant (FROM-base for pmtelemetryd builds)
+```
+
+Full install matrix (including the container run/mount recipe) and post-install steps: [doc/INSTALL.md](doc/INSTALL.md). On-line reference: `man mdt_dialout_collector` after install.
 
 ### Building from source
 

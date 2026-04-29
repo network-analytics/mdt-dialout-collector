@@ -61,6 +61,41 @@ sudo dnf install ./mdt-dialout-collector-<version>-1.<distro>.x86_64.rpm
 sudo dnf install ./mdt-dialout-collector-lib-<version>-1.<distro>.x86_64.rpm
 ```
 
+## Container images
+
+Pre-built images are published to Docker Hub on every push to `main` by
+the [`ci.yaml`](../.github/workflows/ci.yaml) workflow. Two variants
+mirror the `.deb`/`.rpm` pair:
+
+```sh
+# Standalone daemon — replaces a system install when you want to run
+# the collector in a container instead of via systemd.
+docker pull scuzzilla/mdt-dialout-collector:latest
+
+# Library variant — files-only image (libgrpc_collector.so + bridge
+# header + pkg-config) intended as a `FROM` base for pmtelemetryd-style
+# container builds.
+docker pull scuzzilla/mdt-dialout-collector-lib:latest
+```
+
+Run the standalone image with your own config mounted in:
+
+```sh
+docker run --rm \
+    -v /path/to/mdt_dialout_collector.conf:/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf:ro \
+    -p 10007:10007 -p 10008:10008 -p 10009:10009 -p 10010:10010 \
+    scuzzilla/mdt-dialout-collector:latest
+```
+
+The image's default `CMD` already points the daemon at
+`/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf`, so the
+bind mount above is the only required setup. Expose only the vendor
+ports your config actually binds.
+
+The `latest` tag rolls forward with `main`; pin to an immutable digest
+(`docker pull scuzzilla/mdt-dialout-collector@sha256:...`) for
+reproducible deployments.
+
 ## After install
 
 Edit the configuration:
