@@ -6,11 +6,36 @@ name: release
 #   * manual dispatch  — same matrix, but artifacts go to the workflow run
 #     only (no Release object created). Useful for testing the pipeline
 #     between proper releases.
+#   * push to main     — regression gate: reduced matrix (one deb + one
+#     rpm distro), build + validate + packaged e2e, artifacts on the run
+#     only. Catches packaging bugs at merge time instead of at tag time.
+#     Path-filtered so doc-only commits skip it (paths are not evaluated
+#     for tag pushes, so releases are unaffected by the filter).
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
+    paths:
+      - 'src/**'
+      - 'proto/**'
+      - 'pkg/**'
+      - 'tests/e2e/**'
+      - 'CMakeLists.txt'
+      - 'configure.ac'
+      - 'Makefile.am'
+      - 'config_m4/**'
+      - 'autogen.sh'
+      - 'VERSION'
+      - 'grpc-collector.pc.in'
+      - '.github/workflows/release.yml'
   workflow_dispatch:
+
+# Superseded main-push runs are cancelled; tag runs never are.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 permissions:
   contents: write   # creates the GitHub Release on tag push.
@@ -24,12 +49,11 @@ jobs:
       image: ${{ matrix.distro.image }}
     strategy:
       fail-fast: false
+      # Full matrix on tag push / manual dispatch; one deb + one rpm distro
+      # on main pushes (the regression gate is distro-independent, SOVER
+      # drift across the full matrix is release-cut territory).
       matrix:
-        distro:
-          - { name: "debian-12 (bookworm)", image: "debian:12" }
-          - { name: "debian-13 (trixie)",   image: "debian:13" }
-          - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04" }
-          - { name: "fedora",               image: "fedora:latest" }
+        distro: ${{ (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch') && fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12"},{"name":"debian-13 (trixie)","image":"debian:13"},{"name":"ubuntu-24.04 (noble)","image":"ubuntu:24.04"},{"name":"fedora","image":"fedora:latest"}]') || fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12"},{"name":"fedora","image":"fedora:latest"}]') }}
 
     steps:
       # actions/checkout needs `git` inside the container; install it
@@ -66,7 +90,8 @@ jobs:
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
               VERSION="${GITHUB_REF_NAME#v}"
           else
-              VERSION="0.0.0-dev+${GITHUB_SHA::7}"
+              # No '-' or '+': rpm forbids them in Version. Dots only.
+              VERSION="$(sed 's/^v//' VERSION 2>/dev/null || echo 0.0.0).dev.${GITHUB_SHA::7}"
           fi
           echo "VERSION=${VERSION}" >> "${GITHUB_ENV}"
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
@@ -109,12 +134,9 @@ jobs:
       image: ${{ matrix.distro.image }}
     strategy:
       fail-fast: false
+      # Mirrors the packages-job matrix reduction on main pushes.
       matrix:
-        distro:
-          - { name: "debian-12 (bookworm)", image: "debian:12",      tag: "bookworm" }
-          - { name: "debian-13 (trixie)",   image: "debian:13",      tag: "trixie"   }
-          - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04",   tag: "noble"    }
-          - { name: "fedora",               image: "fedora:latest",  tag: "fc"       }
+        distro: ${{ (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch') && fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12","tag":"bookworm"},{"name":"debian-13 (trixie)","image":"debian:13","tag":"trixie"},{"name":"ubuntu-24.04 (noble)","image":"ubuntu:24.04","tag":"noble"},{"name":"fedora","image":"fedora:latest","tag":"fc"}]') || fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12","tag":"bookworm"},{"name":"fedora","image":"fedora:latest","tag":"fc"}]') }}
 
     steps:
       - name: bootstrap (rpm distros)
@@ -304,12 +326,9 @@ jobs:
     runs-on: ubuntu-latest    # host runner: needs podman (pre-installed on ubuntu-latest)
     strategy:
       fail-fast: false
+      # Mirrors the packages-job matrix reduction on main pushes.
       matrix:
-        distro:
-          - { name: "debian-12 (bookworm)", tag: "bookworm" }
-          - { name: "debian-13 (trixie)",   tag: "trixie"   }
-          - { name: "ubuntu-24.04 (noble)", tag: "noble"    }
-          - { name: "fedora",               tag: "fc"       }
+        distro: ${{ (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch') && fromJSON('[{"name":"debian-12 (bookworm)","tag":"bookworm"},{"name":"debian-13 (trixie)","tag":"trixie"},{"name":"ubuntu-24.04 (noble)","tag":"noble"},{"name":"fedora","tag":"fc"}]') || fromJSON('[{"name":"debian-12 (bookworm)","tag":"bookworm"},{"name":"fedora","tag":"fc"}]') }}
     steps:
       - uses: actions/checkout@v5
 
