@@ -11,29 +11,43 @@ priority: optional
 maintainer: "Salvatore Cuzzilla <salvatore.cuzzilla@gmail.com>"
 description: |
     Multi-vendor gRPC MDT Dial-out collector — library variant.
-    Provides libgrpc_collector.so + C bridge header + grpc_collector.pc
+    Provides libgrpc_collector.so + C bridge header + grpc-collector.pc
     for embedding into pmacct/pmtelemetryd or other host processes.
 vendor: "Avaloq (an NEC Company)"
 homepage: https://github.com/network-analytics/mdt-dialout-collector
 license: MIT
 
 contents:
-  - src: build-pkg/lib/libgrpc_collector.so
-    dst: /opt/mdt-dialout-collector/lib/libgrpc_collector.so
+  # Real file under its SONAME (what consumers' DT_NEEDED records).
+  - src: build-pkg/lib/libgrpc_collector.so.0
+    dst: /opt/mdt-dialout-collector/lib/libgrpc_collector.so.0
     file_info:
       mode: 0755
+
+  - src: libgrpc_collector.so.0
+    dst: /opt/mdt-dialout-collector/lib/libgrpc_collector.so
+    type: symlink
+
+  # /opt lib dir is outside the default loader path; postinstall runs ldconfig.
+  - src: build-pkg/mdt-dialout-collector-lib.conf
+    dst: /etc/ld.so.conf.d/mdt-dialout-collector-lib.conf
 
   - src: src/bridge/grpc_collector_bridge.h
     dst: /opt/mdt-dialout-collector/include/grpc_collector_bridge/grpc_collector_bridge.h
 
-  - src: build-pkg/grpc_collector.pc
-    dst: /opt/mdt-dialout-collector/lib/pkgconfig/grpc_collector.pc
+  # pkg-config matches by exact filename: pmacct asks for "grpc-collector".
+  - src: build-pkg/grpc-collector.pc
+    dst: /opt/mdt-dialout-collector/lib/pkgconfig/grpc-collector.pc
 
   - src: doc/CONFIG-KEYS
     dst: /usr/share/doc/mdt-dialout-collector-lib/CONFIG-KEYS
 
   - src: doc/Changelog
     dst: /usr/share/doc/mdt-dialout-collector-lib/Changelog
+
+scripts:
+  postinstall: pkg/scripts/lib-postinstall.sh
+  postremove:  pkg/scripts/lib-postremove.sh
 
 overrides:
   deb:

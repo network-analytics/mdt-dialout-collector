@@ -2,8 +2,8 @@
 # Build the standalone binary AND the library variant in one cmake pass.
 # Outputs into:
 #   bin/mdt_dialout_collector       — for nfpm.standalone.yaml
-#   build-pkg/lib/libgrpc_collector.so — for nfpm.library.yaml
-#   build-pkg/grpc_collector.pc     — for nfpm.library.yaml
+#   build-pkg/lib/libgrpc_collector.so.0 — for nfpm.library.yaml
+#   build-pkg/grpc-collector.pc     — for nfpm.library.yaml
 
 set -eu
 
@@ -24,26 +24,29 @@ cmake --build build-pkg -j"$(nproc)"
 ./configure --prefix=/opt/mdt-dialout-collector --quiet >/dev/null
 make -j"$(nproc)" >/dev/null
 mkdir -p build-pkg/lib
-# libtool-staged .so lives under src/.libs/
-cp -L src/.libs/libgrpc_collector.so build-pkg/lib/libgrpc_collector.so
+# libtool-staged .so lives under src/.libs/; ship it under its SONAME.
+cp -L src/.libs/libgrpc_collector.so build-pkg/lib/libgrpc_collector.so.0
 
-# Generate the .pc file from the .pc.in template.
-VERSION_STR="$(cat VERSION 2>/dev/null || echo 0.0.0)"
+# Render the .pc; the filename must match pmacct's module name "grpc-collector".
+VERSION_STR="$(sed 's/^v//' VERSION 2>/dev/null || echo 0.0.0)"
 sed -e "s|@prefix@|/opt/mdt-dialout-collector|g" \
     -e "s|@exec_prefix@|/opt/mdt-dialout-collector|g" \
     -e "s|@libdir@|/opt/mdt-dialout-collector/lib|g" \
     -e "s|@includedir@|/opt/mdt-dialout-collector/include|g" \
-    -e "s|@PACKAGE_VERSION@|${VERSION_STR}|g" \
-    grpc-collector.pc.in > build-pkg/grpc_collector.pc
+    -e "s|@VERSION@|${VERSION_STR}|g" \
+    grpc-collector.pc.in > build-pkg/grpc-collector.pc
+
+# Loader config shipped by the lib package (/opt lib dir needs registering).
+echo /opt/mdt-dialout-collector/lib > build-pkg/mdt-dialout-collector-lib.conf
 
 # Strip symbols (smaller package payload).
 strip --strip-unneeded bin/mdt_dialout_collector       || true
-strip --strip-unneeded build-pkg/lib/libgrpc_collector.so || true
+strip --strip-unneeded build-pkg/lib/libgrpc_collector.so.0 || true
 
 # Compress the man page (Debian/Fedora policy: gzipped under section dir).
 mkdir -p build-pkg/man
 gzip -9 -n -c pkg/man/mdt_dialout_collector.1 > build-pkg/man/mdt_dialout_collector.1.gz
 
 echo "build OK:"
-ls -lh bin/mdt_dialout_collector build-pkg/lib/libgrpc_collector.so \
-       build-pkg/man/mdt_dialout_collector.1.gz
+ls -lh bin/mdt_dialout_collector build-pkg/lib/libgrpc_collector.so.0 \
+       build-pkg/grpc-collector.pc build-pkg/man/mdt_dialout_collector.1.gz

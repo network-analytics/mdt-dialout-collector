@@ -49,8 +49,10 @@ sudo dnf install ./mdt-dialout-collector-lib-<version>-1.fc<release>.x86_64.rpm
 The library variant ships:
 
 ```SHELL
+/opt/mdt-dialout-collector/lib/libgrpc_collector.so.0
 /opt/mdt-dialout-collector/lib/libgrpc_collector.so
-/opt/mdt-dialout-collector/lib/pkgconfig/grpc_collector.pc
+/opt/mdt-dialout-collector/lib/pkgconfig/grpc-collector.pc
+/etc/ld.so.conf.d/mdt-dialout-collector-lib.conf
 /opt/mdt-dialout-collector/include/grpc_collector_bridge/grpc_collector_bridge.h
 ```
 
