@@ -236,12 +236,21 @@ sleep 1
 echo
 echo "=== consume from kafka and assert per-vendor canaries present ==="
 expected=$(( ${#VENDORS[@]} * COUNT ))
-# --num bounds the wait: rpk returns early once it has $expected messages.
-# 30s is generous: covers librdkafka batching delays under load (linger.ms
-# defaults are larger in 2.x) without hanging forever if the daemon stalls.
-out="$(podman exec mdt-e2e-broker bash -c \
-    "timeout 30 rpk topic consume ${TOPIC} --num ${expected} --offset start --format '%v\n' 2>/dev/null" \
-    || true)"
+# Consume the WHOLE topic (-o :end), not a fixed --num: pmtelemetryd mixes
+# per-peer log_init/log_close records into the msglog topic, so a fixed
+# count truncates before the last vendor's canaries. Poll until every
+# canary landed or the 30s budget is spent (covers kafka batching delays).
+out=""
+consume_deadline=$(( SECONDS + 30 ))
+while :; do
+    out="$(podman exec mdt-e2e-broker bash -c \
+        "rpk topic consume ${TOPIC} -o :end --format '%v\n' 2>/dev/null" \
+        || true)"
+    canaries_seen="$(grep -c -- 'e2e-canary-' <<<"${out}" || true)"
+    [ "${canaries_seen}" -ge "${expected}" ] && break
+    [ "${SECONDS}" -ge "${consume_deadline}" ] && break
+    sleep 2
+done
 echo "${out}"
 
 echo

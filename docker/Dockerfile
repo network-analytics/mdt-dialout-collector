@@ -54,7 +54,7 @@ RUN mkdir -p /out/lib/pkgconfig \
            -e "s|@libdir@|/opt/mdt-dialout-collector/lib|g" \
            -e "s|@includedir@|/opt/mdt-dialout-collector/include|g" \
            -e "s|@VERSION@|${VER}|g" \
-           grpc-collector.pc.in > /out/lib/pkgconfig/grpc_collector.pc
+           grpc-collector.pc.in > /out/lib/pkgconfig/grpc-collector.pc
 
 # --- common runtime base (Debian 12 SOVER pinned via BASE arg) ------------
 FROM ${BASE} AS runtime-base
@@ -79,10 +79,14 @@ CMD ["-f", "/etc/opt/mdt-dialout-collector/mdt_dialout_collector.conf"]
 # as a FROM base for pmtelemetryd-style container builds. The default CMD
 # prints the layout so `docker run` is at least informative.
 FROM runtime-base AS library
+# Real file under its SONAME + dev symlink, registered with the loader.
 COPY --from=build-library /src/src/.libs/libgrpc_collector.so \
-     /opt/mdt-dialout-collector/lib/libgrpc_collector.so
+     /opt/mdt-dialout-collector/lib/libgrpc_collector.so.0
 COPY --from=build-library /src/src/bridge/grpc_collector_bridge.h \
      /opt/mdt-dialout-collector/include/grpc_collector_bridge/grpc_collector_bridge.h
-COPY --from=build-library /out/lib/pkgconfig/grpc_collector.pc \
-     /opt/mdt-dialout-collector/lib/pkgconfig/grpc_collector.pc
+COPY --from=build-library /out/lib/pkgconfig/grpc-collector.pc \
+     /opt/mdt-dialout-collector/lib/pkgconfig/grpc-collector.pc
+RUN ln -s libgrpc_collector.so.0 /opt/mdt-dialout-collector/lib/libgrpc_collector.so \
+    && echo /opt/mdt-dialout-collector/lib > /etc/ld.so.conf.d/mdt-dialout-collector-lib.conf \
+    && ldconfig
 CMD ["sh", "-c", "echo 'mdt-dialout-collector-lib — layout:'; ls -laR /opt/mdt-dialout-collector"]
