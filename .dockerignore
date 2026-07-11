@@ -63,6 +63,5 @@ compile_commands.json
 *.swp
 *~
 
-# packaging / e2e staging
+# packaging staging (NOT tests/e2e/.pkg-stage/ — Containerfile.pkg COPYs from it)
 dist/
-tests/e2e/.pkg-stage/
