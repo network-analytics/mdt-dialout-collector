@@ -54,14 +54,19 @@ jobs:
       - name: Push images to GHCR
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[A-Z]' '[a-z]')
-          # Tag = "latest" on main pushes; release tags mirror the git tag.
+          # main push → :latest; release tag → :vX.Y.Z AND :latest, so a
+          # release always (re)establishes the tag the README tells users
+          # to pull.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [ "$VERSION" = "main" ] && VERSION=latest
+          TAGS="${VERSION} latest"
+          [ "$VERSION" = "main" ] && TAGS="latest"
           for variant in "$IMAGE_NAME" "$IMAGE_NAME-lib"; do
               IMAGE_ID="ghcr.io/${OWNER}/${variant}"
-              echo "pushing ${IMAGE_ID}:${VERSION}"
-              docker tag "${variant}" "${IMAGE_ID}:${VERSION}"
-              docker push "${IMAGE_ID}:${VERSION}"
+              for tag in ${TAGS}; do
+                  echo "pushing ${IMAGE_ID}:${tag}"
+                  docker tag "${variant}" "${IMAGE_ID}:${tag}"
+                  docker push "${IMAGE_ID}:${tag}"
+              done
           done
 
       # Docker Hub mirror — GHCR copies stay private (org policy disallows public
@@ -80,10 +85,13 @@ jobs:
           fi
           echo "${DH_TOKEN}" | docker login docker.io -u "${DH_USER}" --password-stdin
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [ "$VERSION" = "main" ] && VERSION=latest
+          TAGS="${VERSION} latest"
+          [ "$VERSION" = "main" ] && TAGS="latest"
           for variant in "$IMAGE_NAME" "$IMAGE_NAME-lib"; do
               IMAGE_ID="docker.io/${DH_USER}/${variant}"
-              echo "pushing ${IMAGE_ID}:${VERSION}"
-              docker tag "${variant}" "${IMAGE_ID}:${VERSION}"
-              docker push "${IMAGE_ID}:${VERSION}"
+              for tag in ${TAGS}; do
+                  echo "pushing ${IMAGE_ID}:${tag}"
+                  docker tag "${variant}" "${IMAGE_ID}:${tag}"
+                  docker push "${IMAGE_ID}:${tag}"
+              done
           done
