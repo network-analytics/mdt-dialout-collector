@@ -37,7 +37,7 @@ extend google.protobuf.FileOptions {
 
 // gNMI_service is the current version of the gNMI service, returned through
 // the Capabilities RPC.
-option (gnmi_service) = "0.8.0";
+option (gnmi_service) = "0.7.0";
 
 service gNMI {
   // Capabilities allows the client to retrieve the set of capabilities that
