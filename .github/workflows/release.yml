@@ -6,11 +6,11 @@ name: release
 #   * manual dispatch  — same matrix, but artifacts go to the workflow run
 #     only (no Release object created). Useful for testing the pipeline
 #     between proper releases.
-#   * push to main     — regression gate: reduced matrix (one deb + one
-#     rpm distro), build + validate + packaged e2e, artifacts on the run
-#     only. Catches packaging bugs at merge time instead of at tag time.
-#     Path-filtered so doc-only commits skip it (paths are not evaluated
-#     for tag pushes, so releases are unaffected by the filter).
+#   * push to main     — regression gate: full matrix, build + validate +
+#     packaged e2e, artifacts on the run only. Catches packaging bugs at
+#     merge time instead of at tag time, and yields current-main packages
+#     for every distro. Path-filtered so doc-only commits skip it (paths
+#     are not evaluated for tag pushes, so releases are unaffected).
 on:
   push:
     branches:
@@ -50,11 +50,12 @@ jobs:
       image: ${{ matrix.distro.image }}
     strategy:
       fail-fast: false
-      # Full matrix on tag push / manual dispatch; one deb + one rpm distro
-      # on main pushes (the regression gate is distro-independent, SOVER
-      # drift across the full matrix is release-cut territory).
       matrix:
-        distro: ${{ (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch') && fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12"},{"name":"debian-13 (trixie)","image":"debian:13"},{"name":"ubuntu-24.04 (noble)","image":"ubuntu:24.04"},{"name":"fedora","image":"fedora:latest"}]') || fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12"},{"name":"fedora","image":"fedora:latest"}]') }}
+        distro:
+          - { name: "debian-12 (bookworm)", image: "debian:12" }
+          - { name: "debian-13 (trixie)",   image: "debian:13" }
+          - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04" }
+          - { name: "fedora",               image: "fedora:latest" }
 
     steps:
       # actions/checkout needs `git` inside the container; install it
@@ -138,9 +139,12 @@ jobs:
       image: ${{ matrix.distro.image }}
     strategy:
       fail-fast: false
-      # Mirrors the packages-job matrix reduction on main pushes.
       matrix:
-        distro: ${{ (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch') && fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12","tag":"bookworm"},{"name":"debian-13 (trixie)","image":"debian:13","tag":"trixie"},{"name":"ubuntu-24.04 (noble)","image":"ubuntu:24.04","tag":"noble"},{"name":"fedora","image":"fedora:latest","tag":"fc"}]') || fromJSON('[{"name":"debian-12 (bookworm)","image":"debian:12","tag":"bookworm"},{"name":"fedora","image":"fedora:latest","tag":"fc"}]') }}
+        distro:
+          - { name: "debian-12 (bookworm)", image: "debian:12",      tag: "bookworm" }
+          - { name: "debian-13 (trixie)",   image: "debian:13",      tag: "trixie"   }
+          - { name: "ubuntu-24.04 (noble)", image: "ubuntu:24.04",   tag: "noble"    }
+          - { name: "fedora",               image: "fedora:latest",  tag: "fc"       }
 
     steps:
       - name: bootstrap (rpm distros)
@@ -330,11 +334,29 @@ jobs:
     runs-on: ubuntu-latest    # host runner: needs podman (pre-installed on ubuntu-latest)
     strategy:
       fail-fast: false
-      # Mirrors the packages-job matrix reduction on main pushes.
       matrix:
-        distro: ${{ (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch') && fromJSON('[{"name":"debian-12 (bookworm)","tag":"bookworm"},{"name":"debian-13 (trixie)","tag":"trixie"},{"name":"ubuntu-24.04 (noble)","tag":"noble"},{"name":"fedora","tag":"fc"}]') || fromJSON('[{"name":"debian-12 (bookworm)","tag":"bookworm"},{"name":"fedora","tag":"fc"}]') }}
+        distro:
+          - { name: "debian-12 (bookworm)", tag: "bookworm" }
+          - { name: "debian-13 (trixie)",   tag: "trixie"   }
+          - { name: "ubuntu-24.04 (noble)", tag: "noble"    }
+          - { name: "fedora",               tag: "fc"       }
     steps:
       - uses: actions/checkout@v5
+
+      # GitHub runners share NAT egress IPs whose anonymous Docker Hub pull
+      # quota is chronically exhausted — every e2e image (debian bases +
+      # redpanda) comes from docker.io, so pull authenticated when the
+      # ci.yaml mirror credentials are present; degrade to anonymous if not.
+      - name: podman login docker.io (avoid anonymous pull rate limit)
+        env:
+          DH_USER: ${{ vars.DOCKERHUB_USERNAME }}
+          DH_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -z "${DH_USER}" ] || [ -z "${DH_TOKEN}" ]; then
+              echo "::warning::vars.DOCKERHUB_USERNAME or secrets.DOCKERHUB_TOKEN unset — anonymous pulls (rate-limit risk)"
+              exit 0
+          fi
+          echo "${DH_TOKEN}" | podman login docker.io -u "${DH_USER}" --password-stdin
 
       - uses: actions/download-artifact@v7
         with:

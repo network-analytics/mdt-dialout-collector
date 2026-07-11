@@ -163,7 +163,7 @@ echo
 echo "=== broker (redpanda) ==="
 podman run -d --rm --name mdt-e2e-broker \
     --network "${NETWORK}" --network-alias broker \
-    docker.redpanda.com/redpandadata/redpanda:v24.2.7 \
+    docker.io/redpandadata/redpanda:v24.2.7 \
     redpanda start --overprovisioned --smp 1 --memory 512M \
         --reserve-memory 0M --node-id 0 --check=false \
         --kafka-addr PLAINTEXT://0.0.0.0:9092 \
