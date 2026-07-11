@@ -1,7 +1,7 @@
 name: ci
 
-# Build + push two image variants on every push to main, mirrored to GHCR
-# and Docker Hub:
+# Build + push two image variants on every push to main (tag :latest) and
+# every release tag (tag :vX.Y.Z), mirrored to GHCR and Docker Hub:
 #   ghcr.io/<owner>/mdt-dialout-collector            — standalone daemon
 #   ghcr.io/<owner>/mdt-dialout-collector-lib        — library (.so + header + .pc)
 #   docker.io/<dh-user>/mdt-dialout-collector        — same, public mirror
@@ -14,6 +14,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 env:
   IMAGE_NAME: mdt-dialout-collector
@@ -52,8 +54,7 @@ jobs:
       - name: Push images to GHCR
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[A-Z]' '[a-z]')
-          # Tag = "latest" on main pushes; for tag pushes (currently disabled
-          # via the `on:` filter) it would mirror the git tag.
+          # Tag = "latest" on main pushes; release tags mirror the git tag.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           [ "$VERSION" = "main" ] && VERSION=latest
           for variant in "$IMAGE_NAME" "$IMAGE_NAME-lib"; do
