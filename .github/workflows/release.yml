@@ -29,6 +29,7 @@ on:
       - 'autogen.sh'
       - 'VERSION'
       - 'grpc-collector.pc.in'
+      - '.dockerignore'
       - '.github/workflows/release.yml'
   workflow_dispatch:
 
