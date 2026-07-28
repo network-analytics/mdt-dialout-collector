@@ -1,5 +1,12 @@
 syntax = "proto3";
 
+enum StreamType {
+    INITIAL_SYNC = 0;
+    ONCHANGE = 1;
+    PERIODIC = 2;
+}
+
+
 // Present as first gNMI update in all packets
 message GnmiJuniperTelemetryHeaderExtension {
     // router name:export IP address
@@ -30,15 +37,22 @@ message GnmiJuniperTelemetryHeaderExtension {
     // Stream creation timestamp in milliseconds
     int64 stream_creation_timestamp                         = 10;
 
-    // Event timestamp in milliseconds
-    int64 event_timestamp				                    = 11;
+    // [Deprecated] Event timestamp in milliseconds
+    int64 event_timestamp				    = 11 [deprecated=true];
 
     // Export timestamp in milliseconds
-    int64 export_timestamp				                    = 12;
+    int64 export_timestamp				    = 12;
 
     // Subsequence number
     uint64 sub_sequence_number                              = 13;
 
     // End of marker
     bool eom                                                = 14;
+
+    // Event publish timestamp in milliseconds
+    int64 event_publish_timestamp                           = 15;
+
+    // Stream type of packet
+    StreamType stream_id                                    = 16;
+
 }

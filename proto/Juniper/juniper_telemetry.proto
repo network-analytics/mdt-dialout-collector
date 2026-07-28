@@ -41,6 +41,9 @@ message TelemetryFieldOptions {
     optional bool is_timestamp       = 2;
     optional bool is_counter         = 3;
     optional bool is_gauge           = 4;
+    optional bool is_instance        = 5;
+    optional bool is_gauge_min       = 6;
+    optional bool is_gauge_max       = 7;
 }
  
 message TelemetryStream {
@@ -71,6 +74,9 @@ message TelemetryStream {
 
     // minor version
     optional uint32 version_minor    = 8;
+
+    // end-of-message marker, set to true when the end of wrap is reached
+    optional bool eom                = 9;
 
     optional IETFSensors ietf        = 100;
 
