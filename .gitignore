@@ -37,6 +37,10 @@
 # SWP
 *.swp
 
+# Local contributor and macOS metadata
+AGENTS.md
+.DS_Store
+
 # BUILD
 build/*
 
